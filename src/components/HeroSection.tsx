@@ -72,34 +72,40 @@ const HeroSection = ({ onSearch }: HeroSectionProps) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 animate-fade-in-up" style={{animationDelay: '0.6s'}}>
-          <div className="glass-effect rounded-2xl p-8 hover-lift">
-            <div className="flex items-center justify-center mb-4">
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-                <span className="text-3xl font-bold">1K+</span>
-              </div>
+          <div className="glass-effect rounded-2xl p-6 hover-lift overflow-hidden">
+            <div className="aspect-square mb-4 rounded-xl overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=400&h=400&fit=crop&crop=center"
+                alt="Serviço de Chaveiro"
+                className="w-full h-full object-cover"
+              />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Prestadores Ativos</h3>
-            <p className="opacity-80">Profissionais qualificados e verificados</p>
+            <h3 className="text-xl font-semibold mb-2 text-white">Chaveiro</h3>
+            <p className="opacity-80 text-white">Abertura de portas e duplicação de chaves</p>
           </div>
           
-          <div className="glass-effect rounded-2xl p-8 hover-lift" style={{animationDelay: '0.1s'}}>
-            <div className="flex items-center justify-center mb-4">
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-                <span className="text-3xl font-bold">50+</span>
-              </div>
+          <div className="glass-effect rounded-2xl p-6 hover-lift overflow-hidden" style={{animationDelay: '0.1s'}}>
+            <div className="aspect-square mb-4 rounded-xl overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=400&h=400&fit=crop&crop=center"
+                alt="Serviço de Cabeleireira"
+                className="w-full h-full object-cover"
+              />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Tipos de Serviços</h3>
-            <p className="opacity-80">Categorias diversas para todas as necessidades</p>
+            <h3 className="text-xl font-semibold mb-2 text-white">Cabeleireira</h3>
+            <p className="opacity-80 text-white">Cortes, coloração e tratamentos capilares</p>
           </div>
           
-          <div className="glass-effect rounded-2xl p-8 hover-lift" style={{animationDelay: '0.2s'}}>
-            <div className="flex items-center justify-center mb-4">
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-                <Star className="h-8 w-8" />
-              </div>
+          <div className="glass-effect rounded-2xl p-6 hover-lift overflow-hidden" style={{animationDelay: '0.2s'}}>
+            <div className="aspect-square mb-4 rounded-xl overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=400&fit=crop&crop=center"
+                alt="Serviço de Eletricista"
+                className="w-full h-full object-cover"
+              />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Avaliação 4.8</h3>
-            <p className="opacity-80">Satisfação garantida pelos nossos usuários</p>
+            <h3 className="text-xl font-semibold mb-2 text-white">Eletricista</h3>
+            <p className="opacity-80 text-white">Instalações e reparos elétricos residenciais</p>
           </div>
         </div>
       </div>
