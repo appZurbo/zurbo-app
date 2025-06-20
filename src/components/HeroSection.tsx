@@ -66,8 +66,8 @@ const HeroSection = ({
             <div className="aspect-square mb-4 rounded-xl overflow-hidden">
               <img alt="Serviço de Chaveiro" className="w-full h-full object-cover" src="/lovable-uploads/64d7aaaf-9336-4676-b67a-56bc33735766.jpg" />
             </div>
-            <h3 className="text-xl font-semibold mb-2 text-white">Chaveiro</h3>
-            <p className="opacity-80 text-white">Abertura de portas e duplicação de chaves</p>
+            <h3 className="text-xl mb-2 text-zinc-950 font-normal">Chaveiro</h3>
+            <p className="opacity-80 text-zinc-900">Instalações e reparos elétricos residenciais</p>
           </div>
           
           <div className="glass-effect rounded-2xl p-6 hover-lift overflow-hidden" style={{
@@ -76,8 +76,8 @@ const HeroSection = ({
             <div className="aspect-square mb-4 rounded-xl overflow-hidden">
               <img alt="Serviço de Cabeleireira" className="w-full h-full object-cover" src="/lovable-uploads/5f1e1fa9-b5f9-42cc-8574-dc3ca6dbe0f4.jpg" />
             </div>
-            <h3 className="text-xl font-semibold mb-2 text-white">Cabeleireira</h3>
-            <p className="opacity-80 text-white">Cortes, coloração e tratamentos capilares</p>
+            <h3 className="text-xl mb-2 text-zinc-950 font-normal">Cabeleireiros</h3>
+            <p className="opacity-80 text-zinc-900">Cortes, coloração e tratamentos capilares</p>
           </div>
           
           <div className="glass-effect rounded-2xl p-6 hover-lift overflow-hidden" style={{
@@ -86,8 +86,8 @@ const HeroSection = ({
             <div className="aspect-square mb-4 rounded-xl overflow-hidden">
               <img alt="Serviço de Eletricista" src="/lovable-uploads/23923192-d3bc-4751-82d3-665cae0d614f.jpg" className="w-full h-full object-cover" />
             </div>
-            <h3 className="text-xl font-semibold mb-2 text-white">Eletricista</h3>
-            <p className="opacity-80 text-white">Instalações e reparos elétricos residenciais</p>
+            <h3 className="text-xl mb-2 text-zinc-950 font-normal">Chaveiro</h3>
+            <p className="opacity-80 text-zinc-900">Abertura de portas e duplicação de chaves</p>
           </div>
         </div>
       </div>

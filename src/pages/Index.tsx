@@ -7,7 +7,6 @@ import AuthModal from '@/components/AuthModal';
 import ChatModal from '@/components/ChatModal';
 import ScheduleModal from '@/components/ScheduleModal';
 import { useToast } from '@/hooks/use-toast';
-
 const Index = () => {
   const [user, setUser] = useState(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -17,52 +16,46 @@ const Index = () => {
   const [showChat, setShowChat] = useState(false);
   const [showSchedule, setShowSchedule] = useState(false);
   const [selectedPrestador, setSelectedPrestador] = useState(null);
-  
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const handleLogin = (userData: any) => {
     setUser(userData);
     toast({
       title: "Login realizado com sucesso!",
-      description: `Bem-vindo(a), ${userData.name}!`,
+      description: `Bem-vindo(a), ${userData.name}!`
     });
   };
-
   const handleLogout = () => {
     setUser(null);
     setSelectedCategory('');
     setShowSearch(false);
     toast({
       title: "Logout realizado",
-      description: "Até logo!",
+      description: "Até logo!"
     });
   };
-
   const handleBecomePrestador = () => {
     setAuthTab('register-prestador');
     setShowAuthModal(true);
   };
-
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
     setShowSearch(true);
   };
-
   const handleSearch = (query: string) => {
     setShowSearch(true);
     toast({
       title: "Buscando prestadores...",
-      description: "Encontrando os melhores profissionais para você!",
+      description: "Encontrando os melhores profissionais para você!"
     });
   };
-
   const handleViewProfile = (prestadorId: string) => {
     toast({
       title: "Abrindo perfil",
-      description: "Carregando informações do prestador...",
+      description: "Carregando informações do prestador..."
     });
   };
-
   const handleSchedule = (prestadorId: string) => {
     const prestador = {
       id: prestadorId,
@@ -73,7 +66,6 @@ const Index = () => {
     setSelectedPrestador(prestador);
     setShowSchedule(true);
   };
-
   const handleChat = (prestadorId: string) => {
     const prestador = {
       id: prestadorId,
@@ -84,48 +76,36 @@ const Index = () => {
     setSelectedPrestador(prestador);
     setShowChat(true);
   };
-
   const handleConfirmSchedule = (scheduleData: any) => {
     toast({
       title: "Agendamento solicitado!",
-      description: "O prestador será notificado e você receberá uma confirmação em breve.",
+      description: "O prestador será notificado e você receberá uma confirmação em breve."
     });
   };
 
   // Add scroll animation effect
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, {
+      threshold: 0.1
+    });
     const animatedElements = document.querySelectorAll('.animate-on-scroll');
-    animatedElements.forEach((el) => observer.observe(el));
-
+    animatedElements.forEach(el => observer.observe(el));
     return () => observer.disconnect();
   }, [showSearch]);
-
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <Header 
-        user={user}
-        onLogin={() => setShowAuthModal(true)}
-        onLogout={handleLogout}
-        onBecomePrestador={handleBecomePrestador}
-      />
+  return <div className="min-h-screen bg-gray-50">
+      <Header user={user} onLogin={() => setShowAuthModal(true)} onLogout={handleLogout} onBecomePrestador={handleBecomePrestador} />
       
-      {!showSearch ? (
-        <>
+      {!showSearch ? <>
           <HeroSection onSearch={handleSearch} />
           <ServiceCategories onCategorySelect={handleCategorySelect} />
           
-          <section className="py-20 bg-white">
+          <section className="bg-white py-[22px]">
             <div className="max-w-6xl mx-auto px-4 text-center">
               <div className="animate-on-scroll mb-16">
                 <h2 className="text-4xl font-bold mb-6 text-gray-900">
@@ -137,7 +117,9 @@ const Index = () => {
               </div>
               
               <div className="grid md:grid-cols-3 gap-12">
-                <div className="animate-on-scroll hover-lift" style={{animationDelay: '0.1s'}}>
+                <div className="animate-on-scroll hover-lift" style={{
+              animationDelay: '0.1s'
+            }}>
                   <div className="w-20 h-20 mx-auto mb-6 orange-gradient rounded-full flex items-center justify-center shadow-lg">
                     <span className="text-3xl font-bold text-white">1</span>
                   </div>
@@ -147,7 +129,9 @@ const Index = () => {
                   </p>
                 </div>
                 
-                <div className="animate-on-scroll hover-lift" style={{animationDelay: '0.2s'}}>
+                <div className="animate-on-scroll hover-lift" style={{
+              animationDelay: '0.2s'
+            }}>
                   <div className="w-20 h-20 mx-auto mb-6 orange-gradient rounded-full flex items-center justify-center shadow-lg">
                     <span className="text-3xl font-bold text-white">2</span>
                   </div>
@@ -157,7 +141,9 @@ const Index = () => {
                   </p>
                 </div>
                 
-                <div className="animate-on-scroll hover-lift" style={{animationDelay: '0.3s'}}>
+                <div className="animate-on-scroll hover-lift" style={{
+              animationDelay: '0.3s'
+            }}>
                   <div className="w-20 h-20 mx-auto mb-6 orange-gradient rounded-full flex items-center justify-center shadow-lg">
                     <span className="text-3xl font-bold text-white">3</span>
                   </div>
@@ -169,41 +155,17 @@ const Index = () => {
               </div>
             </div>
           </section>
-        </>
-      ) : (
-        <PrestadorList
-          category={selectedCategory}
-          onViewProfile={handleViewProfile}
-          onSchedule={handleSchedule}
-          onChat={handleChat}
-        />
-      )}
+        </> : <PrestadorList category={selectedCategory} onViewProfile={handleViewProfile} onSchedule={handleSchedule} onChat={handleChat} />}
 
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        onLogin={handleLogin}
-        defaultTab={authTab}
-      />
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} onLogin={handleLogin} defaultTab={authTab} />
 
-      {selectedPrestador && (
-        <>
-          <ChatModal
-            isOpen={showChat}
-            onClose={() => setShowChat(false)}
-            prestador={selectedPrestador}
-          />
+      {selectedPrestador && <>
+          <ChatModal isOpen={showChat} onClose={() => setShowChat(false)} prestador={selectedPrestador} />
           
-          <ScheduleModal
-            isOpen={showSchedule}
-            onClose={() => setShowSchedule(false)}
-            prestador={selectedPrestador}
-            onSchedule={handleConfirmSchedule}
-          />
-        </>
-      )}
+          <ScheduleModal isOpen={showSchedule} onClose={() => setShowSchedule(false)} prestador={selectedPrestador} onSchedule={handleConfirmSchedule} />
+        </>}
 
-      <footer className="bg-gray-900 text-white py-16">
+      <footer className="text-white py-16 bg-gray-800">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="animate-on-scroll">
@@ -213,23 +175,27 @@ const Index = () => {
                 </div>
                 <h3 className="text-2xl font-bold text-gradient">ZURBO</h3>
               </div>
-              <p className="text-gray-300 leading-relaxed">
+              <p className="leading-relaxed text-zinc-50">
                 Conectando você aos melhores prestadores de serviços da sua região com segurança e praticidade.
               </p>
             </div>
             
-            <div className="animate-on-scroll" style={{animationDelay: '0.1s'}}>
-              <h4 className="font-semibold mb-6 text-lg">Para Clientes</h4>
-              <ul className="space-y-3 text-gray-300">
+            <div className="animate-on-scroll" style={{
+            animationDelay: '0.1s'
+          }}>
+              <h4 className="font-semibold mb-6 text-lg text-zinc-50">Para Clientes</h4>
+              <ul className="space-y-3 text-gray-300 bg-transparent">
                 <li className="hover:text-orange-400 cursor-pointer transition-colors">Como funciona</li>
                 <li className="hover:text-orange-400 cursor-pointer transition-colors">Categorias</li>
-                <li className="hover:text-orange-400 cursor-pointer transition-colors">Avaliações</li>
+                <li className="hover:text-orange-400 cursor-pointer transition-colors bg-transparent">Avaliações</li>
                 <li className="hover:text-orange-400 cursor-pointer transition-colors">Suporte</li>
               </ul>
             </div>
             
-            <div className="animate-on-scroll" style={{animationDelay: '0.2s'}}>
-              <h4 className="font-semibold mb-6 text-lg">Para Prestadores</h4>
+            <div className="animate-on-scroll" style={{
+            animationDelay: '0.2s'
+          }}>
+              <h4 className="font-semibold mb-6 text-lg text-zinc-50">Para Prestadores</h4>
               <ul className="space-y-3 text-gray-300">
                 <li className="hover:text-orange-400 cursor-pointer transition-colors">Cadastre-se</li>
                 <li className="hover:text-orange-400 cursor-pointer transition-colors">Central do Prestador</li>
@@ -238,8 +204,10 @@ const Index = () => {
               </ul>
             </div>
             
-            <div className="animate-on-scroll" style={{animationDelay: '0.3s'}}>
-              <h4 className="font-semibold mb-6 text-lg">Contato</h4>
+            <div className="animate-on-scroll" style={{
+            animationDelay: '0.3s'
+          }}>
+              <h4 className="font-semibold mb-6 text-lg text-zinc-50">Contato</h4>
               <ul className="space-y-3 text-gray-300">
                 <li className="hover:text-orange-400 cursor-pointer transition-colors">suporte@zurbo.com</li>
                 <li className="hover:text-orange-400 cursor-pointer transition-colors">(11) 99999-9999</li>
@@ -250,12 +218,10 @@ const Index = () => {
           </div>
           
           <div className="border-t border-gray-700 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 ZURBO. Todos os direitos reservados.</p>
+            <p className="font-normal text-gray-100"> ZURBO® Todos os direitos reservados.</p>
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
