@@ -84,7 +84,7 @@ const HeroSection = ({
           animationDelay: '0.2s'
         }}>
             <div className="aspect-square mb-4 rounded-xl overflow-hidden">
-              <img alt="Serviço de Eletricista" src="/lovable-uploads/324802ef-8854-41f3-ab47-ed00e0f52df9.png" className="w-full h-full object-fill" />
+              <img alt="Serviço de Eletricista" src="/lovable-uploads/23923192-d3bc-4751-82d3-665cae0d614f.jpg" className="w-full h-full object-cover" />
             </div>
             <h3 className="text-xl font-semibold mb-2 text-white">Eletricista</h3>
             <p className="opacity-80 text-white">Instalações e reparos elétricos residenciais</p>
