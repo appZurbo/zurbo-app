@@ -12,18 +12,19 @@ import {
   Baby
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { useEffect, useRef } from 'react';
 
 const categories = [
-  { id: 'limpeza', name: 'Limpeza', icon: Brush, color: 'bg-blue-100 text-blue-600' },
-  { id: 'reparos', name: 'Reparos', icon: Wrench, color: 'bg-orange-100 text-orange-600' },
-  { id: 'eletrica', name: 'Elétrica', icon: Zap, color: 'bg-yellow-100 text-yellow-600' },
-  { id: 'beleza', name: 'Beleza', icon: Scissors, color: 'bg-pink-100 text-pink-600' },
-  { id: 'marido-aluguel', name: 'Marido de Aluguel', icon: Hammer, color: 'bg-green-100 text-green-600' },
-  { id: 'jardinagem', name: 'Jardinagem', icon: TreePine, color: 'bg-emerald-100 text-emerald-600' },
-  { id: 'automotivo', name: 'Automotivo', icon: Car, color: 'bg-red-100 text-red-600' },
-  { id: 'domestico', name: 'Doméstico', icon: Home, color: 'bg-purple-100 text-purple-600' },
-  { id: 'tecnologia', name: 'Tecnologia', icon: Laptop, color: 'bg-indigo-100 text-indigo-600' },
-  { id: 'cuidados', name: 'Cuidados', icon: Baby, color: 'bg-teal-100 text-teal-600' },
+  { id: 'limpeza', name: 'Limpeza', icon: Brush, color: 'bg-blue-50 border-blue-200 hover:bg-blue-100' },
+  { id: 'reparos', name: 'Reparos', icon: Wrench, color: 'bg-orange-50 border-orange-200 hover:bg-orange-100' },
+  { id: 'eletrica', name: 'Elétrica', icon: Zap, color: 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100' },
+  { id: 'beleza', name: 'Beleza', icon: Scissors, color: 'bg-pink-50 border-pink-200 hover:bg-pink-100' },
+  { id: 'marido-aluguel', name: 'Marido de Aluguel', icon: Hammer, color: 'bg-green-50 border-green-200 hover:bg-green-100' },
+  { id: 'jardinagem', name: 'Jardinagem', icon: TreePine, color: 'bg-emerald-50 border-emerald-200 hover:bg-emerald-100' },
+  { id: 'automotivo', name: 'Automotivo', icon: Car, color: 'bg-red-50 border-red-200 hover:bg-red-100' },
+  { id: 'domestico', name: 'Doméstico', icon: Home, color: 'bg-purple-50 border-purple-200 hover:bg-purple-100' },
+  { id: 'tecnologia', name: 'Tecnologia', icon: Laptop, color: 'bg-indigo-50 border-indigo-200 hover:bg-indigo-100' },
+  { id: 'cuidados', name: 'Cuidados', icon: Baby, color: 'bg-teal-50 border-teal-200 hover:bg-teal-100' },
 ];
 
 interface ServiceCategoriesProps {
@@ -31,29 +32,60 @@ interface ServiceCategoriesProps {
 }
 
 const ServiceCategories = ({ onCategorySelect }: ServiceCategoriesProps) => {
+  const categoriesRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const cards = categoriesRef.current?.querySelectorAll('.animate-on-scroll');
+    cards?.forEach((card) => observer.observe(card));
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="py-8">
-      <h2 className="text-2xl font-bold text-center mb-8">Categorias de Serviços</h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-6xl mx-auto px-4">
-        {categories.map((category) => {
-          const IconComponent = category.icon;
-          return (
-            <Card 
-              key={category.id} 
-              className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105"
-              onClick={() => onCategorySelect(category.id)}
-            >
-              <CardContent className="p-6 text-center">
-                <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${category.color}`}>
-                  <IconComponent className="h-8 w-8" />
-                </div>
-                <h3 className="font-semibold text-sm">{category.name}</h3>
-              </CardContent>
-            </Card>
-          );
-        })}
+    <section className="py-20 bg-gradient-to-b from-orange-50/50 to-white" ref={categoriesRef}>
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="text-center mb-16 animate-on-scroll">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            Escolha sua <span className="text-gradient">categoria</span>
+          </h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Encontre o profissional ideal para resolver suas necessidades
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          {categories.map((category, index) => {
+            const IconComponent = category.icon;
+            return (
+              <Card 
+                key={category.id} 
+                className={`cursor-pointer transition-all duration-500 hover-lift border-2 ${category.color} animate-on-scroll`}
+                style={{animationDelay: `${index * 0.1}s`}}
+                onClick={() => onCategorySelect(category.id)}
+              >
+                <CardContent className="p-8 text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 orange-gradient rounded-2xl flex items-center justify-center shadow-lg">
+                    <IconComponent className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="font-semibold text-gray-800 text-lg">{category.name}</h3>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 

@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import ServiceCategories from '@/components/ServiceCategories';
@@ -93,6 +92,25 @@ const Index = () => {
     });
   };
 
+  // Add scroll animation effect
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+    animatedElements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, [showSearch]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header 
@@ -107,30 +125,46 @@ const Index = () => {
           <HeroSection onSearch={handleSearch} />
           <ServiceCategories onCategorySelect={handleCategorySelect} />
           
-          <section className="py-16 bg-white">
+          <section className="py-20 bg-white">
             <div className="max-w-6xl mx-auto px-4 text-center">
-              <h2 className="text-3xl font-bold mb-8">Como funciona o ZURBO</h2>
-              <div className="grid md:grid-cols-3 gap-8">
-                <div className="animate-fade-in">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
-                    <span className="text-2xl font-bold text-green-600">1</span>
+              <div className="animate-on-scroll mb-16">
+                <h2 className="text-4xl font-bold mb-6 text-gray-900">
+                  Como funciona o <span className="text-gradient">ZURBO</span>
+                </h2>
+                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                  Três passos simples para conectar você ao profissional ideal
+                </p>
+              </div>
+              
+              <div className="grid md:grid-cols-3 gap-12">
+                <div className="animate-on-scroll hover-lift" style={{animationDelay: '0.1s'}}>
+                  <div className="w-20 h-20 mx-auto mb-6 orange-gradient rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-3xl font-bold text-white">1</span>
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">Escolha o Serviço</h3>
-                  <p className="text-gray-600">Navegue pelas categorias e encontre o que precisa</p>
+                  <h3 className="text-2xl font-semibold mb-4 text-gray-900">Escolha o Serviço</h3>
+                  <p className="text-gray-600 text-lg leading-relaxed">
+                    Navegue pelas categorias e encontre exatamente o que precisa para sua casa ou negócio
+                  </p>
                 </div>
-                <div className="animate-fade-in">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
-                    <span className="text-2xl font-bold text-green-600">2</span>
+                
+                <div className="animate-on-scroll hover-lift" style={{animationDelay: '0.2s'}}>
+                  <div className="w-20 h-20 mx-auto mb-6 orange-gradient rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-3xl font-bold text-white">2</span>
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">Conecte-se</h3>
-                  <p className="text-gray-600">Converse com prestadores e agende o serviço</p>
+                  <h3 className="text-2xl font-semibold mb-4 text-gray-900">Conecte-se</h3>
+                  <p className="text-gray-600 text-lg leading-relaxed">
+                    Converse diretamente com prestadores qualificados e agende o melhor horário
+                  </p>
                 </div>
-                <div className="animate-fade-in">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
-                    <span className="text-2xl font-bold text-green-600">3</span>
+                
+                <div className="animate-on-scroll hover-lift" style={{animationDelay: '0.3s'}}>
+                  <div className="w-20 h-20 mx-auto mb-6 orange-gradient rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-3xl font-bold text-white">3</span>
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">Avalie</h3>
-                  <p className="text-gray-600">Compartilhe sua experiência e ajude outros usuários</p>
+                  <h3 className="text-2xl font-semibold mb-4 text-gray-900">Avalie</h3>
+                  <p className="text-gray-600 text-lg leading-relaxed">
+                    Compartilhe sua experiência e ajude outros usuários a encontrar os melhores profissionais
+                  </p>
                 </div>
               </div>
             </div>
@@ -169,42 +203,53 @@ const Index = () => {
         </>
       )}
 
-      <footer className="bg-gray-800 text-white py-12">
+      <footer className="bg-gray-900 text-white py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-xl font-bold mb-4 gradient-bg bg-clip-text text-transparent">ZURBO</h3>
-              <p className="text-gray-300">Conectando você aos melhores prestadores de serviços da sua região.</p>
+            <div className="animate-on-scroll">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="w-12 h-12 orange-gradient rounded-xl flex items-center justify-center">
+                  <span className="text-white font-bold text-xl">Z</span>
+                </div>
+                <h3 className="text-2xl font-bold text-gradient">ZURBO</h3>
+              </div>
+              <p className="text-gray-300 leading-relaxed">
+                Conectando você aos melhores prestadores de serviços da sua região com segurança e praticidade.
+              </p>
             </div>
-            <div>
-              <h4 className="font-semibold mb-4">Para Clientes</h4>
-              <ul className="space-y-2 text-gray-300">
-                <li>Como funciona</li>
-                <li>Categorias</li>
-                <li>Avaliações</li>
-                <li>Suporte</li>
+            
+            <div className="animate-on-scroll" style={{animationDelay: '0.1s'}}>
+              <h4 className="font-semibold mb-6 text-lg">Para Clientes</h4>
+              <ul className="space-y-3 text-gray-300">
+                <li className="hover:text-orange-400 cursor-pointer transition-colors">Como funciona</li>
+                <li className="hover:text-orange-400 cursor-pointer transition-colors">Categorias</li>
+                <li className="hover:text-orange-400 cursor-pointer transition-colors">Avaliações</li>
+                <li className="hover:text-orange-400 cursor-pointer transition-colors">Suporte</li>
               </ul>
             </div>
-            <div>
-              <h4 className="font-semibold mb-4">Para Prestadores</h4>
-              <ul className="space-y-2 text-gray-300">
-                <li>Cadastre-se</li>
-                <li>Central do Prestador</li>
-                <li>Dicas</li>
-                <li>Comissões</li>
+            
+            <div className="animate-on-scroll" style={{animationDelay: '0.2s'}}>
+              <h4 className="font-semibold mb-6 text-lg">Para Prestadores</h4>
+              <ul className="space-y-3 text-gray-300">
+                <li className="hover:text-orange-400 cursor-pointer transition-colors">Cadastre-se</li>
+                <li className="hover:text-orange-400 cursor-pointer transition-colors">Central do Prestador</li>
+                <li className="hover:text-orange-400 cursor-pointer transition-colors">Dicas</li>
+                <li className="hover:text-orange-400 cursor-pointer transition-colors">Comissões</li>
               </ul>
             </div>
-            <div>
-              <h4 className="font-semibold mb-4">Contato</h4>
-              <ul className="space-y-2 text-gray-300">
-                <li>suporte@zurbo.com</li>
-                <li>(11) 99999-9999</li>
-                <li>Termos de Uso</li>
-                <li>Privacidade</li>
+            
+            <div className="animate-on-scroll" style={{animationDelay: '0.3s'}}>
+              <h4 className="font-semibold mb-6 text-lg">Contato</h4>
+              <ul className="space-y-3 text-gray-300">
+                <li className="hover:text-orange-400 cursor-pointer transition-colors">suporte@zurbo.com</li>
+                <li className="hover:text-orange-400 cursor-pointer transition-colors">(11) 99999-9999</li>
+                <li className="hover:text-orange-400 cursor-pointer transition-colors">Termos de Uso</li>
+                <li className="hover:text-orange-400 cursor-pointer transition-colors">Privacidade</li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
+          
+          <div className="border-t border-gray-700 mt-12 pt-8 text-center text-gray-400">
             <p>&copy; 2024 ZURBO. Todos os direitos reservados.</p>
           </div>
         </div>
