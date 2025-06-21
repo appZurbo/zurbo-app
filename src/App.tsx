@@ -10,7 +10,6 @@ import AuthPage from "@/components/auth/AuthPage";
 import Index from "./pages/Index";
 import { ProfilePageFixed } from "./components/profile/ProfilePageFixed";
 import ServiceSelectionPage from "./components/services/ServiceSelectionPage";
-import SettingsPage from "./components/settings/SettingsPage";
 import { UserSettings } from "./components/settings/UserSettings";
 import NotFound from "./pages/NotFound";
 import { MobileLayout } from "./components/mobile/MobileLayout";
@@ -27,7 +26,7 @@ const AuthenticatedApp = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 orange-gradient rounded-xl flex items-center justify-center animate-pulse">
+          <div className="w-16 h-16 mx-auto mb-4 bg-orange-500 rounded-xl flex items-center justify-center animate-pulse">
             <span className="text-white font-bold text-2xl">Z</span>
           </div>
           <p>Carregando...</p>
@@ -48,7 +47,8 @@ const AuthenticatedApp = () => {
     );
   }
 
-  if (showServiceSelection && profile?.tipo === 'prestador') {
+  // Verificar se precisa mostrar seleção de serviços
+  if (profile?.tipo === 'prestador' && showServiceSelection) {
     return (
       <ServiceSelectionPage 
         onComplete={() => setShowServiceSelection(false)} 

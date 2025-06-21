@@ -13,7 +13,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfilePicture } from '@/hooks/useProfilePicture';
 import { CommentsList } from './CommentsList';
-import { AddCommentDialog } from './AddCommentDialog';
 import { UserSettings } from '../settings/UserSettings';
 import { validateCPF, sanitizeText, formatCPF } from '@/utils/validation';
 

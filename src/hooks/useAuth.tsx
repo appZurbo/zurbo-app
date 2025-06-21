@@ -22,56 +22,87 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Obter usuário atual
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-      if (user) {
-        loadProfile(user.id);
-      } else {
-        setLoading(false);
-      }
-    });
+    let mounted = true;
 
-    // Escutar mudanças de autenticação
+    // Função para carregar o perfil do usuário
+    const loadProfile = async (authId: string) => {
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('auth_id', authId)
+          .maybeSingle();
+
+        if (error) {
+          console.error('Error loading profile:', error);
+          if (mounted) setProfile(null);
+          return;
+        }
+
+        if (data && mounted) {
+          setProfile(data);
+        } else if (mounted) {
+          console.log('No profile found for user');
+          setProfile(null);
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+        if (mounted) setProfile(null);
+      }
+    };
+
+    // Configurar listener de autenticação primeiro
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          await loadProfile(session.user.id);
+        if (!mounted) return;
+        
+        console.log('Auth state changed:', event, session?.user?.id);
+        
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+        
+        if (currentUser) {
+          await loadProfile(currentUser.id);
         } else {
           setProfile(null);
-          setLoading(false);
         }
+        
+        setLoading(false);
       }
     );
 
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const loadProfile = async (authId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('auth_id', authId)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error loading profile:', error);
-        setProfile(null);
-      } else if (data) {
-        setProfile(data);
-      } else {
-        console.log('No profile found for user');
-        setProfile(null);
+    // Verificar sessão atual
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!mounted) return;
+        
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+        
+        if (currentUser) {
+          await loadProfile(currentUser.id);
+        } else {
+          setProfile(null);
+        }
+      } catch (error) {
+        console.error('Error checking session:', error);
+        if (mounted) {
+          setUser(null);
+          setProfile(null);
+        }
+      } finally {
+        if (mounted) setLoading(false);
       }
-    } catch (error) {
-      console.error('Error loading profile:', error);
-      setProfile(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    checkSession();
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   return {
     user,
