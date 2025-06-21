@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Wrench, Heart, Bolt, Broom } from 'lucide-react';
+import { Wrench, Heart, Bolt, Brush } from 'lucide-react';
 
 interface Service {
   id: string;
@@ -137,7 +137,7 @@ const ServiceSelectionPage = ({ onComplete }: { onComplete: () => void }) => {
       case 'wrench': return <Wrench className="h-8 w-8" />;
       case 'heart': return <Heart className="h-8 w-8" />;
       case 'bolt': return <Bolt className="h-8 w-8" />;
-      case 'broom': return <Broom className="h-8 w-8" />;
+      case 'brush': return <Brush className="h-8 w-8" />;
       default: return <Wrench className="h-8 w-8" />;
     }
   };

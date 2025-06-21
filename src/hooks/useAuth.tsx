@@ -9,6 +9,11 @@ interface UserProfile {
   email: string;
   tipo: string;
   cpf: string;
+  foto_perfil?: string;
+  endereco?: string;
+  latitude?: number;
+  longitude?: number;
+  descricao?: string;
 }
 
 export const useAuth = () => {
