@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,7 +9,6 @@ import { Settings, Bell, Trash2, Key } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-
 export const UserSettings = () => {
   const [notifications, setNotifications] = useState(true);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -18,97 +16,90 @@ export const UserSettings = () => {
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
-  const { profile } = useAuth();
-
+  const {
+    toast
+  } = useToast();
+  const {
+    profile
+  } = useAuth();
   const handlePasswordChange = async () => {
     if (newPassword.length < 6) {
       toast({
         title: "Senha muito curta",
         description: "A senha deve ter pelo menos 6 caracteres",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     setLoading(true);
     try {
-      const { error } = await supabase.auth.updateUser({
+      const {
+        error
+      } = await supabase.auth.updateUser({
         password: newPassword
       });
-
       if (error) throw error;
-
       toast({
         title: "Senha alterada!",
-        description: "Sua senha foi alterada com sucesso",
+        description: "Sua senha foi alterada com sucesso"
       });
-
       setShowPasswordDialog(false);
       setNewPassword('');
     } catch (error: any) {
       toast({
         title: "Erro",
         description: error.message,
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
     }
   };
-
   const handleDeleteAccount = async () => {
     if (deleteConfirmation !== 'DELETAR CONTA') {
       toast({
         title: "Confirmação incorreta",
         description: "Digite 'DELETAR CONTA' para confirmar",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     setLoading(true);
     try {
       // Deletar perfil do usuário
       if (profile?.id) {
-        const { error } = await supabase
-          .from('users')
-          .delete()
-          .eq('id', profile.id);
-
+        const {
+          error
+        } = await supabase.from('users').delete().eq('id', profile.id);
         if (error) throw error;
       }
 
       // Fazer logout
       await supabase.auth.signOut();
-      
       toast({
         title: "Conta excluída",
-        description: "Sua conta foi excluída permanentemente",
+        description: "Sua conta foi excluída permanentemente"
       });
-      
       setTimeout(() => window.location.reload(), 1000);
     } catch (error: any) {
       toast({
         title: "Erro",
         description: error.message,
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
     }
   };
-
-  return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+  return <div className="max-w-2xl mx-auto space-y-6">
+      <Card className="py-[73px]">
+        <CardHeader className="py-[31px]">
+          <CardTitle className="flex items-center gap-2 py-0">
             <Settings className="h-5 w-5" />
             Configurações
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 py-[42px] my-0">
           {/* Notificações */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -120,11 +111,7 @@ export const UserSettings = () => {
                 </p>
               </div>
             </div>
-            <Switch
-              id="notifications"
-              checked={notifications}
-              onCheckedChange={setNotifications}
-            />
+            <Switch id="notifications" checked={notifications} onCheckedChange={setNotifications} />
           </div>
 
           {/* Alterar Senha */}
@@ -139,10 +126,7 @@ export const UserSettings = () => {
                   </p>
                 </div>
               </div>
-              <Button 
-                variant="outline" 
-                onClick={() => setShowPasswordDialog(true)}
-              >
+              <Button variant="outline" onClick={() => setShowPasswordDialog(true)}>
                 Alterar
               </Button>
             </div>
@@ -160,10 +144,7 @@ export const UserSettings = () => {
                   </p>
                 </div>
               </div>
-              <Button 
-                variant="destructive" 
-                onClick={() => setShowDeleteDialog(true)}
-              >
+              <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
                 Excluir
               </Button>
             </div>
@@ -181,19 +162,11 @@ export const UserSettings = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="py-4">
-            <Input
-              type="password"
-              placeholder="Nova senha (mín. 6 caracteres)"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
+            <Input type="password" placeholder="Nova senha (mín. 6 caracteres)" value={newPassword} onChange={e => setNewPassword(e.target.value)} />
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handlePasswordChange}
-              disabled={loading || newPassword.length < 6}
-            >
+            <AlertDialogAction onClick={handlePasswordChange} disabled={loading || newPassword.length < 6}>
               {loading ? 'Alterando...' : 'Alterar Senha'}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -221,25 +194,15 @@ export const UserSettings = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="py-4">
-            <Input
-              value={deleteConfirmation}
-              onChange={(e) => setDeleteConfirmation(e.target.value)}
-              placeholder="Digite: DELETAR CONTA"
-              className="border-red-300 focus:border-red-500"
-            />
+            <Input value={deleteConfirmation} onChange={e => setDeleteConfirmation(e.target.value)} placeholder="Digite: DELETAR CONTA" className="border-red-300 focus:border-red-500" />
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteAccount}
-              disabled={loading || deleteConfirmation !== 'DELETAR CONTA'}
-              className="bg-red-600 hover:bg-red-700"
-            >
+            <AlertDialogAction onClick={handleDeleteAccount} disabled={loading || deleteConfirmation !== 'DELETAR CONTA'} className="bg-red-600 hover:bg-red-700">
               {loading ? 'Excluindo...' : 'Confirmar Exclusão'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
-  );
+    </div>;
 };
