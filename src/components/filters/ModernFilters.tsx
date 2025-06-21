@@ -1,193 +1,199 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { Search, MapPin, Star, DollarSign, Filter, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { MapPin, DollarSign, Star, Sparkles, Filter } from 'lucide-react';
 
 interface FilterState {
-  busca: string;
   cidade: string;
-  servico: string;
   precoMin: number;
   precoMax: number;
   notaMin: number;
-  apenasпремium: boolean;
+  servico: string;
+  apenasПремium: boolean;
 }
 
 interface ModernFiltersProps {
-  filters: FilterState;
   onFiltersChange: (filters: FilterState) => void;
-  servicos: Array<{ id: string; nome: string; icone: string }>;
+  servicos: Array<{ id: string; nome: string; icone: string; cor?: string }>;
 }
 
-export const ModernFilters = ({ filters, onFiltersChange, servicos }: ModernFiltersProps) => {
+export const ModernFilters = ({ onFiltersChange, servicos }: ModernFiltersProps) => {
+  const [filters, setFilters] = useState<FilterState>({
+    cidade: '',
+    precoMin: 0,
+    precoMax: 500,
+    notaMin: 0,
+    servico: '',
+    apenasПремium: false
+  });
+
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const updateFilter = (key: keyof FilterState, value: any) => {
-    onFiltersChange({ ...filters, [key]: value });
+    const newFilters = { ...filters, [key]: value };
+    setFilters(newFilters);
+    onFiltersChange(newFilters);
   };
 
   const clearFilters = () => {
-    onFiltersChange({
-      busca: '',
+    const defaultFilters: FilterState = {
       cidade: '',
-      servico: '',
       precoMin: 0,
-      precoMax: 1000,
+      precoMax: 500,
       notaMin: 0,
-      apenaskremium: false,
-    });
+      servico: '',
+      apenasПремium: false
+    };
+    setFilters(defaultFilters);
+    onFiltersChange(defaultFilters);
   };
 
-  const activeFiltersCount = Object.entries(filters).filter(([key, value]) => {
-    if (key === 'busca' || key === 'cidade' || key === 'servico') return value !== '';
-    if (key === 'precoMin') return value > 0;
-    if (key === 'precoMax') return value < 1000;
-    if (key === 'notaMin') return value > 0;
-    if (key === 'apenasремium') return value === true;
-    return false;
-  }).length;
+  const activeFiltersCount = Object.values(filters).filter(value => 
+    value !== '' && value !== 0 && value !== 500 && value !== false
+  ).length;
 
   return (
-    <div className="space-y-4">
-      {/* Barra de busca principal */}
-      <Card className="border-0 shadow-md">
-        <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-3">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Buscar prestadores ou serviços..."
-                value={filters.busca}
-                onChange={(e) => updateFilter('busca', e.target.value)}
-                className="pl-10 border-gray-200 focus:border-orange-500 focus:ring-orange-500"
-              />
-            </div>
-            
-            <div className="relative min-w-[200px]">
-              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Cidade ou região..."
-                value={filters.cidade}
-                onChange={(e) => updateFilter('cidade', e.target.value)}
-                className="pl-10 border-gray-200 focus:border-orange-500 focus:ring-orange-500"
-              />
-            </div>
-            
-            <Button
-              variant="outline"
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              className="flex items-center gap-2 border-gray-200 hover:bg-gray-50"
+    <Card className="p-4 mb-6 bg-white shadow-sm border border-gray-100">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Filter className="w-5 h-5 text-orange-500" />
+          <h3 className="font-semibold text-gray-800">Filtros</h3>
+          {activeFiltersCount > 0 && (
+            <Badge variant="secondary" className="bg-orange-100 text-orange-700">
+              {activeFiltersCount}
+            </Badge>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className="text-gray-600"
+          >
+            {showAdvanced ? 'Menos filtros' : 'Mais filtros'}
+          </Button>
+          {activeFiltersCount > 0 && (
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={clearFilters}
+              className="text-gray-600"
             >
-              <Filter className="h-4 w-4" />
-              Filtros
-              {activeFiltersCount > 0 && (
-                <Badge variant="secondary" className="bg-orange-100 text-orange-700">
-                  {activeFiltersCount}
-                </Badge>
-              )}
+              Limpar
             </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Filtros básicos */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <MapPin className="w-4 h-4" />
+            Cidade
+          </label>
+          <Input
+            placeholder="Ex: São Paulo, Rio de Janeiro..."
+            value={filters.cidade}
+            onChange={(e) => updateFilter('cidade', e.target.value)}
+            className="border-gray-300 focus:border-orange-500"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">Serviço</label>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant={filters.servico === '' ? "default" : "outline"}
+              size="sm"
+              onClick={() => updateFilter('servico', '')}
+              className={filters.servico === '' ? "bg-orange-500 hover:bg-orange-600" : ""}
+            >
+              Todos
+            </Button>
+            {servicos.slice(0, 3).map((servico) => (
+              <Button
+                key={servico.id}
+                variant={filters.servico === servico.id ? "default" : "outline"}
+                size="sm"
+                onClick={() => updateFilter('servico', servico.id)}
+                className={filters.servico === servico.id ? "bg-orange-500 hover:bg-orange-600" : ""}
+              >
+                {servico.nome}
+              </Button>
+            ))}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <Star className="w-4 h-4" />
+            Nota mínima
+          </label>
+          <div className="flex items-center gap-3">
+            <Slider
+              value={[filters.notaMin]}
+              onValueChange={([value]) => updateFilter('notaMin', value)}
+              max={5}
+              step={0.5}
+              className="flex-1"
+            />
+            <span className="text-sm text-gray-600 w-8">
+              {filters.notaMin}+
+            </span>
+          </div>
+        </div>
+      </div>
 
       {/* Filtros avançados */}
       {showAdvanced && (
-        <Card className="border-0 shadow-md">
-          <CardContent className="p-4 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-gray-900">Filtros Avançados</h3>
-              {activeFiltersCount > 0 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearFilters}
-                  className="text-gray-600 hover:text-gray-800"
-                >
-                  <X className="h-4 w-4 mr-1" />
-                  Limpar
-                </Button>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Serviço */}
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
-                  Tipo de Serviço
-                </label>
-                <Select value={filters.servico} onValueChange={(value) => updateFilter('servico', value)}>
-                  <SelectTrigger className="border-gray-200">
-                    <SelectValue placeholder="Todos os serviços" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Todos os serviços</SelectItem>
-                    {servicos.map((servico) => (
-                      <SelectItem key={servico.id} value={servico.id}>
-                        {servico.nome}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Avaliação mínima */}
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block flex items-center gap-1">
-                  <Star className="h-4 w-4" />
-                  Avaliação Mínima: {filters.notaMin} {filters.notaMin > 0 && '⭐'}
-                </label>
-                <Slider
-                  value={[filters.notaMin]}
-                  onValueChange={([value]) => updateFilter('notaMin', value)}
-                  max={5}
-                  step={0.5}
-                  className="mt-2"
-                />
-              </div>
-
-              {/* Premium toggle */}
-              <div className="flex items-center space-x-2 pt-6">
-                <input
-                  type="checkbox"
-                  id="premium"
-                  checked={filters.apenasремium}
-                  onChange={(e) => updateFilter('apenasремium', e.target.checked)}
-                  className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-                />
-                <label htmlFor="premium" className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                  <span className="text-yellow-500">👑</span>
-                  Apenas Premium
-                </label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <DollarSign className="w-4 h-4" />
+              Faixa de preço
+            </label>
+            <div className="space-y-3">
+              <Slider
+                value={[filters.precoMin, filters.precoMax]}
+                onValueChange={([min, max]) => {
+                  updateFilter('precoMin', min);
+                  updateFilter('precoMax', max);
+                }}
+                max={1000}
+                step={25}
+                className="w-full"
+              />
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>R$ {filters.precoMin}</span>
+                <span>R$ {filters.precoMax}</span>
               </div>
             </div>
+          </div>
 
-            {/* Faixa de preço */}
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block flex items-center gap-1">
-                <DollarSign className="h-4 w-4" />
-                Faixa de Preço: R$ {filters.precoMin} - R$ {filters.precoMax}
-              </label>
-              <div className="px-3">
-                <Slider
-                  value={[filters.precoMin, filters.precoMax]}
-                  onValueChange={([min, max]) => {
-                    updateFilter('precoMin', min);
-                    updateFilter('precoMax', max);
-                  }}
-                  max={1000}
-                  step={50}
-                  className="mt-2"
-                />
-              </div>
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <Sparkles className="w-4 h-4" />
+              Apenas Premium
+            </label>
+            <div className="flex items-center space-x-2">
+              <Switch
+                checked={filters.apenasПремium}
+                onCheckedChange={(checked) => updateFilter('apenasПремium', checked)}
+              />
+              <span className="text-sm text-gray-600">
+                Mostrar apenas prestadores premium
+              </span>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
-    </div>
+    </Card>
   );
 };

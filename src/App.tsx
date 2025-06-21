@@ -1,8 +1,10 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMobile } from "@/hooks/useMobile";
 import AuthPage from "@/components/auth/AuthPage";
@@ -16,7 +18,6 @@ import RegrasComunidade from "./pages/RegrasComunidade";
 import PlanoPremium from "./pages/PlanoPremium";
 import NotFound from "./pages/NotFound";
 import { MobileLayout } from "./components/mobile/MobileLayout";
-import { useState } from "react";
 
 const queryClient = new QueryClient();
 

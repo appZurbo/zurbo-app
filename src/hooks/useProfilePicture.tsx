@@ -48,12 +48,12 @@ export const useProfilePicture = () => {
 
       // Atualizar perfil do usuário no banco
       const updatedProfile = await updateUserProfile(profile.id, { 
-        foto_perfil: data.publicUrl 
+        foto_url: data.publicUrl 
       });
 
       if (updatedProfile) {
         // Atualizar o estado local
-        updateLocalProfile({ foto_perfil: data.publicUrl });
+        updateLocalProfile({ foto_url: data.publicUrl });
         console.log('Profile updated with new photo URL');
       }
 
