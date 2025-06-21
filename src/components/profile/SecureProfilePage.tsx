@@ -172,7 +172,9 @@ const SecureProfilePage = () => {
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
               Meu Perfil
-              <Shield className="h-4 w-4 text-green-600 ml-auto" title="Perfil Seguro" />
+              <div className="ml-auto" title="Perfil Seguro">
+                <Shield className="h-4 w-4 text-green-600" />
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -211,7 +213,9 @@ const SecureProfilePage = () => {
                 <div className="flex items-center gap-2 mt-1 p-2 bg-gray-50 rounded">
                   <Mail className="h-4 w-4 text-gray-500" />
                   <span>{profile.email}</span>
-                  <Shield className="h-4 w-4 text-green-600 ml-auto" title="Email Verificado" />
+                  <div className="ml-auto" title="Email Verificado">
+                    <Shield className="h-4 w-4 text-green-600" />
+                  </div>
                 </div>
               </div>
 
@@ -219,7 +223,9 @@ const SecureProfilePage = () => {
                 <Label htmlFor="cpf">CPF</Label>
                 <div className="flex items-center gap-2 mt-1 p-2 bg-gray-50 rounded">
                   <span>{maskCPF(profile.cpf)}</span>
-                  <Shield className="h-4 w-4 text-green-600 ml-auto" title="CPF Validado" />
+                  <div className="ml-auto" title="CPF Validado">
+                    <Shield className="h-4 w-4 text-green-600" />
+                  </div>
                 </div>
               </div>
 

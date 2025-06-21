@@ -198,7 +198,9 @@ const SecureServiceSelectionPage = ({ onComplete }: { onComplete: () => void }) 
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             Escolha os Serviços que Você Presta
-            <Shield className="h-5 w-5 text-green-600" title="Seleção Segura" />
+            <div className="ml-auto" title="Seleção Segura">
+              <Shield className="h-5 w-5 text-green-600" />
+            </div>
           </CardTitle>
           <p className="text-gray-600">
             Selecione todos os serviços que você oferece e defina um preço médio para cada um.
