@@ -69,13 +69,15 @@ export const UserSettings = () => {
 
     setLoading(true);
     try {
-      // Deletar perfil do usuário (isso vai cascatear para outros dados)
-      const { error } = await supabase
-        .from('users')
-        .delete()
-        .eq('id', profile?.id);
+      // Deletar perfil do usuário
+      if (profile?.id) {
+        const { error } = await supabase
+          .from('users')
+          .delete()
+          .eq('id', profile.id);
 
-      if (error) throw error;
+        if (error) throw error;
+      }
 
       // Fazer logout
       await supabase.auth.signOut();
@@ -85,7 +87,7 @@ export const UserSettings = () => {
         description: "Sua conta foi excluída permanentemente",
       });
       
-      window.location.reload();
+      setTimeout(() => window.location.reload(), 1000);
     } catch (error: any) {
       toast({
         title: "Erro",
@@ -98,7 +100,7 @@ export const UserSettings = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

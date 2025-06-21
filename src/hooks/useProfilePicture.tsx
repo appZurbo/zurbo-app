@@ -29,7 +29,10 @@ export const useProfilePicture = () => {
         .from('profile-pictures')
         .upload(fileName, file, { upsert: true });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
 
       // Obter URL pública
       const { data } = supabase.storage
@@ -42,7 +45,10 @@ export const useProfilePicture = () => {
         .update({ foto_perfil: data.publicUrl })
         .eq('id', profile.id);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('Update error:', updateError);
+        throw updateError;
+      }
 
       toast({
         title: "Sucesso!",
@@ -54,7 +60,7 @@ export const useProfilePicture = () => {
       console.error('Erro no upload:', error);
       toast({
         title: "Erro no upload",
-        description: error.message,
+        description: error.message || "Erro desconhecido no upload",
         variant: "destructive",
       });
       return null;

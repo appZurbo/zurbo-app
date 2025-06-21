@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { checkUserProfile, createUserProfile } from '@/utils/database';
 import type { User } from '@supabase/supabase-js';
 
 interface UserProfile {
@@ -24,26 +25,20 @@ export const useAuth = () => {
   useEffect(() => {
     let mounted = true;
 
-    // Função para carregar o perfil do usuário
     const loadProfile = async (authId: string) => {
       try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('auth_id', authId)
-          .maybeSingle();
-
-        if (error) {
-          console.error('Error loading profile:', error);
-          if (mounted) setProfile(null);
-          return;
+        let profileData = await checkUserProfile(authId);
+        
+        if (!profileData && mounted) {
+          // Se não existe perfil, tentar criar um básico
+          const { data: { user: authUser } } = await supabase.auth.getUser();
+          if (authUser) {
+            profileData = await createUserProfile(authId, authUser.email || '', {});
+          }
         }
 
-        if (data && mounted) {
-          setProfile(data);
-        } else if (mounted) {
-          console.log('No profile found for user');
-          setProfile(null);
+        if (mounted) {
+          setProfile(profileData);
         }
       } catch (error) {
         console.error('Error loading profile:', error);
@@ -51,7 +46,7 @@ export const useAuth = () => {
       }
     };
 
-    // Configurar listener de autenticação primeiro
+    // Configurar listener de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!mounted) return;
@@ -62,7 +57,12 @@ export const useAuth = () => {
         setUser(currentUser);
         
         if (currentUser) {
-          await loadProfile(currentUser.id);
+          // Pequeno delay para evitar conflitos
+          setTimeout(() => {
+            if (mounted) {
+              loadProfile(currentUser.id);
+            }
+          }, 100);
         } else {
           setProfile(null);
         }

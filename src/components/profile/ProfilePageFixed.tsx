@@ -14,7 +14,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useProfilePicture } from '@/hooks/useProfilePicture';
 import { CommentsList } from './CommentsList';
 import { UserSettings } from '../settings/UserSettings';
-import { validateCPF, sanitizeText, formatCPF } from '@/utils/validation';
 
 export const ProfilePageFixed = () => {
   const { profile, loading: authLoading } = useAuth();
@@ -44,10 +43,10 @@ export const ProfilePageFixed = () => {
   }, [profile]);
 
   const validateFormData = () => {
-    if (!formData.nome || sanitizeText(formData.nome).length < 2) {
+    if (!formData.nome || formData.nome.trim().length < 2) {
       toast({
         title: "Erro de validação",
-        description: "Nome deve ter pelo menos 2 caracteres válidos.",
+        description: "Nome deve ter pelo menos 2 caracteres.",
         variant: "destructive",
       });
       return false;
@@ -61,9 +60,9 @@ export const ProfilePageFixed = () => {
     setLoading(true);
     try {
       const sanitizedData = {
-        nome: sanitizeText(formData.nome),
-        endereco: sanitizeText(formData.endereco),
-        descricao: sanitizeText(formData.descricao),
+        nome: formData.nome.trim(),
+        endereco: formData.endereco.trim(),
+        descricao: formData.descricao.trim(),
         latitude: formData.latitude,
         longitude: formData.longitude,
       };
@@ -83,7 +82,7 @@ export const ProfilePageFixed = () => {
       });
 
       // Recarregar a página para atualizar os dados
-      window.location.reload();
+      setTimeout(() => window.location.reload(), 1000);
     } catch (error: any) {
       console.error('Profile update error:', error);
       toast({
@@ -146,14 +145,13 @@ export const ProfilePageFixed = () => {
 
     const result = await uploadProfilePicture(file);
     if (result) {
-      // Recarregar página para mostrar nova foto
       setTimeout(() => window.location.reload(), 1000);
     }
   };
 
   const maskCPF = (cpf: string) => {
     if (!cpf) return '';
-    return formatCPF(cpf).replace(/\d(?=\d{4})/g, '*');
+    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '***.***.***-**');
   };
 
   if (authLoading) {
