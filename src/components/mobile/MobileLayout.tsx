@@ -1,4 +1,3 @@
-
 import { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Home, User, Settings, Search, Calendar } from 'lucide-react';
@@ -19,7 +18,7 @@ export const MobileLayout = ({ children }: MobileLayoutProps) => {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header mobile */}
-      <div className="bg-orange-500 text-white p-4 sticky top-0 z-10 shadow-md">
+      <div className="bg-orange-500 text-white p-4 shadow-md">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold">Zurbo</h1>
           <div className="flex items-center gap-2">
