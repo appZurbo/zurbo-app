@@ -14,7 +14,7 @@ interface FilterState {
   precoMax: number;
   notaMin: number;
   servico: string;
-  apenasПремium: boolean;
+  apenasPremium: boolean; // Fixed: changed from apenasПремium to apenasPremium
 }
 
 interface ModernFiltersProps {
@@ -29,7 +29,7 @@ export const ModernFilters = ({ onFiltersChange, servicos }: ModernFiltersProps)
     precoMax: 500,
     notaMin: 0,
     servico: '',
-    apenasПремium: false
+    apenasPremium: false // Fixed: changed from apenasПремium to apenasPremium
   });
 
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -47,7 +47,7 @@ export const ModernFilters = ({ onFiltersChange, servicos }: ModernFiltersProps)
       precoMax: 500,
       notaMin: 0,
       servico: '',
-      apenasПремium: false
+      apenasPremium: false // Fixed: changed from apenasПремium to apenasPremium
     };
     setFilters(defaultFilters);
     onFiltersChange(defaultFilters);
@@ -184,8 +184,8 @@ export const ModernFilters = ({ onFiltersChange, servicos }: ModernFiltersProps)
             </label>
             <div className="flex items-center space-x-2">
               <Switch
-                checked={filters.apenasПремium}
-                onCheckedChange={(checked) => updateFilter('apenasПремium', checked)}
+                checked={filters.apenasPremium}
+                onCheckedChange={(checked) => updateFilter('apenasPremium', checked)}
               />
               <span className="text-sm text-gray-600">
                 Mostrar apenas prestadores premium
