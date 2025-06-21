@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -27,7 +26,8 @@ import {
   ArrowRight,
   Users,
   Star,
-  Shield
+  Shield,
+  Search
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -121,6 +121,17 @@ export default function Index() {
     setShowContactModal(true);
   };
 
+  const handleSearch = (query: string) => {
+    setFilters({ ...filters, servico: query });
+    // Scroll para seção de resultados
+    setTimeout(() => {
+      const resultsSection = document.getElementById('resultados');
+      if (resultsSection) {
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -142,7 +153,7 @@ export default function Index() {
       <HeroSection />
       
       {/* Seção de categorias de serviços */}
-      <section className="py-12 bg-white">
+      <section id="servicos" className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -160,7 +171,16 @@ export default function Index() {
                 <Card
                   key={servico.id}
                   className="group cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1 border-0 shadow-sm"
-                  onClick={() => setFilters({ ...filters, servico: servico.id })}
+                  onClick={() => {
+                    setFilters({ ...filters, servico: servico.id });
+                    // Scroll para resultados
+                    setTimeout(() => {
+                      const resultsSection = document.getElementById('resultados');
+                      if (resultsSection) {
+                        resultsSection.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }, 100);
+                  }}
                 >
                   <CardContent className="p-4 text-center">
                     <div 
@@ -183,8 +203,48 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Como funciona */}
+      <section id="como-funciona" className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Como funciona
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Em poucos passos você encontra o profissional ideal
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Card className="text-center p-6">
+              <div className="w-16 h-16 mx-auto mb-4 bg-orange-100 rounded-full flex items-center justify-center">
+                <Search className="h-8 w-8 text-orange-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">1. Busque</h3>
+              <p className="text-gray-600">Descreva o serviço que você precisa e sua localização</p>
+            </Card>
+            
+            <Card className="text-center p-6">
+              <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+                <Users className="h-8 w-8 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">2. Compare</h3>
+              <p className="text-gray-600">Veja perfis, avaliações e preços dos profissionais</p>
+            </Card>
+            
+            <Card className="text-center p-6">
+              <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
+                <Heart className="h-8 w-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">3. Contrate</h3>
+              <p className="text-gray-600">Entre em contato e agende o serviço diretamente</p>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* Filtros e listagem */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main id="resultados" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <ModernFilters 
           onFiltersChange={setFilters}
           servicos={servicos}

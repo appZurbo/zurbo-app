@@ -5,14 +5,32 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Search, MapPin, Star, ArrowRight, Play, CheckCircle } from 'lucide-react';
+import { ZurboCharacter } from '../hero/ZurboCharacter';
+import { useNavigate } from 'react-router-dom';
 
 export const HeroSection = () => {
   const [busca, setBusca] = useState('');
   const [cidade, setCidade] = useState('');
+  const navigate = useNavigate();
 
   const handleSearch = () => {
-    // TODO: Implementar busca
-    console.log('Search:', { busca, cidade });
+    // Redirecionar para busca com parâmetros
+    const searchParams = new URLSearchParams();
+    if (busca) searchParams.set('servico', busca);
+    if (cidade) searchParams.set('cidade', cidade);
+    
+    // Scroll para seção de resultados
+    const resultsSection = document.getElementById('resultados');
+    if (resultsSection) {
+      resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleComoFunciona = () => {
+    const comoFuncionaSection = document.getElementById('como-funciona');
+    if (comoFuncionaSection) {
+      comoFuncionaSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -21,6 +39,9 @@ export const HeroSection = () => {
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
       <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-orange-200 to-yellow-200 rounded-full blur-3xl opacity-20 -translate-y-1/2 translate-x-1/2"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-br from-blue-200 to-purple-200 rounded-full blur-3xl opacity-20 translate-y-1/2 -translate-x-1/2"></div>
+      
+      {/* Personagem 3D */}
+      <ZurboCharacter />
       
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -55,6 +76,7 @@ export const HeroSection = () => {
                       value={busca}
                       onChange={(e) => setBusca(e.target.value)}
                       className="pl-10 h-12 text-base border-gray-200 focus:border-orange-500 focus:ring-orange-500"
+                      onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                     />
                   </div>
                   
@@ -65,6 +87,7 @@ export const HeroSection = () => {
                       value={cidade}
                       onChange={(e) => setCidade(e.target.value)}
                       className="pl-10 h-12 text-base border-gray-200 focus:border-orange-500 focus:ring-orange-500"
+                      onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                     />
                   </div>
                   
@@ -97,7 +120,12 @@ export const HeroSection = () => {
 
             {/* CTA secundário */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="outline" size="lg" className="group">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="group"
+                onClick={handleComoFunciona}
+              >
                 <Play className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
                 Como funciona
               </Button>

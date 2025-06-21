@@ -13,6 +13,7 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 import { 
   User, 
   Settings, 
@@ -27,6 +28,7 @@ import {
 export const ModernHeader = () => {
   const { profile, isAuthenticated } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -46,13 +48,48 @@ export const ModernHeader = () => {
     }
   };
 
+  const scrollToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+    setMobileMenuOpen(false);
+  };
+
+  const handleLogoClick = () => {
+    navigate('/');
+  };
+
+  const handleProfileClick = () => {
+    navigate('/perfil');
+  };
+
+  const handleSettingsClick = () => {
+    navigate('/configuracoes');
+  };
+
+  const handlePremiumClick = () => {
+    navigate('/premium');
+  };
+
+  const handleServicesClick = () => {
+    if (profile?.tipo === 'prestador') {
+      navigate('/servicos');
+    } else {
+      scrollToSection('servicos');
+    }
+  };
+
   return (
     <header className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <div className="flex items-center gap-3">
+            <div 
+              className="flex items-center gap-3 cursor-pointer"
+              onClick={handleLogoClick}
+            >
               <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
                 <span className="text-white font-bold text-xl">Z</span>
               </div>
@@ -67,16 +104,25 @@ export const ModernHeader = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#servicos" className="text-gray-700 hover:text-orange-600 transition-colors">
+            <button
+              onClick={handleServicesClick}
+              className="text-gray-700 hover:text-orange-600 transition-colors"
+            >
               Serviços
-            </a>
-            <a href="#como-funciona" className="text-gray-700 hover:text-orange-600 transition-colors">
+            </button>
+            <button
+              onClick={() => scrollToSection('como-funciona')}
+              className="text-gray-700 hover:text-orange-600 transition-colors"
+            >
               Como funciona
-            </a>
-            <a href="#premium" className="text-gray-700 hover:text-orange-600 transition-colors flex items-center gap-1">
+            </button>
+            <button
+              onClick={handlePremiumClick}
+              className="text-gray-700 hover:text-orange-600 transition-colors flex items-center gap-1"
+            >
               <Crown className="h-4 w-4 text-yellow-500" />
               Premium
-            </a>
+            </button>
           </nav>
 
           {/* User Menu / Auth Buttons */}
@@ -128,19 +174,19 @@ export const ModernHeader = () => {
                       )}
                     </div>
                     
-                    <DropdownMenuItem className="cursor-pointer">
+                    <DropdownMenuItem className="cursor-pointer" onClick={handleProfileClick}>
                       <User className="h-4 w-4 mr-2" />
                       Meu Perfil
                     </DropdownMenuItem>
                     
                     {profile.tipo === 'prestador' && (
-                      <DropdownMenuItem className="cursor-pointer">
+                      <DropdownMenuItem className="cursor-pointer" onClick={handleServicesClick}>
                         <Heart className="h-4 w-4 mr-2" />
-                        Meu Portfólio
+                        Meus Serviços
                       </DropdownMenuItem>
                     )}
                     
-                    <DropdownMenuItem className="cursor-pointer">
+                    <DropdownMenuItem className="cursor-pointer" onClick={handleSettingsClick}>
                       <Settings className="h-4 w-4 mr-2" />
                       Configurações
                     </DropdownMenuItem>
@@ -148,7 +194,7 @@ export const ModernHeader = () => {
                     {!profile.premium && (
                       <>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="cursor-pointer">
+                        <DropdownMenuItem className="cursor-pointer" onClick={handlePremiumClick}>
                           <Crown className="h-4 w-4 mr-2 text-yellow-500" />
                           <span className="text-yellow-600 font-medium">Upgrade para Premium</span>
                         </DropdownMenuItem>
@@ -168,10 +214,10 @@ export const ModernHeader = () => {
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" onClick={() => window.location.reload()}>
                   Entrar
                 </Button>
-                <Button size="sm" className="bg-orange-500 hover:bg-orange-600">
+                <Button size="sm" className="bg-orange-500 hover:bg-orange-600" onClick={() => window.location.reload()}>
                   Cadastrar
                 </Button>
               </div>
@@ -197,28 +243,25 @@ export const ModernHeader = () => {
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-gray-100 py-4">
             <nav className="space-y-2">
-              <a
-                href="#servicos"
-                className="block px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
+              <button
+                onClick={handleServicesClick}
+                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md transition-colors"
               >
                 Serviços
-              </a>
-              <a
-                href="#como-funciona"
-                className="block px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
+              </button>
+              <button
+                onClick={() => scrollToSection('como-funciona')}
+                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md transition-colors"
               >
                 Como funciona
-              </a>
-              <a
-                href="#premium"
-                className="block px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md transition-colors flex items-center gap-2"
-                onClick={() => setMobileMenuOpen(false)}
+              </button>
+              <button
+                onClick={handlePremiumClick}
+                className="block w-full text-left px-3 py-2 text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md transition-colors flex items-center gap-2"
               >
                 <Crown className="h-4 w-4 text-yellow-500" />
                 Premium
-              </a>
+              </button>
             </nav>
           </div>
         )}
