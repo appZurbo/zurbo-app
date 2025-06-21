@@ -81,7 +81,7 @@ export default function Index() {
         filteredData = filteredData.filter(p => p.premium);
       }
       
-      setPrestadores(filteredData);
+      setPrestadores(filteredData as UserProfile[]);
     } catch (error) {
       console.error('Error loading prestadores:', error);
       toast({
@@ -177,7 +177,6 @@ export default function Index() {
       {/* Filtros e listagem */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <ModernFilters 
-          filters={filters}
           onFiltersChange={setFilters}
           servicos={servicos}
         />
