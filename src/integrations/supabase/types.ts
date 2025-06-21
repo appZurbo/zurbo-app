@@ -9,7 +9,156 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      pagamentos_pix: {
+        Row: {
+          comprovante_url: string | null
+          created_at: string | null
+          id: string
+          prestador_id: string | null
+          solicitante_id: string | null
+          status: string | null
+          valor: number
+        }
+        Insert: {
+          comprovante_url?: string | null
+          created_at?: string | null
+          id?: string
+          prestador_id?: string | null
+          solicitante_id?: string | null
+          status?: string | null
+          valor: number
+        }
+        Update: {
+          comprovante_url?: string | null
+          created_at?: string | null
+          id?: string
+          prestador_id?: string | null
+          solicitante_id?: string | null
+          status?: string | null
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pagamentos_pix_prestador_id_fkey"
+            columns: ["prestador_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pagamentos_pix_solicitante_id_fkey"
+            columns: ["solicitante_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      servicos_disponiveis: {
+        Row: {
+          ativo: boolean | null
+          icone: string | null
+          id: string
+          nome: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          icone?: string | null
+          id?: string
+          nome: string
+        }
+        Update: {
+          ativo?: boolean | null
+          icone?: string | null
+          id?: string
+          nome?: string
+        }
+        Relationships: []
+      }
+      servicos_prestados: {
+        Row: {
+          created_at: string | null
+          id: string
+          preco_medio: number | null
+          prestador_id: string | null
+          servico_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          preco_medio?: number | null
+          prestador_id?: string | null
+          servico_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          preco_medio?: number | null
+          prestador_id?: string | null
+          servico_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "servicos_prestados_prestador_id_fkey"
+            columns: ["prestador_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "servicos_prestados_servico_id_fkey"
+            columns: ["servico_id"]
+            isOneToOne: false
+            referencedRelation: "servicos_disponiveis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          auth_id: string | null
+          cpf: string | null
+          created_at: string | null
+          descricao: string | null
+          email: string | null
+          endereco: string | null
+          foto_perfil: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          nome: string | null
+          tipo: string
+        }
+        Insert: {
+          auth_id?: string | null
+          cpf?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          email?: string | null
+          endereco?: string | null
+          foto_perfil?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          nome?: string | null
+          tipo: string
+        }
+        Update: {
+          auth_id?: string | null
+          cpf?: string | null
+          created_at?: string | null
+          descricao?: string | null
+          email?: string | null
+          endereco?: string | null
+          foto_perfil?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          nome?: string | null
+          tipo?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

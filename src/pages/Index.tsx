@@ -3,46 +3,25 @@ import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import ServiceCategories from '@/components/ServiceCategories';
 import PrestadorList from '@/components/PrestadorList';
-import AuthModal from '@/components/AuthModal';
 import ChatModal from '@/components/ChatModal';
 import ScheduleModal from '@/components/ScheduleModal';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+
 const Index = () => {
-  const [user, setUser] = useState(null);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authTab, setAuthTab] = useState<'login' | 'register-client' | 'register-prestador'>('login');
+  const { isAuthenticated } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [showSchedule, setShowSchedule] = useState(false);
   const [selectedPrestador, setSelectedPrestador] = useState(null);
-  const {
-    toast
-  } = useToast();
-  const handleLogin = (userData: any) => {
-    setUser(userData);
-    toast({
-      title: "Login realizado com sucesso!",
-      description: `Bem-vindo(a), ${userData.name}!`
-    });
-  };
-  const handleLogout = () => {
-    setUser(null);
-    setSelectedCategory('');
-    setShowSearch(false);
-    toast({
-      title: "Logout realizado",
-      description: "Até logo!"
-    });
-  };
-  const handleBecomePrestador = () => {
-    setAuthTab('register-prestador');
-    setShowAuthModal(true);
-  };
+  const { toast } = useToast();
+
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
     setShowSearch(true);
   };
+
   const handleSearch = (query: string) => {
     setShowSearch(true);
     toast({
@@ -50,12 +29,14 @@ const Index = () => {
       description: "Encontrando os melhores profissionais para você!"
     });
   };
+
   const handleViewProfile = (prestadorId: string) => {
     toast({
       title: "Abrindo perfil",
       description: "Carregando informações do prestador..."
     });
   };
+
   const handleSchedule = (prestadorId: string) => {
     const prestador = {
       id: prestadorId,
@@ -66,6 +47,7 @@ const Index = () => {
     setSelectedPrestador(prestador);
     setShowSchedule(true);
   };
+
   const handleChat = (prestadorId: string) => {
     const prestador = {
       id: prestadorId,
@@ -76,6 +58,7 @@ const Index = () => {
     setSelectedPrestador(prestador);
     setShowChat(true);
   };
+
   const handleConfirmSchedule = (scheduleData: any) => {
     toast({
       title: "Agendamento solicitado!",
@@ -98,10 +81,13 @@ const Index = () => {
     animatedElements.forEach(el => observer.observe(el));
     return () => observer.disconnect();
   }, [showSearch]);
-  return <div className="min-h-screen bg-gray-50">
-      <Header user={user} onLogin={() => setShowAuthModal(true)} onLogout={handleLogout} onBecomePrestador={handleBecomePrestador} />
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header />
       
-      {!showSearch ? <>
+      {!showSearch ? (
+        <>
           <HeroSection onSearch={handleSearch} />
           <ServiceCategories onCategorySelect={handleCategorySelect} />
           
@@ -118,8 +104,8 @@ const Index = () => {
               
               <div className="grid md:grid-cols-3 gap-12">
                 <div className="animate-on-scroll hover-lift" style={{
-              animationDelay: '0.1s'
-            }}>
+                  animationDelay: '0.1s'
+                }}>
                   <div className="w-20 h-20 mx-auto mb-6 orange-gradient rounded-full flex items-center justify-center shadow-lg">
                     <span className="text-3xl font-bold text-white">1</span>
                   </div>
@@ -130,8 +116,8 @@ const Index = () => {
                 </div>
                 
                 <div className="animate-on-scroll hover-lift" style={{
-              animationDelay: '0.2s'
-            }}>
+                  animationDelay: '0.2s'
+                }}>
                   <div className="w-20 h-20 mx-auto mb-6 orange-gradient rounded-full flex items-center justify-center shadow-lg">
                     <span className="text-3xl font-bold text-white">2</span>
                   </div>
@@ -142,8 +128,8 @@ const Index = () => {
                 </div>
                 
                 <div className="animate-on-scroll hover-lift" style={{
-              animationDelay: '0.3s'
-            }}>
+                  animationDelay: '0.3s'
+                }}>
                   <div className="w-20 h-20 mx-auto mb-6 orange-gradient rounded-full flex items-center justify-center shadow-lg">
                     <span className="text-3xl font-bold text-white">3</span>
                   </div>
@@ -155,15 +141,32 @@ const Index = () => {
               </div>
             </div>
           </section>
-        </> : <PrestadorList category={selectedCategory} onViewProfile={handleViewProfile} onSchedule={handleSchedule} onChat={handleChat} />}
+        </>
+      ) : (
+        <PrestadorList 
+          category={selectedCategory} 
+          onViewProfile={handleViewProfile} 
+          onSchedule={handleSchedule} 
+          onChat={handleChat} 
+        />
+      )}
 
-      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} onLogin={handleLogin} defaultTab={authTab} />
-
-      {selectedPrestador && <>
-          <ChatModal isOpen={showChat} onClose={() => setShowChat(false)} prestador={selectedPrestador} />
+      {selectedPrestador && (
+        <>
+          <ChatModal 
+            isOpen={showChat} 
+            onClose={() => setShowChat(false)} 
+            prestador={selectedPrestador} 
+          />
           
-          <ScheduleModal isOpen={showSchedule} onClose={() => setShowSchedule(false)} prestador={selectedPrestador} onSchedule={handleConfirmSchedule} />
-        </>}
+          <ScheduleModal 
+            isOpen={showSchedule} 
+            onClose={() => setShowSchedule(false)} 
+            prestador={selectedPrestador} 
+            onSchedule={handleConfirmSchedule} 
+          />
+        </>
+      )}
 
       <footer className="text-white py-16 bg-gray-800">
         <div className="max-w-6xl mx-auto px-4">
@@ -181,8 +184,8 @@ const Index = () => {
             </div>
             
             <div className="animate-on-scroll" style={{
-            animationDelay: '0.1s'
-          }}>
+              animationDelay: '0.1s'
+            }}>
               <h4 className="font-semibold mb-6 text-lg text-zinc-50">Para Clientes</h4>
               <ul className="space-y-3 text-gray-300 bg-transparent">
                 <li className="hover:text-orange-400 cursor-pointer transition-colors">Como funciona</li>
@@ -193,8 +196,8 @@ const Index = () => {
             </div>
             
             <div className="animate-on-scroll" style={{
-            animationDelay: '0.2s'
-          }}>
+              animationDelay: '0.2s'
+            }}>
               <h4 className="font-semibold mb-6 text-lg text-zinc-50">Para Prestadores</h4>
               <ul className="space-y-3 text-gray-300">
                 <li className="hover:text-orange-400 cursor-pointer transition-colors">Cadastre-se</li>
@@ -205,8 +208,8 @@ const Index = () => {
             </div>
             
             <div className="animate-on-scroll" style={{
-            animationDelay: '0.3s'
-          }}>
+              animationDelay: '0.3s'
+            }}>
               <h4 className="font-semibold mb-6 text-lg text-zinc-50">Contato</h4>
               <ul className="space-y-3 text-gray-300">
                 <li className="hover:text-orange-400 cursor-pointer transition-colors">suporte@zurbo.com</li>
@@ -222,6 +225,8 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
