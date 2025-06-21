@@ -33,13 +33,23 @@ export const useComments = (userId?: string) => {
         .from('comentarios')
         .select(`
           *,
-          avaliador:avaliador_id (nome, foto_perfil)
+          users!comentarios_avaliador_id_fkey (nome, foto_perfil)
         `)
         .eq('avaliado_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setComments(data || []);
+      
+      // Transform the data to match our interface
+      const transformedData = (data || []).map(comment => ({
+        ...comment,
+        avaliador: comment.users ? {
+          nome: comment.users.nome,
+          foto_perfil: comment.users.foto_perfil
+        } : undefined
+      }));
+
+      setComments(transformedData);
     } catch (error: any) {
       console.error('Erro ao carregar comentários:', error);
       toast({
