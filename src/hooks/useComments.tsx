@@ -33,7 +33,7 @@ export const useComments = (userId?: string) => {
         .from('comentarios')
         .select(`
           *,
-          users!comentarios_avaliador_id_fkey (nome, foto_perfil)
+          avaliador:users!comentarios_avaliador_id_fkey (nome, foto_perfil)
         `)
         .eq('avaliado_id', userId)
         .order('created_at', { ascending: false });
@@ -43,9 +43,9 @@ export const useComments = (userId?: string) => {
       // Transform the data to match our interface
       const transformedData = (data || []).map(comment => ({
         ...comment,
-        avaliador: comment.users ? {
-          nome: comment.users.nome,
-          foto_perfil: comment.users.foto_perfil
+        avaliador: comment.avaliador ? {
+          nome: comment.avaliador.nome,
+          foto_perfil: comment.avaliador.foto_perfil
         } : undefined
       }));
 
