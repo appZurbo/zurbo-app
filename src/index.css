@@ -153,6 +153,31 @@
   }
 }
 
+/* Welcome Landing Animations */
+@keyframes zoomThrough {
+  0% {
+    transform: scale(1) translateZ(0px);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(10) translateZ(-500px);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(20) translateZ(-1000px);
+    opacity: 0;
+  }
+}
+
+@keyframes letterFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
 .animate-fade-in-up {
   animation: fadeInUp 0.8s ease-out forwards;
 }
@@ -171,6 +196,14 @@
 
 .animate-bounce-slow {
   animation: bounce 2s infinite;
+}
+
+.animate-zoom-through {
+  animation: zoomThrough 1.5s ease-in-out forwards;
+}
+
+.animate-letter-float {
+  animation: letterFloat 3s ease-in-out infinite;
 }
 
 .animate-on-scroll {
@@ -217,4 +250,13 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+/* Perspective for 3D effects */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
 }

@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMobile } from "@/hooks/useMobile";
+import { WelcomeLanding } from "@/components/landing/WelcomeLanding";
 import AuthPage from "@/components/auth/AuthPage";
 import Index from "./pages/Index";
 import { ProfilePageFixed } from "./components/profile/ProfilePageFixed";
@@ -25,6 +26,7 @@ const AuthenticatedApp = () => {
   const { user, profile, loading, isAuthenticated } = useAuth();
   const isMobile = useMobile();
   const [showServiceSelection, setShowServiceSelection] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(!isAuthenticated);
 
   if (loading) {
     return (
@@ -36,6 +38,15 @@ const AuthenticatedApp = () => {
           <p className="text-gray-600">Carregando...</p>
         </div>
       </div>
+    );
+  }
+
+  // Mostrar landing de boas-vindas para usuários não autenticados
+  if (!isAuthenticated && showWelcome) {
+    return (
+      <WelcomeLanding 
+        onEnter={() => setShowWelcome(false)}
+      />
     );
   }
 
