@@ -1,22 +1,8 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { checkUserProfile, createUserProfile } from '@/utils/database';
+import { checkUserProfile, createUserProfile, type UserProfile } from '@/utils/database';
 import type { User } from '@supabase/supabase-js';
-
-interface UserProfile {
-  id: string;
-  nome: string;
-  email: string;
-  tipo: string;
-  cpf: string;
-  foto_perfil?: string;
-  endereco?: string;
-  latitude?: number;
-  longitude?: number;
-  descricao?: string;
-  updated_at?: string;
-}
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -50,7 +36,6 @@ export const useAuth = () => {
       }
     };
 
-    // Configurar listener de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!mounted) return;
@@ -61,7 +46,6 @@ export const useAuth = () => {
         setUser(currentUser);
         
         if (currentUser) {
-          // Pequeno delay para evitar conflitos de race condition
           setTimeout(() => {
             if (mounted) {
               loadProfile(currentUser.id);
@@ -75,7 +59,6 @@ export const useAuth = () => {
       }
     );
 
-    // Verificar sessão atual
     const checkSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -108,7 +91,6 @@ export const useAuth = () => {
     };
   }, []);
 
-  // Função para atualizar o perfil localmente
   const updateLocalProfile = (updates: Partial<UserProfile>) => {
     if (profile) {
       setProfile({ ...profile, ...updates });

@@ -1,232 +1,303 @@
+
 import { useState, useEffect } from 'react';
-import Header from '@/components/Header';
-import HeroSection from '@/components/HeroSection';
-import ServiceCategories from '@/components/ServiceCategories';
-import PrestadorList from '@/components/PrestadorList';
-import ChatModal from '@/components/ChatModal';
-import ScheduleModal from '@/components/ScheduleModal';
-import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
+import { getPrestadores, type UserProfile } from '@/utils/database';
+import { PrestadorCard } from '@/components/prestadores/PrestadorCard';
+import { ModernFilters } from '@/components/filters/ModernFilters';
+import { ModernHeader } from '@/components/layout/ModernHeader';
+import { ModernFooter } from '@/components/layout/ModernFooter';
+import { HeroSection } from '@/components/sections/HeroSection';
+import { 
+  Sparkles, 
+  Flower, 
+  Paintbrush, 
+  Zap, 
+  Droplets, 
+  Truck, 
+  ChefHat, 
+  Hammer, 
+  Scissors, 
+  Heart,
+  ArrowRight,
+  Users,
+  Star,
+  Shield
+} from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
-const Index = () => {
-  const { isAuthenticated } = useAuth();
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [showSearch, setShowSearch] = useState(false);
-  const [showChat, setShowChat] = useState(false);
-  const [showSchedule, setShowSchedule] = useState(false);
-  const [selectedPrestador, setSelectedPrestador] = useState(null);
+const servicos = [
+  { id: 'limpeza', nome: 'Limpeza', icone: 'Sparkles', cor: '#3B82F6' },
+  { id: 'jardinagem', nome: 'Jardinagem', icone: 'Flower', cor: '#10B981' },
+  { id: 'pintura', nome: 'Pintura', icone: 'Paintbrush', cor: '#8B5CF6' },
+  { id: 'eletrica', nome: 'Elétrica', icone: 'Zap', cor: '#F59E0B' },
+  { id: 'encanamento', nome: 'Encanamento', icone: 'Droplets', cor: '#06B6D4' },
+  { id: 'mudanca', nome: 'Mudança', icone: 'Truck', cor: '#EF4444' },
+  { id: 'cozinha', nome: 'Cozinha', icone: 'ChefHat', cor: '#F97316' },
+  { id: 'construcao', nome: 'Construção', icone: 'Hammer', cor: '#6B7280' },
+  { id: 'beleza', nome: 'Beleza', icone: 'Scissors', cor: '#EC4899' },
+  { id: 'petcare', nome: 'Pet Care', icone: 'Heart', cor: '#F87171' },
+];
+
+const iconMap = {
+  Sparkles, Flower, Paintbrush, Zap, Droplets, Truck, ChefHat, Hammer, Scissors, Heart
+};
+
+export default function Index() {
+  const { profile, isAuthenticated, loading } = useAuth();
   const { toast } = useToast();
+  const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
+  const [loadingPrestadores, setLoadingPrestadores] = useState(true);
+  const [filters, setFilters] = useState({
+    busca: '',
+    cidade: '',
+    servico: '',
+    precoMin: 0,
+    precoMax: 1000,
+    notaMin: 0,
+    apenasремium: false,
+  });
 
-  const handleCategorySelect = (categoryId: string) => {
-    setSelectedCategory(categoryId);
-    setShowSearch(true);
-  };
-
-  const handleSearch = (query: string) => {
-    setShowSearch(true);
-    toast({
-      title: "Buscando prestadores...",
-      description: "Encontrando os melhores profissionais para você!"
-    });
-  };
-
-  const handleViewProfile = (prestadorId: string) => {
-    toast({
-      title: "Abrindo perfil",
-      description: "Carregando informações do prestador..."
-    });
-  };
-
-  const handleSchedule = (prestadorId: string) => {
-    const prestador = {
-      id: prestadorId,
-      name: 'Ana Silva',
-      category: 'Limpeza Residencial',
-      price: 'R$ 80/dia'
-    };
-    setSelectedPrestador(prestador);
-    setShowSchedule(true);
-  };
-
-  const handleChat = (prestadorId: string) => {
-    const prestador = {
-      id: prestadorId,
-      name: 'Ana Silva',
-      avatar: '',
-      isOnline: true
-    };
-    setSelectedPrestador(prestador);
-    setShowChat(true);
-  };
-
-  const handleConfirmSchedule = (scheduleData: any) => {
-    toast({
-      title: "Agendamento solicitado!",
-      description: "O prestador será notificado e você receberá uma confirmação em breve."
-    });
-  };
-
-  // Add scroll animation effect
   useEffect(() => {
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
+    loadPrestadores();
+  }, [filters]);
+
+  const loadPrestadores = async () => {
+    setLoadingPrestadores(true);
+    try {
+      const data = await getPrestadores({
+        cidade: filters.cidade,
+        servico: filters.servico,
+        precoMin: filters.precoMin > 0 ? filters.precoMin : undefined,
+        precoMax: filters.precoMax < 1000 ? filters.precoMax : undefined,
+        notaMin: filters.notaMin > 0 ? filters.notaMin : undefined,
       });
-    }, {
-      threshold: 0.1
-    });
-    const animatedElements = document.querySelectorAll('.animate-on-scroll');
-    animatedElements.forEach(el => observer.observe(el));
-    return () => observer.disconnect();
-  }, [showSearch]);
+      
+      let filteredData = data;
+      
+      if (filters.busca) {
+        filteredData = data.filter(p => 
+          p.nome.toLowerCase().includes(filters.busca.toLowerCase()) ||
+          p.bio?.toLowerCase().includes(filters.busca.toLowerCase())
+        );
+      }
+      
+      if (filters.apenasремium) {
+        filteredData = filteredData.filter(p => p.premium);
+      }
+      
+      setPrestadores(filteredData);
+    } catch (error) {
+      console.error('Error loading prestadores:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar os prestadores",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingPrestadores(false);
+    }
+  };
+
+  const handleViewProfile = (prestador: UserProfile) => {
+    // TODO: Implementar visualização de perfil
+    console.log('View profile:', prestador);
+  };
+
+  const handleContact = (prestador: UserProfile) => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Login necessário",
+        description: "Você precisa fazer login para contatar um prestador",
+        variant: "destructive",
+      });
+      return;
+    }
+    // TODO: Implementar chat/contato
+    console.log('Contact:', prestador);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center animate-pulse">
+            <span className="text-white font-bold text-2xl">Z</span>
+          </div>
+          <p className="text-gray-600">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <ModernHeader />
       
-      {!showSearch ? (
-        <>
-          <HeroSection onSearch={handleSearch} />
-          <ServiceCategories onCategorySelect={handleCategorySelect} />
-          
-          <section className="bg-white py-[22px]">
-            <div className="max-w-6xl mx-auto px-4 text-center">
-              <div className="animate-on-scroll mb-16">
-                <h2 className="text-4xl font-bold mb-6 text-gray-900">
-                  Como funciona o <span className="text-gradient">ZURBO</span>
-                </h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                  Três passos simples para conectar você ao profissional ideal
-                </p>
-              </div>
-              
-              <div className="grid md:grid-cols-3 gap-12">
-                <div className="animate-on-scroll hover-lift" style={{
-                  animationDelay: '0.1s'
-                }}>
-                  <div className="w-20 h-20 mx-auto mb-6 orange-gradient rounded-full flex items-center justify-center shadow-lg">
-                    <span className="text-3xl font-bold text-white">1</span>
-                  </div>
-                  <h3 className="text-2xl font-semibold mb-4 text-gray-900">Escolha o Serviço</h3>
-                  <p className="text-gray-600 text-lg leading-relaxed">
-                    Navegue pelas categorias e encontre exatamente o que precisa para sua casa ou negócio
-                  </p>
-                </div>
-                
-                <div className="animate-on-scroll hover-lift" style={{
-                  animationDelay: '0.2s'
-                }}>
-                  <div className="w-20 h-20 mx-auto mb-6 orange-gradient rounded-full flex items-center justify-center shadow-lg">
-                    <span className="text-3xl font-bold text-white">2</span>
-                  </div>
-                  <h3 className="text-2xl font-semibold mb-4 text-gray-900">Conecte-se</h3>
-                  <p className="text-gray-600 text-lg leading-relaxed">
-                    Converse diretamente com prestadores qualificados e agende o melhor horário
-                  </p>
-                </div>
-                
-                <div className="animate-on-scroll hover-lift" style={{
-                  animationDelay: '0.3s'
-                }}>
-                  <div className="w-20 h-20 mx-auto mb-6 orange-gradient rounded-full flex items-center justify-center shadow-lg">
-                    <span className="text-3xl font-bold text-white">3</span>
-                  </div>
-                  <h3 className="text-2xl font-semibold mb-4 text-gray-900">Avalie</h3>
-                  <p className="text-gray-600 text-lg leading-relaxed">
-                    Compartilhe sua experiência e ajude outros usuários a encontrar os melhores profissionais
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-        </>
-      ) : (
-        <PrestadorList 
-          category={selectedCategory} 
-          onViewProfile={handleViewProfile} 
-          onSchedule={handleSchedule} 
-          onChat={handleChat} 
-        />
-      )}
-
-      {selectedPrestador && (
-        <>
-          <ChatModal 
-            isOpen={showChat} 
-            onClose={() => setShowChat(false)} 
-            prestador={selectedPrestador} 
-          />
-          
-          <ScheduleModal 
-            isOpen={showSchedule} 
-            onClose={() => setShowSchedule(false)} 
-            prestador={selectedPrestador} 
-            onSchedule={handleConfirmSchedule} 
-          />
-        </>
-      )}
-
-      <footer className="text-white py-16 bg-gray-800">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="animate-on-scroll">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-12 h-12 orange-gradient rounded-xl flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">Z</span>
-                </div>
-                <h3 className="text-2xl font-bold text-gradient">ZURBO</h3>
-              </div>
-              <p className="leading-relaxed text-zinc-50">
-                Conectando você aos melhores prestadores de serviços da sua região com segurança e praticidade.
-              </p>
-            </div>
-            
-            <div className="animate-on-scroll" style={{
-              animationDelay: '0.1s'
-            }}>
-              <h4 className="font-semibold mb-6 text-lg text-zinc-50">Para Clientes</h4>
-              <ul className="space-y-3 text-gray-300 bg-transparent">
-                <li className="hover:text-orange-400 cursor-pointer transition-colors">Como funciona</li>
-                <li className="hover:text-orange-400 cursor-pointer transition-colors">Categorias</li>
-                <li className="hover:text-orange-400 cursor-pointer transition-colors bg-transparent">Avaliações</li>
-                <li className="hover:text-orange-400 cursor-pointer transition-colors">Suporte</li>
-              </ul>
-            </div>
-            
-            <div className="animate-on-scroll" style={{
-              animationDelay: '0.2s'
-            }}>
-              <h4 className="font-semibold mb-6 text-lg text-zinc-50">Para Prestadores</h4>
-              <ul className="space-y-3 text-gray-300">
-                <li className="hover:text-orange-400 cursor-pointer transition-colors">Cadastre-se</li>
-                <li className="hover:text-orange-400 cursor-pointer transition-colors">Central do Prestador</li>
-                <li className="hover:text-orange-400 cursor-pointer transition-colors">Dicas</li>
-                <li className="hover:text-orange-400 cursor-pointer transition-colors">Comissões</li>
-              </ul>
-            </div>
-            
-            <div className="animate-on-scroll" style={{
-              animationDelay: '0.3s'
-            }}>
-              <h4 className="font-semibold mb-6 text-lg text-zinc-50">Contato</h4>
-              <ul className="space-y-3 text-gray-300">
-                <li className="hover:text-orange-400 cursor-pointer transition-colors">suporte@zurbo.com</li>
-                <li className="hover:text-orange-400 cursor-pointer transition-colors">(11) 99999-9999</li>
-                <li className="hover:text-orange-400 cursor-pointer transition-colors">Termos de Uso</li>
-                <li className="hover:text-orange-400 cursor-pointer transition-colors">Privacidade</li>
-              </ul>
-            </div>
+      {/* Hero Section */}
+      <HeroSection />
+      
+      {/* Seção de categorias de serviços */}
+      <section className="py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Explore nossos serviços
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Encontre profissionais qualificados para qualquer necessidade
+            </p>
           </div>
           
-          <div className="border-t border-gray-700 mt-12 pt-8 text-center text-gray-400">
-            <p className="font-normal text-gray-100"> ZURBO® Todos os direitos reservados.</p>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {servicos.map((servico) => {
+              const IconComponent = iconMap[servico.icone as keyof typeof iconMap];
+              return (
+                <Card
+                  key={servico.id}
+                  className="group cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1 border-0 shadow-sm"
+                  onClick={() => setFilters({ ...filters, servico: servico.id })}
+                >
+                  <CardContent className="p-4 text-center">
+                    <div 
+                      className="w-12 h-12 mx-auto mb-3 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform"
+                      style={{ backgroundColor: `${servico.cor}20` }}
+                    >
+                      <IconComponent 
+                        className="h-6 w-6" 
+                        style={{ color: servico.cor }}
+                      />
+                    </div>
+                    <h3 className="font-medium text-gray-900 text-sm">
+                      {servico.nome}
+                    </h3>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
-      </footer>
+      </section>
+
+      {/* Filtros e listagem */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <ModernFilters 
+          filters={filters}
+          onFiltersChange={setFilters}
+          servicos={servicos}
+        />
+        
+        {/* Resultados */}
+        <div className="mt-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">
+                {loadingPrestadores ? 'Carregando...' : `${prestadores.length} prestadores encontrados`}
+              </h2>
+              {filters.cidade && (
+                <p className="text-gray-600 mt-1">
+                  em {filters.cidade}
+                </p>
+              )}
+            </div>
+            
+            {prestadores.some(p => p.premium) && (
+              <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white">
+                <span className="mr-1">👑</span>
+                Premium disponível
+              </Badge>
+            )}
+          </div>
+
+          {loadingPrestadores ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="bg-white rounded-lg shadow-md animate-pulse">
+                  <div className="aspect-[4/3] bg-gray-200 rounded-t-lg"></div>
+                  <div className="p-4 space-y-3">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-8 bg-gray-200 rounded"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : prestadores.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {prestadores.map((prestador) => (
+                <PrestadorCard
+                  key={prestador.id}
+                  prestador={prestador}
+                  onViewProfile={handleViewProfile}
+                  onContact={handleContact}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                <Users className="h-8 w-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                Nenhum prestador encontrado
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Tente ajustar os filtros ou buscar em outra região
+              </p>
+              <Button 
+                variant="outline" 
+                onClick={() => setFilters({
+                  busca: '',
+                  cidade: '',
+                  servico: '',
+                  precoMin: 0,
+                  precoMax: 1000,
+                  notaMin: 0,
+                  apenasремium: false,
+                })}
+              >
+                Limpar filtros
+              </Button>
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* Seção de estatísticas */}
+      <section className="bg-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-orange-100 rounded-full flex items-center justify-center">
+                <Users className="h-8 w-8 text-orange-600" />
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-2">1000+</h3>
+              <p className="text-gray-600">Prestadores cadastrados</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+                <Star className="h-8 w-8 text-blue-600" />
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-2">4.8</h3>
+              <p className="text-gray-600">Avaliação média</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
+                <Shield className="h-8 w-8 text-green-600" />
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-2">100%</h3>
+              <p className="text-gray-600">Seguro e confiável</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <ModernFooter />
     </div>
   );
-};
-
-export default Index;
+}

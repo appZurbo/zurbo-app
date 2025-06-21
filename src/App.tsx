@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,6 +10,10 @@ import Index from "./pages/Index";
 import { ProfilePageFixed } from "./components/profile/ProfilePageFixed";
 import ServiceSelectionPage from "./components/services/ServiceSelectionPage";
 import { UserSettings } from "./components/settings/UserSettings";
+import TermosUso from "./pages/TermosUso";
+import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
+import RegrasComunidade from "./pages/RegrasComunidade";
+import PlanoPremium from "./pages/PlanoPremium";
 import NotFound from "./pages/NotFound";
 import { MobileLayout } from "./components/mobile/MobileLayout";
 import { useState } from "react";
@@ -24,12 +27,12 @@ const AuthenticatedApp = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-orange-500 rounded-xl flex items-center justify-center animate-pulse">
+          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center animate-pulse">
             <span className="text-white font-bold text-2xl">Z</span>
           </div>
-          <p>Carregando...</p>
+          <p className="text-gray-600">Carregando...</p>
         </div>
       </div>
     );
@@ -37,13 +40,23 @@ const AuthenticatedApp = () => {
 
   if (!isAuthenticated) {
     return (
-      <AuthPage 
-        onAuthSuccess={(userType) => {
-          if (userType === 'prestador') {
-            setShowServiceSelection(true);
-          }
-        }} 
-      />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/termos" element={<TermosUso />} />
+          <Route path="/privacidade" element={<PoliticaPrivacidade />} />
+          <Route path="/regras-comunidade" element={<RegrasComunidade />} />
+          <Route path="/premium" element={<PlanoPremium />} />
+          <Route path="*" element={
+            <AuthPage 
+              onAuthSuccess={(userType) => {
+                if (userType === 'prestador') {
+                  setShowServiceSelection(true);
+                }
+              }} 
+            />} 
+          />
+        </Routes>
+      </BrowserRouter>
     );
   }
 
@@ -69,6 +82,10 @@ const AuthenticatedApp = () => {
             <Navigate to="/" replace />
           )
         } />
+        <Route path="/termos" element={<TermosUso />} />
+        <Route path="/privacidade" element={<PoliticaPrivacidade />} />
+        <Route path="/regras-comunidade" element={<RegrasComunidade />} />
+        <Route path="/premium" element={<PlanoPremium />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
