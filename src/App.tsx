@@ -70,39 +70,43 @@ const AuthenticatedApp = () => {
     );
   }
 
-  const AppContent = () => (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/perfil" element={<ProfilePageFixed />} />
-        <Route path="/configuracoes" element={<UserSettings />} />
-        <Route path="/servicos" element={
-          profile?.tipo === 'prestador' ? (
-            <ServiceSelectionPage onComplete={() => {}} />
-          ) : (
-            <Navigate to="/" replace />
-          )
-        } />
-        <Route path="/termos" element={<TermosUso />} />
-        <Route path="/privacidade" element={<PoliticaPrivacidade />} />
-        <Route path="/regras-comunidade" element={<RegrasComunidade />} />
-        <Route path="/premium" element={<PlanoPremium />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
+  const AppRoutes = () => (
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="/perfil" element={<ProfilePageFixed />} />
+      <Route path="/configuracoes" element={<UserSettings />} />
+      <Route path="/servicos" element={
+        profile?.tipo === 'prestador' ? (
+          <ServiceSelectionPage onComplete={() => {}} />
+        ) : (
+          <Navigate to="/" replace />
+        )
+      } />
+      <Route path="/termos" element={<TermosUso />} />
+      <Route path="/privacidade" element={<PoliticaPrivacidade />} />
+      <Route path="/regras-comunidade" element={<RegrasComunidade />} />
+      <Route path="/premium" element={<PlanoPremium />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 
   // Usar layout mobile se for dispositivo móvel
   if (isMobile) {
     return (
-      <MobileLayout>
-        <AppContent />
-      </MobileLayout>
+      <BrowserRouter>
+        <MobileLayout>
+          <AppRoutes />
+        </MobileLayout>
+      </BrowserRouter>
     );
   }
 
   // Layout desktop padrão
-  return <AppContent />;
+  return (
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
+  );
 };
 
 const App = () => (
