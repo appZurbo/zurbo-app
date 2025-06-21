@@ -72,6 +72,27 @@ export const useComments = (userId?: string) => {
       return false;
     }
 
+    // Verificar se o usuário já comentou sobre esta pessoa
+    try {
+      const { data: existingComment } = await supabase
+        .from('comentarios')
+        .select('id')
+        .eq('avaliador_id', profile.id)
+        .eq('avaliado_id', avaliadoId)
+        .maybeSingle();
+
+      if (existingComment) {
+        toast({
+          title: "Avaliação já existe",
+          description: "Você já avaliou este usuário",
+          variant: "destructive",
+        });
+        return false;
+      }
+    } catch (error) {
+      console.error('Erro ao verificar comentário existente:', error);
+    }
+
     setSubmitting(true);
     try {
       const { error } = await supabase

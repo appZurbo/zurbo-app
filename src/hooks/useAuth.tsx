@@ -54,15 +54,20 @@ export const useAuth = () => {
         .from('users')
         .select('*')
         .eq('auth_id', authId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error loading profile:', error);
-      } else {
+        setProfile(null);
+      } else if (data) {
         setProfile(data);
+      } else {
+        console.log('No profile found for user');
+        setProfile(null);
       }
     } catch (error) {
       console.error('Error loading profile:', error);
+      setProfile(null);
     } finally {
       setLoading(false);
     }

@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { StarRating } from '@/components/ui/star-rating';
 import { MessageSquare } from 'lucide-react';
 import { useComments } from '@/hooks/useComments';
+import { useAuth } from '@/hooks/useAuth';
 
 interface AddCommentDialogProps {
   userId: string;
@@ -18,9 +19,17 @@ export const AddCommentDialog = ({ userId, userName }: AddCommentDialogProps) =>
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const { addComment, submitting } = useComments();
+  const { profile } = useAuth();
+
+  // Não mostrar botão se for o próprio usuário
+  if (profile?.id === userId) {
+    return null;
+  }
 
   const handleSubmit = async () => {
-    if (!comment.trim() || rating === 0) return;
+    if (!comment.trim() || rating === 0) {
+      return;
+    }
 
     const success = await addComment(userId, comment.trim(), rating);
     if (success) {

@@ -145,7 +145,11 @@ export const ProfilePageFixed = () => {
       return;
     }
 
-    await uploadProfilePicture(file);
+    const result = await uploadProfilePicture(file);
+    if (result) {
+      // Recarregar página para mostrar nova foto
+      setTimeout(() => window.location.reload(), 1000);
+    }
   };
 
   const maskCPF = (cpf: string) => {
@@ -154,11 +158,29 @@ export const ProfilePageFixed = () => {
   };
 
   if (authLoading) {
-    return <div className="flex justify-center p-8">Carregando...</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-orange-500 rounded-xl flex items-center justify-center animate-pulse">
+            <span className="text-white font-bold text-2xl">Z</span>
+          </div>
+          <p>Carregando perfil...</p>
+        </div>
+      </div>
+    );
   }
 
   if (!profile) {
-    return <div className="flex justify-center p-8">Perfil não encontrado</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">Perfil não encontrado</p>
+          <Button onClick={() => window.location.href = '/'}>
+            Voltar ao início
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -346,14 +368,8 @@ export const ProfilePageFixed = () => {
               <CardTitle className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Star className="h-5 w-5" />
-                  Avaliações
+                  Minhas Avaliações
                 </div>
-                {profile.tipo === 'prestador' && (
-                  <AddCommentDialog 
-                    userId={profile.id} 
-                    userName={profile.nome || 'Usuário'} 
-                  />
-                )}
               </CardTitle>
             </CardHeader>
             <CardContent>
