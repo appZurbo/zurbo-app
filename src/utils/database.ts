@@ -54,7 +54,7 @@ export const checkUserProfile = async (authId: string): Promise<UserProfile | nu
       return null;
     }
 
-    return data;
+    return data as UserProfile;
   } catch (error) {
     console.error('Database check error:', error);
     return null;
@@ -81,7 +81,7 @@ export const createUserProfile = async (authId: string, email: string, userData:
       return null;
     }
 
-    return data;
+    return data as UserProfile;
   } catch (error) {
     console.error('Profile creation error:', error);
     return null;
@@ -102,7 +102,7 @@ export const updateUserProfile = async (userId: string, updates: Partial<UserPro
       return null;
     }
 
-    return data;
+    return data as UserProfile;
   } catch (error) {
     console.error('Profile update error:', error);
     return null;
@@ -149,7 +149,7 @@ export const getPrestadores = async (filters?: {
     const { data, error } = await query;
 
     if (error) throw error;
-    return data || [];
+    return (data || []) as UserProfile[];
   } catch (error) {
     console.error('Error fetching prestadores:', error);
     return [];

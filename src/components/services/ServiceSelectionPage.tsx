@@ -2,52 +2,78 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Wrench, Heart, Bolt, Brush } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { 
+  CheckCircle, 
+  Star, 
+  DollarSign,
+  Sparkles, 
+  Flower, 
+  Paintbrush, 
+  Zap, 
+  Droplets, 
+  Truck, 
+  ChefHat, 
+  Hammer, 
+  Scissors, 
+  Heart 
+} from 'lucide-react';
 
-interface Service {
+interface Servico {
   id: string;
   nome: string;
   icone: string;
+  cor: string;
+  ativo: boolean;
 }
 
-interface ServiceWithPrice extends Service {
-  selected: boolean;
-  preco_medio?: number;
+interface ServicoSelecionado {
+  servico_id: string;
+  preco_min: number;
+  preco_max: number;
 }
 
-const ServiceSelectionPage = ({ onComplete }: { onComplete: () => void }) => {
-  const [services, setServices] = useState<ServiceWithPrice[]>([]);
+interface ServiceSelectionPageProps {
+  onComplete: () => void;
+}
+
+const iconMap: { [key: string]: any } = {
+  Sparkles, Flower, Paintbrush, Zap, Droplets, Truck, ChefHat, Hammer, Scissors, Heart
+};
+
+const ServiceSelectionPage = ({ onComplete }: ServiceSelectionPageProps) => {
+  const [servicos, setServicos] = useState<Servico[]>([]);
+  const [servicosSelecionados, setServicosSelecionados] = useState<ServicoSelecionado[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+  const { profile } = useAuth();
 
   useEffect(() => {
-    loadServices();
+    loadServicos();
+    loadServicosPrestador();
   }, []);
 
-  const loadServices = async () => {
+  const loadServicos = async () => {
     try {
       const { data, error } = await supabase
-        .from('servicos_disponiveis')
+        .from('servicos')
         .select('*')
-        .eq('ativo', true);
+        .eq('ativo', true)
+        .order('nome');
 
       if (error) throw error;
-
-      setServices(data.map(service => ({
-        ...service,
-        selected: false,
-        preco_medio: 0
-      })));
-    } catch (error: any) {
+      setServicos(data || []);
+    } catch (error) {
+      console.error('Erro ao carregar serviços:', error);
       toast({
-        title: "Erro ao carregar serviços",
-        description: error.message,
+        title: "Erro",
+        description: "Não foi possível carregar os serviços disponíveis",
         variant: "destructive",
       });
     } finally {
@@ -55,76 +81,105 @@ const ServiceSelectionPage = ({ onComplete }: { onComplete: () => void }) => {
     }
   };
 
-  const toggleService = (serviceId: string) => {
-    setServices(services.map(service => 
-      service.id === serviceId 
-        ? { ...service, selected: !service.selected }
-        : service
-    ));
+  const loadServicosPrestador = async () => {
+    if (!profile) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('prestador_servicos')
+        .select('servico_id, preco_min, preco_max')
+        .eq('prestador_id', profile.id);
+
+      if (error) throw error;
+      
+      const servicosExistentes = (data || []).map(item => ({
+        servico_id: item.servico_id,
+        preco_min: item.preco_min || 0,
+        preco_max: item.preco_max || 0,
+      }));
+      
+      setServicosSelecionados(servicosExistentes);
+    } catch (error) {
+      console.error('Erro ao carregar serviços do prestador:', error);
+    }
   };
 
-  const updatePrice = (serviceId: string, price: number) => {
-    setServices(services.map(service => 
-      service.id === serviceId 
-        ? { ...service, preco_medio: price }
-        : service
-    ));
+  const toggleServico = (servicoId: string) => {
+    const jaExiste = servicosSelecionados.find(s => s.servico_id === servicoId);
+    
+    if (jaExiste) {
+      setServicosSelecionados(prev => prev.filter(s => s.servico_id !== servicoId));
+    } else {
+      setServicosSelecionados(prev => [...prev, {
+        servico_id: servicoId,
+        preco_min: 50,
+        preco_max: 200
+      }]);
+    }
   };
 
-  const saveServices = async () => {
+  const updatePreco = (servicoId: string, field: 'preco_min' | 'preco_max', value: number) => {
+    setServicosSelecionados(prev =>
+      prev.map(s =>
+        s.servico_id === servicoId
+          ? { ...s, [field]: value }
+          : s
+      )
+    );
+  };
+
+  const salvarServicos = async () => {
+    if (!profile) {
+      toast({
+        title: "Erro",
+        description: "Perfil não encontrado",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (servicosSelecionados.length === 0) {
+      toast({
+        title: "Atenção",
+        description: "Selecione pelo menos um serviço para continuar",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSaving(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Usuário não autenticado');
-
-      const { data: userProfile } = await supabase
-        .from('users')
-        .select('id')
-        .eq('auth_id', user.id)
-        .single();
-
-      if (!userProfile) throw new Error('Perfil do usuário não encontrado');
-
-      const selectedServices = services.filter(service => service.selected);
-      
-      if (selectedServices.length === 0) {
-        toast({
-          title: "Selecione pelo menos um serviço",
-          description: "Você precisa escolher quais serviços irá prestar.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Primeiro, remover serviços existentes
+      // Primeiro, remover todos os serviços existentes
       await supabase
-        .from('servicos_prestados')
+        .from('prestador_servicos')
         .delete()
-        .eq('prestador_id', userProfile.id);
+        .eq('prestador_id', profile.id);
 
-      // Inserir novos serviços
-      const servicesToInsert = selectedServices.map(service => ({
-        prestador_id: userProfile.id,
-        servico_id: service.id,
-        preco_medio: service.preco_medio || 0
+      // Depois, inserir os novos serviços
+      const servicosParaInserir = servicosSelecionados.map(s => ({
+        prestador_id: profile.id,
+        servico_id: s.servico_id,
+        preco_min: s.preco_min,
+        preco_max: s.preco_max
       }));
 
       const { error } = await supabase
-        .from('servicos_prestados')
-        .insert(servicesToInsert);
+        .from('prestador_servicos')
+        .insert(servicosParaInserir);
 
       if (error) throw error;
 
       toast({
-        title: "Serviços salvos com sucesso!",
-        description: "Você pode alterar suas opções a qualquer momento no perfil.",
+        title: "Sucesso!",
+        description: "Seus serviços foram salvos com sucesso",
       });
 
       onComplete();
     } catch (error: any) {
+      console.error('Erro ao salvar serviços:', error);
       toast({
-        title: "Erro ao salvar serviços",
-        description: error.message,
+        title: "Erro",
+        description: "Não foi possível salvar os serviços",
         variant: "destructive",
       });
     } finally {
@@ -132,90 +187,154 @@ const ServiceSelectionPage = ({ onComplete }: { onComplete: () => void }) => {
     }
   };
 
-  const getServiceIcon = (iconName: string) => {
-    switch (iconName) {
-      case 'wrench': return <Wrench className="h-8 w-8" />;
-      case 'heart': return <Heart className="h-8 w-8" />;
-      case 'bolt': return <Bolt className="h-8 w-8" />;
-      case 'brush': return <Brush className="h-8 w-8" />;
-      default: return <Wrench className="h-8 w-8" />;
-    }
-  };
-
   if (loading) {
-    return <div className="flex justify-center p-8">Carregando serviços...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-orange-500 rounded-xl flex items-center justify-center animate-pulse">
+            <span className="text-white font-bold text-2xl">Z</span>
+          </div>
+          <p>Carregando serviços...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Escolha os Serviços que Você Presta</CardTitle>
-          <p className="text-gray-600">
-            Selecione todos os serviços que você oferece e defina um preço médio para cada um.
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="text-center mb-8">
+          <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
+            <Star className="h-10 w-10 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Configure seus Serviços
+          </h1>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Selecione os serviços que você oferece e defina seus preços. 
+            Isso ajudará os clientes a encontrarem você mais facilmente.
           </p>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            {services.map((service) => (
-              <Card 
-                key={service.id} 
-                className={`cursor-pointer transition-colors ${
-                  service.selected ? 'border-orange-500 bg-orange-50' : ''
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+          {servicos.map((servico) => {
+            const isSelected = servicosSelecionados.some(s => s.servico_id === servico.id);
+            const IconComponent = iconMap[servico.icone] || Star;
+            
+            return (
+              <Card
+                key={servico.id}
+                className={`cursor-pointer transition-all duration-200 ${
+                  isSelected 
+                    ? 'ring-2 ring-orange-500 bg-orange-50' 
+                    : 'hover:shadow-md'
                 }`}
-                onClick={() => toggleService(service.id)}
+                onClick={() => toggleServico(servico.id)}
               >
                 <CardContent className="p-4">
-                  <div className="flex items-center space-x-3">
-                    <Checkbox
-                      checked={service.selected}
-                      onChange={() => toggleService(service.id)}
-                    />
-                    <div className="text-orange-500">
-                      {getServiceIcon(service.icone)}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-medium">{service.nome}</h3>
-                    </div>
-                  </div>
-                  
-                  {service.selected && (
-                    <div className="mt-3">
-                      <Label htmlFor={`price-${service.id}`} className="text-sm">
-                        Preço médio (R$)
-                      </Label>
-                      <Input
-                        id={`price-${service.id}`}
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={service.preco_medio || ''}
-                        onChange={(e) => updatePrice(service.id, parseFloat(e.target.value) || 0)}
-                        onClick={(e) => e.stopPropagation()}
-                        placeholder="Ex: 50.00"
-                        className="mt-1"
+                  <div className="flex items-center justify-between mb-3">
+                    <div 
+                      className="w-10 h-10 rounded-lg flex items-center justify-center"
+                      style={{ backgroundColor: `${servico.cor}20` }}
+                    >
+                      <IconComponent 
+                        className="h-5 w-5" 
+                        style={{ color: servico.cor }}
                       />
                     </div>
-                  )}
+                    {isSelected && (
+                      <CheckCircle className="h-6 w-6 text-orange-500" />
+                    )}
+                  </div>
+                  <h3 className="font-medium text-gray-900">
+                    {servico.nome}
+                  </h3>
                 </CardContent>
               </Card>
-            ))}
-          </div>
-          
-          <div className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={onComplete}>
-              Pular por Agora
-            </Button>
-            <Button 
-              onClick={saveServices} 
-              disabled={saving}
-              className="bg-orange-500 hover:bg-orange-600"
-            >
-              {saving ? 'Salvando...' : 'Salvar Serviços'}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+            );
+          })}
+        </div>
+
+        {servicosSelecionados.length > 0 && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <DollarSign className="h-5 w-5" />
+                Defina seus Preços
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {servicosSelecionados.map((servicoSelecionado) => {
+                const servico = servicos.find(s => s.id === servicoSelecionado.servico_id);
+                if (!servico) return null;
+
+                return (
+                  <div key={servico.id} className="p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-3">
+                      {servico.nome}
+                    </h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor={`min-${servico.id}`}>
+                          Preço Mínimo (R$)
+                        </Label>
+                        <Input
+                          id={`min-${servico.id}`}
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={servicoSelecionado.preco_min}
+                          onChange={(e) => updatePreco(
+                            servico.id, 
+                            'preco_min', 
+                            parseFloat(e.target.value) || 0
+                          )}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor={`max-${servico.id}`}>
+                          Preço Máximo (R$)
+                        </Label>
+                        <Input
+                          id={`max-${servico.id}`}
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={servicoSelecionado.preco_max}
+                          onChange={(e) => updatePreco(
+                            servico.id, 
+                            'preco_max', 
+                            parseFloat(e.target.value) || 0
+                          )}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </CardContent>
+          </Card>
+        )}
+
+        <div className="flex justify-center gap-4">
+          <Button
+            variant="outline"
+            onClick={onComplete}
+            disabled={saving}
+          >
+            Pular por Agora
+          </Button>
+          <Button
+            onClick={salvarServicos}
+            disabled={saving || servicosSelecionados.length === 0}
+            className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
+          >
+            {saving ? 'Salvando...' : 'Salvar e Continuar'}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };

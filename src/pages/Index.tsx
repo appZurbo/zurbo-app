@@ -52,13 +52,12 @@ export default function Index() {
   const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
   const [loadingPrestadores, setLoadingPrestadores] = useState(true);
   const [filters, setFilters] = useState({
-    busca: '',
     cidade: '',
     servico: '',
     precoMin: 0,
     precoMax: 1000,
     notaMin: 0,
-    apenasремium: false,
+    apenasПремium: false,
   });
 
   useEffect(() => {
@@ -78,14 +77,7 @@ export default function Index() {
       
       let filteredData = data;
       
-      if (filters.busca) {
-        filteredData = data.filter(p => 
-          p.nome.toLowerCase().includes(filters.busca.toLowerCase()) ||
-          p.bio?.toLowerCase().includes(filters.busca.toLowerCase())
-        );
-      }
-      
-      if (filters.apenasремium) {
+      if (filters.apenasПремium) {
         filteredData = filteredData.filter(p => p.premium);
       }
       
@@ -250,13 +242,12 @@ export default function Index() {
               <Button 
                 variant="outline" 
                 onClick={() => setFilters({
-                  busca: '',
                   cidade: '',
                   servico: '',
                   precoMin: 0,
                   precoMax: 1000,
                   notaMin: 0,
-                  apenasремium: false,
+                  apenasПремium: false,
                 })}
               >
                 Limpar filtros

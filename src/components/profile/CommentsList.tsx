@@ -26,7 +26,7 @@ export const CommentsList = ({ userId }: CommentsListProps) => {
     );
   }
 
-  const averageRating = comments.reduce((sum, comment) => sum + comment.avaliacao, 0) / comments.length;
+  const averageRating = comments.reduce((sum, comment) => sum + comment.nota, 0) / comments.length;
 
   return (
     <div className="space-y-4">
@@ -48,7 +48,7 @@ export const CommentsList = ({ userId }: CommentsListProps) => {
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
                 <Avatar className="h-10 w-10">
-                  <AvatarImage src={comment.avaliador?.foto_perfil} />
+                  <AvatarImage src={comment.avaliador?.foto_url} />
                   <AvatarFallback>
                     {comment.avaliador?.nome?.charAt(0) || '?'}
                   </AvatarFallback>
@@ -59,7 +59,7 @@ export const CommentsList = ({ userId }: CommentsListProps) => {
                     <span className="font-medium text-sm">
                       {comment.avaliador?.nome || 'Usuário'}
                     </span>
-                    <StarRating rating={comment.avaliacao} readonly size="sm" />
+                    <StarRating rating={comment.nota} readonly size="sm" />
                   </div>
                   
                   <p className="text-gray-700 text-sm mb-2">
@@ -67,7 +67,7 @@ export const CommentsList = ({ userId }: CommentsListProps) => {
                   </p>
                   
                   <p className="text-xs text-gray-500">
-                    {formatDistanceToNow(new Date(comment.created_at), {
+                    {formatDistanceToNow(new Date(comment.criado_em), {
                       addSuffix: true,
                       locale: ptBR
                     })}
