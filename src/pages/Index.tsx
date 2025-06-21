@@ -11,6 +11,8 @@ import { ModernFilters } from '@/components/filters/ModernFilters';
 import { ModernHeader } from '@/components/layout/ModernHeader';
 import { ModernFooter } from '@/components/layout/ModernFooter';
 import { HeroSection } from '@/components/sections/HeroSection';
+import { ProfileViewModal } from '@/components/profile/ProfileViewModal';
+import { ContactModal } from '@/components/contact/ContactModal';
 import { 
   Sparkles, 
   Flower, 
@@ -28,6 +30,7 @@ import {
   Shield
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useDebounce } from '@/hooks/useDebounce';
 
 const servicos = [
   { id: 'limpeza', nome: 'Limpeza', icone: 'Sparkles', cor: '#3B82F6' },
@@ -51,37 +54,43 @@ export default function Index() {
   const { toast } = useToast();
   const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
   const [loadingPrestadores, setLoadingPrestadores] = useState(true);
+  const [selectedPrestador, setSelectedPrestador] = useState<UserProfile | null>(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
   const [filters, setFilters] = useState({
     cidade: '',
     servico: '',
     precoMin: 0,
     precoMax: 1000,
     notaMin: 0,
-    apenasПремium: false,
+    apenasPremium: false, // Corrigido caractere cirílico
   });
+
+  // Debounce dos filtros para melhorar performance
+  const debouncedFilters = useDebounce(filters, 500);
 
   useEffect(() => {
     loadPrestadores();
-  }, [filters]);
+  }, [debouncedFilters]);
 
   const loadPrestadores = async () => {
     setLoadingPrestadores(true);
     try {
       const data = await getPrestadores({
-        cidade: filters.cidade,
-        servico: filters.servico,
-        precoMin: filters.precoMin > 0 ? filters.precoMin : undefined,
-        precoMax: filters.precoMax < 1000 ? filters.precoMax : undefined,
-        notaMin: filters.notaMin > 0 ? filters.notaMin : undefined,
+        cidade: debouncedFilters.cidade,
+        servico: debouncedFilters.servico,
+        precoMin: debouncedFilters.precoMin > 0 ? debouncedFilters.precoMin : undefined,
+        precoMax: debouncedFilters.precoMax < 1000 ? debouncedFilters.precoMax : undefined,
+        notaMin: debouncedFilters.notaMin > 0 ? debouncedFilters.notaMin : undefined,
       });
       
       let filteredData = data;
       
-      if (filters.apenasПремium) {
+      if (debouncedFilters.apenasPremium) {
         filteredData = filteredData.filter(p => p.premium);
       }
       
-      setPrestadores(filteredData as UserProfile[]);
+      setPrestadores(filteredData);
     } catch (error) {
       console.error('Error loading prestadores:', error);
       toast({
@@ -95,8 +104,8 @@ export default function Index() {
   };
 
   const handleViewProfile = (prestador: UserProfile) => {
-    // TODO: Implementar visualização de perfil
-    console.log('View profile:', prestador);
+    setSelectedPrestador(prestador);
+    setShowProfileModal(true);
   };
 
   const handleContact = (prestador: UserProfile) => {
@@ -108,8 +117,8 @@ export default function Index() {
       });
       return;
     }
-    // TODO: Implementar chat/contato
-    console.log('Contact:', prestador);
+    setSelectedPrestador(prestador);
+    setShowContactModal(true);
   };
 
   if (loading) {
@@ -246,7 +255,7 @@ export default function Index() {
                   precoMin: 0,
                   precoMax: 1000,
                   notaMin: 0,
-                  apenasПремium: false,
+                  apenasPremium: false,
                 })}
               >
                 Limpar filtros
@@ -288,6 +297,22 @@ export default function Index() {
       </section>
 
       <ModernFooter />
+
+      {/* Modais */}
+      {selectedPrestador && (
+        <>
+          <ProfileViewModal
+            prestador={selectedPrestador}
+            open={showProfileModal}
+            onOpenChange={setShowProfileModal}
+          />
+          <ContactModal
+            prestador={selectedPrestador}
+            open={showContactModal}
+            onOpenChange={setShowContactModal}
+          />
+        </>
+      )}
     </div>
   );
 }
