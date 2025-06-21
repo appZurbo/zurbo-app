@@ -3,11 +3,12 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { updateUserProfile } from '@/utils/database';
 
 export const useProfilePicture = () => {
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
-  const { profile } = useAuth();
+  const { profile, updateLocalProfile } = useAuth();
 
   const uploadProfilePicture = async (file: File) => {
     if (!profile) {
@@ -21,6 +22,8 @@ export const useProfilePicture = () => {
 
     setUploading(true);
     try {
+      console.log('Starting upload for user:', profile.id);
+      
       const fileExt = file.name.split('.').pop();
       const fileName = `${profile.id}/avatar.${fileExt}`;
 
@@ -34,20 +37,24 @@ export const useProfilePicture = () => {
         throw uploadError;
       }
 
+      console.log('File uploaded successfully');
+
       // Obter URL pública
       const { data } = supabase.storage
         .from('profile-pictures')
         .getPublicUrl(fileName);
 
-      // Atualizar perfil do usuário
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ foto_perfil: data.publicUrl })
-        .eq('id', profile.id);
+      console.log('Public URL generated:', data.publicUrl);
 
-      if (updateError) {
-        console.error('Update error:', updateError);
-        throw updateError;
+      // Atualizar perfil do usuário no banco
+      const updatedProfile = await updateUserProfile(profile.id, { 
+        foto_perfil: data.publicUrl 
+      });
+
+      if (updatedProfile) {
+        // Atualizar o estado local
+        updateLocalProfile({ foto_perfil: data.publicUrl });
+        console.log('Profile updated with new photo URL');
       }
 
       toast({

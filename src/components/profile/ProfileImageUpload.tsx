@@ -21,6 +21,8 @@ export const ProfileImageUpload = ({ profileImage, userName, uploading }: Profil
     const file = event.target.files?.[0];
     if (!file) return;
 
+    console.log('File selected:', file.name, file.type, file.size);
+
     // Validar tipo e tamanho do arquivo
     if (!file.type.startsWith('image/')) {
       toast({
@@ -40,9 +42,21 @@ export const ProfileImageUpload = ({ profileImage, userName, uploading }: Profil
       return;
     }
 
+    console.log('Starting profile picture upload...');
     const result = await uploadProfilePicture(file);
+    
     if (result) {
-      setTimeout(() => window.location.reload(), 1000);
+      console.log('Profile picture upload successful:', result);
+      // Não recarregar a página - o estado será atualizado automaticamente
+      toast({
+        title: "Sucesso!",
+        description: "Recarregue a página para ver a nova foto",
+      });
+    }
+
+    // Limpar o input para permitir re-upload do mesmo arquivo
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 

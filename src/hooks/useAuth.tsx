@@ -15,6 +15,7 @@ interface UserProfile {
   latitude?: number;
   longitude?: number;
   descricao?: string;
+  updated_at?: string;
 }
 
 export const useAuth = () => {
@@ -27,17 +28,20 @@ export const useAuth = () => {
 
     const loadProfile = async (authId: string) => {
       try {
+        console.log('Loading profile for auth ID:', authId);
         let profileData = await checkUserProfile(authId);
         
         if (!profileData && mounted) {
-          // Se não existe perfil, tentar criar um básico
+          console.log('Profile not found, creating new profile...');
           const { data: { user: authUser } } = await supabase.auth.getUser();
           if (authUser) {
             profileData = await createUserProfile(authId, authUser.email || '', {});
+            console.log('Created new profile:', profileData);
           }
         }
 
         if (mounted) {
+          console.log('Setting profile:', profileData);
           setProfile(profileData);
         }
       } catch (error) {
@@ -57,7 +61,7 @@ export const useAuth = () => {
         setUser(currentUser);
         
         if (currentUser) {
-          // Pequeno delay para evitar conflitos
+          // Pequeno delay para evitar conflitos de race condition
           setTimeout(() => {
             if (mounted) {
               loadProfile(currentUser.id);
@@ -104,12 +108,20 @@ export const useAuth = () => {
     };
   }, []);
 
+  // Função para atualizar o perfil localmente
+  const updateLocalProfile = (updates: Partial<UserProfile>) => {
+    if (profile) {
+      setProfile({ ...profile, ...updates });
+    }
+  };
+
   return {
     user,
     profile,
     loading,
     isAuthenticated: !!user,
     isPrestador: profile?.tipo === 'prestador',
-    isCliente: profile?.tipo === 'cliente'
+    isCliente: profile?.tipo === 'cliente',
+    updateLocalProfile
   };
 };

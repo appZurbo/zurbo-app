@@ -31,6 +31,7 @@ export const createUserProfile = async (authId: string, email: string, userData:
         nome: userData.nome || email.split('@')[0],
         tipo: userData.tipo || 'cliente',
         cpf: userData.cpf || '',
+        updated_at: new Date().toISOString()
       })
       .select()
       .single();
@@ -43,6 +44,30 @@ export const createUserProfile = async (authId: string, email: string, userData:
     return data;
   } catch (error) {
     console.error('Profile creation error:', error);
+    return null;
+  }
+};
+
+export const updateUserProfile = async (userId: string, updates: any) => {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating user profile:', error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Profile update error:', error);
     return null;
   }
 };
