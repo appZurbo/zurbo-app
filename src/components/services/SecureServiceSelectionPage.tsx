@@ -9,7 +9,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { Wrench, Heart, Bolt, Brush, Shield, AlertCircle } from 'lucide-react';
-import { sanitizeText } from '@/utils/validation';
 
 interface Service {
   id: string;
@@ -47,7 +46,7 @@ const SecureServiceSelectionPage = ({ onComplete }: { onComplete: () => void }) 
   const loadServices = async () => {
     try {
       const { data, error } = await supabase
-        .from('servicos_disponiveis')
+        .from('servicos')
         .select('*')
         .eq('ativo', true);
 
@@ -129,7 +128,7 @@ const SecureServiceSelectionPage = ({ onComplete }: { onComplete: () => void }) 
 
       // First, remove existing services for this provider
       await supabase
-        .from('servicos_prestados')
+        .from('prestador_servicos')
         .delete()
         .eq('prestador_id', profile.id);
 
@@ -137,11 +136,12 @@ const SecureServiceSelectionPage = ({ onComplete }: { onComplete: () => void }) 
       const servicesToInsert = selectedServices.map(service => ({
         prestador_id: profile.id,
         servico_id: service.id,
-        preco_medio: Number(service.preco_medio) // Ensure numeric type
+        preco_min: Number(service.preco_medio), // Use as both min and max for now
+        preco_max: Number(service.preco_medio)
       }));
 
       const { error } = await supabase
-        .from('servicos_prestados')
+        .from('prestador_servicos')
         .insert(servicesToInsert);
 
       if (error) throw error;

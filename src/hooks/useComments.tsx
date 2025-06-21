@@ -9,11 +9,11 @@ interface Comment {
   avaliador_id: string;
   avaliado_id: string;
   comentario: string;
-  avaliacao: number;
-  created_at: string;
+  nota: number;
+  criado_em: string;
   avaliador?: {
     nome: string;
-    foto_perfil?: string;
+    foto_url?: string;
   };
 }
 
@@ -30,13 +30,13 @@ export const useComments = (userId?: string) => {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('comentarios')
+        .from('avaliacoes')
         .select(`
           *,
-          avaliador:users!comentarios_avaliador_id_fkey (nome, foto_perfil)
+          avaliador:users!avaliacoes_avaliador_id_fkey (nome, foto_url)
         `)
         .eq('avaliado_id', userId)
-        .order('created_at', { ascending: false });
+        .order('criado_em', { ascending: false });
 
       if (error) throw error;
       
@@ -45,7 +45,7 @@ export const useComments = (userId?: string) => {
         ...comment,
         avaliador: comment.avaliador ? {
           nome: comment.avaliador.nome,
-          foto_perfil: comment.avaliador.foto_perfil
+          foto_url: comment.avaliador.foto_url
         } : undefined
       }));
 
@@ -62,7 +62,7 @@ export const useComments = (userId?: string) => {
     }
   };
 
-  const addComment = async (avaliadoId: string, comentario: string, avaliacao: number) => {
+  const addComment = async (avaliadoId: string, comentario: string, nota: number) => {
     if (!profile) {
       toast({
         title: "Erro",
@@ -75,7 +75,7 @@ export const useComments = (userId?: string) => {
     // Verificar se o usuário já comentou sobre esta pessoa
     try {
       const { data: existingComment } = await supabase
-        .from('comentarios')
+        .from('avaliacoes')
         .select('id')
         .eq('avaliador_id', profile.id)
         .eq('avaliado_id', avaliadoId)
@@ -96,12 +96,12 @@ export const useComments = (userId?: string) => {
     setSubmitting(true);
     try {
       const { error } = await supabase
-        .from('comentarios')
+        .from('avaliacoes')
         .insert([{
           avaliador_id: profile.id,
           avaliado_id: avaliadoId,
           comentario,
-          avaliacao
+          nota
         }]);
 
       if (error) throw error;

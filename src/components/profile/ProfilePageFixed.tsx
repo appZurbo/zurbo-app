@@ -21,10 +21,8 @@ export const ProfilePageFixed = () => {
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
     nome: '',
-    endereco: '',
-    descricao: '',
-    latitude: null as number | null,
-    longitude: null as number | null,
+    endereco_cidade: '',
+    bio: '',
   });
   const { toast } = useToast();
   const { uploadProfilePicture, uploading } = useProfilePicture();
@@ -34,10 +32,8 @@ export const ProfilePageFixed = () => {
     if (profile) {
       setFormData({
         nome: profile.nome || '',
-        endereco: profile.endereco || '',
-        descricao: profile.descricao || '',
-        latitude: profile.latitude || null,
-        longitude: profile.longitude || null,
+        endereco_cidade: profile.endereco_cidade || '',
+        bio: profile.bio || '',
       });
     }
   }, [profile]);
@@ -61,10 +57,8 @@ export const ProfilePageFixed = () => {
     try {
       const sanitizedData = {
         nome: formData.nome.trim(),
-        endereco: formData.endereco.trim(),
-        descricao: formData.descricao.trim(),
-        latitude: formData.latitude,
-        longitude: formData.longitude,
+        endereco_cidade: formData.endereco_cidade.trim(),
+        bio: formData.bio.trim(),
       };
 
       const { error } = await supabase
@@ -92,31 +86,6 @@ export const ProfilePageFixed = () => {
       });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const getCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setFormData({
-            ...formData,
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          });
-          toast({
-            title: "Localização obtida!",
-            description: "Sua localização foi atualizada.",
-          });
-        },
-        (error) => {
-          toast({
-            title: "Erro de localização",
-            description: "Não foi possível obter sua localização.",
-            variant: "destructive",
-          });
-        }
-      );
     }
   };
 
@@ -211,7 +180,7 @@ export const ProfilePageFixed = () => {
               <div className="flex flex-col sm:flex-row items-center gap-4">
                 <div className="relative">
                   <Avatar className="w-24 h-24">
-                    <AvatarImage src={profile.foto_perfil} alt={profile.nome} />
+                    <AvatarImage src={profile.foto_url} alt={profile.nome} />
                     <AvatarFallback className="text-xl">
                       {profile.nome?.charAt(0) || '?'}
                     </AvatarFallback>
@@ -275,63 +244,40 @@ export const ProfilePageFixed = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="endereco">Endereço</Label>
+                  <Label htmlFor="endereco_cidade">Cidade</Label>
                   {editing ? (
                     <Input
-                      id="endereco"
-                      value={formData.endereco}
-                      onChange={(e) => setFormData({...formData, endereco: e.target.value})}
+                      id="endereco_cidade"
+                      value={formData.endereco_cidade}
+                      onChange={(e) => setFormData({...formData, endereco_cidade: e.target.value})}
                       maxLength={200}
                       className="mt-1"
                     />
                   ) : (
                     <p className="mt-1 p-2 bg-gray-50 rounded">
-                      {profile.endereco || 'Não informado'}
+                      {profile.endereco_cidade || 'Não informado'}
                     </p>
                   )}
                 </div>
               </div>
 
-              {/* Localização GPS */}
-              {editing && (
-                <div>
-                  <Label>Localização GPS</Label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={getCurrentLocation}
-                      className="flex items-center gap-2"
-                    >
-                      <MapPin className="h-4 w-4" />
-                      Usar GPS
-                    </Button>
-                    {formData.latitude && formData.longitude && (
-                      <span className="text-sm text-green-600">
-                        Localização obtida ✓
-                      </span>
-                    )}
-                  </div>
-                </div>
-              )}
-
               {/* Descrição para prestadores */}
               {profile.tipo === 'prestador' && (
                 <div>
-                  <Label htmlFor="descricao">Descrição dos Serviços</Label>
+                  <Label htmlFor="bio">Descrição dos Serviços</Label>
                   {editing ? (
                     <Textarea
-                      id="descricao"
+                      id="bio"
                       rows={3}
-                      value={formData.descricao}
-                      onChange={(e) => setFormData({...formData, descricao: e.target.value})}
+                      value={formData.bio}
+                      onChange={(e) => setFormData({...formData, bio: e.target.value})}
                       placeholder="Descreva seus serviços e experiência..."
                       maxLength={500}
                       className="mt-1"
                     />
                   ) : (
                     <p className="mt-1 p-2 bg-gray-50 rounded">
-                      {profile.descricao || 'Nenhuma descrição adicionada'}
+                      {profile.bio || 'Nenhuma descrição adicionada'}
                     </p>
                   )}
                 </div>

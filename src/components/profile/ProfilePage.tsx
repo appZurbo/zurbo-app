@@ -14,12 +14,10 @@ interface UserProfile {
   nome: string;
   email: string;
   cpf: string;
-  endereco: string;
+  endereco_cidade: string;
   tipo: string;
-  foto_perfil: string;
-  latitude: number;
-  longitude: number;
-  descricao: string;
+  foto_url: string;
+  bio: string;
 }
 
 const ProfilePage = () => {
@@ -94,31 +92,6 @@ const ProfilePage = () => {
     return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '***.***.***-**');
   };
 
-  const getCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setFormData({
-            ...formData,
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          });
-          toast({
-            title: "Localização obtida!",
-            description: "Sua localização foi atualizada.",
-          });
-        },
-        (error) => {
-          toast({
-            title: "Erro de localização",
-            description: "Não foi possível obter sua localização.",
-            variant: "destructive",
-          });
-        }
-      );
-    }
-  };
-
   if (loading) {
     return <div className="flex justify-center p-8">Carregando...</div>;
   }
@@ -139,7 +112,7 @@ const ProfilePage = () => {
         <CardContent className="space-y-6">
           <div className="flex items-center gap-4">
             <Avatar className="w-20 h-20">
-              <AvatarImage src={profile.foto_perfil} />
+              <AvatarImage src={profile.foto_url} />
               <AvatarFallback>{profile.nome?.charAt(0)}</AvatarFallback>
             </Avatar>
             <div>
@@ -180,56 +153,34 @@ const ProfilePage = () => {
             </div>
 
             <div>
-              <Label htmlFor="endereco">Endereço</Label>
+              <Label htmlFor="endereco_cidade">Cidade</Label>
               {editing ? (
                 <Input
-                  id="endereco"
-                  value={formData.endereco || ''}
-                  onChange={(e) => setFormData({...formData, endereco: e.target.value})}
+                  id="endereco_cidade"
+                  value={formData.endereco_cidade || ''}
+                  onChange={(e) => setFormData({...formData, endereco_cidade: e.target.value})}
                 />
               ) : (
-                <p className="mt-1 p-2 bg-gray-50 rounded">{profile.endereco || 'Não informado'}</p>
+                <p className="mt-1 p-2 bg-gray-50 rounded">{profile.endereco_cidade || 'Não informado'}</p>
               )}
             </div>
           </div>
 
-          {editing && (
-            <div>
-              <Label>Localização</Label>
-              <div className="flex items-center gap-2 mt-1">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={getCurrentLocation}
-                  className="flex items-center gap-2"
-                >
-                  <MapPin className="h-4 w-4" />
-                  Usar GPS
-                </Button>
-                {formData.latitude && formData.longitude && (
-                  <span className="text-sm text-green-600">
-                    Localização obtida ✓
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-
           {profile.tipo === 'prestador' && (
             <div>
-              <Label htmlFor="descricao">Descrição dos Serviços</Label>
+              <Label htmlFor="bio">Descrição dos Serviços</Label>
               {editing ? (
                 <textarea
-                  id="descricao"
+                  id="bio"
                   className="w-full mt-1 p-2 border rounded"
                   rows={3}
-                  value={formData.descricao || ''}
-                  onChange={(e) => setFormData({...formData, descricao: e.target.value})}
+                  value={formData.bio || ''}
+                  onChange={(e) => setFormData({...formData, bio: e.target.value})}
                   placeholder="Descreva seus serviços e experiência..."
                 />
               ) : (
                 <p className="mt-1 p-2 bg-gray-50 rounded">
-                  {profile.descricao || 'Nenhuma descrição adicionada'}
+                  {profile.bio || 'Nenhuma descrição adicionada'}
                 </p>
               )}
             </div>
