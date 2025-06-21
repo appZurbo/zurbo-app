@@ -9,6 +9,51 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      comentarios: {
+        Row: {
+          avaliacao: number | null
+          avaliado_id: string | null
+          avaliador_id: string | null
+          comentario: string
+          created_at: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          avaliacao?: number | null
+          avaliado_id?: string | null
+          avaliador_id?: string | null
+          comentario: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          avaliacao?: number | null
+          avaliado_id?: string | null
+          avaliador_id?: string | null
+          comentario?: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comentarios_avaliado_id_fkey"
+            columns: ["avaliado_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comentarios_avaliador_id_fkey"
+            columns: ["avaliador_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pagamentos_pix: {
         Row: {
           comprovante_url: string | null

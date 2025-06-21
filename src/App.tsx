@@ -5,18 +5,22 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useMobile } from "@/hooks/useMobile";
 import AuthPage from "@/components/auth/AuthPage";
 import Index from "./pages/Index";
-import ProfilePage from "./components/profile/ProfilePage";
+import { ProfilePageFixed } from "./components/profile/ProfilePageFixed";
 import ServiceSelectionPage from "./components/services/ServiceSelectionPage";
 import SettingsPage from "./components/settings/SettingsPage";
+import { UserSettings } from "./components/settings/UserSettings";
 import NotFound from "./pages/NotFound";
+import { MobileLayout } from "./components/mobile/MobileLayout";
 import { useState } from "react";
 
 const queryClient = new QueryClient();
 
 const AuthenticatedApp = () => {
   const { user, profile, loading, isAuthenticated } = useAuth();
+  const isMobile = useMobile();
   const [showServiceSelection, setShowServiceSelection] = useState(false);
 
   if (loading) {
@@ -52,14 +56,12 @@ const AuthenticatedApp = () => {
     );
   }
 
-  return (
+  const AppContent = () => (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/perfil" element={<ProfilePage />} />
-        <Route path="/configuracoes" element={
-          <SettingsPage onLogout={() => window.location.reload()} />
-        } />
+        <Route path="/perfil" element={<ProfilePageFixed />} />
+        <Route path="/configuracoes" element={<UserSettings />} />
         <Route path="/servicos" element={
           profile?.tipo === 'prestador' ? (
             <ServiceSelectionPage onComplete={() => {}} />
@@ -71,6 +73,18 @@ const AuthenticatedApp = () => {
       </Routes>
     </BrowserRouter>
   );
+
+  // Usar layout mobile se for dispositivo móvel
+  if (isMobile) {
+    return (
+      <MobileLayout>
+        <AppContent />
+      </MobileLayout>
+    );
+  }
+
+  // Layout desktop padrão
+  return <AppContent />;
 };
 
 const App = () => (
