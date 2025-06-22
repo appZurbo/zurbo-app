@@ -20,6 +20,9 @@ import PlanoPremium from "./pages/PlanoPremium";
 import NotFound from "./pages/NotFound";
 import { MobileLayout } from "./components/mobile/MobileLayout";
 import { AdminDashboard } from "./pages/AdminDashboard";
+import PrestadorSettings from "./pages/PrestadorSettings";
+import AdminContentModeration from "./pages/AdminContentModeration";
+import SystemSettings from "./pages/SystemSettings";
 
 const queryClient = new QueryClient();
 
@@ -97,9 +100,30 @@ const AuthenticatedApp = () => {
           <Navigate to="/" replace />
         )
       } />
+      <Route path="/prestador/configuracoes" element={
+        isAuthenticated && profile?.tipo === 'prestador' ? (
+          <PrestadorSettings />
+        ) : (
+          <Navigate to="/" replace />
+        )
+      } />
       <Route path="/admin" element={
         isAuthenticated && (profile?.tipo === 'admin' || profile?.tipo === 'moderator') ? (
           <AdminDashboard />
+        ) : (
+          <Navigate to="/" replace />
+        )
+      } />
+      <Route path="/admin/moderacao" element={
+        isAuthenticated && (profile?.tipo === 'admin' || profile?.tipo === 'moderator') ? (
+          <AdminContentModeration />
+        ) : (
+          <Navigate to="/" replace />
+        )
+      } />
+      <Route path="/admin/sistema" element={
+        isAuthenticated && profile?.tipo === 'admin' ? (
+          <SystemSettings />
         ) : (
           <Navigate to="/" replace />
         )
