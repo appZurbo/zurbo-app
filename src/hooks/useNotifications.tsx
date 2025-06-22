@@ -36,7 +36,14 @@ export const useNotifications = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setNotifications(data || []);
+      
+      // Type cast the data to ensure proper typing
+      const typedNotifications: Notification[] = (data || []).map(item => ({
+        ...item,
+        type: item.type as Notification['type']
+      }));
+      
+      setNotifications(typedNotifications);
     } catch (error) {
       console.error('Error loading notifications:', error);
     } finally {

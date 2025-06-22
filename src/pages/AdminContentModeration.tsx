@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -52,7 +51,15 @@ const AdminContentModeration = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setReports(data || []);
+      
+      // Type cast the data to ensure proper typing
+      const typedReports: Report[] = (data || []).map(item => ({
+        ...item,
+        type: item.type as Report['type'],
+        status: item.status as Report['status']
+      }));
+      
+      setReports(typedReports);
     } catch (error: any) {
       console.error('Error loading reports:', error);
       toast({
