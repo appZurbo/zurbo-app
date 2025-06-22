@@ -21,7 +21,10 @@ export const ChatWindow = ({ isOpen, onClose }: ChatWindowProps) => {
 
   const handleChatSelect = (chatId: string) => {
     setSelectedChatId(chatId);
-    setCurrentChat(chatId);
+    const selectedChat = chats.find(chat => chat.id === chatId);
+    if (selectedChat) {
+      setCurrentChat(selectedChat);
+    }
   };
 
   return (

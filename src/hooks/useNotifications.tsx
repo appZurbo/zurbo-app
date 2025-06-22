@@ -7,7 +7,7 @@ export interface Notification {
   user_id: string;
   title: string;
   message: string;
-  type: 'info' | 'success' | 'warning' | 'error';
+  type: 'new_client' | 'new_review' | 'new_message' | 'system_update';
   read: boolean;
   created_at: string;
 }

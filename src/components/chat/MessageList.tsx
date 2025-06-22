@@ -34,7 +34,7 @@ export const MessageList = () => {
                     : 'bg-gray-100 text-gray-900'
                 }`}
               >
-                <p className="text-sm">{message.message}</p>
+                <p className="text-sm">{message.content}</p>
                 <p
                   className={`text-xs mt-1 ${
                     isOwn ? 'text-orange-100' : 'text-gray-500'

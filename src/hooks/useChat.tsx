@@ -7,6 +7,7 @@ export interface Chat {
   cliente_id: string;
   prestador_id: string;
   created_at: string;
+  last_message?: string;
   cliente?: {
     nome: string;
     foto_url?: string;
