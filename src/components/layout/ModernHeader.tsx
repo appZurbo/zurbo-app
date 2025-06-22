@@ -22,7 +22,8 @@ import {
   Menu,
   X,
   Bell,
-  Heart
+  Heart,
+  Shield
 } from 'lucide-react';
 
 export const ModernHeader = () => {
@@ -72,6 +73,14 @@ export const ModernHeader = () => {
     navigate('/premium');
   };
 
+  const handleAdminClick = () => {
+    navigate('/admin');
+  };
+
+  const handleAuthClick = () => {
+    navigate('/auth');
+  };
+
   const handleServicesClick = () => {
     if (profile?.tipo === 'prestador') {
       navigate('/servicos');
@@ -79,6 +88,9 @@ export const ModernHeader = () => {
       scrollToSection('servicos');
     }
   };
+
+  // Verificar se o usuário é admin ou moderator
+  const isAdminOrModerator = profile?.tipo === 'admin' || profile?.tipo === 'moderator';
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
@@ -186,6 +198,13 @@ export const ModernHeader = () => {
                       </DropdownMenuItem>
                     )}
                     
+                    {isAdminOrModerator && (
+                      <DropdownMenuItem className="cursor-pointer" onClick={handleAdminClick}>
+                        <Shield className="h-4 w-4 mr-2" />
+                        Painel Admin
+                      </DropdownMenuItem>
+                    )}
+                    
                     <DropdownMenuItem className="cursor-pointer" onClick={handleSettingsClick}>
                       <Settings className="h-4 w-4 mr-2" />
                       Configurações
@@ -214,10 +233,10 @@ export const ModernHeader = () => {
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" onClick={() => window.location.reload()}>
+                <Button variant="ghost" size="sm" onClick={handleAuthClick}>
                   Entrar
                 </Button>
-                <Button size="sm" className="bg-orange-500 hover:bg-orange-600" onClick={() => window.location.reload()}>
+                <Button size="sm" className="bg-orange-500 hover:bg-orange-600" onClick={handleAuthClick}>
                   Cadastrar
                 </Button>
               </div>

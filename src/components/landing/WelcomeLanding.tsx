@@ -11,27 +11,27 @@ export const WelcomeLanding = ({ onEnter }: WelcomeLandingProps) => {
   const [showButton, setShowButton] = useState(false);
 
   useEffect(() => {
-    // Mostrar botão após 3 segundos
+    // Mostrar botão após 1 segundo
     const timer = setTimeout(() => {
       setShowButton(true);
-    }, 3000);
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, []);
 
   const handleEnter = () => {
     setAnimationStarted(true);
-    // Aguardar animação mais lenta completar antes de chamar onEnter
+    // Aguardar animação de 2,8 segundos completar antes de chamar onEnter
     setTimeout(() => {
       onEnter();
-    }, 2500);
+    }, 2800);
   };
 
   return (
     <div className="fixed inset-0 z-50 bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700 flex items-center justify-center overflow-hidden">
       {/* Texto principal com efeito de zoom através da letra Z */}
       <div className="relative text-center">
-        <div className={`transition-all duration-[2500ms] ease-in-out ${
+        <div className={`transition-all duration-[2800ms] ease-in-out ${
           animationStarted 
             ? 'transform scale-[50] opacity-0' 
             : 'transform scale-100 opacity-100'
