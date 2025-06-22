@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface UserProfile {
@@ -6,16 +5,16 @@ export interface UserProfile {
   auth_id: string;
   nome: string;
   email: string;
-  cpf?: string;
-  tipo: 'cliente' | 'prestador';
-  foto_url?: string;
+  tipo: 'cliente' | 'prestador' | 'admin' | 'moderator';
   bio?: string;
-  nota_media: number;
+  foto_url?: string;
   endereco_cidade?: string;
-  premium: boolean;
-  ocultar_nota: boolean;
+  cpf?: string;
+  nota_media?: number;
+  ocultar_nota?: boolean;
+  premium?: boolean;
   criado_em: string;
-  updated_at: string;
+  updated_at?: string;
 }
 
 export interface Avaliacao {
