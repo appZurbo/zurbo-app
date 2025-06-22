@@ -91,6 +91,13 @@ export const useAuth = () => {
     };
   }, []);
 
+  const logout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
   const updateLocalProfile = (updates: Partial<UserProfile>) => {
     if (profile) {
       setProfile({ ...profile, ...updates });
@@ -104,6 +111,8 @@ export const useAuth = () => {
     isAuthenticated: !!user,
     isPrestador: profile?.tipo === 'prestador',
     isCliente: profile?.tipo === 'cliente',
+    isAdmin: profile?.tipo === 'admin' || profile?.tipo === 'moderator',
+    logout,
     updateLocalProfile
   };
 };
