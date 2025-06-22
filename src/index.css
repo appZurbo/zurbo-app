@@ -159,12 +159,12 @@
     transform: scale(1) translateZ(0px);
     opacity: 1;
   }
-  50% {
-    transform: scale(10) translateZ(-500px);
-    opacity: 0.5;
+  70% {
+    transform: scale(25) translateZ(-800px);
+    opacity: 0.3;
   }
   100% {
-    transform: scale(20) translateZ(-1000px);
+    transform: scale(50) translateZ(-1500px);
     opacity: 0;
   }
 }
@@ -199,7 +199,7 @@
 }
 
 .animate-zoom-through {
-  animation: zoomThrough 1.5s ease-in-out forwards;
+  animation: zoomThrough 2.5s ease-in-out forwards;
 }
 
 .animate-letter-float {

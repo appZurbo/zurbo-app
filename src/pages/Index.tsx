@@ -63,7 +63,7 @@ export default function Index() {
     precoMin: 0,
     precoMax: 1000,
     notaMin: 0,
-    apenasPremium: false, // Corrigido caractere cirílico
+    apenasPremium: false, // Corrigido caractere
   });
 
   // Debounce dos filtros para melhorar performance

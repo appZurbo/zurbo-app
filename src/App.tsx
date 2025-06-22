@@ -19,6 +19,7 @@ import RegrasComunidade from "./pages/RegrasComunidade";
 import PlanoPremium from "./pages/PlanoPremium";
 import NotFound from "./pages/NotFound";
 import { MobileLayout } from "./components/mobile/MobileLayout";
+import { AdminDashboard } from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -41,7 +42,7 @@ const AuthenticatedApp = () => {
     );
   }
 
-  // Mostrar landing de boas-vindas para usuários não autenticados
+  // Mostrar landing de boas-vindas para usuários não autenticados apenas na primeira visita
   if (!isAuthenticated && showWelcome) {
     return (
       <WelcomeLanding 
@@ -50,30 +51,8 @@ const AuthenticatedApp = () => {
     );
   }
 
-  if (!isAuthenticated) {
-    return (
-      <BrowserRouter>
-        <Routes>
-          <Route path="/termos" element={<TermosUso />} />
-          <Route path="/privacidade" element={<PoliticaPrivacidade />} />
-          <Route path="/regras-comunidade" element={<RegrasComunidade />} />
-          <Route path="/premium" element={<PlanoPremium />} />
-          <Route path="*" element={
-            <AuthPage 
-              onAuthSuccess={(userType) => {
-                if (userType === 'prestador') {
-                  setShowServiceSelection(true);
-                }
-              }} 
-            />} 
-          />
-        </Routes>
-      </BrowserRouter>
-    );
-  }
-
   // Verificar se precisa mostrar seleção de serviços
-  if (profile?.tipo === 'prestador' && showServiceSelection) {
+  if (isAuthenticated && profile?.tipo === 'prestador' && showServiceSelection) {
     return (
       <ServiceSelectionPage 
         onComplete={() => setShowServiceSelection(false)} 
@@ -84,11 +63,43 @@ const AuthenticatedApp = () => {
   const AppRoutes = () => (
     <Routes>
       <Route path="/" element={<Index />} />
-      <Route path="/perfil" element={<ProfilePageFixed />} />
-      <Route path="/configuracoes" element={<UserSettings />} />
+      <Route path="/auth" element={
+        isAuthenticated ? (
+          <Navigate to="/" replace />
+        ) : (
+          <AuthPage 
+            onAuthSuccess={(userType) => {
+              if (userType === 'prestador') {
+                setShowServiceSelection(true);
+              }
+            }} 
+          />
+        )
+      } />
+      <Route path="/perfil" element={
+        isAuthenticated ? (
+          <ProfilePageFixed />
+        ) : (
+          <Navigate to="/auth" replace />
+        )
+      } />
+      <Route path="/configuracoes" element={
+        isAuthenticated ? (
+          <UserSettings />
+        ) : (
+          <Navigate to="/auth" replace />
+        )
+      } />
       <Route path="/servicos" element={
-        profile?.tipo === 'prestador' ? (
+        isAuthenticated && profile?.tipo === 'prestador' ? (
           <ServiceSelectionPage onComplete={() => {}} />
+        ) : (
+          <Navigate to="/" replace />
+        )
+      } />
+      <Route path="/admin" element={
+        isAuthenticated && (profile?.tipo === 'admin' || profile?.tipo === 'moderator') ? (
+          <AdminDashboard />
         ) : (
           <Navigate to="/" replace />
         )
