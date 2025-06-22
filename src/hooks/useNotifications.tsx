@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from './useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface Notification {
   id: string;
@@ -28,10 +29,14 @@ export const useNotifications = () => {
     
     setLoading(true);
     try {
-      // For now, we'll use mock data
-      // When the notifications table is created, we can load from there
-      console.log('Loading notifications for user:', profile.id);
-      setNotifications([]);
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', profile.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setNotifications(data || []);
     } catch (error) {
       console.error('Error loading notifications:', error);
     } finally {
@@ -41,8 +46,13 @@ export const useNotifications = () => {
 
   const markAsRead = async (notificationId: string) => {
     try {
-      // For now, we'll just update local state
-      // When the notifications table is created, we can update there
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('id', notificationId);
+
+      if (error) throw error;
+
       setNotifications(prev =>
         prev.map(notif =>
           notif.id === notificationId ? { ...notif, read: true } : notif
@@ -54,9 +64,17 @@ export const useNotifications = () => {
   };
 
   const markAllAsRead = async () => {
+    if (!profile) return;
+
     try {
-      // For now, we'll just update local state
-      // When the notifications table is created, we can update there
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('user_id', profile.id)
+        .eq('read', false);
+
+      if (error) throw error;
+
       setNotifications(prev =>
         prev.map(notif => ({ ...notif, read: true }))
       );

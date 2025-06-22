@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { Bell } from 'lucide-react';
 
 interface NotificationPreferences {
@@ -37,9 +38,30 @@ export const NotificationSettings = () => {
   }, [profile]);
 
   const loadPreferences = async () => {
-    // For now, we'll use default preferences
-    // When the notification_preferences table is created, we can load from there
-    console.log('Loading notification preferences for user:', profile?.id);
+    if (!profile) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('notification_preferences')
+        .select('*')
+        .eq('user_id', profile.id)
+        .maybeSingle();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      
+      if (data) {
+        setPreferences({
+          email_novos_pedidos: data.email_novos_pedidos,
+          email_mensagens: data.email_mensagens,
+          email_avaliacoes: data.email_avaliacoes,
+          push_novos_pedidos: data.push_novos_pedidos,
+          push_mensagens: data.push_mensagens,
+          push_avaliacoes: data.push_avaliacoes,
+        });
+      }
+    } catch (error) {
+      console.error('Error loading preferences:', error);
+    }
   };
 
   const savePreferences = async () => {
@@ -47,9 +69,15 @@ export const NotificationSettings = () => {
 
     setLoading(true);
     try {
-      // For now, we'll just show a success message
-      // When the notification_preferences table is created, we can save there
-      console.log('Saving preferences:', preferences);
+      const { error } = await supabase
+        .from('notification_preferences')
+        .upsert({
+          user_id: profile.id,
+          ...preferences,
+          updated_at: new Date().toISOString(),
+        });
+
+      if (error) throw error;
 
       toast({
         title: "Preferências salvas!",

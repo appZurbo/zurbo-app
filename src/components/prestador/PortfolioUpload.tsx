@@ -1,5 +1,5 @@
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,6 +24,29 @@ export const PortfolioUpload = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { profile } = useAuth();
+
+  useEffect(() => {
+    if (profile) {
+      loadPortfolioImages();
+    }
+  }, [profile]);
+
+  const loadPortfolioImages = async () => {
+    if (!profile) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('portfolio_fotos')
+        .select('*')
+        .eq('prestador_id', profile.id)
+        .order('ordem', { ascending: true });
+
+      if (error) throw error;
+      setImages(data || []);
+    } catch (error) {
+      console.error('Error loading portfolio images:', error);
+    }
+  };
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;

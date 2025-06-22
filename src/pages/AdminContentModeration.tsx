@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { Shield, Flag, User, Ban, CheckCircle } from 'lucide-react';
 
 interface Report {
@@ -41,10 +42,17 @@ const AdminContentModeration = () => {
 
   const loadReports = async () => {
     try {
-      // For now, we'll use mock data
-      // When the user_reports table is created, we can load from there
-      console.log('Loading reports...');
-      setReports([]);
+      const { data, error } = await supabase
+        .from('user_reports')
+        .select(`
+          *,
+          reported_user:users!user_reports_reported_user_id_fkey (nome, email, tipo),
+          reporter:users!user_reports_reporter_id_fkey (nome)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setReports(data || []);
     } catch (error: any) {
       console.error('Error loading reports:', error);
       toast({
@@ -59,9 +67,12 @@ const AdminContentModeration = () => {
 
   const updateReportStatus = async (reportId: string, status: 'reviewed' | 'resolved') => {
     try {
-      // For now, we'll just update local state
-      // When the user_reports table is created, we can update there
-      console.log('Updating report status:', reportId, status);
+      const { error } = await supabase
+        .from('user_reports')
+        .update({ status })
+        .eq('id', reportId);
+
+      if (error) throw error;
 
       setReports(prev =>
         prev.map(report =>
@@ -84,10 +95,23 @@ const AdminContentModeration = () => {
   };
 
   const banUser = async (userId: string, duration: number) => {
+    if (!profile) return;
+
     try {
-      // For now, we'll just log the ban
-      // When the user_bans table is created, we can save there
-      console.log('Banning user:', userId, 'for', duration, 'days');
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + duration);
+
+      const { error } = await supabase
+        .from('user_bans')
+        .insert({
+          user_id: userId,
+          banned_by: profile.id,
+          reason: 'Violação das regras da comunidade',
+          duration_days: duration,
+          expires_at: expiresAt.toISOString(),
+        });
+
+      if (error) throw error;
 
       toast({
         title: "Usuário banido",
@@ -175,15 +199,81 @@ const AdminContentModeration = () => {
           </p>
         </div>
 
-        <Card>
-          <CardContent className="p-8 text-center">
-            <Flag className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-semibold mb-2">Nenhum relatório</h3>
-            <p className="text-gray-600">
-              Não há relatórios de usuários no momento.
-            </p>
-          </CardContent>
-        </Card>
+        {reports.length === 0 ? (
+          <Card>
+            <CardContent className="p-8 text-center">
+              <Flag className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+              <h3 className="text-lg font-semibold mb-2">Nenhum relatório</h3>
+              <p className="text-gray-600">
+                Não há relatórios de usuários no momento.
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            {reports.map((report) => (
+              <Card key={report.id}>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg">
+                      {getReportTypeLabel(report.type)}
+                    </CardTitle>
+                    {getStatusBadge(report.status)}
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm text-gray-600">
+                        <strong>Usuário reportado:</strong> {report.reported_user?.nome} ({report.reported_user?.email})
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <strong>Reportado por:</strong> {report.reporter?.nome}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <strong>Data:</strong> {new Date(report.created_at).toLocaleDateString('pt-BR')}
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <p className="text-sm font-medium mb-2">Descrição:</p>
+                      <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">
+                        {report.description}
+                      </p>
+                    </div>
+
+                    {report.status === 'pending' && (
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => updateReportStatus(report.id, 'reviewed')}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-1" />
+                          Marcar como Revisado
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => banUser(report.reported_user_id, 7)}
+                        >
+                          <Ban className="h-4 w-4 mr-1" />
+                          Banir por 7 dias
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => updateReportStatus(report.id, 'resolved')}
+                        >
+                          Resolver
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

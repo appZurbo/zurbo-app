@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from './useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface Chat {
   id: string;
@@ -44,10 +45,18 @@ export const useChat = () => {
     
     setLoading(true);
     try {
-      // For now, we'll use mock data
-      // When the chats table is created, we can load from there
-      console.log('Loading chats for user:', profile.id);
-      setChats([]);
+      const { data, error } = await supabase
+        .from('chats')
+        .select(`
+          *,
+          cliente:users!chats_cliente_id_fkey (nome, foto_url),
+          prestador:users!chats_prestador_id_fkey (nome, foto_url)
+        `)
+        .or(`cliente_id.eq.${profile.id},prestador_id.eq.${profile.id}`)
+        .order('updated_at', { ascending: false });
+
+      if (error) throw error;
+      setChats(data || []);
     } catch (error) {
       console.error('Error loading chats:', error);
     } finally {
@@ -57,10 +66,14 @@ export const useChat = () => {
 
   const loadMessages = async (chatId: string) => {
     try {
-      // For now, we'll use mock data
-      // When the messages table is created, we can load from there
-      console.log('Loading messages for chat:', chatId);
-      setMessages([]);
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('chat_id', chatId)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      setMessages(data || []);
     } catch (error) {
       console.error('Error loading messages:', error);
     }
@@ -70,20 +83,18 @@ export const useChat = () => {
     if (!profile) return;
 
     try {
-      // For now, we'll just log the message
-      // When the messages table is created, we can save there
-      console.log('Sending message:', { chat: chat.id, content, sender: profile.id });
+      const { error } = await supabase
+        .from('messages')
+        .insert({
+          chat_id: chat.id,
+          sender_id: profile.id,
+          content,
+        });
+
+      if (error) throw error;
       
-      // Add message to local state
-      const newMessage: Message = {
-        id: Date.now().toString(),
-        chat_id: chat.id,
-        sender_id: profile.id,
-        content,
-        created_at: new Date().toISOString(),
-      };
-      
-      setMessages(prev => [...prev, newMessage]);
+      // Recarregar mensagens
+      await loadMessages(chat.id);
     } catch (error) {
       console.error('Error sending message:', error);
     }
@@ -93,17 +104,30 @@ export const useChat = () => {
     if (!profile) return null;
 
     try {
-      // For now, we'll create a mock chat
-      // When the chats table is created, we can save there
-      const newChat: Chat = {
-        id: Date.now().toString(),
-        cliente_id: profile.id,
-        prestador_id: prestadorId,
-        created_at: new Date().toISOString(),
-      };
+      // Verificar se já existe um chat entre estes usuários
+      const { data: existingChat } = await supabase
+        .from('chats')
+        .select('*')
+        .or(`and(cliente_id.eq.${profile.id},prestador_id.eq.${prestadorId}),and(cliente_id.eq.${prestadorId},prestador_id.eq.${profile.id})`)
+        .maybeSingle();
 
-      setChats(prev => [...prev, newChat]);
-      return newChat;
+      if (existingChat) {
+        return existingChat;
+      }
+
+      const { data, error } = await supabase
+        .from('chats')
+        .insert({
+          cliente_id: profile.id,
+          prestador_id: prestadorId,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      await loadChats();
+      return data;
     } catch (error) {
       console.error('Error creating chat:', error);
       return null;
