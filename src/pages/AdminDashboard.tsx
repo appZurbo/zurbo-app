@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -28,6 +27,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { ModernHeader } from '@/components/layout/ModernHeader';
+import { ExportControls } from '@/components/admin/ExportControls';
+import { UserRoleManager } from '@/components/admin/UserRoleManager';
+import { SimulationMode } from '@/components/admin/SimulationMode';
 
 interface DashboardStats {
   totalUsers: number;
@@ -62,6 +64,10 @@ export const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('todos');
+  const [simulationMode, setSimulationMode] = useState({
+    isActive: false,
+    role: 'cliente'
+  });
 
   useEffect(() => {
     if (profile?.tipo === 'admin' || profile?.tipo === 'moderator') {
@@ -151,6 +157,17 @@ export const AdminDashboard = () => {
     window.URL.revokeObjectURL(url);
   };
 
+  const handleSimulationChange = (isSimulating: boolean, simulatedRole?: string) => {
+    setSimulationMode({
+      isActive: isSimulating,
+      role: simulatedRole || 'cliente'
+    });
+  };
+
+  const handleUserRoleUpdate = () => {
+    loadDashboardData(); // Recarregar dados após atualização
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -181,16 +198,20 @@ export const AdminDashboard = () => {
             </p>
           </div>
           <div className="flex gap-3">
-            <Button onClick={exportData} variant="outline" className="flex items-center gap-2">
-              <Download className="h-4 w-4" />
-              Exportar CSV
-            </Button>
+            <SimulationMode onSimulationChange={handleSimulationChange} />
             <Button onClick={loadDashboardData} className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               Atualizar
             </Button>
           </div>
         </div>
+
+        {/* Modo Simulação Ativo */}
+        {simulationMode.isActive && (
+          <div className="mb-6">
+            <SimulationMode onSimulationChange={handleSimulationChange} />
+          </div>
+        )}
 
         {/* Cards de Estatísticas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
@@ -257,6 +278,14 @@ export const AdminDashboard = () => {
           </Card>
         </div>
 
+        {/* Controles de Exportação */}
+        <div className="mb-6">
+          <ExportControls 
+            data={filteredUsers} 
+            filename="usuarios_zurbo" 
+          />
+        </div>
+
         {/* Filtros e Busca */}
         <Card className="mb-6">
           <CardHeader>
@@ -311,6 +340,7 @@ export const AdminDashboard = () => {
                     <TableHead>Nota</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Cadastro</TableHead>
+                    <TableHead>Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -342,6 +372,14 @@ export const AdminDashboard = () => {
                       </TableCell>
                       <TableCell>
                         {new Date(user.criado_em).toLocaleDateString('pt-BR')}
+                      </TableCell>
+                      <TableCell>
+                        <UserRoleManager
+                          userId={user.id}
+                          currentRole={user.tipo}
+                          userName={user.nome}
+                          onRoleUpdate={handleUserRoleUpdate}
+                        />
                       </TableCell>
                     </TableRow>
                   ))}

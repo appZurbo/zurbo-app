@@ -10,6 +10,7 @@ import { ModernFilters } from '@/components/filters/ModernFilters';
 import { ModernHeader } from '@/components/layout/ModernHeader';
 import { ModernFooter } from '@/components/layout/ModernFooter';
 import { HeroSection } from '@/components/sections/HeroSection';
+import { TestBanner } from '@/components/banners/TestBanner';
 import { ProfileViewModal } from '@/components/profile/ProfileViewModal';
 import { ContactModal } from '@/components/contact/ContactModal';
 import { 
@@ -148,6 +149,9 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-gray-50">
       <ModernHeader />
+      
+      {/* Banner de Testes */}
+      <TestBanner />
       
       {/* Hero Section */}
       <HeroSection />
