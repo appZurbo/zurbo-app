@@ -27,7 +27,7 @@ export const MobileLayout = ({ children }: MobileLayoutProps) => {
     { title: "Perfil", icon: User },
     { type: "separator" as const },
     { title: "Config", icon: Settings },
-  ] as const;
+  ];
 
   const handleTabChange = (index: number | null) => {
     if (index === null) return;
