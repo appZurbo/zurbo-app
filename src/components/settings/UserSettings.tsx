@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,10 +11,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { LocationSettings } from '@/components/location/LocationSettings';
-
 export const UserSettings = () => {
-  const { profile } = useAuth();
-  const { toast } = useToast();
+  const {
+    profile
+  } = useAuth();
+  const {
+    toast
+  } = useToast();
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
   const [notificationSettings, setNotificationSettings] = useState({
@@ -24,73 +26,67 @@ export const UserSettings = () => {
     email_avaliacoes: true,
     push_novos_pedidos: true,
     push_mensagens: true,
-    push_avaliacoes: true,
+    push_avaliacoes: true
   });
-
   const handleNotificationUpdate = async (key: string, value: boolean) => {
     if (!profile) return;
-
     try {
-      const { error } = await supabase
-        .from('notification_preferences')
-        .upsert({
-          user_id: profile.id,
-          [key]: value,
-        });
-
+      const {
+        error
+      } = await supabase.from('notification_preferences').upsert({
+        user_id: profile.id,
+        [key]: value
+      });
       if (error) throw error;
-
-      setNotificationSettings(prev => ({ ...prev, [key]: value }));
-      
+      setNotificationSettings(prev => ({
+        ...prev,
+        [key]: value
+      }));
       toast({
         title: "Configuração atualizada",
-        description: "Suas preferências de notificação foram salvas.",
+        description: "Suas preferências de notificação foram salvas."
       });
     } catch (error: any) {
       toast({
         title: "Erro ao atualizar",
         description: error.message,
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
-
   const handleDeleteAccount = async () => {
     if (!confirm('Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.')) {
       return;
     }
-
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signOut();
-      
+      const {
+        error
+      } = await supabase.auth.signOut();
       if (error) throw error;
-
       toast({
         title: "Conta excluída",
-        description: "Sua conta foi excluída com sucesso.",
+        description: "Sua conta foi excluída com sucesso."
       });
-      
+
       // Redirecionar para página inicial
       window.location.href = '/';
     } catch (error: any) {
       toast({
         title: "Erro ao excluir conta",
         description: error.message,
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
     }
   };
-
-  return (
-    <div className="max-w-4xl mx-auto p-4">
+  return <div className="max-w-4xl mx-auto p-4">
       <Card>
         <CardHeader>
           <CardTitle>Configurações da Conta</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="py-0 px-[4px]">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid grid-cols-4 w-full">
               <TabsTrigger value="profile" className="flex items-center gap-2">
@@ -170,10 +166,7 @@ export const UserSettings = () => {
                           <Label>Novos pedidos de serviço</Label>
                           <p className="text-sm text-gray-500">Receber email quando alguém solicitar seus serviços</p>
                         </div>
-                        <Switch
-                          checked={notificationSettings.email_novos_pedidos}
-                          onCheckedChange={(checked) => handleNotificationUpdate('email_novos_pedidos', checked)}
-                        />
+                        <Switch checked={notificationSettings.email_novos_pedidos} onCheckedChange={checked => handleNotificationUpdate('email_novos_pedidos', checked)} />
                       </div>
                       
                       <div className="flex items-center justify-between">
@@ -181,10 +174,7 @@ export const UserSettings = () => {
                           <Label>Mensagens</Label>
                           <p className="text-sm text-gray-500">Receber email para novas mensagens</p>
                         </div>
-                        <Switch
-                          checked={notificationSettings.email_mensagens}
-                          onCheckedChange={(checked) => handleNotificationUpdate('email_mensagens', checked)}
-                        />
+                        <Switch checked={notificationSettings.email_mensagens} onCheckedChange={checked => handleNotificationUpdate('email_mensagens', checked)} />
                       </div>
                       
                       <div className="flex items-center justify-between">
@@ -192,10 +182,7 @@ export const UserSettings = () => {
                           <Label>Avaliações</Label>
                           <p className="text-sm text-gray-500">Receber email quando receber uma avaliação</p>
                         </div>
-                        <Switch
-                          checked={notificationSettings.email_avaliacoes}
-                          onCheckedChange={(checked) => handleNotificationUpdate('email_avaliacoes', checked)}
-                        />
+                        <Switch checked={notificationSettings.email_avaliacoes} onCheckedChange={checked => handleNotificationUpdate('email_avaliacoes', checked)} />
                       </div>
                     </div>
                   </div>
@@ -210,10 +197,7 @@ export const UserSettings = () => {
                           <Label>Novos pedidos de serviço</Label>
                           <p className="text-sm text-gray-500">Receber notificações no navegador</p>
                         </div>
-                        <Switch
-                          checked={notificationSettings.push_novos_pedidos}
-                          onCheckedChange={(checked) => handleNotificationUpdate('push_novos_pedidos', checked)}
-                        />
+                        <Switch checked={notificationSettings.push_novos_pedidos} onCheckedChange={checked => handleNotificationUpdate('push_novos_pedidos', checked)} />
                       </div>
                       
                       <div className="flex items-center justify-between">
@@ -221,10 +205,7 @@ export const UserSettings = () => {
                           <Label>Mensagens</Label>
                           <p className="text-sm text-gray-500">Receber notificações para novas mensagens</p>
                         </div>
-                        <Switch
-                          checked={notificationSettings.push_mensagens}
-                          onCheckedChange={(checked) => handleNotificationUpdate('push_mensagens', checked)}
-                        />
+                        <Switch checked={notificationSettings.push_mensagens} onCheckedChange={checked => handleNotificationUpdate('push_mensagens', checked)} />
                       </div>
                       
                       <div className="flex items-center justify-between">
@@ -232,10 +213,7 @@ export const UserSettings = () => {
                           <Label>Avaliações</Label>
                           <p className="text-sm text-gray-500">Receber notificações para avaliações</p>
                         </div>
-                        <Switch
-                          checked={notificationSettings.push_avaliacoes}
-                          onCheckedChange={(checked) => handleNotificationUpdate('push_avaliacoes', checked)}
-                        />
+                        <Switch checked={notificationSettings.push_avaliacoes} onCheckedChange={checked => handleNotificationUpdate('push_avaliacoes', checked)} />
                       </div>
                     </div>
                   </div>
@@ -269,12 +247,7 @@ export const UserSettings = () => {
                     <p className="text-sm text-gray-600 mb-4">
                       As ações abaixo são irreversíveis. Tenha cuidado ao prosseguir.
                     </p>
-                    <Button 
-                      variant="destructive"
-                      onClick={handleDeleteAccount}
-                      disabled={loading}
-                      className="flex items-center gap-2"
-                    >
+                    <Button variant="destructive" onClick={handleDeleteAccount} disabled={loading} className="flex items-center gap-2">
                       <Trash2 className="h-4 w-4" />
                       {loading ? 'Excluindo...' : 'Excluir Conta'}
                     </Button>
@@ -285,6 +258,5 @@ export const UserSettings = () => {
           </Tabs>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>;
 };
