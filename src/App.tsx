@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,9 +9,11 @@ import { useMobile } from "@/hooks/useMobile";
 import { WelcomeLanding } from "@/components/landing/WelcomeLanding";
 import AuthPage from "@/components/auth/AuthPage";
 import Index from "./pages/Index";
+import PrestadoresPage from "./pages/PrestadoresPage";
+import PrestadorProfile from "./pages/PrestadorProfile";
 import { ProfilePageFixed } from "./components/profile/ProfilePageFixed";
 import ServiceSelectionPage from "./components/services/ServiceSelectionPage";
-import { UserSettings } from "./components/settings/UserSettings";
+import Settings from "./pages/Settings";
 import TermosUso from "./pages/TermosUso";
 import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
 import RegrasComunidade from "./pages/RegrasComunidade";
@@ -66,6 +67,8 @@ const AuthenticatedApp = () => {
   const AppRoutes = () => (
     <Routes>
       <Route path="/" element={<Index />} />
+      <Route path="/prestadores" element={<PrestadoresPage />} />
+      <Route path="/prestador/:id" element={<PrestadorProfile />} />
       <Route path="/auth" element={
         isAuthenticated ? (
           <Navigate to="/" replace />
@@ -88,7 +91,7 @@ const AuthenticatedApp = () => {
       } />
       <Route path="/configuracoes" element={
         isAuthenticated ? (
-          <UserSettings />
+          <Settings />
         ) : (
           <Navigate to="/auth" replace />
         )

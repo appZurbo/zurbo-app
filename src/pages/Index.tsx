@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useDebounce } from '@/hooks/useDebounce';
+import { navigate } from 'react-router-dom';
 
 const servicos = [
   { id: 'limpeza', nome: 'Limpeza', icone: 'Sparkles', cor: '#3B82F6' },
@@ -148,7 +149,7 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <ModernHeader />
+      <ImprovedHeader />
       
       {/* Banner de Testes */}
       <TestBanner />
@@ -203,6 +204,19 @@ export default function Index() {
                 </Card>
               );
             })}
+          </div>
+          
+          {/* Botão para ver todos os prestadores */}
+          <div className="text-center mt-8">
+            <Button 
+              onClick={() => navigate('/prestadores')}
+              size="lg"
+              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-3"
+            >
+              <Users className="h-5 w-5 mr-2" />
+              Ver Todos os Prestadores
+              <ArrowRight className="h-5 w-5 ml-2" />
+            </Button>
           </div>
         </div>
       </section>
