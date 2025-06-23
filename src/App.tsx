@@ -16,6 +16,8 @@ import Conversas from '@/pages/Conversas';
 import AuthPage from '@/pages/AuthPage';
 import NotificacoesPage from '@/pages/NotificacoesPage';
 import ReportPage from '@/pages/ReportPage';
+import PrestadorDashboard from '@/pages/PrestadorDashboard';
+import FavoritosPage from '@/pages/FavoritosPage';
 
 function App() {
   const isMobile = useMobile();
@@ -39,6 +41,8 @@ function App() {
             <Route path="/conversas" element={<Conversas />} />
             <Route path="/notificacoes" element={<NotificacoesPage />} />
             <Route path="/denuncia/:id" element={<ReportPage />} />
+            <Route path="/prestador-dashboard" element={<PrestadorDashboard />} />
+            <Route path="/favoritos" element={<FavoritosPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </MobileLayout>
@@ -62,6 +66,8 @@ function App() {
             <Route path="/conversas" element={<Conversas />} />
             <Route path="/notificacoes" element={<NotificacoesPage />} />
             <Route path="/denuncia/:id" element={<ReportPage />} />
+            <Route path="/prestador-dashboard" element={<PrestadorDashboard />} />
+            <Route path="/favoritos" element={<FavoritosPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

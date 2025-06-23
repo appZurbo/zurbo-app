@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserSettings } from '@/components/settings/UserSettings';
 import PrestadorSettings from './PrestadorSettings';
 import SecuritySettings from '@/components/settings/SecuritySettings';
+import GerenciadorBairros from '@/components/bairros/GerenciadorBairros';
 import { useMobile } from '@/hooks/useMobile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -80,14 +81,20 @@ const Settings = () => {
           </div>
         </div>
 
-        {/* Container principal com abas para incluir segurança */}
+        {/* Container principal com abas */}
         <div className={`${isMobile ? 'space-y-4' : ''}`}>
           <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className={`grid w-full ${isPrestador ? 'grid-cols-3' : 'grid-cols-2'}`}>
               <TabsTrigger value="profile" className="flex items-center gap-2">
                 <User className="h-4 w-4" />
                 Perfil
               </TabsTrigger>
+              {isPrestador && (
+                <TabsTrigger value="bairros" className="flex items-center gap-2">
+                  <Settings as any className="h-4 w-4" />
+                  Bairros
+                </TabsTrigger>
+              )}
               <TabsTrigger value="security" className="flex items-center gap-2">
                 <Shield className="h-4 w-4" />
                 Segurança
@@ -97,6 +104,12 @@ const Settings = () => {
             <TabsContent value="profile">
               {isPrestador ? <PrestadorSettings /> : <UserSettings />}
             </TabsContent>
+            
+            {isPrestador && (
+              <TabsContent value="bairros">
+                <GerenciadorBairros />
+              </TabsContent>
+            )}
             
             <TabsContent value="security">
               <SecuritySettings />

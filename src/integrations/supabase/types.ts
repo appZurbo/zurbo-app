@@ -9,6 +9,61 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      agendamentos: {
+        Row: {
+          criado_em: string | null
+          data_agendada: string
+          hora_agendada: string
+          id: string
+          prestador_id: string | null
+          servico_id: string | null
+          solicitante_id: string | null
+          status: string | null
+        }
+        Insert: {
+          criado_em?: string | null
+          data_agendada: string
+          hora_agendada: string
+          id?: string
+          prestador_id?: string | null
+          servico_id?: string | null
+          solicitante_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          criado_em?: string | null
+          data_agendada?: string
+          hora_agendada?: string
+          id?: string
+          prestador_id?: string | null
+          servico_id?: string | null
+          solicitante_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agendamentos_prestador_id_fkey"
+            columns: ["prestador_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agendamentos_servico_id_fkey"
+            columns: ["servico_id"]
+            isOneToOne: false
+            referencedRelation: "servicos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agendamentos_solicitante_id_fkey"
+            columns: ["solicitante_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       avaliacoes: {
         Row: {
           avaliado_id: string | null
@@ -45,6 +100,32 @@ export type Database = {
           {
             foreignKeyName: "avaliacoes_avaliador_id_fkey"
             columns: ["avaliador_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bairros_atendidos: {
+        Row: {
+          bairro: string
+          id: string
+          prestador_id: string | null
+        }
+        Insert: {
+          bairro: string
+          id?: string
+          prestador_id?: string | null
+        }
+        Update: {
+          bairro?: string
+          id?: string
+          prestador_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bairros_atendidos_prestador_id_fkey"
+            columns: ["prestador_id"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
@@ -116,6 +197,234 @@ export type Database = {
           nome?: string
         }
         Relationships: []
+      }
+      comprovantes: {
+        Row: {
+          gerado_em: string | null
+          historico_id: string | null
+          id: string
+          url_pdf: string | null
+        }
+        Insert: {
+          gerado_em?: string | null
+          historico_id?: string | null
+          id?: string
+          url_pdf?: string | null
+        }
+        Update: {
+          gerado_em?: string | null
+          historico_id?: string | null
+          id?: string
+          url_pdf?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comprovantes_historico_id_fkey"
+            columns: ["historico_id"]
+            isOneToOne: false
+            referencedRelation: "historico_servicos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cupons: {
+        Row: {
+          ativo: boolean | null
+          codigo: string
+          id: string
+          tipo: string
+          valido_ate: string | null
+          valor: number
+        }
+        Insert: {
+          ativo?: boolean | null
+          codigo: string
+          id?: string
+          tipo: string
+          valido_ate?: string | null
+          valor: number
+        }
+        Update: {
+          ativo?: boolean | null
+          codigo?: string
+          id?: string
+          tipo?: string
+          valido_ate?: string | null
+          valor?: number
+        }
+        Relationships: []
+      }
+      cupons_usados: {
+        Row: {
+          cupom_id: string | null
+          id: string
+          usuario_id: string | null
+          utilizado_em: string | null
+        }
+        Insert: {
+          cupom_id?: string | null
+          id?: string
+          usuario_id?: string | null
+          utilizado_em?: string | null
+        }
+        Update: {
+          cupom_id?: string | null
+          id?: string
+          usuario_id?: string | null
+          utilizado_em?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cupons_usados_cupom_id_fkey"
+            columns: ["cupom_id"]
+            isOneToOne: false
+            referencedRelation: "cupons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cupons_usados_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      denuncias: {
+        Row: {
+          data: string | null
+          denunciado_id: string | null
+          denunciante_id: string | null
+          detalhes: string | null
+          id: string
+          motivo: string | null
+          status: string | null
+        }
+        Insert: {
+          data?: string | null
+          denunciado_id?: string | null
+          denunciante_id?: string | null
+          detalhes?: string | null
+          id?: string
+          motivo?: string | null
+          status?: string | null
+        }
+        Update: {
+          data?: string | null
+          denunciado_id?: string | null
+          denunciante_id?: string | null
+          detalhes?: string | null
+          id?: string
+          motivo?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "denuncias_denunciado_id_fkey"
+            columns: ["denunciado_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "denuncias_denunciante_id_fkey"
+            columns: ["denunciante_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      favoritos: {
+        Row: {
+          criado_em: string | null
+          id: string
+          prestador_id: string | null
+          usuario_id: string | null
+        }
+        Insert: {
+          criado_em?: string | null
+          id?: string
+          prestador_id?: string | null
+          usuario_id?: string | null
+        }
+        Update: {
+          criado_em?: string | null
+          id?: string
+          prestador_id?: string | null
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favoritos_prestador_id_fkey"
+            columns: ["prestador_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favoritos_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      historico_servicos: {
+        Row: {
+          criado_em: string | null
+          data_servico: string
+          id: string
+          prestador_id: string | null
+          servico_id: string | null
+          solicitante_id: string | null
+          status: string | null
+          valor: number | null
+        }
+        Insert: {
+          criado_em?: string | null
+          data_servico: string
+          id?: string
+          prestador_id?: string | null
+          servico_id?: string | null
+          solicitante_id?: string | null
+          status?: string | null
+          valor?: number | null
+        }
+        Update: {
+          criado_em?: string | null
+          data_servico?: string
+          id?: string
+          prestador_id?: string | null
+          servico_id?: string | null
+          solicitante_id?: string | null
+          status?: string | null
+          valor?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historico_servicos_prestador_id_fkey"
+            columns: ["prestador_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "historico_servicos_servico_id_fkey"
+            columns: ["servico_id"]
+            isOneToOne: false
+            referencedRelation: "servicos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "historico_servicos_solicitante_id_fkey"
+            columns: ["solicitante_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       messages: {
         Row: {
@@ -310,6 +619,38 @@ export type Database = {
             columns: ["servico_id"]
             isOneToOne: false
             referencedRelation: "servicos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plano_premium: {
+        Row: {
+          ativo: boolean | null
+          desde: string | null
+          expira_em: string | null
+          id: string
+          prestador_id: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          desde?: string | null
+          expira_em?: string | null
+          id?: string
+          prestador_id?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          desde?: string | null
+          expira_em?: string | null
+          id?: string
+          prestador_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plano_premium_prestador_id_fkey"
+            columns: ["prestador_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]

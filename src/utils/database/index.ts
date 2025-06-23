@@ -7,3 +7,7 @@ export * from './avaliacoes';
 export * from './portfolio';
 export * from './cities';
 export * from './pedidos';
+export * from './favoritos';
+export * from './agendamentos';
+export * from './plano-premium';
+export * from './bairros';
