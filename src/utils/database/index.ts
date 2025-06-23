@@ -6,3 +6,4 @@ export * from './prestadores';
 export * from './avaliacoes';
 export * from './portfolio';
 export * from './cities';
+export * from './pedidos';

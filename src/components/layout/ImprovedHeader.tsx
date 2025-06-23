@@ -1,281 +1,266 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger,
+  DropdownMenuSeparator 
+} from '@/components/ui/dropdown-menu';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Menu, 
+  Search, 
+  Bell, 
+  Settings, 
+  User, 
+  LogOut, 
+  Home,
+  MessageCircle,
+  Calendar,
+  History,
+  Wrench
+} from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { LogOut, User, Settings, Shield, MessageCircle, Wrench, Home, Menu, X } from 'lucide-react';
-import { NotificationBell } from '@/components/notifications/NotificationBell';
-import { ChatWindow } from '@/components/chat/ChatWindow';
+import { AuthModal } from '@/components/AuthModal';
 
 export const ImprovedHeader = () => {
-  const { user, profile, logout, isAuthenticated, isAdmin, isPrestador } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [chatOpen, setChatOpen] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { profile, logout, isAuthenticated, isPrestador } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     await logout();
     navigate('/');
   };
 
-  const isHome = location.pathname === '/';
+  const getInitials = (nome: string) => {
+    return nome?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U';
+  };
+
+  const menuItems = [
+    { 
+      label: 'Início', 
+      href: '/', 
+      icon: Home,
+      show: true 
+    },
+    { 
+      label: 'Conversas', 
+      href: '/conversas', 
+      icon: MessageCircle,
+      show: isAuthenticated 
+    },
+    { 
+      label: 'Pedidos', 
+      href: '/pedidos', 
+      icon: Calendar,
+      show: isAuthenticated 
+    },
+    { 
+      label: 'Configurações', 
+      href: '/configuracoes', 
+      icon: Settings,
+      show: isAuthenticated 
+    }
+  ];
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-sm">
-        <div className="container flex h-16 items-center justify-between px-4 mx-auto max-w-7xl">
-          {/* Logo e Home */}
-          <div className="flex items-center gap-4">
-            <Link 
-              to="/" 
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-            >
-              <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-xl">Z</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900">Zurbo</span>
-            </Link>
-            
-            {!isHome && (
-              <div className="hidden md:flex items-center">
-                <div className="w-px h-6 bg-gray-300 mx-2" />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate('/')}
-                  className="text-gray-600 hover:text-orange-500"
-                >
-                  <Home className="h-4 w-4 mr-2" />
-                  Início
-                </Button>
-              </div>
-            )}
-          </div>
+      <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+        <div className="container flex h-16 items-center justify-between px-4">
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-2">
+            <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-xl">Z</span>
+            </div>
+            <span className="font-bold text-xl bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
+              Zurbo
+            </span>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Link 
-              to="/prestadores" 
-              className="text-gray-700 hover:text-orange-500 transition-colors font-medium"
-            >
-              Prestadores
-            </Link>
-            <Link 
-              to="/como-funciona" 
-              className="text-gray-700 hover:text-orange-500 transition-colors font-medium"
-            >
-              Como Funciona
-            </Link>
+            {menuItems.filter(item => item.show).map((item) => (
+              <Link
+                key={item.href}
+                to={item.href}
+                className="text-sm font-medium text-gray-700 hover:text-orange-500 transition-colors flex items-center gap-2"
+              >
+                <item.icon className="h-4 w-4" />
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
-          {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-3">
-            {isAuthenticated ? (
-              <>
-                <NotificationBell />
-                
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setChatOpen(!chatOpen)}
-                  className="relative"
-                >
-                  <MessageCircle className="h-5 w-5" />
-                </Button>
+          {/* Actions */}
+          <div className="flex items-center space-x-4">
+            {/* Search (Desktop) */}
+            <Button variant="outline" size="sm" className="hidden md:flex">
+              <Search className="h-4 w-4 mr-2" />
+              Buscar
+            </Button>
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="relative h-9 w-9 rounded-full">
-                      <Avatar className="h-9 w-9">
-                        <AvatarImage src={profile?.foto_url} alt={profile?.nome} />
-                        <AvatarFallback className="bg-orange-100 text-orange-600">
-                          {profile?.nome?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
-                    <div className="flex items-center justify-start gap-2 p-2">
-                      <div className="flex flex-col space-y-1 leading-none">
-                        <p className="font-medium">{profile?.nome}</p>
-                        <p className="w-[200px] truncate text-sm text-muted-foreground">
-                          {user?.email}
-                        </p>
-                        {isPrestador && (
-                          <span className="inline-flex items-center gap-1 text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded-full">
-                            <Wrench className="h-3 w-3" />
-                            Prestador
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate('/perfil')}>
-                      <User className="mr-2 h-4 w-4" />
-                      Perfil
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
-                      <Settings className="mr-2 h-4 w-4" />
-                      Configurações
-                    </DropdownMenuItem>
-                    {isPrestador && (
-                      <DropdownMenuItem onClick={() => navigate('/prestador/configuracoes')}>
-                        <Wrench className="mr-2 h-4 w-4" />
-                        Configurações de Prestador
-                      </DropdownMenuItem>
-                    )}
-                    {isAdmin && (
-                      <>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => navigate('/admin')}>
-                          <Shield className="mr-2 h-4 w-4" />
-                          Painel Admin
-                        </DropdownMenuItem>
-                      </>
-                    )}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Sair
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
-            ) : (
-              <div className="flex gap-2">
-                <Button variant="ghost" onClick={() => navigate('/auth')}>
-                  Entrar
-                </Button>
-                <Button onClick={() => navigate('/auth')} className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700">
-                  Cadastrar
-                </Button>
-              </div>
-            )}
-          </div>
-
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center gap-2">
-            {!isHome && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/')}
-                className="text-orange-600"
-              >
-                <Home className="h-5 w-5" />
+            {/* Notifications */}
+            {isAuthenticated && (
+              <Button variant="ghost" size="sm" className="relative">
+                <Bell className="h-5 w-5" />
+                <Badge className="absolute -top-1 -right-1 w-5 h-5 text-xs bg-red-500">
+                  2
+                </Badge>
               </Button>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
-          </div>
-        </div>
 
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t bg-white/95 backdrop-blur">
-            <div className="px-4 py-4 space-y-3">
-              <Link 
-                to="/prestadores" 
-                className="block text-gray-700 hover:text-orange-500 transition-colors font-medium py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Prestadores
-              </Link>
-              <Link 
-                to="/como-funciona" 
-                className="block text-gray-700 hover:text-orange-500 transition-colors font-medium py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Como Funciona
-              </Link>
-              
-              {isAuthenticated ? (
-                <div className="pt-3 border-t space-y-2">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={profile?.foto_url} alt={profile?.nome} />
-                      <AvatarFallback className="bg-orange-100 text-orange-600">
-                        {profile?.nome?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase()}
+            {/* User Menu */}
+            {isAuthenticated && profile ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={profile.foto_url} alt={profile.nome} />
+                      <AvatarFallback className="bg-orange-500 text-white">
+                        {getInitials(profile.nome)}
                       </AvatarFallback>
                     </Avatar>
-                    <div>
-                      <p className="font-medium text-sm">{profile?.nome}</p>
-                      {isPrestador && (
-                        <span className="text-xs text-orange-600">Prestador</span>
-                      )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <div className="flex items-center justify-start gap-2 p-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={profile.foto_url} alt={profile.nome} />
+                      <AvatarFallback className="bg-orange-500 text-white text-xs">
+                        {getInitials(profile.nome)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium">{profile.nome}</p>
+                      <p className="text-xs text-gray-500">{profile.email}</p>
                     </div>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    className="w-full justify-start" 
-                    onClick={() => {
-                      navigate('/perfil');
-                      setMobileMenuOpen(false);
-                    }}
-                  >
-                    <User className="mr-2 h-4 w-4" />
-                    Perfil
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    className="w-full justify-start" 
-                    onClick={() => {
-                      navigate('/configuracoes');
-                      setMobileMenuOpen(false);
-                    }}
-                  >
-                    <Settings className="mr-2 h-4 w-4" />
-                    Configurações
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    className="w-full justify-start" 
-                    onClick={() => {
-                      handleLogout();
-                      setMobileMenuOpen(false);
-                    }}
-                  >
+                  <DropdownMenuSeparator />
+                  
+                  <DropdownMenuItem asChild>
+                    <Link to="/perfil" className="flex items-center">
+                      <User className="mr-2 h-4 w-4" />
+                      Meu Perfil
+                    </Link>
+                  </DropdownMenuItem>
+                  
+                  <DropdownMenuItem asChild>
+                    <Link to="/conversas" className="flex items-center">
+                      <MessageCircle className="mr-2 h-4 w-4" />
+                      Conversas
+                    </Link>
+                  </DropdownMenuItem>
+                  
+                  <DropdownMenuItem asChild>
+                    <Link to="/pedidos" className="flex items-center">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      Histórico de Pedidos
+                    </Link>
+                  </DropdownMenuItem>
+                  
+                  <DropdownMenuItem asChild>
+                    <Link to="/configuracoes" className="flex items-center">
+                      <Settings className="mr-2 h-4 w-4" />
+                      Configurações
+                    </Link>
+                  </DropdownMenuItem>
+                  
+                  {isPrestador && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/prestador/dashboard" className="flex items-center">
+                          <Wrench className="mr-2 h-4 w-4" />
+                          Painel do Prestador
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
                     <LogOut className="mr-2 h-4 w-4" />
                     Sair
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button onClick={() => setShowAuthModal(true)}>
+                Entrar
+              </Button>
+            )}
+
+            {/* Mobile Menu */}
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="sm" className="md:hidden">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-80">
+                <div className="flex flex-col space-y-4 mt-8">
+                  {/* Mobile Search */}
+                  <Button variant="outline" className="justify-start">
+                    <Search className="h-4 w-4 mr-2" />
+                    Buscar serviços
                   </Button>
+
+                  {/* Navigation Links */}
+                  {menuItems.filter(item => item.show).map((item) => (
+                    <Link
+                      key={item.href}
+                      to={item.href}
+                      className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <item.icon className="h-5 w-5" />
+                      <span className="font-medium">{item.label}</span>
+                    </Link>
+                  ))}
+
+                  {isAuthenticated && (
+                    <>
+                      <div className="border-t pt-4 mt-4">
+                        <Link
+                          to="/perfil"
+                          className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-colors"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <User className="h-5 w-5" />
+                          <span className="font-medium">Meu Perfil</span>
+                        </Link>
+                        
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start text-red-600 hover:text-red-600 hover:bg-red-50"
+                          onClick={() => {
+                            handleLogout();
+                            setMobileMenuOpen(false);
+                          }}
+                        >
+                          <LogOut className="h-5 w-5 mr-3" />
+                          Sair
+                        </Button>
+                      </div>
+                    </>
+                  )}
                 </div>
-              ) : (
-                <div className="pt-3 border-t space-y-2">
-                  <Button 
-                    variant="ghost" 
-                    className="w-full" 
-                    onClick={() => {
-                      navigate('/auth');
-                      setMobileMenuOpen(false);
-                    }}
-                  >
-                    Entrar
-                  </Button>
-                  <Button 
-                    className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700" 
-                    onClick={() => {
-                      navigate('/auth');
-                      setMobileMenuOpen(false);
-                    }}
-                  >
-                    Cadastrar
-                  </Button>
-                </div>
-              )}
-            </div>
+              </SheetContent>
+            </Sheet>
           </div>
-        )}
+        </div>
       </header>
 
-      <ChatWindow isOpen={chatOpen} onClose={() => setChatOpen(false)} />
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+      />
     </>
   );
 };

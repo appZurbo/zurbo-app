@@ -11,12 +11,14 @@ interface PrestadorCardProps {
   prestador: UserProfile;
   onViewProfile: (prestador: UserProfile) => void;
   onContact: (prestador: UserProfile) => void;
+  onCardClick?: (prestador: UserProfile) => void;
 }
 
 export const PrestadorCard: React.FC<PrestadorCardProps> = ({
   prestador,
   onViewProfile,
-  onContact
+  onContact,
+  onCardClick
 }) => {
   const getInitials = (nome: string) => {
     return nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -52,8 +54,22 @@ export const PrestadorCard: React.FC<PrestadorCardProps> = ({
 
   const totalAvaliacoes = prestador.avaliacoes?.length || 0;
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Prevent card click when clicking on buttons
+    if ((e.target as HTMLElement).closest('button')) {
+      return;
+    }
+    
+    if (onCardClick) {
+      onCardClick(prestador);
+    }
+  };
+
   return (
-    <Card className="group hover:shadow-lg transition-all duration-200 hover:-translate-y-1 bg-white">
+    <Card 
+      className="group hover:shadow-lg transition-all duration-200 hover:-translate-y-1 bg-white cursor-pointer"
+      onClick={handleCardClick}
+    >
       <div className="relative">
         {prestador.premium && (
           <Badge className="absolute top-2 right-2 z-10 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white border-0">
@@ -128,11 +144,40 @@ export const PrestadorCard: React.FC<PrestadorCardProps> = ({
           </p>
         )}
 
-        {/* Estatísticas */}
-        <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
-          <span>{totalAvaliacoes} avaliações</span>
-          {prestador.premium && (
-            <span className="text-yellow-600 font-medium">Premium</span>
+        {/* Estatísticas - Expandido */}
+        <div className="mb-3 p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between text-sm">
+            <div>
+              <span className="text-gray-600">{totalAvaliacoes} avaliações</span>
+              {prestador.endereco_bairro && (
+                <div className="text-xs text-gray-500 mt-1">
+                  {prestador.endereco_bairro}
+                </div>
+              )}
+            </div>
+            {prestador.premium && (
+              <span className="text-yellow-600 font-medium text-xs">Premium</span>
+            )}
+          </div>
+          
+          {/* Preview dos serviços */}
+          {prestador.prestador_servicos && prestador.prestador_servicos.length > 0 && (
+            <div className="mt-2 pt-2 border-t border-gray-200">
+              <div className="flex items-center gap-2 text-xs">
+                <div 
+                  className="w-2 h-2 rounded-full" 
+                  style={{ backgroundColor: prestador.prestador_servicos[0].servicos?.cor || '#f97316' }}
+                />
+                <span className="text-gray-600">
+                  {prestador.prestador_servicos[0].servicos?.nome}
+                </span>
+                {prestador.prestador_servicos[0].preco_min && (
+                  <span className="ml-auto text-orange-600 font-medium">
+                    R$ {prestador.prestador_servicos[0].preco_min}+
+                  </span>
+                )}
+              </div>
+            </div>
           )}
         </div>
 
@@ -141,15 +186,21 @@ export const PrestadorCard: React.FC<PrestadorCardProps> = ({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onViewProfile(prestador)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onViewProfile(prestador);
+            }}
             className="flex-1"
           >
             <Eye className="h-4 w-4 mr-1" />
-            Ver Perfil
+            Perfil Completo
           </Button>
           <Button
             size="sm"
-            onClick={() => onContact(prestador)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onContact(prestador);
+            }}
             className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
           >
             <MessageCircle className="h-4 w-4 mr-1" />
