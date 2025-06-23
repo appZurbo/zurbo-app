@@ -93,6 +93,30 @@ export type Database = {
           },
         ]
       }
+      cidades_brasileiras: {
+        Row: {
+          codigo_ibge: string | null
+          created_at: string | null
+          estado: string
+          id: string
+          nome: string
+        }
+        Insert: {
+          codigo_ibge?: string | null
+          created_at?: string | null
+          estado: string
+          id?: string
+          nome: string
+        }
+        Update: {
+          codigo_ibge?: string | null
+          created_at?: string | null
+          estado?: string
+          id?: string
+          nome?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           chat_id: string | null

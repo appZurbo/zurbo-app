@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface UserProfile {
@@ -39,6 +38,14 @@ export interface PortfolioFoto {
   descricao?: string;
   ordem: number;
   criado_em: string;
+}
+
+export interface CidadeBrasileira {
+  id: string;
+  nome: string;
+  estado: string;
+  codigo_ibge?: string;
+  created_at: string;
 }
 
 export const checkUserProfile = async (authId: string): Promise<UserProfile | null> => {
@@ -227,5 +234,52 @@ export const addPortfolioFoto = async (foto: {
   } catch (error) {
     console.error('Error adding portfolio foto:', error);
     return false;
+  }
+};
+
+export const getCidades = async (searchTerm?: string): Promise<CidadeBrasileira[]> => {
+  try {
+    let query = supabase
+      .from('cidades_brasileiras')
+      .select('*')
+      .eq('estado', 'MT')
+      .order('nome', { ascending: true });
+
+    if (searchTerm && searchTerm.length > 0) {
+      query = query.ilike('nome', `%${searchTerm}%`);
+    }
+
+    const { data, error } = await query.limit(50);
+
+    if (error) {
+      console.error('Error fetching cities:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Database error fetching cities:', error);
+    return [];
+  }
+};
+
+export const getCidadeByNome = async (nome: string): Promise<CidadeBrasileira | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('cidades_brasileiras')
+      .select('*')
+      .eq('nome', nome)
+      .eq('estado', 'MT')
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error fetching city by name:', error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Database error fetching city:', error);
+    return null;
   }
 };
