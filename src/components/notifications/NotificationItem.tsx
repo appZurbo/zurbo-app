@@ -13,12 +13,6 @@ interface Notification {
   type: 'new_client' | 'new_review' | 'new_message' | 'system_update' | 'payment' | 'schedule_change';
   read: boolean;
   created_at: string;
-  metadata?: {
-    pedido_id?: string;
-    chat_id?: string;
-    user_name?: string;
-    service_name?: string;
-  };
 }
 
 interface NotificationItemProps {
@@ -56,15 +50,11 @@ export const NotificationItem = ({ notification }: NotificationItemProps) => {
     // Navigate based on notification type
     switch (notification.type) {
       case 'new_message':
-        if (notification.metadata?.chat_id) {
-          navigate('/conversas');
-        }
+        navigate('/conversas');
         break;
       case 'new_client':
       case 'schedule_change':
-        if (notification.metadata?.pedido_id) {
-          navigate('/pedidos');
-        }
+        navigate('/pedidos');
         break;
       case 'payment':
         navigate('/pedidos');
@@ -114,16 +104,6 @@ export const NotificationItem = ({ notification }: NotificationItemProps) => {
           <p className={`text-sm mt-1 ${!notification.read ? 'text-gray-700' : 'text-gray-500'}`}>
             {notification.message}
           </p>
-          {notification.metadata?.user_name && (
-            <p className="text-xs text-gray-500 mt-1">
-              De: {notification.metadata.user_name}
-            </p>
-          )}
-          {notification.metadata?.service_name && (
-            <p className="text-xs text-gray-500 mt-1">
-              Serviço: {notification.metadata.service_name}
-            </p>
-          )}
           <p className="text-xs text-gray-400 mt-2">
             {formatDistanceToNow(new Date(notification.created_at), {
               addSuffix: true,

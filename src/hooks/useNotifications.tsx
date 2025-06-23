@@ -11,12 +11,6 @@ export interface Notification {
   type: 'new_client' | 'new_review' | 'new_message' | 'system_update' | 'payment' | 'schedule_change';
   read: boolean;
   created_at: string;
-  metadata?: {
-    pedido_id?: string;
-    chat_id?: string;
-    user_name?: string;
-    service_name?: string;
-  };
 }
 
 export const useNotifications = () => {
@@ -67,8 +61,7 @@ export const useNotifications = () => {
       
       const typedNotifications: Notification[] = (data || []).map(item => ({
         ...item,
-        type: item.type as Notification['type'],
-        metadata: item.metadata ? JSON.parse(item.metadata) : undefined
+        type: item.type as Notification['type']
       }));
       
       setNotifications(typedNotifications);
@@ -122,10 +115,7 @@ export const useNotifications = () => {
     try {
       const { error } = await supabase
         .from('notifications')
-        .insert([{
-          ...notification,
-          metadata: notification.metadata ? JSON.stringify(notification.metadata) : null
-        }]);
+        .insert([notification]);
 
       if (error) throw error;
     } catch (error) {
