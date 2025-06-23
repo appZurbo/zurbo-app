@@ -57,9 +57,9 @@ export const criarAgendamento = async (dados: {
       })
       .select(`
         *,
-        solicitante:solicitante_id (nome, foto_url, endereco_cidade),
-        prestador:prestador_id (nome, foto_url, endereco_cidade),
-        servico:servico_id (nome, icone, cor)
+        solicitante:users!agendamentos_solicitante_id_fkey (nome, foto_url, endereco_cidade),
+        prestador:users!agendamentos_prestador_id_fkey (nome, foto_url, endereco_cidade),
+        servico:servicos (nome, icone, cor)
       `)
       .single();
 
@@ -68,7 +68,7 @@ export const criarAgendamento = async (dados: {
       return null;
     }
 
-    return data as Agendamento;
+    return data as unknown as Agendamento;
   } catch (error) {
     console.error('Erro ao criar agendamento:', error);
     return null;
@@ -92,9 +92,9 @@ export const listarAgendamentos = async (): Promise<Agendamento[]> => {
       .from('agendamentos')
       .select(`
         *,
-        solicitante:solicitante_id (nome, foto_url, endereco_cidade),
-        prestador:prestador_id (nome, foto_url, endereco_cidade),
-        servico:servico_id (nome, icone, cor)
+        solicitante:users!agendamentos_solicitante_id_fkey (nome, foto_url, endereco_cidade),
+        prestador:users!agendamentos_prestador_id_fkey (nome, foto_url, endereco_cidade),
+        servico:servicos (nome, icone, cor)
       `)
       .or(`solicitante_id.eq.${profile.id},prestador_id.eq.${profile.id}`)
       .order('data_agendada', { ascending: true });
@@ -104,7 +104,7 @@ export const listarAgendamentos = async (): Promise<Agendamento[]> => {
       return [];
     }
 
-    return data as Agendamento[];
+    return data as unknown as Agendamento[];
   } catch (error) {
     console.error('Erro ao listar agendamentos:', error);
     return [];

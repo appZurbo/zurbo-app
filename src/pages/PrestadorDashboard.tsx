@@ -88,7 +88,7 @@ const PrestadorDashboard = () => {
         .eq('status', 'concluido');
 
       const valorTotal = servicosComValor?.reduce((total, servico) => 
-        total + (parseFloat(servico.valor) || 0), 0) || 0;
+        total + (parseFloat(servico.valor?.toString() || '0') || 0), 0) || 0;
 
       // Total de avaliações
       const { count: totalAvaliacoes } = await supabase

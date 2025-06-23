@@ -91,7 +91,7 @@ const Settings = () => {
               </TabsTrigger>
               {isPrestador && (
                 <TabsTrigger value="bairros" className="flex items-center gap-2">
-                  <Settings as any className="h-4 w-4" />
+                  <SettingsIcon className="h-4 w-4" />
                   Bairros
                 </TabsTrigger>
               )}

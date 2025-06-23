@@ -111,7 +111,7 @@ export const listarFavoritos = async (): Promise<Favorito[]> => {
       .from('favoritos')
       .select(`
         *,
-        prestador:prestador_id (
+        prestador:users!favoritos_prestador_id_fkey (
           nome,
           foto_url,
           nota_media,
@@ -126,7 +126,7 @@ export const listarFavoritos = async (): Promise<Favorito[]> => {
       return [];
     }
 
-    return data as Favorito[];
+    return data as unknown as Favorito[];
   } catch (error) {
     console.error('Erro ao listar favoritos:', error);
     return [];
