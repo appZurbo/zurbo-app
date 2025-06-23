@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import LoginForm from '@/components/auth/LoginForm';
+import SecureLoginForm from '@/components/auth/SecureLoginForm';
 import RegisterForm from '@/components/auth/RegisterForm';
 
 const AuthPage = () => {
@@ -49,7 +49,7 @@ const AuthPage = () => {
               </TabsList>
               
               <TabsContent value="login">
-                <LoginForm
+                <SecureLoginForm
                   onSuccess={() => {}}
                   onSwitchToRegister={() => setActiveTab('register')}
                 />

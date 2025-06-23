@@ -2,11 +2,13 @@
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Settings as SettingsIcon, User, Wrench } from 'lucide-react';
+import { ArrowLeft, Settings as SettingsIcon, User, Wrench, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { UserSettings } from '@/components/settings/UserSettings';
 import PrestadorSettings from './PrestadorSettings';
+import SecuritySettings from '@/components/settings/SecuritySettings';
 import { useMobile } from '@/hooks/useMobile';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -78,9 +80,28 @@ const Settings = () => {
           </div>
         </div>
 
-        {/* Container principal com ajustes para mobile */}
+        {/* Container principal com abas para incluir segurança */}
         <div className={`${isMobile ? 'space-y-4' : ''}`}>
-          {isPrestador ? <PrestadorSettings /> : <UserSettings />}
+          <Tabs defaultValue="profile" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="profile" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Perfil
+              </TabsTrigger>
+              <TabsTrigger value="security" className="flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                Segurança
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="profile">
+              {isPrestador ? <PrestadorSettings /> : <UserSettings />}
+            </TabsContent>
+            
+            <TabsContent value="security">
+              <SecuritySettings />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
