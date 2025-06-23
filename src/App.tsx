@@ -9,6 +9,7 @@ import PrestadoresPage from '@/pages/PrestadoresPage';
 import NotFound from '@/pages/NotFound';
 import Pedidos from '@/pages/Pedidos';
 import Conversas from '@/pages/Conversas';
+import AuthPage from '@/pages/AuthPage';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<AuthPage />} />
             <Route path="/configuracoes" element={<Settings />} />
             <Route path="/prestadores" element={<PrestadoresPage />} />
             <Route path="/pedidos" element={<Pedidos />} />
