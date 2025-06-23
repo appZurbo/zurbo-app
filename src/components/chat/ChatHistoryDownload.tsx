@@ -23,8 +23,8 @@ export const ChatHistoryDownload = ({ chat, messages }: ChatHistoryDownloadProps
         .from('chats')
         .select(`
           *,
-          cliente:users!cliente_id(nome, email),
-          prestador:users!prestador_id(nome, email)
+          cliente:users!cliente_id(id, nome, email),
+          prestador:users!prestador_id(id, nome, email)
         `)
         .eq('id', chat.id)
         .single();
@@ -52,8 +52,8 @@ das comunicações entre as partes.
 ==============================================
 
 PARTICIPANTES:
-- ${chat.cliente?.nome || 'Cliente'} (${chat.cliente?.email || 'N/A'})
-- ${chat.prestador?.nome || 'Prestador'} (${chat.prestador?.email || 'N/A'})
+- ${chatData?.cliente?.nome || 'Cliente'} (${chatData?.cliente?.email || 'N/A'})
+- ${chatData?.prestador?.nome || 'Prestador'} (${chatData?.prestador?.email || 'N/A'})
 
 PERÍODO: ${new Date(chat.created_at).toLocaleString('pt-BR')} até ${new Date().toLocaleString('pt-BR')}
 
@@ -62,7 +62,7 @@ HISTÓRICO DE MENSAGENS:
 
 ${messages.map(message => {
   const isFromCurrentUser = message.sender_id === chat.cliente_id;
-  const senderName = isFromCurrentUser ? (chat.cliente?.nome || 'Cliente') : (chat.prestador?.nome || 'Prestador');
+  const senderName = isFromCurrentUser ? (chatData?.cliente?.nome || 'Cliente') : (chatData?.prestador?.nome || 'Prestador');
   
   return `[${new Date(message.created_at).toLocaleString('pt-BR')}] ${senderName}:
 ${message.content}

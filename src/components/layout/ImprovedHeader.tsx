@@ -28,7 +28,7 @@ import { TestBanner } from '@/components/banners/TestBanner';
 
 export const ImprovedHeader = () => {
   const navigate = useNavigate();
-  const { profile, signOut } = useAuth();
+  const { profile, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleAuthClick = () => {
@@ -36,7 +36,7 @@ export const ImprovedHeader = () => {
   };
 
   const handleSignOut = async () => {
-    await signOut();
+    await logout();
     navigate('/');
   };
 
