@@ -1,4 +1,3 @@
-
 import { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { ExpandableTabs } from '@/components/ui/expandable-tabs';
@@ -6,6 +5,7 @@ import { Home, User, Settings, Search, Bell } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
+import type { TabItem } from '@/components/ui/expandable-tabs';
 
 interface MobileLayoutProps {
   children: ReactNode;
@@ -21,11 +21,11 @@ export const MobileLayout = ({ children }: MobileLayoutProps) => {
     return <>{children}</>;
   }
 
-  const tabs = [
+  const tabs: TabItem[] = [
     { title: "Início", icon: Home },
     { title: "Serviços", icon: Search },
     { title: "Perfil", icon: User },
-    { type: "separator" as const },
+    { type: "separator" },
     { title: "Config", icon: Settings },
   ];
 
