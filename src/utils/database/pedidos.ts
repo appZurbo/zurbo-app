@@ -28,26 +28,27 @@ export interface Pedido {
 
 export const getPedidos = async (userId?: string): Promise<Pedido[]> => {
   try {
-    // Usar SQL direto já que a tabela pedidos não está nos tipos gerados
-    let query = `
-      SELECT 
-        p.*,
-        row_to_json(c.*) as cliente,
-        row_to_json(pr.*) as prestador,
-        row_to_json(s.*) as servico
-      FROM pedidos p
-      LEFT JOIN users c ON p.cliente_id = c.id
-      LEFT JOIN users pr ON p.prestador_id = pr.id
-      LEFT JOIN servicos s ON p.servico_id = s.id
-    `;
-    
-    if (userId) {
-      query += ` WHERE p.cliente_id = '${userId}' OR p.prestador_id = '${userId}'`;
-    }
-    
-    query += ` ORDER BY p.created_at DESC`;
+    let query = supabase
+      .from('pedidos')
+      .select(`
+        *,
+        cliente:users!cliente_id(
+          id, nome, email, foto_url, endereco_cidade
+        ),
+        prestador:users!prestador_id(
+          id, nome, email, foto_url, endereco_cidade, nota_media
+        ),
+        servico:servicos(
+          nome, icone, cor
+        )
+      `)
+      .order('created_at', { ascending: false });
 
-    const { data, error } = await supabase.rpc('execute_sql', { query });
+    if (userId) {
+      query = query.or(`cliente_id.eq.${userId},prestador_id.eq.${userId}`);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       console.error('Error fetching pedidos:', error);
@@ -63,20 +64,26 @@ export const getPedidos = async (userId?: string): Promise<Pedido[]> => {
 
 export const createPedido = async (pedidoData: Partial<Pedido>): Promise<Pedido | null> => {
   try {
-    const query = `
-      INSERT INTO pedidos (cliente_id, prestador_id, servico_id, titulo, descricao, preco_acordado, endereco_completo)
-      VALUES ('${pedidoData.cliente_id}', '${pedidoData.prestador_id}', '${pedidoData.servico_id}', '${pedidoData.titulo}', '${pedidoData.descricao}', ${pedidoData.preco_acordado}, '${pedidoData.endereco_completo}')
-      RETURNING *
-    `;
-
-    const { data, error } = await supabase.rpc('execute_sql', { query });
+    const { data, error } = await supabase
+      .from('pedidos')
+      .insert([{
+        cliente_id: pedidoData.cliente_id,
+        prestador_id: pedidoData.prestador_id,
+        servico_id: pedidoData.servico_id,
+        titulo: pedidoData.titulo,
+        descricao: pedidoData.descricao,
+        preco_acordado: pedidoData.preco_acordado,
+        endereco_completo: pedidoData.endereco_completo
+      }])
+      .select()
+      .single();
 
     if (error) {
       console.error('Error creating pedido:', error);
       return null;
     }
 
-    return (data?.[0] || null) as Pedido;
+    return data || null;
   } catch (error) {
     console.error('Error creating pedido:', error);
     return null;
@@ -85,25 +92,22 @@ export const createPedido = async (pedidoData: Partial<Pedido>): Promise<Pedido 
 
 export const updatePedido = async (pedidoId: string, updates: Partial<Pedido>): Promise<Pedido | null> => {
   try {
-    const setClause = Object.entries(updates)
-      .map(([key, value]) => `${key} = '${value}'`)
-      .join(', ');
-
-    const query = `
-      UPDATE pedidos 
-      SET ${setClause}, updated_at = NOW()
-      WHERE id = '${pedidoId}'
-      RETURNING *
-    `;
-
-    const { data, error } = await supabase.rpc('execute_sql', { query });
+    const { data, error } = await supabase
+      .from('pedidos')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', pedidoId)
+      .select()
+      .single();
 
     if (error) {
       console.error('Error updating pedido:', error);
       return null;
     }
 
-    return (data?.[0] || null) as Pedido;
+    return data || null;
   } catch (error) {
     console.error('Error updating pedido:', error);
     return null;

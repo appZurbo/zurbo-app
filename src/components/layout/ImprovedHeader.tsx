@@ -39,6 +39,11 @@ export const ImprovedHeader = () => {
     navigate('/');
   };
 
+  const handleLogin = (user: any) => {
+    console.log('User logged in:', user);
+    // Handle login logic here
+  };
+
   const getInitials = (nome: string) => {
     return nome?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U';
   };
@@ -233,6 +238,7 @@ export const ImprovedHeader = () => {
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
+        onLogin={handleLogin}
       />
     </>
   );
