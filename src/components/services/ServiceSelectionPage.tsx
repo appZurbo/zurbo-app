@@ -7,8 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { CheckCircle, Star, DollarSign, Sparkles, Flower, Paintbrush, Zap, Droplets, Truck, ChefHat, Hammer, Scissors, Heart, Snowflake } from 'lucide-react';
-
+import { CheckCircle, Star, DollarSign, Sparkles, Flower, Paintbrush, Zap, Droplets, Truck, ChefHat, Hammer, Scissors, Heart } from 'lucide-react';
 interface Servico {
   id: string;
   nome: string;
@@ -36,8 +35,7 @@ const iconMap: {
   ChefHat,
   Hammer,
   Scissors,
-  Heart,
-  Snowflake
+  Heart
 };
 const ServiceSelectionPage = ({
   onComplete
@@ -185,43 +183,28 @@ const ServiceSelectionPage = ({
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
           {servicos.map(servico => {
-            const isSelected = servicosSelecionados.some(s => s.servico_id === servico.id);
-            const IconComponent = iconMap[servico.icone] || Star;
-            
-            return (
-              <Card 
-                key={servico.id} 
-                className={`cursor-pointer transition-all duration-200 ${
-                  isSelected 
-                    ? 'ring-2 ring-orange-500 bg-orange-50' 
-                    : 'hover:shadow-md'
-                }`}
-                onClick={() => toggleServico(servico.id)}
-              >
-                <CardContent className="p-4">
+          const isSelected = servicosSelecionados.some(s => s.servico_id === servico.id);
+          const IconComponent = iconMap[servico.icone] || Star;
+          return <Card key={servico.id} className={`cursor-pointer transition-all duration-200 ${isSelected ? 'ring-2 ring-orange-500 bg-orange-50' : 'hover:shadow-md'}`} onClick={() => toggleServico(servico.id)}>
+                <CardContent className="p-4 px-0 py-0">
                   <div className="flex items-center justify-between mb-3">
-                    <div 
-                      className="w-10 h-10 rounded-lg flex items-center justify-center" 
-                      style={{ backgroundColor: `${servico.cor}20` }}
-                    >
-                      <IconComponent 
-                        className="h-5 w-5" 
-                        style={{ color: servico.cor }} 
-                      />
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{
+                  backgroundColor: `${servico.cor}20`
+                }}>
+                      <IconComponent className="h-5 w-5" style={{
+                    color: servico.cor
+                  }} />
                     </div>
-                    {isSelected && (
-                      <CheckCircle className="h-6 w-6 text-orange-500" />
-                    )}
+                    {isSelected && <CheckCircle className="h-6 w-6 text-orange-500" />}
                   </div>
                   <h3 className="font-medium text-gray-900">
                     {servico.nome}
                   </h3>
                 </CardContent>
-              </Card>
-            );
-          })}
+              </Card>;
+        })}
         </div>
 
         {servicosSelecionados.length > 0 && <Card className="mb-8">
