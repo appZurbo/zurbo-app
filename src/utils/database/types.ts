@@ -41,6 +41,30 @@ export interface UserProfile {
   }[];
 }
 
+export interface Pedido {
+  id: string;
+  cliente_id: string;
+  prestador_id: string;
+  servico_id: string;
+  titulo: string;
+  descricao?: string;
+  preco_acordado?: number;
+  status: 'pendente' | 'aceito' | 'em_andamento' | 'concluido' | 'cancelado';
+  data_solicitacao: string;
+  data_conclusao?: string;
+  endereco_completo?: string;
+  observacoes?: string;
+  created_at: string;
+  updated_at: string;
+  cliente?: UserProfile;
+  prestador?: UserProfile;
+  servico?: {
+    nome: string;
+    icone?: string;
+    cor?: string;
+  };
+}
+
 export interface Avaliacao {
   id: string;
   avaliador_id: string;

@@ -241,6 +241,79 @@ export type Database = {
           },
         ]
       }
+      pedidos: {
+        Row: {
+          cliente_id: string
+          created_at: string
+          data_conclusao: string | null
+          data_solicitacao: string
+          descricao: string | null
+          endereco_completo: string | null
+          id: string
+          observacoes: string | null
+          preco_acordado: number | null
+          prestador_id: string
+          servico_id: string
+          status: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          cliente_id: string
+          created_at?: string
+          data_conclusao?: string | null
+          data_solicitacao?: string
+          descricao?: string | null
+          endereco_completo?: string | null
+          id?: string
+          observacoes?: string | null
+          preco_acordado?: number | null
+          prestador_id: string
+          servico_id: string
+          status?: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          cliente_id?: string
+          created_at?: string
+          data_conclusao?: string | null
+          data_solicitacao?: string
+          descricao?: string | null
+          endereco_completo?: string | null
+          id?: string
+          observacoes?: string | null
+          preco_acordado?: number | null
+          prestador_id?: string
+          servico_id?: string
+          status?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pedidos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pedidos_prestador_id_fkey"
+            columns: ["prestador_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pedidos_servico_id_fkey"
+            columns: ["servico_id"]
+            isOneToOne: false
+            referencedRelation: "servicos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       portfolio_fotos: {
         Row: {
           criado_em: string | null

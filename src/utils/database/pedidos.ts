@@ -1,30 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { UserProfile } from './types';
-
-export interface Pedido {
-  id: string;
-  cliente_id: string;
-  prestador_id: string;
-  servico_id: string;
-  titulo: string;
-  descricao?: string;
-  preco_acordado?: number;
-  status: 'pendente' | 'aceito' | 'em_andamento' | 'concluido' | 'cancelado';
-  data_solicitacao: string;
-  data_conclusao?: string;
-  endereco_completo?: string;
-  observacoes?: string;
-  created_at: string;
-  updated_at: string;
-  cliente?: UserProfile;
-  prestador?: UserProfile;
-  servico?: {
-    nome: string;
-    icone?: string;
-    cor?: string;
-  };
-}
+import { Pedido } from './types';
 
 export const getPedidos = async (userId?: string): Promise<Pedido[]> => {
   try {
@@ -83,7 +59,7 @@ export const createPedido = async (pedidoData: Partial<Pedido>): Promise<Pedido 
       return null;
     }
 
-    return data || null;
+    return data as Pedido;
   } catch (error) {
     console.error('Error creating pedido:', error);
     return null;
@@ -107,7 +83,7 @@ export const updatePedido = async (pedidoId: string, updates: Partial<Pedido>): 
       return null;
     }
 
-    return data || null;
+    return data as Pedido;
   } catch (error) {
     console.error('Error updating pedido:', error);
     return null;
