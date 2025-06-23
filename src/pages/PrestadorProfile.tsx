@@ -9,6 +9,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ImprovedHeader } from '@/components/layout/ImprovedHeader';
 import { ModernFooter } from '@/components/layout/ModernFooter';
 import { getUserProfile, getAvaliacoes, getPortfolioFotos } from '@/utils/database';
+import { CommentsList } from '@/components/profile/CommentsList';
+import { AddCommentDialog } from '@/components/profile/AddCommentDialog';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { 
@@ -24,14 +26,16 @@ import {
   CheckCircle,
   Calendar,
   MessageCircle,
-  Share2
+  Share2,
+  Crown,
+  Shield
 } from 'lucide-react';
 
 export default function PrestadorProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, profile: currentUser } = useAuth();
   const [prestador, setPrestador] = useState<any>(null);
   const [avaliacoes, setAvaliacoes] = useState<any[]>([]);
   const [portfolio, setPortfolio] = useState<any[]>([]);
@@ -105,6 +109,12 @@ export default function PrestadorProfile() {
 
   const ratings = calculateRatings();
 
+  const bairrosAtendidos = [
+    'Centro', 'Jardim Botânico', 'Residencial Anaterra', 
+    'Vila Rica', 'Jardim Primavera', 'Setor Industrial',
+    'Jardim das Flores', 'Cidade Alta'
+  ];
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -175,7 +185,7 @@ export default function PrestadorProfile() {
                     <h1 className="text-3xl font-bold text-gray-900">{prestador.nome}</h1>
                     {prestador.premium && (
                       <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white">
-                        <span className="mr-1">👑</span>
+                        <Crown className="h-4 w-4 mr-1" />
                         Premium
                       </Badge>
                     )}
@@ -270,11 +280,29 @@ export default function PrestadorProfile() {
         </div>
       </div>
 
+      {/* Status Premium */}
+      {prestador.premium && (
+        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-b">
+          <div className="max-w-6xl mx-auto px-4 py-4">
+            <div className="flex items-center justify-center gap-3 text-center">
+              <Shield className="h-6 w-6 text-yellow-600" />
+              <div>
+                <h3 className="font-semibold text-yellow-800">✅ Prestador Premium</h3>
+                <p className="text-sm text-yellow-700">
+                  Perfil verificado com garantia de qualidade e prioridade no atendimento
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
         <Tabs defaultValue="sobre" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="sobre">Sobre</TabsTrigger>
+            <TabsTrigger value="servicos">Serviços</TabsTrigger>
             <TabsTrigger value="avaliacoes">Avaliações</TabsTrigger>
             <TabsTrigger value="portfolio">Portfólio</TabsTrigger>
             <TabsTrigger value="localizacao">Localização</TabsTrigger>
@@ -361,8 +389,9 @@ export default function PrestadorProfile() {
                 </CardContent>
               </Card>
             )}
-            
-            {/* Services */}
+          </TabsContent>
+          
+          <TabsContent value="servicos" className="space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle>Serviços Oferecidos</CardTitle>
@@ -387,49 +416,17 @@ export default function PrestadorProfile() {
           </TabsContent>
           
           <TabsContent value="avaliacoes" className="space-y-4">
-            {avaliacoes.length > 0 ? (
-              avaliacoes.map((avaliacao, index) => (
-                <Card key={index}>
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <Avatar>
-                        <AvatarImage src={avaliacao.avaliador?.foto_url} />
-                        <AvatarFallback>
-                          {avaliacao.avaliador?.nome?.[0]?.toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-grow">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="font-medium">{avaliacao.avaliador?.nome}</span>
-                          <div className="flex">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                              <Star 
-                                key={i} 
-                                className={`h-4 w-4 ${
-                                  i < avaliacao.nota 
-                                    ? 'text-yellow-500 fill-current' 
-                                    : 'text-gray-300'
-                                }`} 
-                              />
-                            ))}
-                          </div>
-                          <span className="text-sm text-gray-500">
-                            {new Date(avaliacao.criado_em).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <p className="text-gray-700">{avaliacao.comentario}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <p className="text-gray-500">Ainda não há avaliações para este prestador.</p>
-                </CardContent>
-              </Card>
-            )}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Avaliações dos Clientes</span>
+                  <AddCommentDialog userId={prestador.id} userName={prestador.nome} />
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CommentsList userId={prestador.id} />
+              </CardContent>
+            </Card>
           </TabsContent>
           
           <TabsContent value="portfolio" className="space-y-4">
@@ -459,6 +456,11 @@ export default function PrestadorProfile() {
               <Card>
                 <CardContent className="p-6 text-center">
                   <p className="text-gray-500">Este prestador ainda não adicionou fotos ao portfólio.</p>
+                  {!prestador.premium && (
+                    <p className="text-sm text-orange-600 mt-2">
+                      Prestadores Premium podem adicionar até 10 fotos
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             )}
@@ -467,31 +469,34 @@ export default function PrestadorProfile() {
           <TabsContent value="localizacao">
             <Card>
               <CardHeader>
-                <CardTitle>Área de Atendimento</CardTitle>
+                <CardTitle>Área de Atendimento - Sinop, MT</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div className="flex items-center gap-2 text-gray-700">
                     <MapPin className="h-5 w-5" />
-                    <span>{prestador.endereco_cidade || 'Sinop, MT'}</span>
+                    <span>Base de operação: {prestador.endereco_cidade || 'Sinop, MT'}</span>
                   </div>
                   
-                  {/* Mini mapa placeholder - Em produção, usar um componente de mapa real */}
-                  <div className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center">
-                    <div className="text-center text-gray-500">
-                      <MapPin className="h-8 w-8 mx-auto mb-2" />
-                      <p>Mapa de Sinop, MT</p>
-                      <p className="text-sm">Em breve: mapa interativo</p>
+                  {/* Mini mapa placeholder */}
+                  <div className="w-full h-64 bg-gradient-to-br from-green-100 to-blue-100 rounded-lg flex items-center justify-center border-2 border-dashed border-green-300">
+                    <div className="text-center text-green-700">
+                      <MapPin className="h-12 w-12 mx-auto mb-2" />
+                      <p className="font-medium">Mapa de Sinop - MT</p>
+                      <p className="text-sm">Bairros atendidos destacados</p>
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {['Centro', 'Jardim Botânico', 'Residencial Anaterra', 'Vila Rica', 'Jardim Primavera', 'Setor Industrial'].map((bairro) => (
-                      <div key={bairro} className="flex items-center gap-2 p-3 bg-green-50 rounded-lg">
-                        <CheckCircle className="h-4 w-4 text-green-600" />
-                        <span className="text-sm">{bairro}</span>
-                      </div>
-                    ))}
+                  <div>
+                    <h4 className="font-medium mb-3">Bairros Atendidos:</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {bairrosAtendidos.map((bairro) => (
+                        <div key={bairro} className="flex items-center gap-2 p-3 bg-green-50 rounded-lg">
+                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <span className="text-sm">{bairro}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </CardContent>
