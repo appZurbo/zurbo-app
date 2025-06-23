@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { X, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,20 +7,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onLogin: (user: any) => void;
   defaultTab?: 'login' | 'register-client' | 'register-prestador';
 }
-
-const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = 'login' }: AuthModalProps) => {
+const AuthModal = ({
+  isOpen,
+  onClose,
+  onLogin,
+  defaultTab = 'login'
+}: AuthModalProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState(defaultTab);
-
   if (!isOpen) return null;
-
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // Simulação de login
@@ -32,7 +32,6 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = 'login' }: AuthModal
     });
     onClose();
   };
-
   const handleRegisterClient = (e: React.FormEvent) => {
     e.preventDefault();
     onLogin({
@@ -42,7 +41,6 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = 'login' }: AuthModal
     });
     onClose();
   };
-
   const handleRegisterPrestador = (e: React.FormEvent) => {
     e.preventDefault();
     onLogin({
@@ -52,25 +50,18 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = 'login' }: AuthModal
     });
     onClose();
   };
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+  return <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
         <CardHeader className="relative">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute right-2 top-2"
-            onClick={onClose}
-          >
+          <Button variant="ghost" size="sm" className="absolute right-2 top-2" onClick={onClose}>
             <X className="h-4 w-4" />
           </Button>
           <CardTitle className="text-center">
-            Bem-vindo ao <span className="gradient-bg bg-clip-text text-transparent">ZURBO</span>
+            Bem-vindo ao <span className="gradient-bg bg-clip-text text-orange-600">zurbo.</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
+          <Tabs value={activeTab} onValueChange={value => setActiveTab(value as any)}>
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="login">Entrar</TabsTrigger>
               <TabsTrigger value="register-client">Cliente</TabsTrigger>
@@ -86,18 +77,8 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = 'login' }: AuthModal
                 <div>
                   <Label htmlFor="password">Senha</Label>
                   <div className="relative">
-                    <Input 
-                      id="password" 
-                      type={showPassword ? "text" : "password"} 
-                      required 
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
+                    <Input id="password" type={showPassword ? "text" : "password"} required />
+                    <Button type="button" variant="ghost" size="sm" className="absolute right-2 top-1/2 transform -translate-y-1/2" onClick={() => setShowPassword(!showPassword)}>
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
                   </div>
@@ -193,8 +174,6 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = 'login' }: AuthModal
           </Tabs>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>;
 };
-
 export default AuthModal;
