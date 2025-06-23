@@ -2,7 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Avaliacao } from './types';
 
-export const getAvaliacoes = async (userId: string): Promise<Avaliacao[]> => {
+export const getAvaliacoes = async (prestadorId: string): Promise<Avaliacao[]> => {
   try {
     const { data, error } = await supabase
       .from('avaliacoes')
@@ -10,32 +10,17 @@ export const getAvaliacoes = async (userId: string): Promise<Avaliacao[]> => {
         *,
         avaliador:users!avaliacoes_avaliador_id_fkey (nome, foto_url)
       `)
-      .eq('avaliado_id', userId)
+      .eq('avaliado_id', prestadorId)
       .order('criado_em', { ascending: false });
 
-    if (error) throw error;
-    return data || [];
+    if (error) {
+      console.error('Error fetching avaliacoes:', error);
+      return [];
+    }
+
+    return (data || []) as Avaliacao[];
   } catch (error) {
-    console.error('Error fetching avaliações:', error);
+    console.error('Error loading avaliacoes:', error);
     return [];
-  }
-};
-
-export const createAvaliacao = async (avaliacao: {
-  avaliador_id: string;
-  avaliado_id: string;
-  nota: number;
-  comentario?: string;
-}): Promise<boolean> => {
-  try {
-    const { error } = await supabase
-      .from('avaliacoes')
-      .insert(avaliacao);
-
-    if (error) throw error;
-    return true;
-  } catch (error) {
-    console.error('Error creating avaliação:', error);
-    return false;
   }
 };

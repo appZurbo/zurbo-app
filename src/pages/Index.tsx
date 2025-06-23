@@ -13,6 +13,8 @@ import { HeroSection } from '@/components/sections/HeroSection';
 import { TestBanner } from '@/components/banners/TestBanner';
 import { ProfileViewModal } from '@/components/profile/ProfileViewModal';
 import { ContactModal } from '@/components/contact/ContactModal';
+import { ImprovedHeader } from '@/components/layout/ImprovedHeader';
+import { useNavigate } from 'react-router-dom';
 import { 
   Sparkles, 
   Flower, 
@@ -32,7 +34,6 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useDebounce } from '@/hooks/useDebounce';
-import { navigate } from 'react-router-dom';
 
 const servicos = [
   { id: 'limpeza', nome: 'Limpeza', icone: 'Sparkles', cor: '#3B82F6' },
@@ -54,6 +55,7 @@ const iconMap = {
 export default function Index() {
   const { profile, isAuthenticated, loading } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
   const [loadingPrestadores, setLoadingPrestadores] = useState(true);
   const [selectedPrestador, setSelectedPrestador] = useState<UserProfile | null>(null);

@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { UserProfile } from './types';
 
@@ -66,6 +65,34 @@ export const updateUserProfile = async (userId: string, updates: Partial<UserPro
     return data as UserProfile;
   } catch (error) {
     console.error('Profile update error:', error);
+    return null;
+  }
+};
+
+export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select(`
+        *,
+        prestador_servicos (
+          servico_id,
+          preco_min,
+          preco_max,
+          servicos (nome, icone, cor)
+        )
+      `)
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error getting user profile:', error);
+      return null;
+    }
+
+    return data as UserProfile;
+  } catch (error) {
+    console.error('Database get user profile error:', error);
     return null;
   }
 };

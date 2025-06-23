@@ -1,4 +1,3 @@
-
 export interface UserProfile {
   id: string;
   auth_id: string;
@@ -20,6 +19,16 @@ export interface UserProfile {
   premium?: boolean;
   criado_em: string;
   updated_at?: string;
+  prestador_servicos?: {
+    servico_id: string;
+    preco_min: number;
+    preco_max: number;
+    servicos?: {
+      nome: string;
+      icone?: string;
+      cor?: string;
+    };
+  }[];
 }
 
 export interface Avaliacao {
