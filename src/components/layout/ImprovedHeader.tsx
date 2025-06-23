@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -25,7 +26,7 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { AuthModal } from '@/components/AuthModal';
+import AuthModal from '@/components/AuthModal';
 
 export const ImprovedHeader = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -144,13 +145,6 @@ export const ImprovedHeader = () => {
                   <DropdownMenuSeparator />
                   
                   <DropdownMenuItem asChild>
-                    <Link to="/perfil" className="flex items-center">
-                      <User className="mr-2 h-4 w-4" />
-                      Meu Perfil
-                    </Link>
-                  </DropdownMenuItem>
-                  
-                  <DropdownMenuItem asChild>
                     <Link to="/conversas" className="flex items-center">
                       <MessageCircle className="mr-2 h-4 w-4" />
                       Conversas
@@ -170,18 +164,6 @@ export const ImprovedHeader = () => {
                       Configurações
                     </Link>
                   </DropdownMenuItem>
-                  
-                  {isPrestador && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
-                        <Link to="/prestador/dashboard" className="flex items-center">
-                          <Wrench className="mr-2 h-4 w-4" />
-                          Painel do Prestador
-                        </Link>
-                      </DropdownMenuItem>
-                    </>
-                  )}
                   
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
@@ -227,15 +209,6 @@ export const ImprovedHeader = () => {
                   {isAuthenticated && (
                     <>
                       <div className="border-t pt-4 mt-4">
-                        <Link
-                          to="/perfil"
-                          className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-colors"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <User className="h-5 w-5" />
-                          <span className="font-medium">Meu Perfil</span>
-                        </Link>
-                        
                         <Button
                           variant="ghost"
                           className="w-full justify-start text-red-600 hover:text-red-600 hover:bg-red-50"

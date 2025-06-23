@@ -8,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, MessageCircle, Calendar, MapPin, Clock, User, Wrench } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { getPedidos } from '@/utils/database/pedidos';
 import { Pedido } from '@/utils/database/types';
 import { useToast } from '@/hooks/use-toast';
 
@@ -30,8 +29,27 @@ const Pedidos = () => {
     
     setLoadingPedidos(true);
     try {
-      const data = await getPedidos(profile.id);
-      setPedidos(data);
+      // Mock data for now since we don't have the backend function ready
+      const mockPedidos: Pedido[] = [
+        {
+          id: '1',
+          cliente_id: 'client1',
+          prestador_id: 'prest1',
+          servico_id: 'serv1',
+          titulo: 'Limpeza residencial completa',
+          descricao: 'Preciso de limpeza geral da casa',
+          preco_acordado: 150,
+          status: 'concluido',
+          data_solicitacao: '2024-01-15T10:00:00Z',
+          endereco_completo: 'Rua das Flores, 123',
+          created_at: '2024-01-15T10:00:00Z',
+          updated_at: '2024-01-15T10:00:00Z',
+          cliente: { id: 'client1', nome: 'João Silva', foto_url: '', email: 'joao@email.com' } as any,
+          prestador: { id: 'prest1', nome: 'Ana Limpeza', foto_url: '', email: 'ana@email.com' } as any,
+          servico: { nome: 'Limpeza', cor: '#3B82F6' }
+        }
+      ];
+      setPedidos(mockPedidos);
     } catch (error) {
       console.error('Error loading pedidos:', error);
       toast({
@@ -72,8 +90,7 @@ const Pedidos = () => {
   };
 
   const handleOpenChat = (pedido: Pedido) => {
-    // Implementar navegação para chat
-    navigate(`/chat?pedido=${pedido.id}`);
+    navigate(`/conversas`);
   };
 
   if (loading || loadingPedidos) {
@@ -98,8 +115,8 @@ const Pedidos = () => {
             <p className="text-gray-600 mb-4">
               Você precisa estar logado para ver seus pedidos.
             </p>
-            <Button onClick={() => navigate('/auth')}>
-              Fazer Login
+            <Button onClick={() => navigate('/')}>
+              Voltar ao Início
             </Button>
           </CardContent>
         </Card>

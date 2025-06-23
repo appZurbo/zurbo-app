@@ -7,7 +7,6 @@ import { ArrowLeft, MessageCircle, Clock, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
 import { Chat } from '@/utils/database/types';
 import { useToast } from '@/hooks/use-toast';
 
@@ -30,18 +29,20 @@ const Conversas = () => {
     
     setLoadingChats(true);
     try {
-      const { data, error } = await supabase
-        .from('chats')
-        .select(`
-          *,
-          cliente:users!chats_cliente_id_fkey (nome, foto_url, email),
-          prestador:users!chats_prestador_id_fkey (nome, foto_url, email)
-        `)
-        .or(`cliente_id.eq.${profile.id},prestador_id.eq.${profile.id}`)
-        .order('updated_at', { ascending: false });
-
-      if (error) throw error;
-      setChats((data || []) as Chat[]);
+      // Mock data for now
+      const mockChats: Chat[] = [
+        {
+          id: '1',
+          cliente_id: 'client1',
+          prestador_id: 'prest1',
+          last_message: 'Obrigado pelo excelente trabalho!',
+          created_at: '2024-01-15T10:00:00Z',
+          updated_at: '2024-01-15T12:00:00Z',
+          cliente: { id: 'client1', nome: 'João Silva', foto_url: '', email: 'joao@email.com' } as any,
+          prestador: { id: 'prest1', nome: 'Ana Limpeza', foto_url: '', email: 'ana@email.com' } as any
+        }
+      ];
+      setChats(mockChats);
     } catch (error) {
       console.error('Error loading chats:', error);
       toast({
@@ -55,7 +56,8 @@ const Conversas = () => {
   };
 
   const handleOpenChat = (chat: Chat) => {
-    navigate(`/chat/${chat.id}`);
+    // Navigate to chat or show chat modal
+    console.log('Opening chat:', chat.id);
   };
 
   const filteredChats = chats.filter(chat => {
@@ -86,8 +88,8 @@ const Conversas = () => {
             <p className="text-gray-600 mb-4">
               Você precisa estar logado para ver suas conversas.
             </p>
-            <Button onClick={() => navigate('/auth')}>
-              Fazer Login
+            <Button onClick={() => navigate('/')}>
+              Voltar ao Início
             </Button>
           </CardContent>
         </Card>

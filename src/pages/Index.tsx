@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import { HeroSection } from '@/components/sections/HeroSection';
-import { ServiceCategories } from '@/components/ServiceCategories';
+import ServiceCategories from '@/components/ServiceCategories';
 import { ModernFilters } from '@/components/filters/ModernFilters';
 import { PrestadorCard } from '@/components/prestadores/PrestadorCard';
 import { PrestadorProfileModal } from '@/components/prestadores/PrestadorProfileModal';
@@ -75,7 +76,10 @@ const Index = () => {
         <ServiceCategories />
         
         <div className="mt-12">
-          <ModernFilters onFiltersChange={handleFiltersChange} />
+          <ModernFilters 
+            onFiltersChange={handleFiltersChange}
+            servicos={[]} 
+          />
         </div>
 
         <div className="mt-12">
@@ -125,18 +129,22 @@ const Index = () => {
       </div>
 
       {/* Modals */}
-      <PrestadorProfileModal
-        prestador={selectedPrestador}
-        isOpen={showProfileModal}
-        onClose={() => setShowProfileModal(false)}
-        onContact={handleContact}
-      />
+      {selectedPrestador && (
+        <>
+          <PrestadorProfileModal
+            prestador={selectedPrestador}
+            isOpen={showProfileModal}
+            onClose={() => setShowProfileModal(false)}
+            onContact={handleContact}
+          />
 
-      <ContactModal
-        prestador={selectedPrestador}
-        isOpen={showContactModal}
-        onClose={() => setShowContactModal(false)}
-      />
+          <ContactModal
+            prestador={selectedPrestador}
+            open={showContactModal}
+            onClose={() => setShowContactModal(false)}
+          />
+        </>
+      )}
     </div>
   );
 };
