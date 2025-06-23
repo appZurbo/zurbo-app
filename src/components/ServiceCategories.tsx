@@ -74,7 +74,7 @@ const ServiceCategories = ({
     return () => observer.disconnect();
   }, []);
   return <section ref={categoriesRef} className="bg-gradient-to-b from-orange-50/50 to-white py-0">
-      <div className="max-w-7xl mx-auto px-[29px] my-[26px]">
+      <div className="max-w-7xl mx-auto px-0 my-0">
         <div className="text-center mb-16 animate-on-scroll">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Escolha sua <span className="text-gradient">categoria</span>
@@ -90,7 +90,7 @@ const ServiceCategories = ({
           return <Card key={category.id} className={`cursor-pointer transition-all duration-500 hover-lift border-2 ${category.color} animate-on-scroll`} style={{
             animationDelay: `${index * 0.1}s`
           }} onClick={() => onCategorySelect(category.id)}>
-                <CardContent className="p-8 text-center">
+                <CardContent className="p-8 text-center py-0 px-0 my-[5px]">
                   <div className="w-16 h-16 mx-auto mb-4 orange-gradient rounded-2xl flex items-center justify-center shadow-lg">
                     <IconComponent className="h-8 w-8 text-white" />
                   </div>
