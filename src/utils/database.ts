@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 export interface UserProfile {
@@ -9,6 +10,12 @@ export interface UserProfile {
   bio?: string;
   foto_url?: string;
   endereco_cidade?: string;
+  endereco_rua?: string;
+  endereco_numero?: string;
+  endereco_bairro?: string;
+  endereco_cep?: string;
+  latitude?: number;
+  longitude?: number;
   cpf?: string;
   nota_media?: number;
   ocultar_nota?: boolean;

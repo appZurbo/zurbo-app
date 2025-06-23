@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, GPS, AlertCircle } from 'lucide-react';
+import { MapPin, Navigation, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { getCidades } from '@/utils/database';
@@ -215,7 +215,7 @@ export const LocationSettings = () => {
               variant="outline"
               className="w-full"
             >
-              <GPS className="h-4 w-4 mr-2" />
+              <Navigation className="h-4 w-4 mr-2" />
               {gettingLocation ? 'Obtendo...' : 'Obter Localização Atual'}
             </Button>
           </div>
