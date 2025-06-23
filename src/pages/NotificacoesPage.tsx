@@ -140,7 +140,7 @@ const NotificacoesPage = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">
-                {filteredNotifications.length} notificação{filt gfailaeredNotifications.length !== 1 ? 'ões' : ''}
+                {filteredNotifications.length} notificação{filteredNotifications.length !== 1 ? 'ões' : ''}
                 {filter !== 'all' && ` - ${filterOptions.find(f => f.value === filter)?.label}`}
               </CardTitle>
             </CardHeader>
