@@ -5,8 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Search, MapPin, Star, ArrowRight, Play, CheckCircle } from 'lucide-react';
-import { ZurboCharacter } from '../hero/ZurboCharacter';
-import { AnimatedPhrases } from '../hero/AnimatedPhrases';
 import { useNavigate } from 'react-router-dom';
 
 export const HeroSection = () => {
@@ -40,9 +38,6 @@ export const HeroSection = () => {
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
       <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-orange-200 to-yellow-200 rounded-full blur-3xl opacity-20 -translate-y-1/2 translate-x-1/2"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-br from-blue-200 to-purple-200 rounded-full blur-3xl opacity-20 translate-y-1/2 -translate-x-1/2"></div>
-      
-      {/* Personagem 3D */}
-      <ZurboCharacter />
       
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -142,22 +137,17 @@ export const HeroSection = () => {
             </div>
           </div>
 
-          {/* Visual side - Quadro laranja com animações */}
+          {/* Visual side - Quadro laranja simples */}
           <div className="relative">
-            {/* Quadro principal laranja com animações de frases */}
-            <div className="relative bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 rounded-3xl p-8 h-96 shadow-2xl overflow-hidden">
-              <AnimatedPhrases />
-              
-              {/* Logo/Texto central sobreposto */}
-              <div className="absolute inset-0 flex items-center justify-center z-10">
-                <div className="text-center">
-                  <h2 className="text-6xl font-black text-white mb-4 drop-shadow-lg">
-                    ZURBO
-                  </h2>
-                  <p className="text-xl text-white/90 font-semibold">
-                    Sempre que você precisar
-                  </p>
-                </div>
+            {/* Quadro principal laranja com logo central */}
+            <div className="relative bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 rounded-3xl p-8 h-96 shadow-2xl overflow-hidden flex items-center justify-center">
+              <div className="text-center">
+                <h2 className="text-6xl font-black text-white mb-4 drop-shadow-lg">
+                  ZURBO
+                </h2>
+                <p className="text-xl text-white/90 font-semibold">
+                  Sempre que você precisar
+                </p>
               </div>
             </div>
 

@@ -1,8 +1,11 @@
+
 import { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
-import { Home, User, Settings, Search, Calendar } from 'lucide-react';
+import { ExpandableTabs } from '@/components/ui/expandable-tabs';
+import { Home, User, Settings, Search, Bell } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useMobile } from '@/hooks/useMobile';
 
 interface MobileLayoutProps {
   children: ReactNode;
@@ -12,103 +15,85 @@ export const MobileLayout = ({ children }: MobileLayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { profile } = useAuth();
+  const isMobile = useMobile();
 
-  const isActive = (path: string) => location.pathname === path;
+  if (!isMobile) {
+    return <>{children}</>;
+  }
+
+  const tabs = [
+    { title: "Início", icon: Home },
+    { title: "Serviços", icon: Search },
+    { title: "Perfil", icon: User },
+    { type: "separator" as const },
+    { title: "Config", icon: Settings },
+  ];
+
+  const handleTabChange = (index: number | null) => {
+    if (index === null) return;
+    
+    const routes = ['/', '/servicos', '/perfil', null, '/configuracoes'];
+    const route = routes[index];
+    if (route) {
+      navigate(route);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header mobile */}
-      <div className="bg-orange-500 text-white p-4 shadow-md">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white">
+      {/* Header mobile aprimorado */}
+      <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4 shadow-lg">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold">Zurbo</h1>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+              <span className="text-white font-bold text-lg">Z</span>
+            </div>
+            <div>
+              <h1 className="text-xl font-bold">Zurbo</h1>
+              <p className="text-white/80 text-xs">Conectando talentos</p>
+            </div>
+          </div>
+          
           <div className="flex items-center gap-2">
             {profile && (
-              <span className="text-sm capitalize bg-orange-600 px-2 py-1 rounded">
-                {profile.tipo}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs capitalize bg-white/20 px-2 py-1 rounded-full">
+                  {profile.tipo}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white hover:bg-white/20 p-2"
+                  onClick={() => navigate('/notificacoes')}
+                >
+                  <Bell className="h-5 w-5" />
+                </Button>
+              </div>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-orange-600"
-              onClick={() => navigate('/')}
-            >
-              <Search className="h-5 w-5" />
-            </Button>
           </div>
         </div>
       </div>
 
+      {/* Navegação com ExpandableTabs */}
+      <div className="px-4 py-3 bg-white shadow-sm">
+        <ExpandableTabs 
+          tabs={tabs}
+          onChange={handleTabChange}
+          activeColor="text-orange-500"
+          className="border-orange-200"
+        />
+      </div>
+
       {/* Conteúdo principal */}
-      <div className="px-4 py-6 min-h-[calc(100vh-140px)]">
+      <div className="px-4 py-6 min-h-[calc(100vh-160px)]">
         {children}
       </div>
 
-      {/* Navigation Bar inferior mobile */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-2 py-2 shadow-lg">
-        <div className="flex justify-around items-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`flex flex-col items-center gap-1 p-2 min-w-[60px] ${
-              isActive('/') ? 'text-orange-500 bg-orange-50' : 'text-gray-600'
-            }`}
-            onClick={() => navigate('/')}
-          >
-            <Home className="h-5 w-5" />
-            <span className="text-xs">Início</span>
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`flex flex-col items-center gap-1 p-2 min-w-[60px] ${
-              isActive('/servicos') ? 'text-orange-500 bg-orange-50' : 'text-gray-600'
-            }`}
-            onClick={() => navigate('/servicos')}
-          >
-            <Search className="h-5 w-5" />
-            <span className="text-xs">Serviços</span>
-          </Button>
-
-          {profile?.tipo === 'prestador' && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`flex flex-col items-center gap-1 p-2 min-w-[60px] ${
-                isActive('/agenda') ? 'text-orange-500 bg-orange-50' : 'text-gray-600'
-              }`}
-              onClick={() => navigate('/agenda')}
-            >
-              <Calendar className="h-5 w-5" />
-              <span className="text-xs">Agenda</span>
-            </Button>
-          )}
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`flex flex-col items-center gap-1 p-2 min-w-[60px] ${
-              isActive('/perfil') ? 'text-orange-500 bg-orange-50' : 'text-gray-600'
-            }`}
-            onClick={() => navigate('/perfil')}
-          >
-            <User className="h-5 w-5" />
-            <span className="text-xs">Perfil</span>
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`flex flex-col items-center gap-1 p-2 min-w-[60px] ${
-              isActive('/configuracoes') ? 'text-orange-500 bg-orange-50' : 'text-gray-600'
-            }`}
-            onClick={() => navigate('/configuracoes')}
-          >
-            <Settings className="h-5 w-5" />
-            <span className="text-xs">Config</span>
-          </Button>
-        </div>
+      {/* Footer mobile */}
+      <div className="bg-white border-t border-gray-200 p-4 text-center">
+        <p className="text-xs text-gray-500">
+          © 2024 Zurbo - Conectando você aos melhores profissionais
+        </p>
       </div>
     </div>
   );
