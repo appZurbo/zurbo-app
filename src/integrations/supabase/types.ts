@@ -495,9 +495,15 @@ export type Database = {
           cpf: string | null
           criado_em: string | null
           email: string
+          endereco_bairro: string | null
+          endereco_cep: string | null
           endereco_cidade: string | null
+          endereco_numero: string | null
+          endereco_rua: string | null
           foto_url: string | null
           id: string
+          latitude: number | null
+          longitude: number | null
           nome: string
           nota_media: number | null
           ocultar_nota: boolean | null
@@ -511,9 +517,15 @@ export type Database = {
           cpf?: string | null
           criado_em?: string | null
           email: string
+          endereco_bairro?: string | null
+          endereco_cep?: string | null
           endereco_cidade?: string | null
+          endereco_numero?: string | null
+          endereco_rua?: string | null
           foto_url?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           nome: string
           nota_media?: number | null
           ocultar_nota?: boolean | null
@@ -527,9 +539,15 @@ export type Database = {
           cpf?: string | null
           criado_em?: string | null
           email?: string
+          endereco_bairro?: string | null
+          endereco_cep?: string | null
           endereco_cidade?: string | null
+          endereco_numero?: string | null
+          endereco_rua?: string | null
           foto_url?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           nome?: string
           nota_media?: number | null
           ocultar_nota?: boolean | null

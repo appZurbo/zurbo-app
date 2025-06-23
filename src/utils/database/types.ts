@@ -1,0 +1,54 @@
+
+export interface UserProfile {
+  id: string;
+  auth_id: string;
+  nome: string;
+  email: string;
+  tipo: 'cliente' | 'prestador' | 'admin' | 'moderator';
+  bio?: string;
+  foto_url?: string;
+  endereco_cidade?: string;
+  endereco_rua?: string;
+  endereco_numero?: string;
+  endereco_bairro?: string;
+  endereco_cep?: string;
+  latitude?: number;
+  longitude?: number;
+  cpf?: string;
+  nota_media?: number;
+  ocultar_nota?: boolean;
+  premium?: boolean;
+  criado_em: string;
+  updated_at?: string;
+}
+
+export interface Avaliacao {
+  id: string;
+  avaliador_id: string;
+  avaliado_id: string;
+  nota: number;
+  comentario?: string;
+  criado_em: string;
+  avaliador?: {
+    nome: string;
+    foto_url?: string;
+  };
+}
+
+export interface PortfolioFoto {
+  id: string;
+  prestador_id: string;
+  foto_url: string;
+  titulo?: string;
+  descricao?: string;
+  ordem: number;
+  criado_em: string;
+}
+
+export interface CidadeBrasileira {
+  id: string;
+  nome: string;
+  estado: string;
+  codigo_ibge?: string;
+  created_at: string;
+}
