@@ -1,3 +1,4 @@
+
 import { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { ExpandableTabs } from '@/components/ui/expandable-tabs';
@@ -40,7 +41,7 @@ export const MobileLayout = ({ children }: MobileLayoutProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white flex flex-col">
       {/* Header mobile aprimorado */}
       <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4 shadow-lg">
         <div className="flex items-center justify-between">
@@ -74,18 +75,8 @@ export const MobileLayout = ({ children }: MobileLayoutProps) => {
         </div>
       </div>
 
-      {/* Navegação com ExpandableTabs */}
-      <div className="px-4 py-3 bg-white shadow-sm">
-        <ExpandableTabs 
-          tabs={tabs}
-          onChange={handleTabChange}
-          activeColor="text-orange-500"
-          className="border-orange-200"
-        />
-      </div>
-
-      {/* Conteúdo principal */}
-      <div className="px-4 py-6 min-h-[calc(100vh-160px)]">
+      {/* Conteúdo principal com padding para não sobrepor a navegação inferior */}
+      <div className="flex-1 px-4 py-6 pb-24">
         {children}
       </div>
 
@@ -94,6 +85,18 @@ export const MobileLayout = ({ children }: MobileLayoutProps) => {
         <p className="text-xs text-gray-500">
           © 2024 Zurbo - Conectando você aos melhores profissionais
         </p>
+      </div>
+
+      {/* Navegação inferior fixa */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+        <div className="px-4 py-3 flex justify-center">
+          <ExpandableTabs 
+            tabs={tabs}
+            onChange={handleTabChange}
+            activeColor="text-orange-500"
+            className="border-orange-200 w-full max-w-md"
+          />
+        </div>
       </div>
     </div>
   );

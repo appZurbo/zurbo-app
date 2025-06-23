@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import * as React from "react";
@@ -31,13 +32,13 @@ interface ExpandableTabsProps {
 const buttonVariants = {
   initial: {
     gap: 0,
-    paddingLeft: ".5rem",
-    paddingRight: ".5rem",
+    paddingLeft: ".75rem",
+    paddingRight: ".75rem",
   },
   animate: (isSelected: boolean) => ({
     gap: isSelected ? ".5rem" : 0,
-    paddingLeft: isSelected ? "1rem" : ".5rem",
-    paddingRight: isSelected ? "1rem" : ".5rem",
+    paddingLeft: isSelected ? "1rem" : ".75rem",
+    paddingRight: isSelected ? "1rem" : ".75rem",
   }),
 };
 
@@ -74,14 +75,14 @@ export function ExpandableTabs({
   };
 
   const Separator = () => (
-    <div className="mx-1 h-[24px] w-[1.2px] bg-border" aria-hidden="true" />
+    <div className="mx-2 h-[24px] w-[1.2px] bg-border" aria-hidden="true" />
   );
 
   return (
     <div
       ref={outsideClickRef}
       className={cn(
-        "flex flex-wrap items-center gap-2 rounded-2xl border bg-background p-1 shadow-sm",
+        "flex items-center justify-center gap-1 rounded-2xl border bg-background p-2 shadow-sm",
         className
       )}
     >
@@ -104,13 +105,13 @@ export function ExpandableTabs({
             onClick={() => handleSelect(index)}
             transition={transition}
             className={cn(
-              "relative flex items-center rounded-xl px-4 py-2 text-sm font-medium transition-colors duration-300",
+              "relative flex items-center justify-center rounded-xl min-w-[48px] h-12 px-3 py-2 text-sm font-medium transition-colors duration-300 flex-1",
               selected === index
                 ? cn("bg-muted", activeColor)
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
             )}
           >
-            <Icon size={20} />
+            <Icon size={20} className="flex-shrink-0" />
             <AnimatePresence initial={false}>
               {selected === index && (
                 <motion.span
@@ -119,7 +120,7 @@ export function ExpandableTabs({
                   animate="animate"
                   exit="exit"
                   transition={transition}
-                  className="overflow-hidden"
+                  className="overflow-hidden whitespace-nowrap ml-2"
                 >
                   {tabItem.title}
                 </motion.span>
