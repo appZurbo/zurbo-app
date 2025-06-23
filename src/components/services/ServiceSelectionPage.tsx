@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { CheckCircle, Star, DollarSign, Sparkles, Flower, Paintbrush, Zap, Droplets, Truck, ChefHat, Hammer, Scissors, Heart } from 'lucide-react';
+import { CheckCircle, Star, DollarSign, Sparkles, Flower, Paintbrush, Zap, Droplets, Truck, ChefHat, Hammer, Scissors, Heart, Snowflake } from 'lucide-react';
 interface Servico {
   id: string;
   nome: string;
@@ -35,7 +35,8 @@ const iconMap: {
   ChefHat,
   Hammer,
   Scissors,
-  Heart
+  Heart,
+  Snowflake
 };
 const ServiceSelectionPage = ({
   onComplete
@@ -183,7 +184,7 @@ const ServiceSelectionPage = ({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-2 gap-4 mb-8">
           {servicos.map(servico => {
           const isSelected = servicosSelecionados.some(s => s.servico_id === servico.id);
           const IconComponent = iconMap[servico.icone] || Star;
