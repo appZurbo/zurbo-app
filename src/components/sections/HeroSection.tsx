@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -5,11 +6,14 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Search, MapPin, Star, ArrowRight, Play, CheckCircle } from 'lucide-react';
 import { ZurboCharacter } from '../hero/ZurboCharacter';
+import { AnimatedPhrases } from '../hero/AnimatedPhrases';
 import { useNavigate } from 'react-router-dom';
+
 export const HeroSection = () => {
   const [busca, setBusca] = useState('');
   const [cidade, setCidade] = useState('');
   const navigate = useNavigate();
+
   const handleSearch = () => {
     // Redirecionar para busca com parâmetros
     const searchParams = new URLSearchParams();
@@ -19,20 +23,19 @@ export const HeroSection = () => {
     // Scroll para seção de resultados
     const resultsSection = document.getElementById('resultados');
     if (resultsSection) {
-      resultsSection.scrollIntoView({
-        behavior: 'smooth'
-      });
+      resultsSection.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
   const handleComoFunciona = () => {
     const comoFuncionaSection = document.getElementById('como-funciona');
     if (comoFuncionaSection) {
-      comoFuncionaSection.scrollIntoView({
-        behavior: 'smooth'
-      });
+      comoFuncionaSection.scrollIntoView({ behavior: 'smooth' });
     }
   };
-  return <section className="relative bg-gradient-to-br from-orange-50 via-white to-orange-50 py-16 lg:py-24 overflow-hidden">
+
+  return (
+    <section className="relative bg-gradient-to-br from-orange-50 via-white to-orange-50 py-16 lg:py-24 overflow-hidden">
       {/* Background decorativo */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
       <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-orange-200 to-yellow-200 rounded-full blur-3xl opacity-20 -translate-y-1/2 translate-x-1/2"></div>
@@ -69,15 +72,30 @@ export const HeroSection = () => {
                 <div className="flex flex-col sm:flex-row gap-3">
                   <div className="flex-1 relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                    <Input placeholder="O que você precisa? (ex: limpeza, jardinagem...)" value={busca} onChange={e => setBusca(e.target.value)} className="pl-10 h-12 text-base border-gray-200 focus:border-orange-500 focus:ring-orange-500" onKeyPress={e => e.key === 'Enter' && handleSearch()} />
+                    <Input 
+                      placeholder="O que você precisa? (ex: limpeza, jardinagem...)" 
+                      value={busca} 
+                      onChange={(e) => setBusca(e.target.value)}
+                      className="pl-10 h-12 text-base border-gray-200 focus:border-orange-500 focus:ring-orange-500" 
+                      onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                    />
                   </div>
                   
                   <div className="relative min-w-[200px]">
                     <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                    <Input placeholder="Sua cidade" value={cidade} onChange={e => setCidade(e.target.value)} className="pl-10 h-12 text-base border-gray-200 focus:border-orange-500 focus:ring-orange-500" onKeyPress={e => e.key === 'Enter' && handleSearch()} />
+                    <Input 
+                      placeholder="Sua cidade" 
+                      value={cidade} 
+                      onChange={(e) => setCidade(e.target.value)}
+                      className="pl-10 h-12 text-base border-gray-200 focus:border-orange-500 focus:ring-orange-500" 
+                      onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                    />
                   </div>
                   
-                  <Button onClick={handleSearch} className="h-12 px-8 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold">
+                  <Button 
+                    onClick={handleSearch}
+                    className="h-12 px-8 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold"
+                  >
                     Buscar
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -110,70 +128,79 @@ export const HeroSection = () => {
               
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <div className="flex -space-x-2">
-                  {[1, 2, 3, 4].map(i => <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-400 to-orange-600 border-2 border-white flex items-center justify-center text-white text-xs font-bold">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div 
+                      key={i} 
+                      className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-400 to-orange-600 border-2 border-white flex items-center justify-center text-white text-xs font-bold"
+                    >
                       {i}
-                    </div>)}
+                    </div>
+                  ))}
                 </div>
                 <span>+1000 usuários satisfeitos</span>
               </div>
             </div>
           </div>
 
-          {/* Visual side - Cards flutuantes */}
+          {/* Visual side - Quadro laranja com animações */}
           <div className="relative">
-            <div className="grid grid-cols-2 gap-4">
+            {/* Quadro principal laranja com animações de frases */}
+            <div className="relative bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 rounded-3xl p-8 h-96 shadow-2xl overflow-hidden">
+              <AnimatedPhrases />
+              
+              {/* Logo/Texto central sobreposto */}
+              <div className="absolute inset-0 flex items-center justify-center z-10">
+                <div className="text-center">
+                  <h2 className="text-6xl font-black text-white mb-4 drop-shadow-lg">
+                    ZURBO
+                  </h2>
+                  <p className="text-xl text-white/90 font-semibold">
+                    Sempre que você precisar
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Cards flutuantes menores */}
+            <div className="absolute -top-4 -right-4 grid grid-cols-1 gap-3">
               {/* Card 1 - Prestador */}
-              <Card className="bg-white shadow-xl transform rotate-3 hover:rotate-0 transition-transform duration-300">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                      AM
+              <Card className="bg-white shadow-xl transform rotate-3 hover:rotate-0 transition-transform duration-300 w-48">
+                <CardContent className="p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                      JS
                     </div>
                     <div>
-                      <h4 className="font-semibold text-sm">Ana Maria</h4>
-                      <p className="text-xs text-gray-600">Limpeza</p>
+                      <h4 className="font-semibold text-xs">João Silva</h4>
+                      <p className="text-xs text-gray-600">Eletricista</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
-                    {[1, 2, 3, 4, 5].map(i => <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />)}
-                    <span className="text-xs text-gray-600 ml-1">5.0</span>
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                    ))}
+                    <span className="text-xs text-gray-600 ml-1">4.8</span>
                   </div>
                 </CardContent>
               </Card>
 
               {/* Card 2 - Serviço */}
-              <Card className="bg-white shadow-xl transform -rotate-3 hover:rotate-0 transition-transform duration-300 mt-8">
-                <CardContent className="p-4">
-                  <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center mb-3">
-                    <span className="text-white text-sm">🌱</span>
+              <Card className="bg-white shadow-xl transform -rotate-2 hover:rotate-0 transition-transform duration-300 w-44">
+                <CardContent className="p-3">
+                  <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center mb-2">
+                    <span className="text-white text-xs">🔧</span>
                   </div>
-                  <h4 className="font-semibold text-sm mb-1">Jardinagem</h4>
-                  <p className="text-xs text-gray-600">124 profissionais</p>
-                  <Badge className="bg-green-100 text-green-700 text-xs mt-2">
+                  <h4 className="font-semibold text-xs mb-1">Reparos</h4>
+                  <p className="text-xs text-gray-600">87 profissionais</p>
+                  <Badge className="bg-green-100 text-green-700 text-xs mt-1">
                     Disponível
                   </Badge>
                 </CardContent>
               </Card>
-
-              {/* Card 3 - Premium */}
-              <Card className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white shadow-xl transform rotate-1 hover:rotate-0 transition-transform duration-300 col-span-2">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg">👑</span>
-                    <h4 className="font-bold text-sm">Premium</h4>
-                  </div>
-                  <p className="text-xs opacity-90">
-                    Destaque seu perfil e receba mais clientes
-                  </p>
-                </CardContent>
-              </Card>
             </div>
-
-            {/* Elementos decorativos */}
-            
-            
           </div>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };

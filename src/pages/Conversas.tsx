@@ -1,16 +1,16 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, MessageCircle, Clock, Search, Info, Users } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Clock, Search, Info, Users, Download } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Chat } from '@/utils/database/types';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { ChatHistoryDownload } from '@/components/chat/ChatHistoryDownload';
 
 const Conversas = () => {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ const Conversas = () => {
     
     setLoadingChats(true);
     try {
-      // Tentar carregar chats reais do banco de dados
+      // Carregar chats reais do banco de dados
       const { data: realChats, error } = await supabase
         .from('chats')
         .select(`
@@ -46,16 +46,16 @@ const Conversas = () => {
         console.error('Error loading chats:', error);
       }
 
-      // Se não houver chats reais, usar dados de exemplo
+      // Se não houver chats reais, criar alguns dados de exemplo
       if (!realChats || realChats.length === 0) {
         const mockChats: Chat[] = [
           {
             id: '1',
-            cliente_id: profile.id,
-            prestador_id: 'prestador-exemplo-1',
+            cliente_id: profile.tipo === 'cliente' ? profile.id : 'cliente-exemplo-1',
+            prestador_id: profile.tipo === 'prestador' ? profile.id : 'prestador-exemplo-1',
             last_message: 'Olá, gostaria de solicitar um orçamento para limpeza residencial.',
-            created_at: new Date(Date.now() - 86400000).toISOString(), // 1 dia atrás
-            updated_at: new Date(Date.now() - 3600000).toISOString(), // 1 hora atrás
+            created_at: new Date(Date.now() - 86400000).toISOString(),
+            updated_at: new Date(Date.now() - 3600000).toISOString(),
             cliente: profile.tipo === 'cliente' ? profile : {
               id: 'cliente-exemplo-1',
               nome: 'Maria Silva',
@@ -74,8 +74,8 @@ const Conversas = () => {
             cliente_id: profile.tipo === 'cliente' ? profile.id : 'cliente-exemplo-2',
             prestador_id: profile.tipo === 'prestador' ? profile.id : 'prestador-exemplo-2',
             last_message: 'Perfeito! O serviço foi realizado com excelência. Muito obrigada!',
-            created_at: new Date(Date.now() - 172800000).toISOString(), // 2 dias atrás
-            updated_at: new Date(Date.now() - 7200000).toISOString(), // 2 horas atrás
+            created_at: new Date(Date.now() - 172800000).toISOString(),
+            updated_at: new Date(Date.now() - 7200000).toISOString(),
             cliente: profile.tipo === 'cliente' ? profile : {
               id: 'cliente-exemplo-2',
               nome: 'Carlos Mendes',
@@ -87,26 +87,6 @@ const Conversas = () => {
               nome: 'Ana Jardinagem',
               foto_url: '',
               email: 'ana.jardim@email.com'
-            } as any
-          },
-          {
-            id: '3',
-            cliente_id: profile.tipo === 'cliente' ? profile.id : 'cliente-exemplo-3',
-            prestador_id: profile.tipo === 'prestador' ? profile.id : 'prestador-exemplo-3',
-            last_message: 'Consegue fazer o serviço na próxima terça-feira pela manhã?',
-            created_at: new Date(Date.now() - 259200000).toISOString(), // 3 dias atrás
-            updated_at: new Date(Date.now() - 10800000).toISOString(), // 3 horas atrás
-            cliente: profile.tipo === 'cliente' ? profile : {
-              id: 'cliente-exemplo-3',
-              nome: 'Sandra Costa',
-              foto_url: '',
-              email: 'sandra@email.com'
-            } as any,
-            prestador: profile.tipo === 'prestador' ? profile : {
-              id: 'prestador-exemplo-3',
-              nome: 'Pedro Eletricista',
-              foto_url: '',
-              email: 'pedro.eletrica@email.com'
             } as any
           }
         ];
@@ -222,8 +202,7 @@ const Conversas = () => {
                 </h4>
                 <p className="text-sm text-blue-700">
                   Todas as suas conversas ficam salvas permanentemente para futuras consultas. 
-                  Não é possível deletar o histórico, garantindo que você sempre tenha acesso 
-                  às informações importantes sobre seus serviços.
+                  Use o botão de download em cada conversa para obter um arquivo completo do histórico.
                 </p>
               </div>
             </div>
@@ -255,13 +234,13 @@ const Conversas = () => {
           <div className="space-y-3">
             {filteredChats.map((chat) => {
               const otherUser = chat.cliente_id === profile.id ? chat.prestador : chat.cliente;
-              const isUnread = Math.random() > 0.7; // Simular mensagens não lidas
+              const isUnread = Math.random() > 0.7;
               
               return (
-                <Card key={chat.id} className="hover:shadow-md transition-shadow cursor-pointer">
-                  <CardContent className="p-4" onClick={() => handleOpenChat(chat)}>
+                <Card key={chat.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
                     <div className="flex items-center gap-4">
-                      <div className="relative">
+                      <div className="relative cursor-pointer" onClick={() => handleOpenChat(chat)}>
                         <Avatar className="h-12 w-12">
                           <AvatarImage src={otherUser?.foto_url} />
                           <AvatarFallback>
@@ -273,7 +252,7 @@ const Conversas = () => {
                         )}
                       </div>
                       
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 cursor-pointer" onClick={() => handleOpenChat(chat)}>
                         <div className="flex items-center justify-between mb-1">
                           <div className="flex items-center gap-2">
                             <h3 className={`font-semibold text-gray-900 truncate ${isUnread ? 'font-bold' : ''}`}>
@@ -303,16 +282,19 @@ const Conversas = () => {
                           {chat.last_message || 'Conversa iniciada'}
                         </p>
                         
-                        <div className="flex items-center justify-between mt-2">
-                          <p className="text-xs text-gray-500">
-                            {otherUser?.email}
-                          </p>
-                          <div className="flex items-center gap-2">
-                            <Button variant="ghost" size="sm" className="h-8 px-2">
-                              <MessageCircle className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {otherUser?.email}
+                        </p>
+                      </div>
+
+                      <div className="flex flex-col gap-2">
+                        <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => handleOpenChat(chat)}>
+                          <MessageCircle className="h-4 w-4" />
+                        </Button>
+                        <ChatHistoryDownload 
+                          chat={chat} 
+                          messages={[]} // Por enquanto vazio, mas funcionará quando tivermos mensagens reais
+                        />
                       </div>
                     </div>
                   </CardContent>
