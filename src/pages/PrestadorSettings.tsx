@@ -3,12 +3,13 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Settings, Wrench, Image, Bell } from 'lucide-react';
+import { ArrowLeft, Settings, Wrench, Image, Bell, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import ServiceSelectionPage from '@/components/services/ServiceSelectionPage';
 import { PortfolioUpload } from '@/components/prestador/PortfolioUpload';
 import { NotificationSettings } from '@/components/prestador/NotificationSettings';
+import { LocationSettings } from '@/components/location/LocationSettings';
 
 const PrestadorSettings = () => {
   const navigate = useNavigate();
@@ -46,16 +47,20 @@ const PrestadorSettings = () => {
               Configurações do Prestador
             </h1>
             <p className="text-gray-600">
-              Gerencie seus serviços, portfólio e configurações
+              Gerencie seus serviços, localização, portfólio e configurações
             </p>
           </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-3 w-full max-w-md">
+          <TabsList className="grid grid-cols-4 w-full max-w-2xl">
             <TabsTrigger value="services" className="flex items-center gap-2">
               <Wrench className="h-4 w-4" />
               Serviços
+            </TabsTrigger>
+            <TabsTrigger value="location" className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              Localização
             </TabsTrigger>
             <TabsTrigger value="portfolio" className="flex items-center gap-2">
               <Image className="h-4 w-4" />
@@ -69,6 +74,10 @@ const PrestadorSettings = () => {
 
           <TabsContent value="services">
             <ServiceSelectionPage onComplete={() => {}} />
+          </TabsContent>
+
+          <TabsContent value="location">
+            <LocationSettings />
           </TabsContent>
 
           <TabsContent value="portfolio">

@@ -1,208 +1,290 @@
+
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Settings, Bell, Trash2, Key } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
+import { Shield, Bell, MapPin, User, Trash2, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { LocationSettings } from '@/components/location/LocationSettings';
+
 export const UserSettings = () => {
-  const [notifications, setNotifications] = useState(true);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
-  const [deleteConfirmation, setDeleteConfirmation] = useState('');
-  const [newPassword, setNewPassword] = useState('');
+  const { profile } = useAuth();
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
-  const {
-    toast
-  } = useToast();
-  const {
-    profile
-  } = useAuth();
-  const handlePasswordChange = async () => {
-    if (newPassword.length < 6) {
-      toast({
-        title: "Senha muito curta",
-        description: "A senha deve ter pelo menos 6 caracteres",
-        variant: "destructive"
-      });
-      return;
-    }
-    setLoading(true);
+  const [notificationSettings, setNotificationSettings] = useState({
+    email_novos_pedidos: true,
+    email_mensagens: true,
+    email_avaliacoes: true,
+    push_novos_pedidos: true,
+    push_mensagens: true,
+    push_avaliacoes: true,
+  });
+
+  const handleNotificationUpdate = async (key: string, value: boolean) => {
+    if (!profile) return;
+
     try {
-      const {
-        error
-      } = await supabase.auth.updateUser({
-        password: newPassword
-      });
+      const { error } = await supabase
+        .from('notification_preferences')
+        .upsert({
+          user_id: profile.id,
+          [key]: value,
+        });
+
       if (error) throw error;
+
+      setNotificationSettings(prev => ({ ...prev, [key]: value }));
+      
       toast({
-        title: "Senha alterada!",
-        description: "Sua senha foi alterada com sucesso"
+        title: "Configuração atualizada",
+        description: "Suas preferências de notificação foram salvas.",
       });
-      setShowPasswordDialog(false);
-      setNewPassword('');
     } catch (error: any) {
       toast({
-        title: "Erro",
+        title: "Erro ao atualizar",
         description: error.message,
-        variant: "destructive"
+        variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
+
   const handleDeleteAccount = async () => {
-    if (deleteConfirmation !== 'DELETAR CONTA') {
-      toast({
-        title: "Confirmação incorreta",
-        description: "Digite 'DELETAR CONTA' para confirmar",
-        variant: "destructive"
-      });
+    if (!confirm('Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.')) {
       return;
     }
+
     setLoading(true);
     try {
-      // Deletar perfil do usuário
-      if (profile?.id) {
-        const {
-          error
-        } = await supabase.from('users').delete().eq('id', profile.id);
-        if (error) throw error;
-      }
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) throw error;
 
-      // Fazer logout
-      await supabase.auth.signOut();
       toast({
         title: "Conta excluída",
-        description: "Sua conta foi excluída permanentemente"
+        description: "Sua conta foi excluída com sucesso.",
       });
-      setTimeout(() => window.location.reload(), 1000);
+      
+      // Redirecionar para página inicial
+      window.location.href = '/';
     } catch (error: any) {
       toast({
-        title: "Erro",
+        title: "Erro ao excluir conta",
         description: error.message,
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
     }
   };
-  return <div className="max-w-2xl mx-auto space-y-6">
-      <Card className="py-[73px]">
-        <CardHeader className="py-[31px]">
-          <CardTitle className="flex items-center gap-2 py-0">
-            <Settings className="h-5 w-5" />
-            Configurações
-          </CardTitle>
+
+  return (
+    <div className="max-w-4xl mx-auto p-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Configurações da Conta</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6 py-[42px] my-0">
-          {/* Notificações */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Bell className="h-5 w-5 text-gray-500" />
-              <div>
-                <Label htmlFor="notifications">Notificações</Label>
-                <p className="text-sm text-gray-600">
-                  Receber notificações sobre novos serviços e mensagens
-                </p>
-              </div>
-            </div>
-            <Switch id="notifications" checked={notifications} onCheckedChange={setNotifications} />
-          </div>
+        <CardContent>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid grid-cols-4 w-full">
+              <TabsTrigger value="profile" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                <span className="hidden sm:inline">Perfil</span>
+              </TabsTrigger>
+              <TabsTrigger value="location" className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                <span className="hidden sm:inline">Localização</span>
+              </TabsTrigger>
+              <TabsTrigger value="notifications" className="flex items-center gap-2">
+                <Bell className="h-4 w-4" />
+                <span className="hidden sm:inline">Notificações</span>
+              </TabsTrigger>
+              <TabsTrigger value="security" className="flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                <span className="hidden sm:inline">Segurança</span>
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Alterar Senha */}
-          <div className="border-t pt-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Key className="h-5 w-5 text-gray-500" />
-                <div>
-                  <Label>Alterar Senha</Label>
-                  <p className="text-sm text-gray-600">
-                    Atualize sua senha de acesso
-                  </p>
-                </div>
-              </div>
-              <Button variant="outline" onClick={() => setShowPasswordDialog(true)}>
-                Alterar
-              </Button>
-            </div>
-          </div>
+            <TabsContent value="profile" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Informações do Perfil</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Nome</Label>
+                      <p className="text-sm text-gray-600 mt-1">{profile?.nome}</p>
+                    </div>
+                    <div>
+                      <Label>Email</Label>
+                      <p className="text-sm text-gray-600 mt-1">{profile?.email}</p>
+                    </div>
+                    <div>
+                      <Label>Tipo de Conta</Label>
+                      <p className="text-sm text-gray-600 mt-1 capitalize">{profile?.tipo}</p>
+                    </div>
+                    <div>
+                      <Label>Membro desde</Label>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {profile?.criado_em ? new Date(profile.criado_em).toLocaleDateString('pt-BR') : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <Separator />
+                  
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600 mb-2">
+                      Para editar informações do perfil, acesse a página de perfil
+                    </p>
+                    <Button onClick={() => window.location.href = '/perfil'}>
+                      Editar Perfil
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-          {/* Excluir Conta */}
-          <div className="border-t pt-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Trash2 className="h-5 w-5 text-red-500" />
-                <div>
-                  <Label className="text-red-600">Excluir Conta</Label>
-                  <p className="text-sm text-gray-600">
-                    Esta ação é permanente e irreversível
-                  </p>
-                </div>
-              </div>
-              <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
-                Excluir
-              </Button>
-            </div>
-          </div>
+            <TabsContent value="location" className="mt-6">
+              <LocationSettings />
+            </TabsContent>
+
+            <TabsContent value="notifications" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Preferências de Notificação</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <h4 className="font-medium mb-4">Notificações por Email</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label>Novos pedidos de serviço</Label>
+                          <p className="text-sm text-gray-500">Receber email quando alguém solicitar seus serviços</p>
+                        </div>
+                        <Switch
+                          checked={notificationSettings.email_novos_pedidos}
+                          onCheckedChange={(checked) => handleNotificationUpdate('email_novos_pedidos', checked)}
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label>Mensagens</Label>
+                          <p className="text-sm text-gray-500">Receber email para novas mensagens</p>
+                        </div>
+                        <Switch
+                          checked={notificationSettings.email_mensagens}
+                          onCheckedChange={(checked) => handleNotificationUpdate('email_mensagens', checked)}
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label>Avaliações</Label>
+                          <p className="text-sm text-gray-500">Receber email quando receber uma avaliação</p>
+                        </div>
+                        <Switch
+                          checked={notificationSettings.email_avaliacoes}
+                          onCheckedChange={(checked) => handleNotificationUpdate('email_avaliacoes', checked)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div>
+                    <h4 className="font-medium mb-4">Notificações Push</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label>Novos pedidos de serviço</Label>
+                          <p className="text-sm text-gray-500">Receber notificações no navegador</p>
+                        </div>
+                        <Switch
+                          checked={notificationSettings.push_novos_pedidos}
+                          onCheckedChange={(checked) => handleNotificationUpdate('push_novos_pedidos', checked)}
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label>Mensagens</Label>
+                          <p className="text-sm text-gray-500">Receber notificações para novas mensagens</p>
+                        </div>
+                        <Switch
+                          checked={notificationSettings.push_mensagens}
+                          onCheckedChange={(checked) => handleNotificationUpdate('push_mensagens', checked)}
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label>Avaliações</Label>
+                          <p className="text-sm text-gray-500">Receber notificações para avaliações</p>
+                        </div>
+                        <Switch
+                          checked={notificationSettings.push_avaliacoes}
+                          onCheckedChange={(checked) => handleNotificationUpdate('push_avaliacoes', checked)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="security" className="mt-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Segurança da Conta</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <h4 className="font-medium mb-4">Alterar Senha</h4>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Para alterar sua senha, clique no botão abaixo. Você receberá um email com instruções.
+                    </p>
+                    <Button variant="outline">
+                      Solicitar Alteração de Senha
+                    </Button>
+                  </div>
+
+                  <Separator />
+
+                  <div>
+                    <h4 className="font-medium mb-4 text-red-600 flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4" />
+                      Zona de Perigo
+                    </h4>
+                    <p className="text-sm text-gray-600 mb-4">
+                      As ações abaixo são irreversíveis. Tenha cuidado ao prosseguir.
+                    </p>
+                    <Button 
+                      variant="destructive"
+                      onClick={handleDeleteAccount}
+                      disabled={loading}
+                      className="flex items-center gap-2"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      {loading ? 'Excluindo...' : 'Excluir Conta'}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
-
-      {/* Dialog para alterar senha */}
-      <AlertDialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Alterar Senha</AlertDialogTitle>
-            <AlertDialogDescription>
-              Digite sua nova senha abaixo:
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="py-4">
-            <Input type="password" placeholder="Nova senha (mín. 6 caracteres)" value={newPassword} onChange={e => setNewPassword(e.target.value)} />
-          </div>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handlePasswordChange} disabled={loading || newPassword.length < 6}>
-              {loading ? 'Alterando...' : 'Alterar Senha'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Dialog para excluir conta */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-red-600">
-              ⚠️ Excluir Conta Permanentemente
-            </AlertDialogTitle>
-            <AlertDialogDescription className="space-y-3">
-              <p>Esta ação é IRREVERSÍVEL e irá:</p>
-              <ul className="list-disc list-inside space-y-1 text-sm">
-                <li>Excluir permanentemente seu perfil</li>
-                <li>Remover todos os seus dados</li>
-                <li>Apagar seu histórico de avaliações</li>
-                <li>Deletar todas as suas informações do sistema</li>
-              </ul>
-              <p className="text-red-600 font-medium">
-                Para confirmar, digite "DELETAR CONTA" abaixo:
-              </p>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="py-4">
-            <Input value={deleteConfirmation} onChange={e => setDeleteConfirmation(e.target.value)} placeholder="Digite: DELETAR CONTA" className="border-red-300 focus:border-red-500" />
-          </div>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteAccount} disabled={loading || deleteConfirmation !== 'DELETAR CONTA'} className="bg-red-600 hover:bg-red-700">
-              {loading ? 'Excluindo...' : 'Confirmar Exclusão'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>;
+    </div>
+  );
 };
