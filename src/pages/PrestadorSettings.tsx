@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,15 +9,15 @@ import ServiceSelectionPage from '@/components/services/ServiceSelectionPage';
 import { PortfolioUpload } from '@/components/prestador/PortfolioUpload';
 import { NotificationSettings } from '@/components/prestador/NotificationSettings';
 import { LocationSettings } from '@/components/location/LocationSettings';
-
 const PrestadorSettings = () => {
   const navigate = useNavigate();
-  const { profile, isPrestador } = useAuth();
+  const {
+    profile,
+    isPrestador
+  } = useAuth();
   const [activeTab, setActiveTab] = useState('services');
-
   if (!isPrestador) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
+    return <div className="min-h-screen flex items-center justify-center">
         <Card className="max-w-md">
           <CardContent className="p-6 text-center">
             <h3 className="text-lg font-semibold mb-2">Acesso Restrito</h3>
@@ -30,13 +29,10 @@ const PrestadorSettings = () => {
             </Button>
           </CardContent>
         </Card>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto p-4">
+  return <div className="min-h-screen bg-gray-50">
+      <div className="max-w-6xl mx-auto p-4 py-0 px-0">
         <div className="flex items-center gap-4 mb-6">
           <Button variant="ghost" onClick={() => navigate('/')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -89,8 +85,6 @@ const PrestadorSettings = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default PrestadorSettings;
