@@ -5,7 +5,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { ImprovedHeader } from '@/components/layout/ImprovedHeader';
 import { ModernFooter } from '@/components/layout/ModernFooter';
 import { getPrestadores, type UserProfile } from '@/utils/database';
 import { useToast } from '@/hooks/use-toast';
@@ -133,8 +132,6 @@ export default function PrestadoresPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <ImprovedHeader />
-      
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between mb-4">

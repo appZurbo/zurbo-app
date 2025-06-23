@@ -1,12 +1,15 @@
 
-import { Bell, Check, CheckCheck } from 'lucide-react';
+import { Bell, Check, CheckCheck, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 import { useNotifications } from '@/hooks/useNotifications';
 import { NotificationItem } from './NotificationItem';
+import { useNavigate } from 'react-router-dom';
 
 export const NotificationPanel = () => {
-  const { notifications, unreadCount, loading, markAllAsRead } = useNotifications();
+  const { recentNotifications, unreadCount, loading, markAllAsRead } = useNotifications();
+  const navigate = useNavigate();
 
   if (loading) {
     return (
@@ -40,14 +43,15 @@ export const NotificationPanel = () => {
       </div>
       
       <ScrollArea className="max-h-96">
-        {notifications.length === 0 ? (
+        {recentNotifications.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
             <Bell className="h-12 w-12 mx-auto mb-2 opacity-30" />
             <p>Nenhuma notificação</p>
+            <p className="text-xs mt-1">Suas notificações aparecerão aqui</p>
           </div>
         ) : (
           <div className="divide-y">
-            {notifications.map((notification) => (
+            {recentNotifications.map((notification) => (
               <NotificationItem
                 key={notification.id}
                 notification={notification}
@@ -56,6 +60,23 @@ export const NotificationPanel = () => {
           </div>
         )}
       </ScrollArea>
+      
+      {recentNotifications.length > 0 && (
+        <>
+          <Separator />
+          <div className="p-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/notificacoes')}
+              className="w-full justify-center text-sm text-orange-600 hover:text-orange-700"
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Ver todas as notificações
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 };

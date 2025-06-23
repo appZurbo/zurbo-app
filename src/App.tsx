@@ -10,6 +10,7 @@ import NotFound from '@/pages/NotFound';
 import Pedidos from '@/pages/Pedidos';
 import Conversas from '@/pages/Conversas';
 import AuthPage from '@/pages/AuthPage';
+import NotificacoesPage from '@/pages/NotificacoesPage';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/prestadores" element={<PrestadoresPage />} />
             <Route path="/pedidos" element={<Pedidos />} />
             <Route path="/conversas" element={<Conversas />} />
+            <Route path="/notificacoes" element={<NotificacoesPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

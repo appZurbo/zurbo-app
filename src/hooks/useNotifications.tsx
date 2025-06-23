@@ -8,9 +8,15 @@ export interface Notification {
   user_id: string;
   title: string;
   message: string;
-  type: 'new_client' | 'new_review' | 'new_message' | 'system_update';
+  type: 'new_client' | 'new_review' | 'new_message' | 'system_update' | 'payment' | 'schedule_change';
   read: boolean;
   created_at: string;
+  metadata?: {
+    pedido_id?: string;
+    chat_id?: string;
+    user_name?: string;
+    service_name?: string;
+  };
 }
 
 export const useNotifications = () => {
@@ -21,6 +27,27 @@ export const useNotifications = () => {
   useEffect(() => {
     if (profile) {
       loadNotifications();
+      // Set up real-time subscription for new notifications
+      const channel = supabase
+        .channel('notifications-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${profile.id}`
+          },
+          (payload) => {
+            const newNotification = payload.new as Notification;
+            setNotifications(prev => [newNotification, ...prev]);
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [profile]);
 
@@ -33,14 +60,15 @@ export const useNotifications = () => {
         .from('notifications')
         .select('*')
         .eq('user_id', profile.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(20);
 
       if (error) throw error;
       
-      // Type cast the data to ensure proper typing
       const typedNotifications: Notification[] = (data || []).map(item => ({
         ...item,
-        type: item.type as Notification['type']
+        type: item.type as Notification['type'],
+        metadata: item.metadata ? JSON.parse(item.metadata) : undefined
       }));
       
       setNotifications(typedNotifications);
@@ -90,14 +118,32 @@ export const useNotifications = () => {
     }
   };
 
+  const createNotification = async (notification: Omit<Notification, 'id' | 'created_at'>) => {
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .insert([{
+          ...notification,
+          metadata: notification.metadata ? JSON.stringify(notification.metadata) : null
+        }]);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error creating notification:', error);
+    }
+  };
+
   const unreadCount = notifications.filter(n => !n.read).length;
+  const recentNotifications = notifications.slice(0, 5);
 
   return {
     notifications,
+    recentNotifications,
     loading,
     unreadCount,
     markAsRead,
     markAllAsRead,
     loadNotifications,
+    createNotification,
   };
 };
