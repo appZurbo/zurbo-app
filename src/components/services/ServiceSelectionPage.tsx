@@ -170,12 +170,12 @@ const ServiceSelectionPage = ({
       </div>;
   }
   return <div className="min-h-screen bg-gray-50 py-0">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-4xl mx-auto px-0">
         <div className="text-center mb-8">
           <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
             <Star className="h-10 w-10 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="font-bold text-gray-900 mb-2 text-xl">
             Configure seus Serviços
           </h1>
           <p className="text-gray-600 max-w-2xl px-0 mx-0">
@@ -184,13 +184,13 @@ const ServiceSelectionPage = ({
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-2 gap-4 mb-8 px-0 mx-0">
           {servicos.map(servico => {
           const isSelected = servicosSelecionados.some(s => s.servico_id === servico.id);
           const IconComponent = iconMap[servico.icone] || Star;
           return <Card key={servico.id} className={`cursor-pointer transition-all duration-200 ${isSelected ? 'ring-2 ring-orange-500 bg-orange-50' : 'hover:shadow-md'}`} onClick={() => toggleServico(servico.id)}>
                 <CardContent className="p-4 px-0 py-0">
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center justify-between mb-3 px-0">
                     <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{
                   backgroundColor: `${servico.cor}20`
                 }}>
@@ -200,7 +200,7 @@ const ServiceSelectionPage = ({
                     </div>
                     {isSelected && <CheckCircle className="h-6 w-6 text-orange-500" />}
                   </div>
-                  <h3 className="font-medium text-gray-900">
+                  <h3 className="font-medium text-gray-900 text-center">
                     {servico.nome}
                   </h3>
                 </CardContent>

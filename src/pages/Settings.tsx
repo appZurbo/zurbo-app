@@ -1,4 +1,3 @@
-
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,28 +9,26 @@ import SecuritySettings from '@/components/settings/SecuritySettings';
 import GerenciadorBairros from '@/components/bairros/GerenciadorBairros';
 import { useMobile } from '@/hooks/useMobile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
 const Settings = () => {
   const navigate = useNavigate();
-  const { profile, isPrestador, loading } = useAuth();
+  const {
+    profile,
+    isPrestador,
+    loading
+  } = useAuth();
   const isMobile = useMobile();
-
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+    return <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center">
           <div className="w-16 h-16 mx-auto mb-4 bg-orange-500 rounded-xl flex items-center justify-center animate-pulse">
             <span className="text-white font-bold text-2xl">Z</span>
           </div>
           <p className="text-gray-600">Carregando configurações...</p>
         </div>
-      </div>
-    );
+      </div>;
   }
-
   if (!profile) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+    return <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardContent className="p-6 text-center">
             <h3 className="text-lg font-semibold mb-2">Acesso Restrito</h3>
@@ -43,25 +40,18 @@ const Settings = () => {
             </Button>
           </CardContent>
         </Card>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
+  return <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
       <div className={`${isMobile ? 'px-4 py-4' : 'max-w-4xl mx-auto p-6'}`}>
         {/* Header centralizado */}
         <div className="text-center mb-8">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/')}
-            className="absolute left-4 top-4"
-          >
+          <Button variant="ghost" onClick={() => navigate('/')} className="absolute left-4 top-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Voltar
           </Button>
           
-          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center rounded-sm">
             <SettingsIcon className="h-8 w-8 text-white" />
           </div>
           
@@ -69,17 +59,13 @@ const Settings = () => {
             Configurações
           </h1>
           <p className="text-gray-600 flex items-center justify-center gap-2">
-            {isPrestador ? (
-              <>
+            {isPrestador ? <>
                 <Wrench className="h-4 w-4" />
                 Painel do Prestador
-              </>
-            ) : (
-              <>
+              </> : <>
                 <User className="h-4 w-4" />
                 Configurações do Cliente
-              </>
-            )}
+              </>}
           </p>
         </div>
 
@@ -91,12 +77,10 @@ const Settings = () => {
                 <User className="h-4 w-4" />
                 {isMobile ? 'Perfil' : 'Meu Perfil'}
               </TabsTrigger>
-              {isPrestador && (
-                <TabsTrigger value="bairros" className="flex items-center gap-2 data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600">
+              {isPrestador && <TabsTrigger value="bairros" className="flex items-center gap-2 data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600">
                   <SettingsIcon className="h-4 w-4" />
                   {isMobile ? 'Bairros' : 'Área de Atendimento'}
-                </TabsTrigger>
-              )}
+                </TabsTrigger>}
               <TabsTrigger value="security" className="flex items-center gap-2 data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600">
                 <Shield className="h-4 w-4" />
                 {isMobile ? 'Segurança' : 'Privacidade & Segurança'}
@@ -111,14 +95,13 @@ const Settings = () => {
                     Informações Pessoais
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="px-0">
                   {isPrestador ? <PrestadorSettings /> : <UserSettings />}
                 </CardContent>
               </Card>
             </TabsContent>
             
-            {isPrestador && (
-              <TabsContent value="bairros" className="space-y-6">
+            {isPrestador && <TabsContent value="bairros" className="space-y-6">
                 <Card className="shadow-sm">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -130,8 +113,7 @@ const Settings = () => {
                     <GerenciadorBairros />
                   </CardContent>
                 </Card>
-              </TabsContent>
-            )}
+              </TabsContent>}
             
             <TabsContent value="security" className="space-y-6">
               <Card className="shadow-sm">
@@ -149,8 +131,6 @@ const Settings = () => {
           </Tabs>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Settings;
