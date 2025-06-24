@@ -42,9 +42,7 @@ export const HeroSection = () => {
           {/* Conteúdo principal */}
           <div className="text-center lg:text-left">
             <div className="mb-6">
-              <Badge className="bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0 mb-4">
-                ✨ Conectando talentos em toda cidade
-              </Badge>
+              
               
               <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
                 Encontre os
