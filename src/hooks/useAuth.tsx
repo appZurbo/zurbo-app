@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { checkUserProfile, createUserProfile, type UserProfile } from '@/utils/database';
 import type { User } from '@supabase/supabase-js';
@@ -8,93 +8,125 @@ export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadProfile = useCallback(async (authId: string) => {
+    try {
+      console.log('Loading profile for auth ID:', authId);
+      let profileData = await checkUserProfile(authId);
+      
+      if (!profileData) {
+        console.log('Profile not found, creating new profile...');
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (authUser && authUser.user_metadata) {
+          const metadata = authUser.user_metadata;
+          profileData = await createUserProfile(authId, authUser.email || '', {
+            nome: metadata.nome || authUser.email?.split('@')[0] || 'Usuário',
+            tipo: metadata.tipo || 'cliente',
+            cpf: metadata.cpf || null
+          });
+        } else {
+          profileData = await createUserProfile(authId, authUser?.email || '', {});
+        }
+      }
+
+      setProfile(profileData);
+      setError(null);
+    } catch (error) {
+      console.error('Error loading profile:', error);
+      setProfile(null);
+      setError('Erro ao carregar perfil do usuário');
+    }
+  }, []);
 
   useEffect(() => {
     let mounted = true;
 
-    const loadProfile = async (authId: string) => {
+    const initializeAuth = async () => {
       try {
-        console.log('Loading profile for auth ID:', authId);
-        let profileData = await checkUserProfile(authId);
-        
-        if (!profileData && mounted) {
-          console.log('Profile not found, creating new profile...');
-          const { data: { user: authUser } } = await supabase.auth.getUser();
-          if (authUser) {
-            profileData = await createUserProfile(authId, authUser.email || '', {});
-            console.log('Created new profile:', profileData);
-          }
-        }
-
-        if (mounted) {
-          console.log('Setting profile:', profileData);
-          setProfile(profileData);
-        }
-      } catch (error) {
-        console.error('Error loading profile:', error);
-        if (mounted) setProfile(null);
-      }
-    };
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (!mounted) return;
-        
-        console.log('Auth state changed:', event, session?.user?.id);
-        
-        const currentUser = session?.user ?? null;
-        setUser(currentUser);
-        
-        if (currentUser) {
-          setTimeout(() => {
-            if (mounted) {
-              loadProfile(currentUser.id);
+        // Set up auth state listener
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (event, session) => {
+            if (!mounted) return;
+            
+            console.log('Auth state changed:', event, session?.user?.id);
+            
+            const currentUser = session?.user ?? null;
+            setUser(currentUser);
+            
+            if (currentUser) {
+              // Use setTimeout to prevent infinite loops
+              setTimeout(() => {
+                if (mounted) {
+                  loadProfile(currentUser.id);
+                }
+              }, 100);
+            } else {
+              setProfile(null);
+              setError(null);
             }
-          }, 100);
-        } else {
-          setProfile(null);
-        }
-        
-        setLoading(false);
-      }
-    );
+            
+            setLoading(false);
+          }
+        );
 
-    const checkSession = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!mounted) return;
+        // Check for existing session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        const currentUser = session?.user ?? null;
-        setUser(currentUser);
-        
-        if (currentUser) {
-          await loadProfile(currentUser.id);
-        } else {
-          setProfile(null);
+        if (sessionError) {
+          console.error('Error getting session:', sessionError);
+          setError('Erro ao verificar sessão');
         }
-      } catch (error) {
-        console.error('Error checking session:', error);
+        
         if (mounted) {
-          setUser(null);
-          setProfile(null);
+          const currentUser = session?.user ?? null;
+          setUser(currentUser);
+          
+          if (currentUser) {
+            await loadProfile(currentUser.id);
+          } else {
+            setProfile(null);
+          }
+          setLoading(false);
         }
-      } finally {
-        if (mounted) setLoading(false);
+
+        return () => {
+          mounted = false;
+          subscription.unsubscribe();
+        };
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        if (mounted) {
+          setError('Erro ao inicializar autenticação');
+          setLoading(false);
+        }
       }
     };
 
-    checkSession();
+    initializeAuth();
 
     return () => {
       mounted = false;
-      subscription.unsubscribe();
     };
-  }, []);
+  }, [loadProfile]);
 
   const logout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('Error logging out:', error);
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error logging out:', error);
+        setError('Erro ao fazer logout');
+      } else {
+        setUser(null);
+        setProfile(null);
+        setError(null);
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      setError('Erro inesperado ao fazer logout');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -104,15 +136,25 @@ export const useAuth = () => {
     }
   };
 
+  const refreshProfile = async () => {
+    if (user) {
+      setLoading(true);
+      await loadProfile(user.id);
+      setLoading(false);
+    }
+  };
+
   return {
     user,
     profile,
     loading,
+    error,
     isAuthenticated: !!user,
     isPrestador: profile?.tipo === 'prestador',
     isCliente: profile?.tipo === 'cliente',
     isAdmin: profile?.tipo === 'admin' || profile?.tipo === 'moderator',
     logout,
-    updateLocalProfile
+    updateLocalProfile,
+    refreshProfile
   };
 };
