@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { checkUserProfile, createUserProfile, type UserProfile } from '@/utils/database';
 import { securityLogger } from '@/utils/securityLogger';
@@ -11,51 +11,47 @@ export const useImprovedAuth = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let mounted = true;
-
-    const loadUserProfile = async (authId: string) => {
-      try {
-        console.log('Loading profile for auth ID:', authId);
-        let profileData = await checkUserProfile(authId);
+  const loadUserProfile = useCallback(async (authId: string) => {
+    try {
+      console.log('Loading profile for auth ID:', authId);
+      let profileData = await checkUserProfile(authId);
+      
+      if (!profileData) {
+        console.log('Profile not found, attempting to create...');
         
-        if (!profileData && mounted) {
-          console.log('Profile not found, attempting to create...');
+        // Get user metadata from auth
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (authUser && authUser.user_metadata) {
+          const metadata = authUser.user_metadata;
+          profileData = await createUserProfile(authId, authUser.email || '', {
+            nome: metadata.nome || authUser.email?.split('@')[0] || 'Usuário',
+            tipo: metadata.tipo || 'cliente',
+            cpf: metadata.cpf || null
+          });
           
-          // Get user metadata from auth
-          const { data: { user: authUser } } = await supabase.auth.getUser();
-          if (authUser && authUser.user_metadata) {
-            const metadata = authUser.user_metadata;
-            profileData = await createUserProfile(authId, authUser.email || '', {
-              nome: metadata.nome || authUser.email?.split('@')[0] || 'Usuário',
-              tipo: metadata.tipo || 'cliente',
-              cpf: metadata.cpf || null
+          if (profileData) {
+            console.log('Profile created successfully:', profileData);
+            await securityLogger.logEvent({
+              event_type: 'profile_update',
+              user_id: authId,
+              details: { action: 'profile_created_from_metadata' },
+              severity: 'low'
             });
-            
-            if (profileData) {
-              console.log('Profile created successfully:', profileData);
-              await securityLogger.logEvent({
-                event_type: 'profile_update',
-                user_id: authId,
-                details: { action: 'profile_created_from_metadata' },
-                severity: 'low'
-              });
-            }
           }
         }
-
-        if (mounted) {
-          setProfile(profileData);
-          setError(null);
-        }
-      } catch (error) {
-        console.error('Error loading profile:', error);
-        if (mounted) {
-          setProfile(null);
-          setError('Erro ao carregar perfil do usuário');
-        }
       }
-    };
+
+      setProfile(profileData);
+      setError(null);
+    } catch (error) {
+      console.error('Error loading profile:', error);
+      setProfile(null);
+      setError('Erro ao carregar perfil do usuário');
+    }
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
 
     const initializeAuth = async () => {
       try {
@@ -126,7 +122,7 @@ export const useImprovedAuth = () => {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [loadUserProfile]);
 
   const logout = async () => {
     setLoading(true);
