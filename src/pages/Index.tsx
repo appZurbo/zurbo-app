@@ -70,7 +70,7 @@ const Index = () => {
   };
   return <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white">
       <HeroSection />
-      <div className="max-w-7xl mx-auto py-0 px-0">
+      <div className="max-w-7xl mx-auto py-0 px-[32px]">
         <ServiceCategories onCategorySelect={handleCategorySelect} />
         
         <div className="mt-12">
