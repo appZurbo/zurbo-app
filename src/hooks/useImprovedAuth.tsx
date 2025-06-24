@@ -122,7 +122,7 @@ export const useImprovedAuth = () => {
     return () => {
       mounted = false;
     };
-  }, [loadUserProfile]);
+  }, []); // Remove loadUserProfile from dependencies to prevent infinite loop
 
   const logout = async () => {
     setLoading(true);
