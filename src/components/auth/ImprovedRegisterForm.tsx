@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -110,17 +110,29 @@ const ImprovedRegisterForm = ({ onSuccess, onSwitchToLogin }: ImprovedRegisterFo
     validateField(field, value);
   };
 
-  const validateForm = () => {
+  // Memoize form validation to prevent re-renders
+  const isFormValid = useMemo(() => {
     const fields = ['nome', 'email', 'cpf', 'password', 'confirmPassword'];
-    let isValid = true;
-
-    fields.forEach(field => {
-      validateField(field, formData[field as keyof typeof formData]);
-      if (errors[field]) isValid = false;
+    return fields.every(field => {
+      const value = formData[field as keyof typeof formData];
+      if (!value) return false;
+      
+      switch (field) {
+        case 'nome':
+          return sanitizeText(value).length >= 2;
+        case 'email':
+          return validateEmail(value);
+        case 'cpf':
+          return validateCPF(value);
+        case 'password':
+          return validatePassword(value).isValid;
+        case 'confirmPassword':
+          return value === formData.password;
+        default:
+          return true;
+      }
     });
-
-    return isValid;
-  };
+  }, [formData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -135,7 +147,7 @@ const ImprovedRegisterForm = ({ onSuccess, onSwitchToLogin }: ImprovedRegisterFo
       return;
     }
 
-    if (!validateForm()) {
+    if (!isFormValid) {
       toast({
         title: "Dados inválidos",
         description: "Por favor, corrija os erros antes de continuar",
@@ -425,7 +437,7 @@ const ImprovedRegisterForm = ({ onSuccess, onSwitchToLogin }: ImprovedRegisterFo
 
           <Button 
             type="submit" 
-            disabled={loading || rateLimiter.isBlocked || !validateForm()} 
+            disabled={loading || rateLimiter.isBlocked || !isFormValid} 
             className="w-full bg-orange-500 hover:bg-orange-600"
           >
             {loading ? 'Criando conta...' : 'Criar Conta'}
