@@ -49,70 +49,102 @@ const Settings = () => {
 
   return (
     <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
-      <div className={`${isMobile ? 'px-4 py-4' : 'max-w-6xl mx-auto p-4'}`}>
-        {/* Header com botão voltar - otimizado para mobile */}
-        <div className={`flex items-center gap-3 mb-6 ${isMobile ? 'sticky top-0 bg-gray-50 py-2 z-10' : ''}`}>
+      <div className={`${isMobile ? 'px-4 py-4' : 'max-w-4xl mx-auto p-6'}`}>
+        {/* Header centralizado */}
+        <div className="text-center mb-8">
           <Button 
             variant="ghost" 
             onClick={() => navigate('/')}
-            className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}
+            className="absolute left-4 top-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            {!isMobile && 'Voltar'}
+            Voltar
           </Button>
-          <div className="flex-1">
-            <h1 className={`font-bold text-gray-900 flex items-center gap-2 ${isMobile ? 'text-lg' : 'text-2xl'}`}>
-              <SettingsIcon className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`} />
-              Configurações
-            </h1>
-            <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
-              {isPrestador ? (
-                <>
-                  <Wrench className="h-4 w-4 inline mr-1" />
-                  Painel do Prestador
-                </>
-              ) : (
-                <>
-                  <User className="h-4 w-4 inline mr-1" />
-                  Configurações do Cliente
-                </>
-              )}
-            </p>
+          
+          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
+            <SettingsIcon className="h-8 w-8 text-white" />
           </div>
+          
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Configurações
+          </h1>
+          <p className="text-gray-600 flex items-center justify-center gap-2">
+            {isPrestador ? (
+              <>
+                <Wrench className="h-4 w-4" />
+                Painel do Prestador
+              </>
+            ) : (
+              <>
+                <User className="h-4 w-4" />
+                Configurações do Cliente
+              </>
+            )}
+          </p>
         </div>
 
-        {/* Container principal com abas */}
-        <div className={`${isMobile ? 'space-y-4' : ''}`}>
+        {/* Tabs organizadas centralmente */}
+        <div className="max-w-2xl mx-auto">
           <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className={`grid w-full ${isPrestador ? 'grid-cols-3' : 'grid-cols-2'}`}>
-              <TabsTrigger value="profile" className="flex items-center gap-2">
+            <TabsList className={`grid w-full ${isPrestador ? 'grid-cols-3' : 'grid-cols-2'} bg-white shadow-sm`}>
+              <TabsTrigger value="profile" className="flex items-center gap-2 data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600">
                 <User className="h-4 w-4" />
-                Perfil
+                {isMobile ? 'Perfil' : 'Meu Perfil'}
               </TabsTrigger>
               {isPrestador && (
-                <TabsTrigger value="bairros" className="flex items-center gap-2">
+                <TabsTrigger value="bairros" className="flex items-center gap-2 data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600">
                   <SettingsIcon className="h-4 w-4" />
-                  Bairros
+                  {isMobile ? 'Bairros' : 'Área de Atendimento'}
                 </TabsTrigger>
               )}
-              <TabsTrigger value="security" className="flex items-center gap-2">
+              <TabsTrigger value="security" className="flex items-center gap-2 data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600">
                 <Shield className="h-4 w-4" />
-                Segurança
+                {isMobile ? 'Segurança' : 'Privacidade & Segurança'}
               </TabsTrigger>
             </TabsList>
             
-            <TabsContent value="profile">
-              {isPrestador ? <PrestadorSettings /> : <UserSettings />}
+            <TabsContent value="profile" className="space-y-6">
+              <Card className="shadow-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="h-5 w-5 text-orange-500" />
+                    Informações Pessoais
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {isPrestador ? <PrestadorSettings /> : <UserSettings />}
+                </CardContent>
+              </Card>
             </TabsContent>
             
             {isPrestador && (
-              <TabsContent value="bairros">
-                <GerenciadorBairros />
+              <TabsContent value="bairros" className="space-y-6">
+                <Card className="shadow-sm">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <SettingsIcon className="h-5 w-5 text-orange-500" />
+                      Área de Atendimento
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <GerenciadorBairros />
+                  </CardContent>
+                </Card>
               </TabsContent>
             )}
             
-            <TabsContent value="security">
-              <SecuritySettings />
+            <TabsContent value="security" className="space-y-6">
+              <Card className="shadow-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-orange-500" />
+                    Privacidade & Segurança
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <SecuritySettings />
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </div>

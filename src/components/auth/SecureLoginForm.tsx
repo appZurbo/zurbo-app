@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,6 +24,7 @@ const SecureLoginForm = ({ onSuccess, onSwitchToRegister }: SecureLoginFormProps
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const rateLimiter = useRateLimiter('login', {
     maxAttempts: 5,
@@ -88,16 +90,41 @@ const SecureLoginForm = ({ onSuccess, onSwitchToRegister }: SecureLoginFormProps
         throw error;
       }
 
-      // Login bem-sucedido
-      rateLimiter.reset();
-      await securityLogger.logLoginAttempt(cleanEmail, true, data.user?.id);
+      // Login bem-sucedido - buscar perfil do usuário
+      if (data.user) {
+        const { data: perfil, error: profileError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('auth_id', data.user.id)
+          .single();
 
-      toast({
-        title: "Login realizado com sucesso!",
-        description: "Bem-vindo de volta ao ZURBO!",
-      });
-      
-      onSuccess();
+        if (profileError) {
+          console.error('Erro ao buscar perfil:', profileError);
+          toast({
+            title: "Erro ao carregar perfil",
+            description: "Tente fazer login novamente",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        rateLimiter.reset();
+        await securityLogger.logLoginAttempt(cleanEmail, true, data.user.id);
+
+        toast({
+          title: "Login realizado com sucesso!",
+          description: "Bem-vindo de volta ao ZURBO!",
+        });
+
+        // Redirecionamento baseado no tipo de usuário
+        if (perfil.tipo === 'prestador') {
+          navigate('/prestador-dashboard');
+        } else {
+          navigate('/');
+        }
+        
+        onSuccess();
+      }
     } catch (error: any) {
       let errorMessage = "Erro no login";
       

@@ -40,11 +40,44 @@ export const useChat = () => {
     }
   }, [profile]);
 
+  // Setup realtime subscription for messages
+  useEffect(() => {
+    if (!currentChat) return;
+
+    console.log('Setting up realtime subscription for chat:', currentChat.id);
+
+    const channel = supabase
+      .channel('chat-messages')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `chat_id=eq.${currentChat.id}`
+        },
+        (payload) => {
+          console.log('New message received:', payload);
+          const newMessage = payload.new as Message;
+          setMessages(prev => [...prev, newMessage]);
+        }
+      )
+      .subscribe((status) => {
+        console.log('Realtime subscription status:', status);
+      });
+
+    return () => {
+      console.log('Cleaning up realtime subscription');
+      supabase.removeChannel(channel);
+    };
+  }, [currentChat]);
+
   const loadChats = async () => {
     if (!profile) return;
     
     setLoading(true);
     try {
+      console.log('Loading chats for profile:', profile.id);
       const { data, error } = await supabase
         .from('chats')
         .select(`
@@ -55,7 +88,12 @@ export const useChat = () => {
         .or(`cliente_id.eq.${profile.id},prestador_id.eq.${profile.id}`)
         .order('updated_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading chats:', error);
+        throw error;
+      }
+      
+      console.log('Loaded chats:', data);
       setChats(data || []);
     } catch (error) {
       console.error('Error loading chats:', error);
@@ -66,13 +104,19 @@ export const useChat = () => {
 
   const loadMessages = async (chatId: string) => {
     try {
+      console.log('Loading messages for chat:', chatId);
       const { data, error } = await supabase
         .from('messages')
         .select('*')
         .eq('chat_id', chatId)
         .order('created_at', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading messages:', error);
+        throw error;
+      }
+      
+      console.log('Loaded messages:', data);
       setMessages(data || []);
     } catch (error) {
       console.error('Error loading messages:', error);
@@ -80,30 +124,44 @@ export const useChat = () => {
   };
 
   const sendMessage = async (chat: Chat, content: string) => {
-    if (!profile) return;
+    if (!profile || !content.trim()) {
+      console.log('Cannot send message - missing profile or content');
+      return;
+    }
 
     try {
-      const { error } = await supabase
+      console.log('Sending message:', { chatId: chat.id, content, senderId: profile.id });
+      
+      const { data, error } = await supabase
         .from('messages')
         .insert({
           chat_id: chat.id,
           sender_id: profile.id,
-          content,
-        });
+          content: content.trim(),
+        })
+        .select()
+        .single();
 
-      if (error) throw error;
-      
-      // Recarregar mensagens
-      await loadMessages(chat.id);
+      if (error) {
+        console.error('Error sending message:', error);
+        throw error;
+      }
+
+      console.log('Message sent successfully:', data);
     } catch (error) {
       console.error('Error sending message:', error);
     }
   };
 
   const createChat = async (prestadorId: string) => {
-    if (!profile) return null;
+    if (!profile) {
+      console.log('Cannot create chat - no profile');
+      return null;
+    }
 
     try {
+      console.log('Creating chat between:', profile.id, 'and', prestadorId);
+      
       // Verificar se já existe um chat entre estes usuários
       const { data: existingChat } = await supabase
         .from('chats')
@@ -112,6 +170,7 @@ export const useChat = () => {
         .maybeSingle();
 
       if (existingChat) {
+        console.log('Chat already exists:', existingChat);
         return existingChat;
       }
 
@@ -124,8 +183,12 @@ export const useChat = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating chat:', error);
+        throw error;
+      }
 
+      console.log('Chat created successfully:', data);
       await loadChats();
       return data;
     } catch (error) {

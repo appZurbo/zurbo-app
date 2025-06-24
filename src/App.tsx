@@ -18,6 +18,13 @@ import NotificacoesPage from '@/pages/NotificacoesPage';
 import ReportPage from '@/pages/ReportPage';
 import PrestadorDashboard from '@/pages/PrestadorDashboard';
 import FavoritosPage from '@/pages/FavoritosPage';
+import SobreNos from '@/pages/SobreNos';
+import ComoFunciona from '@/pages/ComoFunciona';
+import CentralAjuda from '@/pages/CentralAjuda';
+import PlanoPremium from '@/pages/PlanoPremium';
+import TermosUso from '@/pages/TermosUso';
+import PoliticaPrivacidade from '@/pages/PoliticaPrivacidade';
+import RegrasComunidade from '@/pages/RegrasComunidade';
 
 function App() {
   const isMobile = useMobile();
@@ -43,6 +50,16 @@ function App() {
             <Route path="/denuncia/:id" element={<ReportPage />} />
             <Route path="/prestador-dashboard" element={<PrestadorDashboard />} />
             <Route path="/favoritos" element={<FavoritosPage />} />
+            
+            {/* Páginas do rodapé */}
+            <Route path="/sobre-nos" element={<SobreNos />} />
+            <Route path="/como-funciona" element={<ComoFunciona />} />
+            <Route path="/central-ajuda" element={<CentralAjuda />} />
+            <Route path="/plano-premium" element={<PlanoPremium />} />
+            <Route path="/termos-uso" element={<TermosUso />} />
+            <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
+            <Route path="/regras-comunidade" element={<RegrasComunidade />} />
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </MobileLayout>
@@ -68,6 +85,16 @@ function App() {
             <Route path="/denuncia/:id" element={<ReportPage />} />
             <Route path="/prestador-dashboard" element={<PrestadorDashboard />} />
             <Route path="/favoritos" element={<FavoritosPage />} />
+            
+            {/* Páginas do rodapé */}
+            <Route path="/sobre-nos" element={<SobreNos />} />
+            <Route path="/como-funciona" element={<ComoFunciona />} />
+            <Route path="/central-ajuda" element={<CentralAjuda />} />
+            <Route path="/plano-premium" element={<PlanoPremium />} />
+            <Route path="/termos-uso" element={<TermosUso />} />
+            <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
+            <Route path="/regras-comunidade" element={<RegrasComunidade />} />
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
