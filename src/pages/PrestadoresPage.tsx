@@ -6,8 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ModernFooter } from '@/components/layout/ModernFooter';
+import { PrestadorCard } from '@/components/prestadores/PrestadorCard';
+import { PrestadorProfileModal } from '@/components/prestadores/PrestadorProfileModal';
+import { MapFilter } from '@/components/maps/MapFilter';
 import { getPrestadores, type UserProfile } from '@/utils/database';
 import { useToast } from '@/hooks/use-toast';
+import { useChat } from '@/hooks/useChat';
 import { 
   Search, 
   MapPin, 
@@ -22,11 +26,16 @@ import {
 export default function PrestadoresPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { createChat } = useChat();
   const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
+  const [filteredPrestadores, setFilteredPrestadores] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedService, setSelectedService] = useState('');
+  const [selectedBairros, setSelectedBairros] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [selectedPrestador, setSelectedPrestador] = useState<UserProfile | null>(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const servicos = [
     { id: '', nome: 'Todos os Serviços' },
@@ -43,6 +52,10 @@ export default function PrestadoresPage() {
     loadPrestadores();
   }, []);
 
+  useEffect(() => {
+    applyFilters();
+  }, [prestadores, searchTerm, selectedService, selectedBairros]);
+
   const loadPrestadores = async () => {
     try {
       const data = await getPrestadores();
@@ -58,77 +71,58 @@ export default function PrestadoresPage() {
     }
   };
 
-  const filteredPrestadores = prestadores.filter(prestador => {
-    const matchesSearch = prestador.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         prestador.endereco_cidade?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesService = !selectedService || 
-                          prestador.prestador_servicos?.some(s => s.servicos?.nome?.toLowerCase().includes(selectedService.toLowerCase()));
-    return matchesSearch && matchesService;
-  });
-
-  const PrestadorCard = ({ prestador }: { prestador: UserProfile }) => (
-    <Card 
-      className="group cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-      onClick={() => navigate(`/prestador/${prestador.id}`)}
-    >
-      <div className="relative aspect-[4/3] overflow-hidden rounded-t-lg">
-        <img
-          src={prestador.foto_url || '/placeholder.svg'}
-          alt={prestador.nome}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-        />
-        {prestador.premium && (
-          <Badge className="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white">
-            <span className="mr-1">👑</span>
-            Premium
-          </Badge>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      </div>
+  const applyFilters = () => {
+    let filtered = prestadores.filter(prestador => {
+      const matchesSearch = prestador.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           prestador.endereco_cidade?.toLowerCase().includes(searchTerm.toLowerCase());
       
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="font-semibold text-lg text-gray-900 group-hover:text-orange-600 transition-colors">
-            {prestador.nome}
-          </h3>
-          <div className="flex items-center gap-1">
-            <Star className="h-4 w-4 text-yellow-500 fill-current" />
-            <span className="text-sm font-medium">{prestador.nota_media?.toFixed(1) || '0.0'}</span>
-          </div>
-        </div>
-        
-        <div className="space-y-2 mb-3">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <MapPin className="h-4 w-4" />
-            <span>{prestador.endereco_cidade || 'Sinop, MT'}</span>
-          </div>
-          
-          <div className="flex flex-wrap gap-1">
-            {prestador.prestador_servicos?.slice(0, 3).map((servico, index) => (
-              <Badge key={index} variant="secondary" className="text-xs">
-                {servico.servicos?.nome}
-              </Badge>
-            ))}
-            {prestador.prestador_servicos && prestador.prestador_servicos.length > 3 && (
-              <Badge variant="outline" className="text-xs">
-                +{prestador.prestador_servicos.length - 3} mais
-              </Badge>
-            )}
-          </div>
-        </div>
-        
-        <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center gap-1 text-green-600">
-            <Clock className="h-4 w-4" />
-            <span>Disponível</span>
-          </div>
-          <Button size="sm" className="bg-orange-500 hover:bg-orange-600">
-            Ver Perfil
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
+      const matchesService = !selectedService || 
+                            prestador.prestador_servicos?.some(s => 
+                              s.servicos?.nome?.toLowerCase().includes(selectedService.toLowerCase())
+                            );
+
+      // Filtro por bairros (simulado - na prática você teria os bairros específicos de cada prestador)
+      const matchesBairros = selectedBairros.length === 0 || 
+                            selectedBairros.some(bairro => 
+                              prestador.endereco_bairro?.includes(bairro) ||
+                              prestador.endereco_cidade?.includes('Sinop') // Simplificação
+                            );
+
+      return matchesSearch && matchesService && matchesBairros;
+    });
+
+    setFilteredPrestadores(filtered);
+  };
+
+  const handleViewProfile = (prestador: UserProfile) => {
+    setSelectedPrestador(prestador);
+    setShowProfileModal(true);
+  };
+
+  const handleContact = async (prestador: UserProfile) => {
+    try {
+      const chat = await createChat(prestador.id);
+      if (chat) {
+        navigate('/conversas', { state: { openChatId: chat.id } });
+      } else {
+        toast({
+          title: "Erro",
+          description: "Não foi possível iniciar a conversa",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Erro ao contatar prestador",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleBairroFilter = (bairros: string[]) => {
+    setSelectedBairros(bairros);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -203,9 +197,21 @@ export default function PrestadoresPage() {
       </div>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
+        {/* Filtro de Mapa */}
+        <MapFilter
+          prestadores={filteredPrestadores}
+          onBairroFilter={handleBairroFilter}
+          selectedBairros={selectedBairros}
+        />
+
         <div className="flex items-center justify-between mb-6">
           <p className="text-gray-600">
             {loading ? 'Carregando...' : `${filteredPrestadores.length} prestadores encontrados`}
+            {selectedBairros.length > 0 && (
+              <span className="ml-2 text-orange-600">
+                • Filtrado por: {selectedBairros.join(', ')}
+              </span>
+            )}
           </p>
         </div>
 
@@ -229,7 +235,13 @@ export default function PrestadoresPage() {
               : 'grid-cols-1 max-w-4xl mx-auto'
           }`}>
             {filteredPrestadores.map((prestador) => (
-              <PrestadorCard key={prestador.id} prestador={prestador} />
+              <PrestadorCard 
+                key={prestador.id} 
+                prestador={prestador}
+                onViewProfile={handleViewProfile}
+                onContact={handleContact}
+                onCardClick={handleViewProfile}
+              />
             ))}
           </div>
         ) : (
@@ -248,6 +260,7 @@ export default function PrestadoresPage() {
               onClick={() => {
                 setSearchTerm('');
                 setSelectedService('');
+                setSelectedBairros([]);
               }}
             >
               Limpar filtros
@@ -255,6 +268,17 @@ export default function PrestadoresPage() {
           </div>
         )}
       </main>
+
+      {/* Modal do Perfil do Prestador */}
+      <PrestadorProfileModal
+        prestador={selectedPrestador}
+        isOpen={showProfileModal}
+        onClose={() => {
+          setShowProfileModal(false);
+          setSelectedPrestador(null);
+        }}
+        onContact={handleContact}
+      />
 
       <ModernFooter />
     </div>

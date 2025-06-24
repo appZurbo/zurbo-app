@@ -1,11 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Star, MapPin, Crown, Eye, MessageCircle } from 'lucide-react';
+import { Star, MapPin, Crown, Eye, MessageCircle, Map } from 'lucide-react';
 import { UserProfile } from '@/utils/database/types';
+import { PrestadorMapCard } from '@/components/maps/PrestadorMapCard';
 
 interface PrestadorCardProps {
   prestador: UserProfile;
@@ -20,6 +21,8 @@ export const PrestadorCard: React.FC<PrestadorCardProps> = ({
   onContact,
   onCardClick
 }) => {
+  const [showMap, setShowMap] = useState(false);
+
   const getInitials = (nome: string) => {
     return nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
@@ -144,6 +147,13 @@ export const PrestadorCard: React.FC<PrestadorCardProps> = ({
           </p>
         )}
 
+        {/* Mapa */}
+        {showMap && (
+          <div className="mb-3">
+            <PrestadorMapCard prestador={prestador} height="150px" />
+          </div>
+        )}
+
         {/* Estatísticas - Expandido */}
         <div className="mb-3 p-3 bg-gray-50 rounded-lg">
           <div className="flex items-center justify-between text-sm">
@@ -155,9 +165,23 @@ export const PrestadorCard: React.FC<PrestadorCardProps> = ({
                 </div>
               )}
             </div>
-            {prestador.premium && (
-              <span className="text-yellow-600 font-medium text-xs">Premium</span>
-            )}
+            <div className="flex items-center gap-2">
+              {prestador.premium && (
+                <span className="text-yellow-600 font-medium text-xs">Premium</span>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowMap(!showMap);
+                }}
+                className="h-6 px-2 text-xs"
+              >
+                <Map className="h-3 w-3 mr-1" />
+                {showMap ? 'Ocultar' : 'Mapa'}
+              </Button>
+            </div>
           </div>
           
           {/* Preview dos serviços */}
