@@ -22,7 +22,13 @@ export const verificarClassificacao = async (prestadorId: string): Promise<Class
       return null;
     }
 
-    return data;
+    if (!data) return null;
+
+    // Type casting para garantir que o tipo está correto
+    return {
+      ...data,
+      tipo: data.tipo as 'destaque' | 'padrao'
+    } as ClassificacaoPrestador;
   } catch (error) {
     console.error('Error loading classificacao:', error);
     return null;
