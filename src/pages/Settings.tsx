@@ -89,8 +89,8 @@ const Settings = () => {
             
             <TabsContent value="profile" className="space-y-6">
               <Card className="shadow-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                <CardHeader className="py-[10px] my-0 mx-0 px-[65px]">
+                  <CardTitle className="flex items-center gap-2 text-sm text-center">
                     <User className="h-5 w-5 text-orange-500" />
                     Informações Pessoais
                   </CardTitle>
