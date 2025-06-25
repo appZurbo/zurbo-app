@@ -1018,6 +1018,38 @@ export type Database = {
         }
         Relationships: []
       }
+      usuarios_premium: {
+        Row: {
+          ativo: boolean | null
+          desde: string | null
+          expira_em: string | null
+          id: string
+          usuario_id: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          desde?: string | null
+          expira_em?: string | null
+          id?: string
+          usuario_id?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          desde?: string | null
+          expira_em?: string | null
+          id?: string
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usuarios_premium_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

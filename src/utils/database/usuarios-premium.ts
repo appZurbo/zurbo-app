@@ -27,7 +27,8 @@ export const verificarUsuarioPremium = async (usuarioId?: string): Promise<Usuar
       targetId = profile.id;
     }
 
-    const { data, error } = await supabase
+    // Use any para contornar temporariamente o problema de tipos do Supabase
+    const { data, error } = await (supabase as any)
       .from('usuarios_premium')
       .select('*')
       .eq('usuario_id', targetId)
@@ -62,7 +63,8 @@ export const ativarUsuarioPremium = async (duracao: number = 30): Promise<boolea
     const dataExpiracao = new Date();
     dataExpiracao.setDate(dataExpiracao.getDate() + duracao);
 
-    const { error } = await supabase
+    // Use any para contornar temporariamente o problema de tipos do Supabase
+    const { error } = await (supabase as any)
       .from('usuarios_premium')
       .upsert({
         usuario_id: profile.id,
