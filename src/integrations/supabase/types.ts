@@ -11,34 +11,49 @@ export type Database = {
     Tables: {
       agendamentos: {
         Row: {
+          cliente_nome: string | null
           criado_em: string | null
           data_agendada: string
+          descricao: string | null
+          endereco: string | null
           hora_agendada: string
           id: string
+          preco_acordado: number | null
           prestador_id: string | null
           servico_id: string | null
           solicitante_id: string | null
           status: string | null
+          titulo: string | null
         }
         Insert: {
+          cliente_nome?: string | null
           criado_em?: string | null
           data_agendada: string
+          descricao?: string | null
+          endereco?: string | null
           hora_agendada: string
           id?: string
+          preco_acordado?: number | null
           prestador_id?: string | null
           servico_id?: string | null
           solicitante_id?: string | null
           status?: string | null
+          titulo?: string | null
         }
         Update: {
+          cliente_nome?: string | null
           criado_em?: string | null
           data_agendada?: string
+          descricao?: string | null
+          endereco?: string | null
           hora_agendada?: string
           id?: string
+          preco_acordado?: number | null
           prestador_id?: string | null
           servico_id?: string | null
           solicitante_id?: string | null
           status?: string | null
+          titulo?: string | null
         }
         Relationships: [
           {
@@ -197,6 +212,38 @@ export type Database = {
           nome?: string
         }
         Relationships: []
+      }
+      classificacao_prestadores: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          id: string
+          prestador_id: string
+          tipo: string
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          id?: string
+          prestador_id: string
+          tipo?: string
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          id?: string
+          prestador_id?: string
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classificacao_prestadores_prestador_id_fkey"
+            columns: ["prestador_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       comprovantes: {
         Row: {

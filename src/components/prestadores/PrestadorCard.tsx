@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Star, MapPin, MessageCircle, Eye, Heart } from 'lucide-react';
 import { UserProfile } from '@/utils/database/types';
-import { BotaoFavorito } from '@/components/favoritos/BotaoFavorito';
+import BotaoFavorito from '@/components/favoritos/BotaoFavorito';
 import { IconeDestaque } from './IconeDestaque';
 import { verificarClassificacao, ClassificacaoPrestador } from '@/utils/database/classificacao';
 

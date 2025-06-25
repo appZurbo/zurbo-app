@@ -22,7 +22,7 @@ export const verificarClassificacao = async (prestadorId: string): Promise<Class
       return null;
     }
 
-    return data as ClassificacaoPrestador;
+    return data;
   } catch (error) {
     console.error('Error loading classificacao:', error);
     return null;
