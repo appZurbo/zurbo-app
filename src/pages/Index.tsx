@@ -1,4 +1,6 @@
+
 import { useState, useEffect } from 'react';
+import HeroDemo from '@/components/ui/hero-demo';
 import { HeroSection } from '@/components/sections/HeroSection';
 import ServiceCategories from '@/components/ServiceCategories';
 import { ModernFilters } from '@/components/filters/ModernFilters';
@@ -11,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { getPrestadores } from '@/utils/database/prestadores';
 import { UserProfile } from '@/utils/database/types';
 import { Loader2, Users } from 'lucide-react';
+
 const Index = () => {
   const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,12 +27,12 @@ const Index = () => {
     precoMax: undefined as number | undefined,
     notaMin: undefined as number | undefined
   });
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+
   useEffect(() => {
     loadPrestadores();
   }, [filters]);
+
   const loadPrestadores = async () => {
     setLoading(true);
     try {
@@ -46,30 +49,38 @@ const Index = () => {
       setLoading(false);
     }
   };
+
   const handleViewProfile = (prestador: UserProfile) => {
     setSelectedPrestador(prestador);
     setShowProfileModal(true);
   };
+
   const handleContact = (prestador: UserProfile) => {
     setSelectedPrestador(prestador);
     setShowContactModal(true);
   };
+
   const handleCardClick = (prestador: UserProfile) => {
-    // Mostrar preview expandido do prestador
     setSelectedPrestador(prestador);
     setShowProfileModal(true);
   };
+
   const handleFiltersChange = (newFilters: any) => {
     setFilters(newFilters);
   };
+
   const handleCategorySelect = (categoryId: string) => {
     setFilters(prev => ({
       ...prev,
       servico: categoryId
     }));
   };
-  return <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white">
-      <HeroSection />
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white">
+      {/* Novo componente Hero no topo */}
+      <HeroDemo />
+      
       <div className="max-w-7xl mx-auto px-[30px] py-[15px]">
         <ServiceCategories onCategorySelect={handleCategorySelect} />
         
@@ -89,10 +100,13 @@ const Index = () => {
             </div>
           </div>
 
-          {loading ? <div className="flex justify-center items-center py-12">
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
               <span className="ml-2 text-gray-600">Carregando prestadores...</span>
-            </div> : prestadores.length === 0 ? <Card>
+            </div>
+          ) : prestadores.length === 0 ? (
+            <Card>
               <CardContent className="p-12 text-center">
                 <Users className="h-16 w-16 mx-auto mb-4 text-gray-400" />
                 <h3 className="text-xl font-semibold mb-2">Nenhum prestador encontrado</h3>
@@ -100,27 +114,51 @@ const Index = () => {
                   Não encontramos prestadores que correspondam aos seus filtros.
                 </p>
                 <Button onClick={() => setFilters({
-              cidade: '',
-              servico: '',
-              precoMin: undefined,
-              precoMax: undefined,
-              notaMin: undefined
-            })}>
+                  cidade: '',
+                  servico: '',
+                  precoMin: undefined,
+                  precoMax: undefined,
+                  notaMin: undefined
+                })}>
                   Limpar Filtros
                 </Button>
               </CardContent>
-            </Card> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {prestadores.map(prestador => <PrestadorCard key={prestador.id} prestador={prestador} onViewProfile={handleViewProfile} onContact={handleContact} onCardClick={handleCardClick} />)}
-            </div>}
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {prestadores.map(prestador => (
+                <PrestadorCard
+                  key={prestador.id}
+                  prestador={prestador}
+                  onViewProfile={handleViewProfile}
+                  onContact={handleContact}
+                  onCardClick={handleCardClick}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Modals */}
-      {selectedPrestador && <>
-          <PrestadorProfileModal prestador={selectedPrestador} isOpen={showProfileModal} onClose={() => setShowProfileModal(false)} onContact={handleContact} />
+      {selectedPrestador && (
+        <>
+          <PrestadorProfileModal
+            prestador={selectedPrestador}
+            isOpen={showProfileModal}
+            onClose={() => setShowProfileModal(false)}
+            onContact={handleContact}
+          />
 
-          <ContactModal prestador={selectedPrestador} open={showContactModal} onOpenChange={setShowContactModal} />
-        </>}
-    </div>;
+          <ContactModal
+            prestador={selectedPrestador}
+            open={showContactModal}
+            onOpenChange={setShowContactModal}
+          />
+        </>
+      )}
+    </div>
+  );
 };
+
 export default Index;

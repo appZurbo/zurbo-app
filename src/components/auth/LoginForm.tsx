@@ -19,6 +19,7 @@ const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -78,7 +79,6 @@ const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => {
           description: "Bem-vindo de volta ao ZURBO!",
         });
 
-        // Aguarda um momento para o estado de autenticação ser atualizado
         setTimeout(() => {
           if (onSuccess) {
             onSuccess();
@@ -95,6 +95,57 @@ const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!email) {
+      toast({
+        title: "Email necessário",
+        description: "Por favor, insira seu email para recuperar a senha.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      toast({
+        title: "Email inválido",
+        description: "Por favor, insira um email válido.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setResetLoading(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth?mode=reset`,
+      });
+
+      if (error) {
+        toast({
+          title: "Erro ao enviar email",
+          description: "Não foi possível enviar o email de recuperação. Tente novamente.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Email enviado!",
+        description: "Verifique sua caixa de entrada para redefinir sua senha.",
+      });
+    } catch (error) {
+      console.error('Password reset error:', error);
+      toast({
+        title: "Erro inesperado",
+        description: "Ocorreu um erro ao tentar recuperar a senha.",
+        variant: "destructive",
+      });
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -151,6 +202,16 @@ const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => {
         disabled={loading}
       >
         {loading ? 'Entrando...' : 'Entrar'}
+      </Button>
+
+      <Button 
+        type="button" 
+        variant="ghost" 
+        className="w-full text-orange-600 hover:text-orange-700"
+        onClick={handlePasswordReset}
+        disabled={resetLoading}
+      >
+        {resetLoading ? 'Enviando...' : 'Recuperar Senha'}
       </Button>
       
       <Button 
