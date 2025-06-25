@@ -1,6 +1,6 @@
 
-import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,6 +11,14 @@ import { AlertCircle } from 'lucide-react';
 const AuthPage = () => {
   const { isAuthenticated, loading, error } = useAuth();
   const [activeTab, setActiveTab] = useState('login');
+  const navigate = useNavigate();
+
+  // Redireciona usuários autenticados para a página inicial
+  useEffect(() => {
+    if (isAuthenticated && !loading) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, loading, navigate]);
 
   if (loading) {
     return (
@@ -47,8 +55,9 @@ const AuthPage = () => {
     );
   }
 
+  // Se já está autenticado, não mostra a página de login
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return null;
   }
 
   return (
@@ -78,14 +87,19 @@ const AuthPage = () => {
               
               <TabsContent value="login">
                 <LoginForm
-                  onSuccess={() => {}}
+                  onSuccess={() => {
+                    // O redirecionamento é tratado pelo useEffect
+                  }}
                   onSwitchToRegister={() => setActiveTab('register')}
                 />
               </TabsContent>
               
               <TabsContent value="register">
                 <RegisterForm
-                  onSuccess={() => {}}
+                  onSuccess={() => {
+                    // Após cadastro bem-sucedido, muda para login
+                    setActiveTab('login');
+                  }}
                   onSwitchToLogin={() => setActiveTab('login')}
                 />
               </TabsContent>

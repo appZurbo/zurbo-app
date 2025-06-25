@@ -4,14 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { validateEmail, sanitizeText } from '@/utils/validation';
 import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 interface LoginFormProps {
-  onSuccess: () => void;
+  onSuccess?: () => void;
   onSwitchToRegister: () => void;
 }
 
@@ -79,8 +78,13 @@ const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => {
           description: "Bem-vindo de volta ao ZURBO!",
         });
 
-        // Redirecionamento será feito pelo hook useAuth
-        onSuccess();
+        // Aguarda um momento para o estado de autenticação ser atualizado
+        setTimeout(() => {
+          if (onSuccess) {
+            onSuccess();
+          }
+          navigate('/', { replace: true });
+        }, 100);
       }
     } catch (error: any) {
       console.error('Login error:', error);
@@ -95,79 +99,69 @@ const LoginForm = ({ onSuccess, onSwitchToRegister }: LoginFormProps) => {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle>Entrar</CardTitle>
-        <CardDescription>
-          Entre na sua conta do ZURBO
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            {errors.email && (
-              <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
-                <AlertCircle className="h-3 w-3" />
-                {errors.email}
-              </p>
-            )}
-          </div>
-          
-          <div>
-            <Label htmlFor="password">Senha</Label>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </Button>
-            </div>
-            {errors.password && (
-              <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
-                <AlertCircle className="h-3 w-3" />
-                {errors.password}
-              </p>
-            )}
-          </div>
-          
-          <Button 
-            type="submit" 
-            className="w-full bg-orange-500 hover:bg-orange-600" 
-            disabled={loading}
+    <form onSubmit={handleLogin} className="space-y-4">
+      <div>
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        {errors.email && (
+          <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+            <AlertCircle className="h-3 w-3" />
+            {errors.email}
+          </p>
+        )}
+      </div>
+      
+      <div>
+        <Label htmlFor="password">Senha</Label>
+        <div className="relative">
+          <Input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+            onClick={() => setShowPassword(!showPassword)}
           >
-            {loading ? 'Entrando...' : 'Entrar'}
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </Button>
-          
-          <Button 
-            type="button" 
-            variant="link" 
-            className="w-full"
-            onClick={onSwitchToRegister}
-          >
-            Não tem conta? Cadastre-se
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+        </div>
+        {errors.password && (
+          <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+            <AlertCircle className="h-3 w-3" />
+            {errors.password}
+          </p>
+        )}
+      </div>
+      
+      <Button 
+        type="submit" 
+        className="w-full bg-orange-500 hover:bg-orange-600" 
+        disabled={loading}
+      >
+        {loading ? 'Entrando...' : 'Entrar'}
+      </Button>
+      
+      <Button 
+        type="button" 
+        variant="link" 
+        className="w-full"
+        onClick={onSwitchToRegister}
+      >
+        Não tem conta? Cadastre-se
+      </Button>
+    </form>
   );
 };
 

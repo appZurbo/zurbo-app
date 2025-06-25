@@ -44,33 +44,7 @@ export const useAuth = () => {
 
     const initializeAuth = async () => {
       try {
-        // Set up auth state listener
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(
-          async (event, session) => {
-            if (!mounted) return;
-            
-            console.log('Auth state changed:', event, session?.user?.id);
-            
-            const currentUser = session?.user ?? null;
-            setUser(currentUser);
-            
-            if (currentUser) {
-              // Use setTimeout to prevent infinite loops
-              setTimeout(() => {
-                if (mounted) {
-                  loadProfile(currentUser.id);
-                }
-              }, 100);
-            } else {
-              setProfile(null);
-              setError(null);
-            }
-            
-            setLoading(false);
-          }
-        );
-
-        // Check for existing session
+        // Verificar sessão existente primeiro
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -89,6 +63,34 @@ export const useAuth = () => {
           }
           setLoading(false);
         }
+
+        // Configurar listener de mudanças de autenticação
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (event, session) => {
+            if (!mounted) return;
+            
+            console.log('Auth state changed:', event, session?.user?.id);
+            
+            const currentUser = session?.user ?? null;
+            setUser(currentUser);
+            
+            if (currentUser && event === 'SIGNED_IN') {
+              // Usar setTimeout para evitar loops infinitos
+              setTimeout(async () => {
+                if (mounted) {
+                  await loadProfile(currentUser.id);
+                }
+              }, 100);
+            } else if (event === 'SIGNED_OUT') {
+              setProfile(null);
+              setError(null);
+            }
+            
+            if (!loading) {
+              setLoading(false);
+            }
+          }
+        );
 
         return () => {
           mounted = false;
