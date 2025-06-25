@@ -1,0 +1,196 @@
+
+import { DayType } from './types';
+
+export const DAYS: DayType[] = [
+  { day: '-3', classNames: 'bg-gray-100' },
+  { day: '-2', classNames: 'bg-gray-100' },
+  { day: '-1', classNames: 'bg-gray-100' },
+  { day: '01', classNames: 'bg-white border border-gray-200' },
+  {
+    day: '02',
+    classNames: 'bg-white border border-gray-200 cursor-pointer',
+    meetingInfo: [
+      {
+        date: 'Seg, 2 Dez',
+        time: '10:00 - 11:00',
+        title: 'Instalação Elétrica Residencial',
+        participants: ['João Silva', 'Maria Santos'],
+        location: 'Rua das Flores, 123',
+      },
+      {
+        date: 'Seg, 2 Dez',
+        time: '13:00 - 14:00',
+        title: 'Manutenção de Ar Condicionado',
+        participants: ['Carlos Oliveira', 'Ana Costa'],
+        location: 'Av. Paulista, 456',
+      },
+    ],
+  },
+  { day: '03', classNames: 'bg-white border border-gray-200' },
+  { day: '04', classNames: 'bg-gray-100' },
+  { day: '05', classNames: 'bg-gray-100' },
+  {
+    day: '06',
+    classNames: 'bg-white border border-gray-200 cursor-pointer',
+    meetingInfo: [
+      {
+        date: 'Sex, 6 Dez',
+        time: '10:00 - 11:00',
+        title: 'Limpeza Pós-Obra',
+        participants: ['Sara Pereira', 'Kamal Nunes'],
+        location: 'Rua Augusta, 789',
+      },
+    ],
+  },
+  { day: '07', classNames: 'bg-white border border-gray-200' },
+  {
+    day: '08',
+    classNames: 'bg-white border border-gray-200 cursor-pointer',
+    meetingInfo: [
+      {
+        date: 'Dom, 8 Dez',
+        time: '14:00 - 15:00',
+        title: 'Pintura Residencial',
+        participants: ['Roberto Verde', 'David Lima'],
+        location: 'Rua dos Jardins, 321',
+      },
+      {
+        date: 'Dom, 8 Dez',
+        time: '16:00 - 17:00',
+        title: 'Consultoria Financeira',
+        participants: ['Jessica Branca', 'Tom Henrique'],
+        location: 'Centro Empresarial',
+      },
+      {
+        date: 'Dom, 8 Dez',
+        time: '17:30 - 18:30',
+        title: 'Reparo Hidráulico',
+        participants: ['Bob Silva', 'Emma Pedra'],
+        location: 'Presencial',
+      },
+    ],
+  },
+  { day: '09', classNames: 'bg-white border border-gray-200' },
+  { day: '10', classNames: 'bg-white border border-gray-200' },
+  { day: '11', classNames: 'bg-gray-100' },
+  { day: '12', classNames: 'bg-gray-100' },
+  { day: '13', classNames: 'bg-white border border-gray-200' },
+  { day: '14', classNames: 'bg-white border border-gray-200' },
+  {
+    day: '15',
+    classNames: 'bg-white border border-gray-200 cursor-pointer',
+    meetingInfo: [
+      {
+        date: 'Dom, 15 Dez',
+        time: '09:00 - 10:00',
+        title: 'Avaliação de Imóvel',
+        participants: ['Sarah Pereira', 'Kamal Nunes'],
+        location: 'Presencial no Escritório',
+      },
+    ],
+  },
+  { day: '16', classNames: 'bg-white border border-gray-200' },
+  {
+    day: '17',
+    classNames: 'bg-white border border-gray-200 cursor-pointer',
+    meetingInfo: [
+      {
+        date: 'Ter, 17 Dez',
+        time: '09:00 - 10:00',
+        title: 'Jardinagem e Paisagismo',
+        participants: ['David Lima', 'Sofia Jovem'],
+        location: 'Condomínio Verde',
+      },
+      {
+        date: 'Ter, 17 Dez',
+        time: '11:00 - 12:00',
+        title: 'Consultoria Imobiliária',
+        participants: ['Sara Pereira', 'Kamal Nunes'],
+        location: 'Presencial',
+      },
+      {
+        date: 'Ter, 17 Dez',
+        time: '14:00 - 15:00',
+        title: 'Demonstração de Sistema',
+        participants: ['Bob Silva', 'Emma Pedra'],
+        location: 'Online',
+      },
+      {
+        date: 'Ter, 17 Dez',
+        time: '16:00 - 17:00',
+        title: 'Feedback do Cliente',
+        participants: ['Marcos Lima', 'Alice João'],
+        location: 'Videochamada',
+      },
+    ],
+  },
+  { day: '18', classNames: 'bg-gray-100' },
+  { day: '19', classNames: 'bg-gray-100' },
+  { day: '20', classNames: 'bg-white border border-gray-200' },
+  {
+    day: '21',
+    classNames: 'bg-white border border-gray-200 cursor-pointer',
+    meetingInfo: [
+      {
+        date: 'Sáb, 21 Dez',
+        time: '11:00 - 12:00',
+        title: 'Lançamento de Produto',
+        participants: ['Alice João', 'Marcos Lima'],
+        location: 'Online',
+      },
+      {
+        date: 'Sáb, 21 Dez',
+        time: '13:00 - 14:00',
+        title: 'Feedback do Cliente',
+        participants: ['Sara Pereira', 'Kamal Nunes'],
+        location: 'Videochamada',
+      },
+      {
+        date: 'Sáb, 21 Dez',
+        time: '15:00 - 16:00',
+        title: 'Design de Interiores',
+        participants: ['David Lima', 'Sofia Jovem'],
+        location: 'Presencial',
+      },
+      {
+        date: 'Sáb, 21 Dez',
+        time: '17:00 - 18:00',
+        title: 'Celebração da Equipe',
+        participants: ['Bob Silva', 'Jessica Branca'],
+        location: 'Terraço do Escritório',
+      },
+      {
+        date: 'Sáb, 21 Dez',
+        time: '19:00 - 20:00',
+        title: 'Happy Hour',
+        participants: ['Tom Henrique', 'Emma Pedra'],
+        location: 'Bar Local',
+      },
+    ],
+  },
+  { day: '22', classNames: 'bg-white border border-gray-200' },
+  { day: '23', classNames: 'bg-white border border-gray-200' },
+  { day: '24', classNames: 'bg-white border border-gray-200' },
+  { day: '25', classNames: 'bg-gray-100' },
+  { day: '26', classNames: 'bg-gray-100' },
+  { day: '27', classNames: 'bg-white border border-gray-200' },
+  { day: '28', classNames: 'bg-white border border-gray-200' },
+  { day: '29', classNames: 'bg-white border border-gray-200' },
+  {
+    day: '30',
+    classNames: 'bg-white border border-gray-200 cursor-pointer',
+    meetingInfo: [
+      {
+        date: 'Seg, 30 Dez',
+        time: '11:00 - 12:00',
+        title: 'Sessão de Brainstorming',
+        participants: ['David Lima', 'Sofia Jovem'],
+        location: 'Online',
+      },
+    ],
+  },
+  { day: '+1', classNames: 'bg-gray-100' },
+  { day: '+2', classNames: 'bg-gray-100' },
+];
+
+export const daysOfWeek = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
