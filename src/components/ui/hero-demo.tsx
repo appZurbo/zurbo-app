@@ -1,11 +1,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { MoveRight, PhoneCall } from "lucide-react";
+import { MoveRight, Wrench } from "lucide-react";
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
@@ -58,6 +59,7 @@ Button.displayName = "Button";
 
 function Hero() {
   const [titleNumber, setTitleNumber] = useState(0);
+  const navigate = useNavigate();
   const titles = useMemo(
     () => ["eletricista", "encanador", "pintor", "jardineiro", "diarista"],
     []
@@ -73,6 +75,10 @@ function Hero() {
     }, 2000);
     return () => clearTimeout(timeoutId);
   }, [titleNumber, titles]);
+
+  const handleContrateServicos = () => {
+    navigate('/prestadores');
+  };
 
   return (
     <div className="w-full">
@@ -113,9 +119,9 @@ function Hero() {
               Rápido, seguro e com avaliações reais.
             </p>
           </div>
-          <div className="flex flex-row gap-3">
-            <Button size="lg" className="gap-4" variant="outline">
-              Contrate Serviços <PhoneCall className="w-4 h-4" />
+          <div className="flex flex-col gap-3 items-center">
+            <Button size="lg" className="gap-4" variant="outline" onClick={handleContrateServicos}>
+              Contrate Serviços <Wrench className="w-4 h-4" />
             </Button>
             <Button size="lg" className="gap-4 bg-orange-500 hover:bg-orange-600">
               Trabalhe conosco <MoveRight className="w-4 h-4" />
