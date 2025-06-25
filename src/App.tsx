@@ -17,6 +17,7 @@ import AuthPage from '@/pages/AuthPage';
 import NotificacoesPage from '@/pages/NotificacoesPage';
 import ReportPage from '@/pages/ReportPage';
 import PrestadorDashboard from '@/pages/PrestadorDashboard';
+import AgendaPrestador from '@/pages/AgendaPrestador';
 import FavoritosPage from '@/pages/FavoritosPage';
 import SobreNos from '@/pages/SobreNos';
 import ComoFunciona from '@/pages/ComoFunciona';
@@ -49,6 +50,7 @@ function App() {
             <Route path="/notificacoes" element={<NotificacoesPage />} />
             <Route path="/denuncia/:id" element={<ReportPage />} />
             <Route path="/prestador-dashboard" element={<PrestadorDashboard />} />
+            <Route path="/agenda-prestador" element={<AgendaPrestador />} />
             <Route path="/favoritos" element={<FavoritosPage />} />
             
             {/* Páginas do rodapé */}
@@ -84,6 +86,7 @@ function App() {
             <Route path="/notificacoes" element={<NotificacoesPage />} />
             <Route path="/denuncia/:id" element={<ReportPage />} />
             <Route path="/prestador-dashboard" element={<PrestadorDashboard />} />
+            <Route path="/agenda-prestador" element={<AgendaPrestador />} />
             <Route path="/favoritos" element={<FavoritosPage />} />
             
             {/* Páginas do rodapé */}

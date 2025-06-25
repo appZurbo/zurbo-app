@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -25,6 +24,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { TestBanner } from '@/components/banners/TestBanner';
+import { UserSubmenu } from '@/components/navigation/UserSubmenu';
 
 export const ImprovedHeader = () => {
   const navigate = useNavigate();
@@ -37,6 +37,11 @@ export const ImprovedHeader = () => {
 
   const handleSignOut = async () => {
     await logout();
+    navigate('/');
+  };
+
+  const handleLogout = () => {
+    logout();
     navigate('/');
   };
 
@@ -94,50 +99,17 @@ export const ImprovedHeader = () => {
               )}
 
               {profile ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-orange-50">
-                      <Avatar className="h-9 w-9">
-                        <AvatarImage src={profile.foto_url} alt={profile.nome} />
-                        <AvatarFallback className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-                          {profile.nome.split(' ').map(n => n[0]).join('').toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      {profile.premium && (
-                        <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs bg-gradient-to-r from-yellow-400 to-yellow-600 border-0">
-                          ⭐
-                        </Badge>
-                      )}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
-                    <div className="flex items-center justify-start gap-2 p-2">
-                      <div className="flex flex-col space-y-1 leading-none">
-                        <p className="font-medium">{profile.nome}</p>
-                        <p className="w-[200px] truncate text-sm text-muted-foreground">
-                          {profile.email}
-                        </p>
-                        <Badge variant="outline" className="w-fit text-xs">
-                          {profile.tipo === 'cliente' ? 'Cliente' : 'Prestador'}
-                        </Badge>
-                      </div>
-                    </div>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
-                      <Settings className="mr-2 h-4 w-4" />
-                      <span>Configurações</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/notificacoes')}>
-                      <Bell className="mr-2 h-4 w-4" />
-                      <span>Notificações</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOut}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Sair</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="flex items-center gap-4">
+                  <UserSubmenu />
+                  <Button
+                    variant="ghost"
+                    onClick={handleLogout}
+                    className="text-gray-600 hover:text-gray-900"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sair
+                  </Button>
+                </div>
               ) : (
                 <Button onClick={handleAuthClick} className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700">
                   Entrar / Cadastrar
