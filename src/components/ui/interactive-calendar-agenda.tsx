@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Columns3, Grid } from 'lucide-react';
+import { Columns3, Grid, MessageCircle } from 'lucide-react';
 
 export type DayType = {
   day: string;
@@ -11,6 +11,10 @@ export type DayType = {
     title: string;
     participants: string[];
     location: string;
+    clientName?: string;
+    address?: string;
+    value?: number;
+    clientId?: string;
   }[];
 };
 
@@ -122,6 +126,11 @@ const InteractiveCalendarAgenda = React.forwardRef<
     console.log('Add new job for day:', selectedDay?.day);
   };
 
+  const handleChatWithClient = (clientId?: string, clientName?: string) => {
+    console.log('Opening chat with client:', clientName, clientId);
+    // Aqui você pode implementar a lógica para abrir o chat
+  };
+
   const sortedDays = React.useMemo(() => {
     if (!hoveredDay) return DAYS;
     return [...DAYS].sort((a, b) => {
@@ -136,7 +145,6 @@ const InteractiveCalendarAgenda = React.forwardRef<
       <motion.div
         ref={ref}
         className="relative mx-auto my-10 flex w-full flex-col items-center justify-center gap-8 lg:flex-row"
-        {...props}
       >
         <motion.div layout className="w-full max-w-lg">
           <motion.div
@@ -205,7 +213,7 @@ const InteractiveCalendarAgenda = React.forwardRef<
                 {selectedDay.meetingInfo.map((meeting, index) => (
                   <motion.div
                     key={index}
-                    className="border-b border-gray-200 pb-3 last:border-b-0 last:pb-0"
+                    className="border-b border-gray-200 pb-4 last:border-b-0 last:pb-0"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.2, delay: index * 0.05 }}
@@ -214,13 +222,35 @@ const InteractiveCalendarAgenda = React.forwardRef<
                       <span className="text-sm text-gray-800">{meeting.date}</span>
                       <span className="text-sm text-gray-800">{meeting.time}</span>
                     </div>
-                    <h4 className="mb-1 text-lg font-semibold text-gray-900">{meeting.title}</h4>
-                    <p className="mb-1 text-sm text-gray-600">{meeting.participants.join(', ')}</p>
-                    <div className="flex items-center text-orange-500">
-                      <svg className="mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                      <span className="text-sm">{meeting.location}</span>
+                    
+                    <h4 className="mb-2 text-lg font-semibold text-gray-900">{meeting.title}</h4>
+                    
+                    {meeting.clientName && (
+                      <p className="mb-1 text-sm text-gray-700 font-medium">
+                        Cliente: {meeting.clientName}
+                      </p>
+                    )}
+                    
+                    {meeting.address && (
+                      <p className="mb-2 text-sm text-gray-600">
+                        Endereço: {meeting.address}
+                      </p>
+                    )}
+                    
+                    <div className="flex items-center justify-between mt-3">
+                      {meeting.value && (
+                        <div className="text-green-600 font-semibold">
+                          R$ {meeting.value.toFixed(2).replace('.', ',')}
+                        </div>
+                      )}
+                      
+                      <button
+                        onClick={() => handleChatWithClient(meeting.clientId, meeting.clientName)}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors duration-200"
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                        Conversar
+                      </button>
                     </div>
                   </motion.div>
                 ))}
@@ -266,7 +296,7 @@ const InteractiveCalendarAgenda = React.forwardRef<
                           day.meetingInfo.map((meeting, mIndex) => (
                             <motion.div
                               key={mIndex}
-                              className="border-b border-gray-200 p-3 last:border-b-0"
+                              className="border-b border-gray-200 p-4 last:border-b-0"
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: -10 }}
@@ -283,30 +313,37 @@ const InteractiveCalendarAgenda = React.forwardRef<
                                   {meeting.time}
                                 </span>
                               </div>
-                              <h3 className="mb-1 text-lg font-semibold text-gray-900">
+                              
+                              <h3 className="mb-2 text-lg font-semibold text-gray-900">
                                 {meeting.title}
                               </h3>
-                              <p className="mb-1 text-sm text-gray-600">
-                                {meeting.participants.join(', ')}
-                              </p>
-                              <div className="flex items-center text-orange-500">
-                                <svg
-                                  className="mr-1 h-4 w-4"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                  xmlns="http://www.w3.org/2000/svg"
+                              
+                              {meeting.clientName && (
+                                <p className="mb-1 text-sm text-gray-700 font-medium">
+                                  Cliente: {meeting.clientName}
+                                </p>
+                              )}
+                              
+                              {meeting.address && (
+                                <p className="mb-2 text-sm text-gray-600">
+                                  Endereço: {meeting.address}
+                                </p>
+                              )}
+                              
+                              <div className="flex items-center justify-between mt-3">
+                                {meeting.value && (
+                                  <div className="text-green-600 font-semibold">
+                                    R$ {meeting.value.toFixed(2).replace('.', ',')}
+                                  </div>
+                                )}
+                                
+                                <button
+                                  onClick={() => handleChatWithClient(meeting.clientId, meeting.clientName)}
+                                  className="flex items-center gap-2 px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors duration-200"
                                 >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-                                  />
-                                </svg>
-                                <span className="text-sm">
-                                  {meeting.location}
-                                </span>
+                                  <MessageCircle className="h-4 w-4" />
+                                  Conversar
+                                </button>
                               </div>
                             </motion.div>
                           ))}
@@ -338,6 +375,10 @@ const DAYS: DayType[] = [
         title: 'Instalação Elétrica Residencial',
         participants: ['João Silva', 'Maria Santos'],
         location: 'Rua das Flores, 123',
+        clientName: 'João Silva',
+        address: 'Rua das Flores, 123 - Centro',
+        value: 250.00,
+        clientId: 'client-001'
       },
       {
         date: 'Qua, 2 Nov',
@@ -345,6 +386,10 @@ const DAYS: DayType[] = [
         title: 'Manutenção de Ar Condicionado',
         participants: ['Carlos Oliveira', 'Ana Costa'],
         location: 'Av. Paulista, 456',
+        clientName: 'Ana Costa',
+        address: 'Av. Paulista, 456 - Bela Vista',
+        value: 180.00,
+        clientId: 'client-002'
       },
     ],
   },
@@ -364,6 +409,10 @@ const DAYS: DayType[] = [
         title: 'Limpeza Pós-Obra',
         participants: ['Sara Pereira', 'Kamal Nunes'],
         location: 'Rua Augusta, 789',
+        clientName: 'Sara Pereira',
+        address: 'Rua Augusta, 789 - Vila Madalena',
+        value: 320.00,
+        clientId: 'client-003'
       },
     ],
   },
@@ -378,6 +427,10 @@ const DAYS: DayType[] = [
         title: 'Pintura Residencial',
         participants: ['Roberto Verde', 'David Lima'],
         location: 'Rua dos Jardins, 321',
+        clientName: 'Roberto Verde',
+        address: 'Rua dos Jardins, 321 - Jardins',
+        value: 450.00,
+        clientId: 'client-004'
       },
       {
         date: 'Qua, 8 Nov',
@@ -385,6 +438,10 @@ const DAYS: DayType[] = [
         title: 'Consultoria Financeira',
         participants: ['Jessica Branca', 'Tom Henrique'],
         location: 'Centro Empresarial',
+        clientName: 'Jessica Branca',
+        address: 'Centro Empresarial - Itaim Bibi',
+        value: 200.00,
+        clientId: 'client-005'
       },
       {
         date: 'Qua, 8 Nov',
@@ -392,6 +449,10 @@ const DAYS: DayType[] = [
         title: 'Reparo Hidráulico',
         participants: ['Bob Silva', 'Emma Pedra'],
         location: 'Presencial',
+        clientName: 'Bob Silva',
+        address: 'Rua das Palmeiras, 89 - Moema',
+        value: 150.00,
+        clientId: 'client-006'
       },
     ],
   },
@@ -417,6 +478,10 @@ const DAYS: DayType[] = [
         title: 'Avaliação de Imóvel',
         participants: ['Sarah Pereira', 'Kamal Nunes'],
         location: 'Presencial no Escritório',
+        clientName: 'Sarah Pereira',
+        address: 'Rua dos Três Irmãos, 456 - Vila Progredior',
+        value: 300.00,
+        clientId: 'client-007'
       },
     ],
   },
@@ -431,6 +496,10 @@ const DAYS: DayType[] = [
         title: 'Jardinagem e Paisagismo',
         participants: ['David Lima', 'Sofia Jovem'],
         location: 'Condomínio Verde',
+        clientName: 'David Lima',
+        address: 'Condomínio Verde - Alphaville',
+        value: 380.00,
+        clientId: 'client-008'
       },
       {
         date: 'Sex, 17 Nov',
@@ -438,6 +507,10 @@ const DAYS: DayType[] = [
         title: 'Consultoria Imobiliária',
         participants: ['Sara Pereira', 'Kamal Nunes'],
         location: 'Presencial',
+        clientName: 'Sara Pereira',
+        address: 'Av. Faria Lima, 1200 - Itaim',
+        value: 280.00,
+        clientId: 'client-009'
       },
       {
         date: 'Sex, 17 Nov',
@@ -445,6 +518,10 @@ const DAYS: DayType[] = [
         title: 'Demonstração de Sistema',
         participants: ['Bob Silva', 'Emma Pedra'],
         location: 'Online',
+        clientName: 'Bob Silva',
+        address: 'Online (Remoto)',
+        value: 120.00,
+        clientId: 'client-010'
       },
       {
         date: 'Sex, 17 Nov',
@@ -452,6 +529,10 @@ const DAYS: DayType[] = [
         title: 'Feedback do Cliente',
         participants: ['Marcos Lima', 'Alice João'],
         location: 'Videochamada',
+        clientName: 'Marcos Lima',
+        address: 'Videochamada (Remoto)',
+        value: 80.00,
+        clientId: 'client-011'
       },
     ],
   },
@@ -471,6 +552,10 @@ const DAYS: DayType[] = [
         title: 'Lançamento de Produto',
         participants: ['Alice João', 'Marcos Lima'],
         location: 'Online',
+        clientName: 'Alice João',
+        address: 'Online (Remoto)',
+        value: 150.00,
+        clientId: 'client-012'
       },
       {
         date: 'Ter, 21 Nov',
@@ -478,6 +563,10 @@ const DAYS: DayType[] = [
         title: 'Feedback do Cliente',
         participants: ['Sara Pereira', 'Kamal Nunes'],
         location: 'Videochamada',
+        clientName: 'Sara Pereira',
+        address: 'Videochamada (Remoto)',
+        value: 90.00,
+        clientId: 'client-013'
       },
       {
         date: 'Ter, 21 Nov',
@@ -485,6 +574,10 @@ const DAYS: DayType[] = [
         title: 'Design de Interiores',
         participants: ['David Lima', 'Sofia Jovem'],
         location: 'Presencial',
+        clientName: 'David Lima',
+        address: 'Rua Oscar Freire, 789 - Jardins',
+        value: 420.00,
+        clientId: 'client-014'
       },
       {
         date: 'Ter, 21 Nov',
@@ -492,6 +585,10 @@ const DAYS: DayType[] = [
         title: 'Celebração da Equipe',
         participants: ['Bob Silva', 'Jessica Branca'],
         location: 'Terraço do Escritório',
+        clientName: 'Bob Silva',
+        address: 'Terraço do Escritório - Vila Olímpia',
+        value: 200.00,
+        clientId: 'client-015'
       },
       {
         date: 'Ter, 21 Nov',
@@ -499,6 +596,10 @@ const DAYS: DayType[] = [
         title: 'Happy Hour',
         participants: ['Tom Henrique', 'Emma Pedra'],
         location: 'Bar Local',
+        clientName: 'Tom Henrique',
+        address: 'Bar Local - Vila Madalena',
+        value: 100.00,
+        clientId: 'client-016'
       },
     ],
   },
@@ -529,6 +630,10 @@ const DAYS: DayType[] = [
         title: 'Sessão de Brainstorming',
         participants: ['David Lima', 'Sofia Jovem'],
         location: 'Online',
+        clientName: 'David Lima',
+        address: 'Online (Remoto)',
+        value: 180.00,
+        clientId: 'client-017'
       },
     ],
   },
