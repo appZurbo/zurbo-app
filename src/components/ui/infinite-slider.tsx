@@ -18,28 +18,30 @@ export const InfiniteSlider: React.FC<InfiniteSliderProps> = ({
   return (
     <div className={cn("w-full overflow-hidden", className)}>
       <div 
-        className={`flex animate-scroll ${reverse ? 'animate-reverse' : ''}`}
+        className={`flex ${reverse ? 'animate-scroll-reverse' : 'animate-scroll'}`}
         style={{ gap: `${gap}px` }}
       >
         {children}
         {children}
       </div>
-      <style jsx>{`
-        @keyframes scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        @keyframes reverse {
-          0% { transform: translateX(-50%); }
-          100% { transform: translateX(0); }
-        }
-        .animate-scroll {
-          animation: scroll 30s linear infinite;
-        }
-        .animate-reverse {
-          animation: reverse 30s linear infinite;
-        }
-      `}</style>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+          @keyframes scroll-reverse {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0); }
+          }
+          .animate-scroll {
+            animation: scroll 30s linear infinite;
+          }
+          .animate-scroll-reverse {
+            animation: scroll-reverse 30s linear infinite;
+          }
+        `
+      }} />
     </div>
   );
 };
