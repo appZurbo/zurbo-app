@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,90 +9,55 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { ModernHeader } from '@/components/layout/ModernHeader';
 import { ModernFooter } from '@/components/layout/ModernFooter';
-
 export default function Planos() {
   const navigate = useNavigate();
-  const { profile } = useAuth();
-  const { toast } = useToast();
+  const {
+    profile
+  } = useAuth();
+  const {
+    toast
+  } = useToast();
   const [selectedPlan, setSelectedPlan] = useState<'usuario' | 'prestador'>('usuario');
-
   const handleAssinatura = (tipo: 'usuario' | 'prestador', plano: 'premium') => {
     toast({
       title: "Assinatura Premium",
-      description: `Em breve você poderá assinar o plano Premium ${tipo === 'usuario' ? 'de Cliente' : 'de Prestador'} via Pix. Funcionalidade em desenvolvimento!`,
+      description: `Em breve você poderá assinar o plano Premium ${tipo === 'usuario' ? 'de Cliente' : 'de Prestador'} via Pix. Funcionalidade em desenvolvimento!`
     });
   };
-
-  const usuarioPlanos = [
-    {
-      id: 'free',
-      nome: 'Plano Gratuito',
-      preco: 'Grátis',
-      cor: 'green',
-      icone: Users,
-      beneficios: [
-        'Solicitar serviços ilimitados',
-        'Avaliar prestadores',
-        'Acesso ao chat',
-        'Adicionar prestadores aos favoritos',
-        '3 usos/mês do serviço de emergência'
-      ]
-    },
-    {
-      id: 'premium',
-      nome: 'Premium Cliente',
-      preco: 'R$ 9,90/mês',
-      cor: 'blue',
-      icone: Crown,
-      beneficios: [
-        'Tudo do plano Gratuito',
-        'Suporte prioritário',
-        'Cupons exclusivos de desconto',
-        '5 usos/mês do serviço de emergência com prioridade',
-        'Participação em sorteios mensais',
-        'Acesso a prestadores Premium verificados'
-      ]
-    }
-  ];
-
-  const prestadorPlanos = [
-    {
-      id: 'free',
-      nome: 'Plano Gratuito',
-      preco: 'Grátis',
-      cor: 'green',
-      icone: Users,
-      beneficios: [
-        'Cadastrar até 3 serviços',
-        'Receber solicitações',
-        'Exibir até 3 fotos na galeria',
-        'Avaliações básicas',
-        'Página de perfil padrão'
-      ]
-    },
-    {
-      id: 'premium',
-      nome: 'Premium Prestador',
-      preco: 'R$ 39,90/mês',
-      cor: 'orange',
-      icone: Crown,
-      beneficios: [
-        'Tudo do plano Gratuito',
-        'Exibir até 10 fotos no portfólio',
-        'Destaque nas buscas (prioridade nos filtros)',
-        'Página de perfil estendida',
-        'Selo "Prestador Premium" no cartão',
-        'Participação em promoções internas',
-        'Destaque nas campanhas da Zurbo'
-      ]
-    }
-  ];
-
-  return (
-    <div className="min-h-screen bg-gray-50">
+  const usuarioPlanos = [{
+    id: 'free',
+    nome: 'Plano Gratuito',
+    preco: 'Grátis',
+    cor: 'green',
+    icone: Users,
+    beneficios: ['Solicitar serviços ilimitados', 'Avaliar prestadores', 'Acesso ao chat', 'Adicionar prestadores aos favoritos', '3 usos/mês do serviço de emergência']
+  }, {
+    id: 'premium',
+    nome: 'Premium Cliente',
+    preco: 'R$ 9,90/mês',
+    cor: 'blue',
+    icone: Crown,
+    beneficios: ['Tudo do plano Gratuito', 'Suporte prioritário', 'Cupons exclusivos de desconto', '5 usos/mês do serviço de emergência com prioridade', 'Participação em sorteios mensais', 'Acesso a prestadores Premium verificados']
+  }];
+  const prestadorPlanos = [{
+    id: 'free',
+    nome: 'Plano Gratuito',
+    preco: 'Grátis',
+    cor: 'green',
+    icone: Users,
+    beneficios: ['Cadastrar até 3 serviços', 'Receber solicitações', 'Exibir até 3 fotos na galeria', 'Avaliações básicas', 'Página de perfil padrão']
+  }, {
+    id: 'premium',
+    nome: 'Premium Prestador',
+    preco: 'R$ 39,90/mês',
+    cor: 'orange',
+    icone: Crown,
+    beneficios: ['Tudo do plano Gratuito', 'Exibir até 10 fotos no portfólio', 'Destaque nas buscas (prioridade nos filtros)', 'Página de perfil estendida', 'Selo "Prestador Premium" no cartão', 'Participação em promoções internas', 'Destaque nas campanhas da Zurbo']
+  }];
+  return <div className="min-h-screen bg-gray-50">
       <ModernHeader />
       
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-[10px]">
         <div className="mb-8">
           <Button variant="ghost" onClick={() => navigate('/')} className="mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -115,7 +79,7 @@ export default function Planos() {
 
         {/* Seletor de Tipo de Usuário */}
         <div className="flex justify-center mb-8">
-          <Tabs value={selectedPlan} onValueChange={(value) => setSelectedPlan(value as 'usuario' | 'prestador')} className="w-full max-w-md">
+          <Tabs value={selectedPlan} onValueChange={value => setSelectedPlan(value as 'usuario' | 'prestador')} className="w-full max-w-md">
             <TabsList className="grid w-full grid-cols-2 bg-white shadow-sm">
               <TabsTrigger value="usuario" className="flex items-center gap-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-600">
                 <Heart className="h-4 w-4" />
@@ -129,7 +93,7 @@ export default function Planos() {
           </Tabs>
         </div>
 
-        <Tabs value={selectedPlan} onValueChange={(value) => setSelectedPlan(value as 'usuario' | 'prestador')}>
+        <Tabs value={selectedPlan} onValueChange={value => setSelectedPlan(value as 'usuario' | 'prestador')}>
           {/* Planos para Cliente */}
           <TabsContent value="usuario" className="space-y-8">
             <div className="text-center mb-8">
@@ -142,20 +106,16 @@ export default function Planos() {
             </div>
             
             <div className="grid lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              {usuarioPlanos.map((plano) => {
-                const IconComponent = plano.icone;
-                const isPremium = plano.id === 'premium';
-                
-                return (
-                  <Card key={plano.id} className={`relative ${isPremium ? 'border-blue-300 bg-gradient-to-br from-blue-50 to-indigo-50 ring-2 ring-blue-200' : 'border-gray-200'}`}>
-                    {isPremium && (
-                      <div className="absolute top-4 right-4">
+              {usuarioPlanos.map(plano => {
+              const IconComponent = plano.icone;
+              const isPremium = plano.id === 'premium';
+              return <Card key={plano.id} className={`relative ${isPremium ? 'border-blue-300 bg-gradient-to-br from-blue-50 to-indigo-50 ring-2 ring-blue-200' : 'border-gray-200'}`}>
+                    {isPremium && <div className="absolute top-4 right-4">
                         <Badge className="bg-gradient-to-r from-blue-400 to-blue-600 text-white">
                           <Crown className="h-3 w-3 mr-1" />
                           Recomendado
                         </Badge>
-                      </div>
-                    )}
+                      </div>}
                     
                     <CardHeader className="text-center pb-4">
                       <div className={`w-16 h-16 ${isPremium ? 'bg-gradient-to-r from-blue-400 to-blue-600' : 'bg-gray-100'} rounded-full flex items-center justify-center mx-auto mb-4`}>
@@ -171,32 +131,24 @@ export default function Planos() {
                     
                     <CardContent className="space-y-4">
                       <div className="space-y-3">
-                        {plano.beneficios.map((beneficio, index) => (
-                          <div key={index} className="flex items-start gap-3">
+                        {plano.beneficios.map((beneficio, index) => <div key={index} className="flex items-start gap-3">
                             <CheckCircle className={`h-5 w-5 mt-0.5 ${isPremium ? 'text-blue-500' : 'text-green-500'}`} />
                             <span className="text-gray-700">{beneficio}</span>
-                          </div>
-                        ))}
+                          </div>)}
                       </div>
                       
-                      {isPremium && (
-                        <div className="pt-4">
-                          <Button 
-                            className="w-full bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white"
-                            onClick={() => handleAssinatura('usuario', 'premium')}
-                          >
+                      {isPremium && <div className="pt-4">
+                          <Button className="w-full bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white" onClick={() => handleAssinatura('usuario', 'premium')}>
                             <Crown className="h-4 w-4 mr-2" />
                             Assinar Premium
                           </Button>
                           <p className="text-center text-sm text-gray-500 mt-2">
                             Pagamento via Pix (em breve)
                           </p>
-                        </div>
-                      )}
+                        </div>}
                     </CardContent>
-                  </Card>
-                );
-              })}
+                  </Card>;
+            })}
             </div>
           </TabsContent>
 
@@ -212,20 +164,16 @@ export default function Planos() {
             </div>
             
             <div className="grid lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
-              {prestadorPlanos.map((plano) => {
-                const IconComponent = plano.icone;
-                const isPremium = plano.id === 'premium';
-                
-                return (
-                  <Card key={plano.id} className={`relative ${isPremium ? 'border-orange-300 bg-gradient-to-br from-orange-50 to-yellow-50 ring-2 ring-orange-200' : 'border-gray-200'}`}>
-                    {isPremium && (
-                      <div className="absolute top-4 right-4">
+              {prestadorPlanos.map(plano => {
+              const IconComponent = plano.icone;
+              const isPremium = plano.id === 'premium';
+              return <Card key={plano.id} className={`relative ${isPremium ? 'border-orange-300 bg-gradient-to-br from-orange-50 to-yellow-50 ring-2 ring-orange-200' : 'border-gray-200'}`}>
+                    {isPremium && <div className="absolute top-4 right-4">
                         <Badge className="bg-gradient-to-r from-orange-400 to-orange-600 text-white">
                           <Crown className="h-3 w-3 mr-1" />
                           Recomendado
                         </Badge>
-                      </div>
-                    )}
+                      </div>}
                     
                     <CardHeader className="text-center pb-4">
                       <div className={`w-16 h-16 ${isPremium ? 'bg-gradient-to-r from-orange-400 to-orange-600' : 'bg-gray-100'} rounded-full flex items-center justify-center mx-auto mb-4`}>
@@ -241,32 +189,24 @@ export default function Planos() {
                     
                     <CardContent className="space-y-4">
                       <div className="space-y-3">
-                        {plano.beneficios.map((beneficio, index) => (
-                          <div key={index} className="flex items-start gap-3">
+                        {plano.beneficios.map((beneficio, index) => <div key={index} className="flex items-start gap-3">
                             <CheckCircle className={`h-5 w-5 mt-0.5 ${isPremium ? 'text-orange-500' : 'text-green-500'}`} />
                             <span className="text-gray-700">{beneficio}</span>
-                          </div>
-                        ))}
+                          </div>)}
                       </div>
                       
-                      {isPremium && (
-                        <div className="pt-4">
-                          <Button 
-                            className="w-full bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 text-white"
-                            onClick={() => handleAssinatura('prestador', 'premium')}
-                          >
+                      {isPremium && <div className="pt-4">
+                          <Button className="w-full bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 text-white" onClick={() => handleAssinatura('prestador', 'premium')}>
                             <Crown className="h-4 w-4 mr-2" />
                             Assinar Premium
                           </Button>
                           <p className="text-center text-sm text-gray-500 mt-2">
                             Pagamento via Pix (em breve)
                           </p>
-                        </div>
-                      )}
+                        </div>}
                     </CardContent>
-                  </Card>
-                );
-              })}
+                  </Card>;
+            })}
             </div>
           </TabsContent>
         </Tabs>
@@ -376,6 +316,5 @@ export default function Planos() {
       </main>
 
       <ModernFooter />
-    </div>
-  );
+    </div>;
 }
