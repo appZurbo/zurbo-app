@@ -15,97 +15,53 @@ import {
   Crown,
   DollarSign,
   Users,
-  Clock
+  Clock,
+  Eye
 } from 'lucide-react';
 import { useMobile } from '@/hooks/useMobile';
-import { listarAgendamentos, type Agendamento } from '@/utils/database/agendamentos';
-import { verificarPlanoPremium, type PlanoPremium } from '@/utils/database/plano-premium';
-import { listarBairrosAtendidos, type BairroAtendido } from '@/utils/database/bairros';
-import { supabase } from '@/integrations/supabase/client';
 
 const PrestadorDashboard = () => {
   const navigate = useNavigate();
   const { profile, isPrestador, loading } = useAuth();
   const isMobile = useMobile();
-  const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
-  const [planoPremium, setPlanoPremium] = useState<PlanoPremium | null>(null);
-  const [bairros, setBairros] = useState<BairroAtendido[]>([]);
   const [stats, setStats] = useState({
-    totalServicos: 0,
-    valorRecebido: 0,
-    avaliacoes: 0,
-    notaMedia: 0
+    totalServicos: 24,
+    valorRecebido: 3250.80,
+    avaliacoes: 18,
+    notaMedia: 4.8
   });
 
-  useEffect(() => {
-    if (!loading && (!profile || !isPrestador)) {
-      navigate('/');
-      return;
+  // Dados fake para próximos agendamentos
+  const proximosAgendamentos = [
+    {
+      id: '1',
+      servico: 'Instalação Elétrica',
+      data: '2024-01-22',
+      hora: '14:00',
+      cliente: 'Pedro Costa',
+      status: 'confirmado'
+    },
+    {
+      id: '2',
+      servico: 'Reparo Encanamento',
+      data: '2024-01-23',
+      hora: '09:30',
+      cliente: 'Maria Silva',
+      status: 'confirmado'
+    },
+    {
+      id: '3',
+      servico: 'Pintura Quarto',
+      data: '2024-01-24',
+      hora: '15:00',
+      cliente: 'João Santos',
+      status: 'pendente'
     }
+  ];
 
-    if (profile && isPrestador) {
-      carregarDados();
-    }
-  }, [profile, isPrestador, loading, navigate]);
-
-  const carregarDados = async () => {
-    try {
-      // Carregar agendamentos
-      const agendamentosData = await listarAgendamentos();
-      setAgendamentos(agendamentosData);
-
-      // Carregar plano premium
-      const planoData = await verificarPlanoPremium();
-      setPlanoPremium(planoData);
-
-      // Carregar bairros
-      const bairrosData = await listarBairrosAtendidos();
-      setBairros(bairrosData);
-
-      // Carregar estatísticas
-      await carregarEstatisticas();
-    } catch (error) {
-      console.error('Erro ao carregar dados do dashboard:', error);
-    }
-  };
-
-  const carregarEstatisticas = async () => {
-    try {
-      if (!profile) return;
-
-      // Total de serviços realizados
-      const { count: totalServicos } = await supabase
-        .from('historico_servicos')
-        .select('*', { count: 'exact', head: true })
-        .eq('prestador_id', profile.id)
-        .eq('status', 'concluido');
-
-      // Valor total recebido
-      const { data: servicosComValor } = await supabase
-        .from('historico_servicos')
-        .select('valor')
-        .eq('prestador_id', profile.id)
-        .eq('status', 'concluido');
-
-      const valorTotal = servicosComValor?.reduce((total, servico) => 
-        total + (parseFloat(servico.valor?.toString() || '0') || 0), 0) || 0;
-
-      // Total de avaliações
-      const { count: totalAvaliacoes } = await supabase
-        .from('avaliacoes')
-        .select('*', { count: 'exact', head: true })
-        .eq('avaliado_id', profile.id);
-
-      setStats({
-        totalServicos: totalServicos || 0,
-        valorRecebido: valorTotal,
-        avaliacoes: totalAvaliacoes || 0,
-        notaMedia: profile.nota_media || 0
-      });
-    } catch (error) {
-      console.error('Erro ao carregar estatísticas:', error);
-    }
-  };
+  const bairrosAtendidos = [
+    'Vila Madalena', 'Pinheiros', 'Jardins', 'Moema', 'Itaim Bibi'
+  ];
 
   if (loading) {
     return (
@@ -120,9 +76,23 @@ const PrestadorDashboard = () => {
     );
   }
 
-  const proximosAgendamentos = agendamentos
-    .filter(ag => ag.status === 'confirmado' && new Date(ag.data_agendada) >= new Date())
-    .slice(0, 3);
+  if (!profile || !isPrestador) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-6 text-center">
+            <h3 className="text-lg font-semibold mb-2">Acesso Restrito</h3>
+            <p className="text-gray-600 mb-4">
+              Esta página é exclusiva para prestadores de serviços.
+            </p>
+            <Button onClick={() => navigate('/')} className="w-full">
+              Voltar à Página Inicial
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
@@ -143,10 +113,10 @@ const PrestadorDashboard = () => {
               Dashboard do Prestador
             </h1>
             <p className={`text-gray-600 flex items-center gap-1 ${isMobile ? 'text-sm' : ''}`}>
-              {planoPremium?.ativo && (
+              {profile.premium && (
                 <Crown className="h-4 w-4 text-yellow-500" />
               )}
-              {planoPremium?.ativo ? 'Prestador Premium' : 'Prestador Padrão'}
+              {profile.premium ? 'Prestador Premium' : 'Prestador Padrão'}
             </p>
           </div>
         </div>
@@ -227,22 +197,17 @@ const PrestadorDashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {planoPremium?.ativo ? (
+            {profile.premium ? (
               <div className="flex items-center justify-between">
                 <div>
                   <Badge className="bg-yellow-100 text-yellow-800 mb-2">
                     ✨ Prestador Premium Ativo
                   </Badge>
                   <p className="text-sm text-gray-600">
-                    Premium desde: {new Date(planoPremium.desde).toLocaleDateString()}
+                    Acesso a recursos exclusivos e destaque nos resultados
                   </p>
-                  {planoPremium.expira_em && (
-                    <p className="text-sm text-gray-600">
-                      Expira em: {new Date(planoPremium.expira_em).toLocaleDateString()}
-                    </p>
-                  )}
                 </div>
-                <Button onClick={() => navigate('/plano-premium')}>
+                <Button onClick={() => navigate('/planos')}>
                   Gerenciar Plano
                 </Button>
               </div>
@@ -259,7 +224,7 @@ const PrestadorDashboard = () => {
                   </ul>
                 </div>
                 <Button 
-                  onClick={() => navigate('/plano-premium')}
+                  onClick={() => navigate('/planos')}
                   className="bg-yellow-600 hover:bg-yellow-700"
                 >
                   Ativar Premium
@@ -271,28 +236,39 @@ const PrestadorDashboard = () => {
 
         {/* Grid de Conteúdo */}
         <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
-          {/* Próximos Agendamentos */}
+          {/* Próximos Agendamentos com botão Ver Agenda Completa */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5" />
-                Próximos Agendamentos
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  Próximos Agendamentos
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => navigate('/agenda-prestador')}
+                  className="flex items-center gap-1"
+                >
+                  <Eye className="h-4 w-4" />
+                  Ver Agenda Completa
+                </Button>
               </CardTitle>
             </CardHeader>
             <CardContent>
               {proximosAgendamentos.length > 0 ? (
                 <div className="space-y-3">
-                  {proximosAgendamentos.map((agendamento) => (
+                  {proximosAgendamentos.slice(0, 3).map((agendamento) => (
                     <div key={agendamento.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                       <div>
                         <p className="font-medium text-sm">
-                          {agendamento.servico?.nome}
+                          {agendamento.servico}
                         </p>
                         <p className="text-xs text-gray-600">
-                          {new Date(agendamento.data_agendada).toLocaleDateString()} às {agendamento.hora_agendada}
+                          {new Date(agendamento.data).toLocaleDateString()} às {agendamento.hora}
                         </p>
                         <p className="text-xs text-gray-500">
-                          Cliente: {agendamento.solicitante?.nome}
+                          Cliente: {agendamento.cliente}
                         </p>
                       </div>
                       <Badge variant="outline">
@@ -300,13 +276,6 @@ const PrestadorDashboard = () => {
                       </Badge>
                     </div>
                   ))}
-                  <Button 
-                    variant="outline" 
-                    className="w-full mt-3"
-                    onClick={() => navigate('/pedidos')}
-                  >
-                    Ver Todos os Agendamentos
-                  </Button>
                 </div>
               ) : (
                 <div className="text-center py-6">
@@ -326,17 +295,17 @@ const PrestadorDashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {bairros.length > 0 ? (
+              {bairrosAtendidos.length > 0 ? (
                 <div className="space-y-2">
                   <div className="flex flex-wrap gap-2">
-                    {bairros.slice(0, 6).map((bairro) => (
-                      <Badge key={bairro.id} variant="secondary">
-                        {bairro.bairro}
+                    {bairrosAtendidos.slice(0, 6).map((bairro) => (
+                      <Badge key={bairro} variant="secondary">
+                        {bairro}
                       </Badge>
                     ))}
-                    {bairros.length > 6 && (
+                    {bairrosAtendidos.length > 6 && (
                       <Badge variant="outline">
-                        +{bairros.length - 6} mais
+                        +{bairrosAtendidos.length - 6} mais
                       </Badge>
                     )}
                   </div>

@@ -2,7 +2,8 @@
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Calendar, Clock } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, Calendar, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMobile } from '@/hooks/useMobile';
 import InteractiveCalendarAgenda from '@/components/ui/interactive-calendar-agenda';
@@ -85,8 +86,8 @@ const AgendaPrestador = () => {
           </div>
         </div>
 
-        {/* Estatísticas rápidas */}
-        <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-4'} gap-4 mb-6`}>
+        {/* Estatísticas rápidas - Melhoradas para mobile */}
+        <div className={`grid gap-4 mb-6 ${isMobile ? 'grid-cols-2' : 'grid-cols-4'}`}>
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
@@ -106,6 +107,28 @@ const AgendaPrestador = () => {
                 <div>
                   <p className="text-sm text-gray-600">Esta semana</p>
                   <p className="text-lg font-semibold">12 serviços</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Cards de status - Visíveis no mobile */}
+          <Card className={`${isMobile ? 'col-span-2' : ''}`}>
+            <CardContent className="p-4">
+              <div className={`flex ${isMobile ? 'justify-around' : 'items-center gap-2'}`}>
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1 mb-1">
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <span className="text-sm font-medium text-green-600">Concluídos</span>
+                  </div>
+                  <p className="text-lg font-semibold">87%</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1 mb-1">
+                    <AlertCircle className="h-4 w-4 text-yellow-500" />
+                    <span className="text-sm font-medium text-yellow-600">Pendentes</span>
+                  </div>
+                  <p className="text-lg font-semibold">5</p>
                 </div>
               </div>
             </CardContent>

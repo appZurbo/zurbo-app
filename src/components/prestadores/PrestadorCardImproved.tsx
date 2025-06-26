@@ -182,7 +182,7 @@ export const PrestadorCardImproved: React.FC<PrestadorCardImprovedProps> = ({
               className="flex-1"
               onClick={() => onContact(prestador)}
             >
-              <Phone className="h-4 w-4 mr-1" />
+              <Eye className="h-4 w-4 mr-1" />
               Ver Perfil
             </Button>
             <Button 
