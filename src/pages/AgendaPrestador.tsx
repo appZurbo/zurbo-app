@@ -1,4 +1,3 @@
-
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,28 +6,26 @@ import { ArrowLeft, Calendar, Clock, CheckCircle, AlertCircle } from 'lucide-rea
 import { useNavigate } from 'react-router-dom';
 import { useMobile } from '@/hooks/useMobile';
 import InteractiveCalendarAgenda from '@/components/ui/interactive-calendar-agenda';
-
 const AgendaPrestador = () => {
   const navigate = useNavigate();
-  const { profile, isPrestador, loading } = useAuth();
+  const {
+    profile,
+    isPrestador,
+    loading
+  } = useAuth();
   const isMobile = useMobile();
-
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+    return <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center">
           <div className="w-16 h-16 mx-auto mb-4 bg-orange-500 rounded-xl flex items-center justify-center animate-pulse">
             <span className="text-white font-bold text-2xl">Z</span>
           </div>
           <p className="text-gray-600">Carregando agenda...</p>
         </div>
-      </div>
-    );
+      </div>;
   }
-
   if (!profile) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+    return <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardContent className="p-6 text-center">
             <h3 className="text-lg font-semibold mb-2">Acesso Restrito</h3>
@@ -40,13 +37,10 @@ const AgendaPrestador = () => {
             </Button>
           </CardContent>
         </Card>
-      </div>
-    );
+      </div>;
   }
-
   if (!isPrestador) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+    return <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardContent className="p-6 text-center">
             <h3 className="text-lg font-semibold mb-2">Acesso Restrito</h3>
@@ -58,20 +52,13 @@ const AgendaPrestador = () => {
             </Button>
           </CardContent>
         </Card>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
+  return <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
       <div className={`${isMobile ? 'px-4 py-4' : 'max-w-6xl mx-auto p-6'}`}>
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/prestador-dashboard')}
-            className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}
-          >
+          <Button variant="ghost" onClick={() => navigate('/prestador-dashboard')} className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             {!isMobile && 'Voltar'}
           </Button>
@@ -113,29 +100,9 @@ const AgendaPrestador = () => {
           </Card>
           
           {/* Cards de status - Visíveis no mobile */}
-          <Card className={`${isMobile ? 'col-span-2' : ''}`}>
-            <CardContent className="p-4">
-              <div className={`flex ${isMobile ? 'justify-around' : 'items-center gap-2'}`}>
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 mb-1">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    <span className="text-sm font-medium text-green-600">Concluídos</span>
-                  </div>
-                  <p className="text-lg font-semibold">87%</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 mb-1">
-                    <AlertCircle className="h-4 w-4 text-yellow-500" />
-                    <span className="text-sm font-medium text-yellow-600">Pendentes</span>
-                  </div>
-                  <p className="text-lg font-semibold">5</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
           
-          {!isMobile && (
-            <>
+          
+          {!isMobile && <>
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2">
@@ -159,8 +126,7 @@ const AgendaPrestador = () => {
                   </div>
                 </CardContent>
               </Card>
-            </>
-          )}
+            </>}
         </div>
 
         {/* Calendário Interativo */}
@@ -176,8 +142,6 @@ const AgendaPrestador = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default AgendaPrestador;
