@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Columns3, Grid, MessageCircle } from 'lucide-react';
+import { Columns3, Grid, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export type DayType = {
   day: string;
@@ -83,13 +84,65 @@ const Day: React.FC<DayProps> = ({ classNames, day, onHover, onClick }) => {
 const CalendarGrid: React.FC<{ 
   onHover: (day: string | null) => void;
   onDayClick: (day: DayType) => void;
+  currentMonth: number;
+  currentYear: number;
 }> = ({
   onHover,
   onDayClick,
+  currentMonth,
+  currentYear,
 }) => {
+  // Generate days for the current month/year
+  const generateDaysForMonth = (month: number, year: number): DayType[] => {
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDayOfMonth = new Date(year, month, 1).getDay();
+    const lastDayOfPrevMonth = new Date(year, month, 0).getDate();
+    
+    const days: DayType[] = [];
+    
+    // Previous month's trailing days
+    for (let i = firstDayOfMonth - 1; i >= 0; i--) {
+      const day = lastDayOfPrevMonth - i;
+      days.push({
+        day: `-${day}`,
+        classNames: 'bg-gray-100'
+      });
+    }
+    
+    // Current month's days
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dayString = day.toString().padStart(2, '0');
+      const isToday = new Date().getDate() === day && 
+                     new Date().getMonth() === month && 
+                     new Date().getFullYear() === year;
+      
+      // Check if this day has meetings (using original mock data for November 2024)
+      const mockMeetings = getMockMeetingsForDay(dayString, month, year);
+      
+      days.push({
+        day: dayString,
+        classNames: `${isToday ? 'bg-blue-100 border-2 border-blue-500' : 'bg-white'} border border-gray-200 ${mockMeetings ? 'cursor-pointer' : ''}`,
+        meetingInfo: mockMeetings
+      });
+    }
+    
+    // Next month's leading days
+    const remainingSlots = 42 - days.length; // 6 rows * 7 days
+    for (let day = 1; day <= remainingSlots; day++) {
+      days.push({
+        day: `+${day}`,
+        classNames: 'bg-gray-100'
+      });
+    }
+    
+    return days;
+  };
+
+  const days = generateDaysForMonth(currentMonth, currentYear);
+
   return (
     <div className="grid grid-cols-7 gap-2">
-      {DAYS.map((day, index) => (
+      {days.map((day, index) => (
         <Day
           key={`${day.day}-${index}`}
           classNames={day.classNames}
@@ -102,10 +155,82 @@ const CalendarGrid: React.FC<{
   );
 };
 
+// Mock meetings data (you can replace this with real data)
+const getMockMeetingsForDay = (day: string, month: number, year: number) => {
+  // Only show mock data for November 2024 for now
+  if (month !== 10 || year !== 2024) return null;
+  
+  const mockData: { [key: string]: any[] } = {
+    '02': [
+      {
+        date: 'Qua, 2 Nov',
+        time: '10:00 - 11:00',
+        title: 'Instalação Elétrica Residencial',
+        participants: ['João Silva', 'Maria Santos'],
+        location: 'Rua das Flores, 123',
+        clientName: 'João Silva',
+        address: 'Rua das Flores, 123 - Centro',
+        value: 250.00,
+        clientId: 'client-001'
+      },
+      {
+        date: 'Qua, 2 Nov',
+        time: '13:00 - 14:00',
+        title: 'Manutenção de Ar Condicionado',
+        participants: ['Carlos Oliveira', 'Ana Costa'],
+        location: 'Av. Paulista, 456',
+        clientName: 'Ana Costa',
+        address: 'Av. Paulista, 456 - Bela Vista',
+        value: 180.00,
+        clientId: 'client-002'
+      },
+    ],
+    '06': [
+      {
+        date: 'Seg, 6 Nov',
+        time: '10:00 - 11:00',
+        title: 'Limpeza Pós-Obra',
+        participants: ['Sara Pereira', 'Kamal Nunes'],
+        location: 'Rua Augusta, 789',
+        clientName: 'Sara Pereira',
+        address: 'Rua Augusta, 789 - Vila Madalena',
+        value: 320.00,
+        clientId: 'client-003'
+      },
+    ],
+    '08': [
+      {
+        date: 'Qua, 8 Nov',
+        time: '14:00 - 15:00',
+        title: 'Pintura Residencial',
+        participants: ['Roberto Verde', 'David Lima'],
+        location: 'Rua dos Jardins, 321',
+        clientName: 'Roberto Verde',
+        address: 'Rua dos Jardins, 321 - Jardins',
+        value: 450.00,
+        clientId: 'client-004'
+      },
+    ],
+  };
+  
+  return mockData[day] || null;
+};
+
+const getMonthName = (month: number): string => {
+  const months = [
+    'JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN',
+    'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'
+  ];
+  return months[month];
+};
+
 const InteractiveCalendarAgenda = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
+  const today = new Date();
+  const [currentMonth, setCurrentMonth] = useState(today.getMonth());
+  const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [moreView, setMoreView] = useState(false);
   const [hoveredDay, setHoveredDay] = useState<string | null>(null);
   const [selectedDay, setSelectedDay] = useState<DayType | null>(null);
@@ -128,17 +253,33 @@ const InteractiveCalendarAgenda = React.forwardRef<
 
   const handleChatWithClient = (clientId?: string, clientName?: string) => {
     console.log('Opening chat with client:', clientName, clientId);
-    // Aqui você pode implementar a lógica para abrir o chat
   };
 
-  const sortedDays = React.useMemo(() => {
-    if (!hoveredDay) return DAYS;
-    return [...DAYS].sort((a, b) => {
-      if (a.day === hoveredDay) return -1;
-      if (b.day === hoveredDay) return 1;
-      return 0;
-    });
-  }, [hoveredDay]);
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    if (direction === 'prev') {
+      if (currentMonth === 0) {
+        setCurrentMonth(11);
+        setCurrentYear(currentYear - 1);
+      } else {
+        setCurrentMonth(currentMonth - 1);
+      }
+    } else {
+      if (currentMonth === 11) {
+        setCurrentMonth(0);
+        setCurrentYear(currentYear + 1);
+      } else {
+        setCurrentMonth(currentMonth + 1);
+      }
+    }
+    setSelectedDay(null); // Clear selected day when changing months
+  };
+
+  const goToToday = () => {
+    const today = new Date();
+    setCurrentMonth(today.getMonth());
+    setCurrentYear(today.getFullYear());
+    setSelectedDay(null);
+  };
 
   return (
     <AnimatePresence mode="wait">
@@ -152,9 +293,34 @@ const InteractiveCalendarAgenda = React.forwardRef<
             className="flex w-full flex-col gap-4"
           >
             <div className="flex w-full items-center justify-between">
-              <motion.h2 className="mb-2 text-4xl font-bold tracking-wider text-gray-800">
-                NOV <span className="opacity-50">2024</span>
-              </motion.h2>
+              <div className="flex items-center gap-4">
+                <motion.h2 className="mb-2 text-4xl font-bold tracking-wider text-gray-800">
+                  {getMonthName(currentMonth)} <span className="opacity-50">{currentYear}</span>
+                </motion.h2>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => navigateMonth('prev')}
+                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    title="Mês anterior"
+                  >
+                    <ChevronLeft className="h-5 w-5 text-gray-600" />
+                  </button>
+                  <button
+                    onClick={goToToday}
+                    className="px-3 py-1 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                    title="Ir para hoje"
+                  >
+                    Hoje
+                  </button>
+                  <button
+                    onClick={() => navigateMonth('next')}
+                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    title="Próximo mês"
+                  >
+                    <ChevronRight className="h-5 w-5 text-gray-600" />
+                  </button>
+                </div>
+              </div>
               <motion.button
                 className="relative flex items-center gap-3 rounded-lg border border-gray-300 px-1.5 py-1 text-gray-600"
                 onClick={() => setMoreView(!moreView)}
@@ -182,7 +348,12 @@ const InteractiveCalendarAgenda = React.forwardRef<
                 </div>
               ))}
             </div>
-            <CalendarGrid onHover={handleDayHover} onDayClick={handleDayClick} />
+            <CalendarGrid 
+              onHover={handleDayHover} 
+              onDayClick={handleDayClick}
+              currentMonth={currentMonth}
+              currentYear={currentYear}
+            />
           </motion.div>
         </motion.div>
 
@@ -283,73 +454,9 @@ const InteractiveCalendarAgenda = React.forwardRef<
                 className="flex h-[620px] flex-col items-start justify-start overflow-hidden overflow-y-scroll rounded-xl border-2 border-gray-300 bg-white shadow-md"
                 layout
               >
-                <AnimatePresence>
-                  {sortedDays
-                    .filter((day) => day.meetingInfo)
-                    .map((day) => (
-                      <motion.div
-                        key={day.day}
-                        className={`w-full border-b-2 border-gray-200 py-0 last:border-b-0`}
-                        layout
-                      >
-                        {day.meetingInfo &&
-                          day.meetingInfo.map((meeting, mIndex) => (
-                            <motion.div
-                              key={mIndex}
-                              className="border-b border-gray-200 p-4 last:border-b-0"
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -10 }}
-                              transition={{
-                                duration: 0.2,
-                                delay: mIndex * 0.05,
-                              }}
-                            >
-                              <div className="mb-2 flex items-center justify-between">
-                                <span className="text-sm text-gray-800">
-                                  {meeting.date}
-                                </span>
-                                <span className="text-sm text-gray-800">
-                                  {meeting.time}
-                                </span>
-                              </div>
-                              
-                              <h3 className="mb-2 text-lg font-semibold text-gray-900">
-                                {meeting.title}
-                              </h3>
-                              
-                              {meeting.clientName && (
-                                <p className="mb-1 text-sm text-gray-700 font-medium">
-                                  Cliente: {meeting.clientName}
-                                </p>
-                              )}
-                              
-                              {meeting.address && (
-                                <p className="mb-2 text-sm text-gray-600">
-                                  Endereço: {meeting.address}
-                                </p>
-                              )}
-                              
-                              <div className="flex items-center justify-between mt-3">
-                                {meeting.value && (
-                                  <div className="text-green-600 font-semibold">
-                                    R$ {meeting.value.toFixed(2).replace('.', ',')}
-                                  </div>
-                                )}
-                                
-                                <button
-                                  onClick={() => handleChatWithClient(meeting.clientId, meeting.clientName)}
-                                  className="flex items-center gap-2 px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors duration-200"
-                                >
-                                  <MessageCircle className="h-4 w-4" />
-                                  Conversar
-                                </button>
-                              </div>
-                            </motion.div>
-                          ))}
-                      </motion.div>
-                    ))}
-                </AnimatePresence>
+                <div className="w-full p-4 text-center text-gray-500">
+                  Lista completa de agendamentos para {getMonthName(currentMonth)} {currentYear}
+                </div>
               </motion.div>
             </motion.div>
           </motion.div>
@@ -359,287 +466,6 @@ const InteractiveCalendarAgenda = React.forwardRef<
   );
 });
 InteractiveCalendarAgenda.displayName = 'InteractiveCalendarAgenda';
-
-const DAYS: DayType[] = [
-  { day: '-3', classNames: 'bg-gray-100' },
-  { day: '-2', classNames: 'bg-gray-100' },
-  { day: '-1', classNames: 'bg-gray-100' },
-  { day: '01', classNames: 'bg-white border border-gray-200' },
-  {
-    day: '02',
-    classNames: 'bg-white border border-gray-200 cursor-pointer',
-    meetingInfo: [
-      {
-        date: 'Qua, 2 Nov',
-        time: '10:00 - 11:00',
-        title: 'Instalação Elétrica Residencial',
-        participants: ['João Silva', 'Maria Santos'],
-        location: 'Rua das Flores, 123',
-        clientName: 'João Silva',
-        address: 'Rua das Flores, 123 - Centro',
-        value: 250.00,
-        clientId: 'client-001'
-      },
-      {
-        date: 'Qua, 2 Nov',
-        time: '13:00 - 14:00',
-        title: 'Manutenção de Ar Condicionado',
-        participants: ['Carlos Oliveira', 'Ana Costa'],
-        location: 'Av. Paulista, 456',
-        clientName: 'Ana Costa',
-        address: 'Av. Paulista, 456 - Bela Vista',
-        value: 180.00,
-        clientId: 'client-002'
-      },
-    ],
-  },
-  { day: '03', classNames: 'bg-white border border-gray-200' },
-  {
-    day: '04',
-    classNames: 'bg-gray-100',
-  },
-  { day: '05', classNames: 'bg-gray-100' },
-  {
-    day: '06',
-    classNames: 'bg-white border border-gray-200 cursor-pointer',
-    meetingInfo: [
-      {
-        date: 'Seg, 6 Nov',
-        time: '10:00 - 11:00',
-        title: 'Limpeza Pós-Obra',
-        participants: ['Sara Pereira', 'Kamal Nunes'],
-        location: 'Rua Augusta, 789',
-        clientName: 'Sara Pereira',
-        address: 'Rua Augusta, 789 - Vila Madalena',
-        value: 320.00,
-        clientId: 'client-003'
-      },
-    ],
-  },
-  { day: '07', classNames: 'bg-white border border-gray-200' },
-  {
-    day: '08',
-    classNames: 'bg-white border border-gray-200 cursor-pointer',
-    meetingInfo: [
-      {
-        date: 'Qua, 8 Nov',
-        time: '14:00 - 15:00',
-        title: 'Pintura Residencial',
-        participants: ['Roberto Verde', 'David Lima'],
-        location: 'Rua dos Jardins, 321',
-        clientName: 'Roberto Verde',
-        address: 'Rua dos Jardins, 321 - Jardins',
-        value: 450.00,
-        clientId: 'client-004'
-      },
-      {
-        date: 'Qua, 8 Nov',
-        time: '16:00 - 17:00',
-        title: 'Consultoria Financeira',
-        participants: ['Jessica Branca', 'Tom Henrique'],
-        location: 'Centro Empresarial',
-        clientName: 'Jessica Branca',
-        address: 'Centro Empresarial - Itaim Bibi',
-        value: 200.00,
-        clientId: 'client-005'
-      },
-      {
-        date: 'Qua, 8 Nov',
-        time: '17:30 - 18:30',
-        title: 'Reparo Hidráulico',
-        participants: ['Bob Silva', 'Emma Pedra'],
-        location: 'Presencial',
-        clientName: 'Bob Silva',
-        address: 'Rua das Palmeiras, 89 - Moema',
-        value: 150.00,
-        clientId: 'client-006'
-      },
-    ],
-  },
-  { day: '09', classNames: 'bg-white border border-gray-200' },
-  {
-    day: '10',
-    classNames: 'bg-white border border-gray-200',
-  },
-  { day: '11', classNames: 'bg-gray-100' },
-  {
-    day: '12',
-    classNames: 'bg-gray-100',
-  },
-  { day: '13', classNames: 'bg-white border border-gray-200' },
-  { day: '14', classNames: 'bg-white border border-gray-200' },
-  {
-    day: '15',
-    classNames: 'bg-white border border-gray-200 cursor-pointer',
-    meetingInfo: [
-      {
-        date: 'Qua, 15 Nov',
-        time: '09:00 - 10:00',
-        title: 'Avaliação de Imóvel',
-        participants: ['Sarah Pereira', 'Kamal Nunes'],
-        location: 'Presencial no Escritório',
-        clientName: 'Sarah Pereira',
-        address: 'Rua dos Três Irmãos, 456 - Vila Progredior',
-        value: 300.00,
-        clientId: 'client-007'
-      },
-    ],
-  },
-  { day: '16', classNames: 'bg-white border border-gray-200' },
-  {
-    day: '17',
-    classNames: 'bg-white border border-gray-200 cursor-pointer',
-    meetingInfo: [
-      {
-        date: 'Sex, 17 Nov',
-        time: '09:00 - 10:00',
-        title: 'Jardinagem e Paisagismo',
-        participants: ['David Lima', 'Sofia Jovem'],
-        location: 'Condomínio Verde',
-        clientName: 'David Lima',
-        address: 'Condomínio Verde - Alphaville',
-        value: 380.00,
-        clientId: 'client-008'
-      },
-      {
-        date: 'Sex, 17 Nov',
-        time: '11:00 - 12:00',
-        title: 'Consultoria Imobiliária',
-        participants: ['Sara Pereira', 'Kamal Nunes'],
-        location: 'Presencial',
-        clientName: 'Sara Pereira',
-        address: 'Av. Faria Lima, 1200 - Itaim',
-        value: 280.00,
-        clientId: 'client-009'
-      },
-      {
-        date: 'Sex, 17 Nov',
-        time: '14:00 - 15:00',
-        title: 'Demonstração de Sistema',
-        participants: ['Bob Silva', 'Emma Pedra'],
-        location: 'Online',
-        clientName: 'Bob Silva',
-        address: 'Online (Remoto)',
-        value: 120.00,
-        clientId: 'client-010'
-      },
-      {
-        date: 'Sex, 17 Nov',
-        time: '16:00 - 17:00',
-        title: 'Feedback do Cliente',
-        participants: ['Marcos Lima', 'Alice João'],
-        location: 'Videochamada',
-        clientName: 'Marcos Lima',
-        address: 'Videochamada (Remoto)',
-        value: 80.00,
-        clientId: 'client-011'
-      },
-    ],
-  },
-  { day: '18', classNames: 'bg-gray-100' },
-  {
-    day: '19',
-    classNames: 'bg-gray-100',
-  },
-  { day: '20', classNames: 'bg-white border border-gray-200' },
-  {
-    day: '21',
-    classNames: 'bg-white border border-gray-200 cursor-pointer',
-    meetingInfo: [
-      {
-        date: 'Ter, 21 Nov',
-        time: '11:00 - 12:00',
-        title: 'Lançamento de Produto',
-        participants: ['Alice João', 'Marcos Lima'],
-        location: 'Online',
-        clientName: 'Alice João',
-        address: 'Online (Remoto)',
-        value: 150.00,
-        clientId: 'client-012'
-      },
-      {
-        date: 'Ter, 21 Nov',
-        time: '13:00 - 14:00',
-        title: 'Feedback do Cliente',
-        participants: ['Sara Pereira', 'Kamal Nunes'],
-        location: 'Videochamada',
-        clientName: 'Sara Pereira',
-        address: 'Videochamada (Remoto)',
-        value: 90.00,
-        clientId: 'client-013'
-      },
-      {
-        date: 'Ter, 21 Nov',
-        time: '15:00 - 16:00',
-        title: 'Design de Interiores',
-        participants: ['David Lima', 'Sofia Jovem'],
-        location: 'Presencial',
-        clientName: 'David Lima',
-        address: 'Rua Oscar Freire, 789 - Jardins',
-        value: 420.00,
-        clientId: 'client-014'
-      },
-      {
-        date: 'Ter, 21 Nov',
-        time: '17:00 - 18:00',
-        title: 'Celebração da Equipe',
-        participants: ['Bob Silva', 'Jessica Branca'],
-        location: 'Terraço do Escritório',
-        clientName: 'Bob Silva',
-        address: 'Terraço do Escritório - Vila Olímpia',
-        value: 200.00,
-        clientId: 'client-015'
-      },
-      {
-        date: 'Ter, 21 Nov',
-        time: '19:00 - 20:00',
-        title: 'Happy Hour',
-        participants: ['Tom Henrique', 'Emma Pedra'],
-        location: 'Bar Local',
-        clientName: 'Tom Henrique',
-        address: 'Bar Local - Vila Madalena',
-        value: 100.00,
-        clientId: 'client-016'
-      },
-    ],
-  },
-  { day: '22', classNames: 'bg-white border border-gray-200' },
-  { day: '23', classNames: 'bg-white border border-gray-200' },
-  {
-    day: '24',
-    classNames: 'bg-white border border-gray-200',
-  },
-  { day: '25', classNames: 'bg-gray-100' },
-  { day: '26', classNames: 'bg-gray-100' },
-  {
-    day: '27',
-    classNames: 'bg-white border border-gray-200',
-  },
-  { day: '28', classNames: 'bg-white border border-gray-200' },
-  {
-    day: '29',
-    classNames: 'bg-white border border-gray-200',
-  },
-  {
-    day: '30',
-    classNames: 'bg-white border border-gray-200 cursor-pointer',
-    meetingInfo: [
-      {
-        date: 'Qui, 30 Nov',
-        time: '11:00 - 12:00',
-        title: 'Sessão de Brainstorming',
-        participants: ['David Lima', 'Sofia Jovem'],
-        location: 'Online',
-        clientName: 'David Lima',
-        address: 'Online (Remoto)',
-        value: 180.00,
-        clientId: 'client-017'
-      },
-    ],
-  },
-  { day: '+1', classNames: 'bg-gray-100' },
-  { day: '+2', classNames: 'bg-gray-100' },
-];
 
 const daysOfWeek = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
 
