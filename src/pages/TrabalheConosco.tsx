@@ -118,7 +118,7 @@ const TrabalheConosco = () => {
       </section>
 
       {/* Serviços Disponíveis */}
-      <section className="py-16 px-4 bg-white">
+      <section className="px-4 bg-white py-[15px]">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12">Muitos Serviços Disponíveis</h2>
           
@@ -138,7 +138,7 @@ const TrabalheConosco = () => {
             Junte-se a centenas de prestadores que já confiam no Zurbo para fazer seus negócios crescerem.
           </p>
           
-          <Button size="lg" onClick={() => navigate('/auth')} className="bg-white text-orange-600 hover:bg-gray-50 text-lg px-8 py-6">
+          <Button size="lg" onClick={() => navigate('/auth')} className="bg-white text-orange-600 hover:bg-gray-50 py-[10px] text-left text-sm px-[11px]">
             <Wrench className="mr-2 h-5 w-5" />
             Cadastrar-se agora como Prestador
             <ArrowRight className="ml-2 h-5 w-5" />
