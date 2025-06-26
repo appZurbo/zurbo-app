@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -14,7 +15,7 @@ import HeroDemo from '@/components/ui/hero-demo';
 import { HeroSection } from '@/components/sections/HeroSection';
 import ServiceCategories from '@/components/ServiceCategories';
 import { ModernFilters } from '@/components/filters/ModernFilters';
-import { PrestadorCardImproved } from '@/components/prestadores/PrestadorCard';
+import { PrestadorCardImproved } from '@/components/prestadores/PrestadorCardImproved';
 import { PrestadorProfileModal } from '@/components/prestadores/PrestadorProfileModal';
 import { ContactModal } from '@/components/contact/ContactModal';
 import { Card, CardContent } from '@/components/ui/card';
