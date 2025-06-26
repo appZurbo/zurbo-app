@@ -90,10 +90,7 @@ function Hero() {
               </span>
             </h1>
 
-            <p className="text-lg md:text-xl leading-relaxed tracking-tight text-muted-foreground max-w-2xl text-center">
-              Conecte-se com prestadores de serviços qualificados na sua região. 
-              Rápido, seguro e com avaliações reais.
-            </p>
+            <p className="text-lg md:text-xl leading-relaxed tracking-tight text-muted-foreground max-w-2xl text-center">Conecte-se com prestadores de serviços qualificados na sua região. Rápido, seguro e de confiança.</p>
           </div>
           <div className="flex flex-col gap-3 items-center">
             <Button size="lg" className="gap-4" variant="outline" onClick={handleContrateServicos}>
