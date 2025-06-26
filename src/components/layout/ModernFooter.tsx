@@ -1,9 +1,6 @@
-
 import { Link } from 'react-router-dom';
-
 export const ModernFooter = () => {
-  return (
-    <footer className="bg-gray-900 text-white py-12 px-4">
+  return <footer className="bg-gray-900 text-white py-12 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Section */}
@@ -73,11 +70,8 @@ export const ModernFooter = () => {
           <p className="text-gray-400 text-sm">
             © 2024 Zurbo. Todos os direitos reservados.
           </p>
-          <p className="text-gray-400 text-sm mt-2 md:mt-0">
-            Desenvolvido com ❤️ para Sinop, MT
-          </p>
+          
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
