@@ -94,7 +94,6 @@ export const ModernHeader = () => {
                         </p>
                         <Badge 
                           variant="secondary" 
-                          size="sm"
                           className={`text-xs w-fit ${getUserTypeColor(profile?.tipo || 'cliente')} flex items-center gap-1`}
                         >
                           {getUserTypeIcon(profile?.tipo || 'cliente')}

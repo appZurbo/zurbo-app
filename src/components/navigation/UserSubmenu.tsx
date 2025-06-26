@@ -66,7 +66,6 @@ export const UserSubmenu = () => {
             </div>
             <Badge 
               variant="secondary" 
-              size="sm"
               className={`text-xs ${getUserTypeColor(profile.tipo)} flex items-center gap-1`}
             >
               {getUserTypeIcon(profile.tipo)}

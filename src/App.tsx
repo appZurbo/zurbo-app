@@ -11,7 +11,7 @@ import PrestadoresPage from './pages/PrestadoresPage';
 import PrestadorDashboard from './pages/PrestadorDashboard';
 import AgendaPrestador from './pages/AgendaPrestador';
 import TrabalheConosco from './pages/TrabalheConosco';
-import AdminDashboard from './pages/AdminDashboard';
+import { AdminDashboard } from './pages/AdminDashboard';
 import AdminContentModeration from './pages/AdminContentModeration';
 import SystemSettings from './pages/SystemSettings';
 import FavoritosPage from './pages/FavoritosPage';
