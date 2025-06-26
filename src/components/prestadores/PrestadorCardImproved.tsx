@@ -180,10 +180,10 @@ export const PrestadorCardImproved: React.FC<PrestadorCardImprovedProps> = ({
               variant="outline" 
               size="sm" 
               className="flex-1"
-              onClick={() => window.open(`tel:${prestador.telefone}`, '_self')}
+              onClick={() => onContact(prestador)}
             >
               <Phone className="h-4 w-4 mr-1" />
-              Ligar
+              Ver Perfil
             </Button>
             <Button 
               size="sm" 
