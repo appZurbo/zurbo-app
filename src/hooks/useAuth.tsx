@@ -146,6 +146,20 @@ export const useAuth = () => {
     }
   };
 
+  // Enhanced admin check - include specific admin emails
+  const isAdminUser = () => {
+    if (!user || !profile) return false;
+    
+    // Check if user has admin type in profile
+    if (profile.tipo === 'admin' || profile.tipo === 'moderator') {
+      return true;
+    }
+    
+    // Check specific admin emails
+    const adminEmails = ['contato@zurbo.com.br', 'admin@zurbo.com.br'];
+    return adminEmails.includes(user.email || '');
+  };
+
   return {
     user,
     profile,
@@ -154,7 +168,7 @@ export const useAuth = () => {
     isAuthenticated: !!user,
     isPrestador: profile?.tipo === 'prestador',
     isCliente: profile?.tipo === 'cliente',
-    isAdmin: profile?.tipo === 'admin' || profile?.tipo === 'moderator',
+    isAdmin: isAdminUser(),
     logout,
     updateLocalProfile,
     refreshProfile

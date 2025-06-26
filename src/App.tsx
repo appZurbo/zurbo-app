@@ -15,6 +15,7 @@ import { AdminDashboard } from './pages/AdminDashboard';
 import AdminContentModeration from './pages/AdminContentModeration';
 import SystemSettings from './pages/SystemSettings';
 import FavoritosPage from './pages/FavoritosPage';
+import NotificacoesPage from './pages/NotificacoesPage';
 import { MobileLayoutImproved } from './components/mobile/MobileLayoutImproved';
 import Pedidos from './pages/Pedidos';
 import Planos from './pages/Planos';
@@ -38,6 +39,7 @@ function App() {
             <Route path="/pedidos" element={<Pedidos />} />
             <Route path="/planos" element={<Planos />} />
             <Route path="/favoritos" element={<FavoritosPage />} />
+            <Route path="/notificacoes" element={<NotificacoesPage />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/moderacao" element={<AdminContentModeration />} />
             <Route path="/admin/sistema" element={<SystemSettings />} />
