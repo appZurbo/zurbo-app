@@ -10,9 +10,9 @@ import Settings from './pages/Settings';
 import PrestadoresPage from './pages/PrestadoresPage';
 import PrestadorDashboard from './pages/PrestadorDashboard';
 import AgendaPrestador from './pages/AgendaPrestador';
-import { MobileLayout } from './components/mobile/MobileLayout';
+import TrabalheConosco from './pages/TrabalheConosco';
+import { MobileLayoutImproved } from './components/mobile/MobileLayoutImproved';
 import Pedidos from './pages/Pedidos';
-import PlanoPremium from './pages/PlanoPremium';
 import Planos from './pages/Planos';
 
 const queryClient = new QueryClient();
@@ -22,7 +22,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Toaster />
-        <MobileLayout>
+        <MobileLayoutImproved>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<AuthPage />} />
@@ -30,11 +30,11 @@ function App() {
             <Route path="/prestadores" element={<PrestadoresPage />} />
             <Route path="/prestador-dashboard" element={<PrestadorDashboard />} />
             <Route path="/agenda-prestador" element={<AgendaPrestador />} />
+            <Route path="/trabalhe-conosco" element={<TrabalheConosco />} />
             <Route path="/pedidos" element={<Pedidos />} />
-            <Route path="/plano-premium" element={<PlanoPremium />} />
             <Route path="/planos" element={<Planos />} />
           </Routes>
-        </MobileLayout>
+        </MobileLayoutImproved>
       </BrowserRouter>
     </QueryClientProvider>
   );
