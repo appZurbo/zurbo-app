@@ -16,7 +16,7 @@ export const UserSettings = () => {
           <CardTitle className={`${isMobile ? 'text-lg' : ''}`}>      Configurações da Conta</CardTitle>
         </CardHeader>
         <CardContent className={`${isMobile ? 'px-0 py-0' : ''}`}>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="px-[5px]">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="px-[10px]">
             <TabsList className={`grid grid-cols-4 w-full ${isMobile ? 'h-12 mb-6' : ''}`}>
               <TabsTrigger value="profile" className={`flex items-center gap-1 ${isMobile ? 'text-xs px-2' : 'gap-2'}`}>
                 <User className="h-4 w-4" />
