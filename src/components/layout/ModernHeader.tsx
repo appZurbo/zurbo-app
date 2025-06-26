@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/useAuth';
@@ -17,6 +18,32 @@ export const ModernHeader = () => {
   const handleLogout = async () => {
     await logout();
     navigate('/');
+  };
+
+  const getUserTypeColor = (tipo: string) => {
+    switch (tipo) {
+      case 'admin':
+        return 'bg-red-100 text-red-800';
+      case 'prestador':
+        return 'bg-orange-100 text-orange-800';
+      case 'cliente':
+        return 'bg-blue-100 text-blue-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getUserTypeIcon = (tipo: string) => {
+    switch (tipo) {
+      case 'admin':
+        return <Shield className="h-3 w-3" />;
+      case 'prestador':
+        return <Wrench className="h-3 w-3" />;
+      case 'cliente':
+        return <User className="h-3 w-3" />;
+      default:
+        return <User className="h-3 w-3" />;
+    }
   };
 
   return (
@@ -65,24 +92,46 @@ export const ModernHeader = () => {
                         <p className="w-[200px] truncate text-sm text-muted-foreground">
                           {user?.email}
                         </p>
+                        <Badge 
+                          variant="secondary" 
+                          size="sm"
+                          className={`text-xs w-fit ${getUserTypeColor(profile?.tipo || 'cliente')} flex items-center gap-1`}
+                        >
+                          {getUserTypeIcon(profile?.tipo || 'cliente')}
+                          {profile?.tipo === 'admin' ? 'Administrador' : 
+                           profile?.tipo === 'prestador' ? 'Prestador' : 'Cliente'}
+                        </Badge>
                       </div>
                     </div>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate('/perfil')}>
-                      <User className="mr-2 h-4 w-4" />
-                      Perfil
-                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
-                      <Settings className="mr-2 h-4 w-4" />
-                      Configurações
+                      <User className="mr-2 h-4 w-4" />
+                      {isPrestador ? 'Configurações do Prestador' : 'Perfil'}
                     </DropdownMenuItem>
+                    
                     {isPrestador && (
-                      <DropdownMenuItem onClick={() => navigate('/prestador/configuracoes')}>
-                        <Wrench className="mr-2 h-4 w-4" />
-                        Configurações de Prestador
-                      </DropdownMenuItem>
+                      <>
+                        <DropdownMenuItem onClick={() => navigate('/prestador-dashboard')}>
+                          <Settings className="mr-2 h-4 w-4" />
+                          Painel do Prestador
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/agenda-prestador')}>
+                          <Settings className="mr-2 h-4 w-4" />
+                          Minha Agenda
+                        </DropdownMenuItem>
+                      </>
                     )}
-                    {(isAdmin) && (
+                    
+                    {!isPrestador && !isAdmin && (
+                      <>
+                        <DropdownMenuItem onClick={() => navigate('/pedidos')}>
+                          <Settings className="mr-2 h-4 w-4" />
+                          Meus Agendamentos
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    
+                    {isAdmin && (
                       <>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => navigate('/admin')}>

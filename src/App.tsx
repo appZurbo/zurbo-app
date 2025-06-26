@@ -11,6 +11,10 @@ import PrestadoresPage from './pages/PrestadoresPage';
 import PrestadorDashboard from './pages/PrestadorDashboard';
 import AgendaPrestador from './pages/AgendaPrestador';
 import TrabalheConosco from './pages/TrabalheConosco';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminContentModeration from './pages/AdminContentModeration';
+import SystemSettings from './pages/SystemSettings';
+import FavoritosPage from './pages/FavoritosPage';
 import { MobileLayoutImproved } from './components/mobile/MobileLayoutImproved';
 import Pedidos from './pages/Pedidos';
 import Planos from './pages/Planos';
@@ -33,6 +37,10 @@ function App() {
             <Route path="/trabalhe-conosco" element={<TrabalheConosco />} />
             <Route path="/pedidos" element={<Pedidos />} />
             <Route path="/planos" element={<Planos />} />
+            <Route path="/favoritos" element={<FavoritosPage />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/moderacao" element={<AdminContentModeration />} />
+            <Route path="/admin/sistema" element={<SystemSettings />} />
           </Routes>
         </MobileLayoutImproved>
       </BrowserRouter>
