@@ -23,13 +23,13 @@ export const ModernHeader = () => {
   const getUserTypeColor = (tipo: string) => {
     switch (tipo) {
       case 'admin':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800 border-red-200';
       case 'prestador':
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-orange-100 text-orange-800 border-orange-200';
       case 'cliente':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-blue-800 border-blue-200';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
@@ -43,6 +43,19 @@ export const ModernHeader = () => {
         return <User className="h-3 w-3" />;
       default:
         return <User className="h-3 w-3" />;
+    }
+  };
+
+  const getUserTypeLabel = (tipo: string) => {
+    switch (tipo) {
+      case 'admin':
+        return 'Administrador';
+      case 'prestador':
+        return 'Prestador';
+      case 'cliente':
+        return 'Cliente';
+      default:
+        return 'Cliente';
     }
   };
 
@@ -97,8 +110,7 @@ export const ModernHeader = () => {
                           className={`text-xs w-fit ${getUserTypeColor(profile?.tipo || 'cliente')} flex items-center gap-1`}
                         >
                           {getUserTypeIcon(profile?.tipo || 'cliente')}
-                          {profile?.tipo === 'admin' ? 'Administrador' : 
-                           profile?.tipo === 'prestador' ? 'Prestador' : 'Cliente'}
+                          {getUserTypeLabel(profile?.tipo || 'cliente')}
                         </Badge>
                       </div>
                     </div>

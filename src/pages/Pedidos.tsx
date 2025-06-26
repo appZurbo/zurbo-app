@@ -63,7 +63,7 @@ const Pedidos = () => {
             </h1>
             <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
               {profile.tipo === 'prestador' 
-                ? 'Geренcie os pedidos recebidos de clientes'
+                ? 'Gerencie os pedidos recebidos de clientes'
                 : 'Acompanhe seus agendamentos de serviços'
               }
             </p>

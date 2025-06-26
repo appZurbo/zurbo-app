@@ -14,7 +14,7 @@ import HeroDemo from '@/components/ui/hero-demo';
 import { HeroSection } from '@/components/sections/HeroSection';
 import ServiceCategories from '@/components/ServiceCategories';
 import { ModernFilters } from '@/components/filters/ModernFilters';
-import { PrestadorCard } from '@/components/prestadores/PrestadorCard';
+import { PrestadorCardImproved } from '@/components/prestadores/PrestadorCard';
 import { PrestadorProfileModal } from '@/components/prestadores/PrestadorProfileModal';
 import { ContactModal } from '@/components/contact/ContactModal';
 import { Card, CardContent } from '@/components/ui/card';
@@ -216,12 +216,10 @@ const Index = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {prestadores.map(prestador => (
-                <PrestadorCard
+                <PrestadorCardImproved
                   key={prestador.id}
                   prestador={prestador}
-                  onViewProfile={handleViewProfile}
                   onContact={handleContact}
-                  onCardClick={handleCardClick}
                 />
               ))}
             </div>

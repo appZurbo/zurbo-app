@@ -18,7 +18,8 @@ import {
   BarChart3,
   ChevronDown,
   Shield,
-  Wrench
+  Wrench,
+  Heart
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -32,13 +33,13 @@ export const UserSubmenu = () => {
   const getUserTypeColor = (tipo: string) => {
     switch (tipo) {
       case 'admin':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800 border-red-200';
       case 'prestador':
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-orange-100 text-orange-800 border-orange-200';
       case 'cliente':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-blue-800 border-blue-200';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
@@ -52,6 +53,19 @@ export const UserSubmenu = () => {
         return <User className="h-3 w-3" />;
       default:
         return <User className="h-3 w-3" />;
+    }
+  };
+
+  const getUserTypeLabel = (tipo: string) => {
+    switch (tipo) {
+      case 'admin':
+        return 'Administrador';
+      case 'prestador':
+        return 'Prestador';
+      case 'cliente':
+        return 'Cliente';
+      default:
+        return 'Cliente';
     }
   };
 
@@ -69,8 +83,7 @@ export const UserSubmenu = () => {
               className={`text-xs ${getUserTypeColor(profile.tipo)} flex items-center gap-1`}
             >
               {getUserTypeIcon(profile.tipo)}
-              {profile.tipo === 'admin' ? 'Administrador' : 
-               profile.tipo === 'prestador' ? 'Prestador' : 'Cliente'}
+              {getUserTypeLabel(profile.tipo)}
             </Badge>
           </div>
           <ChevronDown className="h-3 w-3" />
@@ -104,7 +117,7 @@ export const UserSubmenu = () => {
             </DropdownMenuItem>
             
             <DropdownMenuItem onClick={() => navigate('/favoritos')}>
-              <User className="h-4 w-4 mr-2" />
+              <Heart className="h-4 w-4 mr-2" />
               Prestadores Favoritos
             </DropdownMenuItem>
           </>
