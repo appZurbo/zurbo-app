@@ -1,13 +1,16 @@
 
 import { useState, useEffect } from 'react';
-import { ModernHeader } from '@/components/layout/ModernHeader';
+import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import HeroDemo from '@/components/ui/hero-demo';
 import ServiceCategories from '@/components/ServiceCategories';
 import { ModernFilters } from '@/components/filters/ModernFilters';
 import { PrestadorCardImproved } from '@/components/prestadores/PrestadorCardImproved';
 import { PrestadorProfileModal } from '@/components/prestadores/PrestadorProfileModal';
 import { ContactModal } from '@/components/contact/ContactModal';
+import { EmergencyButton } from '@/components/emergency/EmergencyButton';
 import { Card, CardContent } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { getPrestadores } from '@/utils/database/prestadores';
 import { UserProfile } from '@/utils/database/types';
@@ -22,6 +25,7 @@ const Index = () => {
   const [selectedPrestador, setSelectedPrestador] = useState<UserProfile | null>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [filters, setFilters] = useState({
     cidade: '',
     servico: '',
@@ -30,16 +34,24 @@ const Index = () => {
     notaMin: undefined as number | undefined
   });
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     loadPrestadores();
-  }, [filters]);
+  }, [filters, showFavoritesOnly]);
 
   const loadPrestadores = async () => {
     setLoading(true);
     try {
       const data = await getPrestadores(filters);
-      setPrestadores(data);
+      
+      if (showFavoritesOnly && isAuthenticated) {
+        const favorites = JSON.parse(localStorage.getItem('user_favorites') || '[]');
+        const filteredData = data.filter(prestador => favorites.includes(prestador.id));
+        setPrestadores(filteredData);
+      } else {
+        setPrestadores(data);
+      }
     } catch (error) {
       console.error('Error loading prestadores:', error);
       toast({
@@ -70,10 +82,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white">
-      {/* Use ModernHeader instead of custom header */}
-      <ModernHeader />
+      <UnifiedHeader />
 
-      {/* Hero Section */}
       <HeroDemo />
       
       <div className="max-w-7xl mx-auto px-[30px] py-[15px]">
@@ -82,6 +92,13 @@ const Index = () => {
         <div className="mt-12">
           <ModernFilters onFiltersChange={handleFiltersChange} servicos={[]} />
         </div>
+
+        {/* Emergency SOS Button for authenticated users */}
+        {isAuthenticated && (
+          <div className="mt-8">
+            <EmergencyButton />
+          </div>
+        )}
 
         <div className="mt-12">
           <div className="flex items-center justify-between mb-8">
@@ -93,6 +110,18 @@ const Index = () => {
                 Encontre o profissional ideal para suas necessidades
               </p>
             </div>
+
+            {/* Show Favorites Filter */}
+            {isAuthenticated && (
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="show-favorites"
+                  checked={showFavoritesOnly}
+                  onCheckedChange={setShowFavoritesOnly}
+                />
+                <Label htmlFor="show-favorites">Mostrar apenas favoritos</Label>
+              </div>
+            )}
           </div>
 
           {loading ? (
@@ -104,18 +133,29 @@ const Index = () => {
             <Card>
               <CardContent className="p-12 text-center">
                 <Users className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                <h3 className="text-xl font-semibold mb-2">Nenhum prestador encontrado</h3>
+                <h3 className="text-xl font-semibold mb-2">
+                  {showFavoritesOnly ? 'Nenhum favorito encontrado' : 'Nenhum prestador encontrado'}
+                </h3>
                 <p className="text-gray-600 mb-4">
-                  Não encontramos prestadores que correspondam aos seus filtros.
+                  {showFavoritesOnly 
+                    ? 'Você ainda não favoritou nenhum prestador.'
+                    : 'Não encontramos prestadores que correspondam aos seus filtros.'
+                  }
                 </p>
-                <Button onClick={() => setFilters({
-                  cidade: '',
-                  servico: '',
-                  precoMin: undefined,
-                  precoMax: undefined,
-                  notaMin: undefined
-                })}>
-                  Limpar Filtros
+                <Button onClick={() => {
+                  if (showFavoritesOnly) {
+                    setShowFavoritesOnly(false);
+                  } else {
+                    setFilters({
+                      cidade: '',
+                      servico: '',
+                      precoMin: undefined,
+                      precoMax: undefined,
+                      notaMin: undefined
+                    });
+                  }
+                }}>
+                  {showFavoritesOnly ? 'Ver Todos Prestadores' : 'Limpar Filtros'}
                 </Button>
               </CardContent>
             </Card>
@@ -133,7 +173,6 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Partners Section */}
       <PartnersSection />
 
       {/* Modals */}
