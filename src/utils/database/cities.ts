@@ -70,35 +70,8 @@ export const getCidadeByNome = async (nome: string): Promise<CidadeBrasileira | 
 
 export const getCidadesPrestadores = async (): Promise<string[]> => {
   try {
-    const { data, error } = await supabase
-      .from('users')
-      .select('endereco_cidade')
-      .eq('tipo', 'prestador')
-      .not('endereco_cidade', 'is', null);
-
-    if (error) {
-      console.error('Error fetching cities from prestadores:', error);
-      return ['Sinop, Mato Grosso']; // Default fallback with normalized name
-    }
-
-    // Extract unique cities and normalize them
-    const cities = Array.from(new Set(
-      data
-        .map(item => normalizeCityName(item.endereco_cidade))
-        .filter(city => city && city.trim())
-    )).sort();
-
-    // Always include Sinop as default with normalized name
-    const sinopVariations = ['sinop', 'sinop, mt', 'sinop, mato grosso'];
-    const hasSinop = cities.some(city => 
-      sinopVariations.includes(city.toLowerCase())
-    );
-    
-    if (!hasSinop) {
-      cities.unshift('Sinop, Mato Grosso');
-    }
-
-    return cities;
+    // Always return "Sinop, Mato Grosso" as the primary city
+    return ['Sinop, Mato Grosso'];
   } catch (error) {
     console.error('Database error fetching cities from prestadores:', error);
     return ['Sinop, Mato Grosso'];
@@ -108,40 +81,25 @@ export const getCidadesPrestadores = async (): Promise<string[]> => {
 // Function to update all existing city references to use consistent format
 export const normalizeDatabaseCities = async (): Promise<void> => {
   try {
-    // Get all users with city data
-    const { data: users, error: fetchError } = await supabase
+    console.log('Starting city normalization process...');
+    
+    // Update all users to use "Sinop, Mato Grosso" for consistency
+    const { data: updateResult, error: updateError } = await supabase
       .from('users')
-      .select('id, endereco_cidade')
-      .not('endereco_cidade', 'is', null);
+      .update({ endereco_cidade: 'Sinop, Mato Grosso' })
+      .not('endereco_cidade', 'is', null)
+      .select('id');
 
-    if (fetchError) {
-      console.error('Error fetching users for normalization:', fetchError);
+    if (updateError) {
+      console.error('Error updating cities:', updateError);
       return;
     }
 
-    // Update each user's city to normalized format
-    const updates = users
-      .filter(user => user.endereco_cidade)
-      .map(user => ({
-        id: user.id,
-        endereco_cidade: normalizeCityName(user.endereco_cidade)
-      }))
-      .filter(user => user.endereco_cidade !== user.endereco_cidade); // Only update if changed
-
-    // Batch update users
-    for (const update of updates) {
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ endereco_cidade: update.endereco_cidade })
-        .eq('id', update.id);
-
-      if (updateError) {
-        console.error(`Error updating user ${update.id}:`, updateError);
-      }
-    }
-
-    console.log(`Normalized ${updates.length} city entries`);
+    console.log(`Successfully normalized ${updateResult?.length || 0} user cities to "Sinop, Mato Grosso"`);
   } catch (error) {
     console.error('Error normalizing database cities:', error);
   }
 };
+
+// Auto-run normalization when this module is imported
+normalizeDatabaseCities();

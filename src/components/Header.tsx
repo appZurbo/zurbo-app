@@ -19,8 +19,8 @@ import {
   Menu,
   X,
   Crown,
-  BarChart3,
-  Calendar
+  Calendar,
+  Gauge
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
@@ -124,7 +124,7 @@ const Header = () => {
                       {isPrestador && (
                         <>
                           <DropdownMenuItem onClick={() => navigate('/prestador-dashboard')}>
-                            <BarChart3 className="mr-2 h-4 w-4" />
+                            <Gauge className="mr-2 h-4 w-4" />
                             Painel do Prestador
                           </DropdownMenuItem>
                           
@@ -166,18 +166,20 @@ const Header = () => {
               )}
             </div>
 
-            {/* Mobile/Tablet Actions - Updated to show Crown for all users */}
+            {/* Mobile/Tablet Actions */}
             <div className="flex lg:hidden items-center space-x-2">
               {user ? (
                 <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => navigate('/planos')}
-                    className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
-                  >
-                    <Crown className="h-5 w-5" />
-                  </Button>
+                  {!profile?.premium && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => navigate('/planos')}
+                      className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
+                    >
+                      <Crown className="h-5 w-5" />
+                    </Button>
+                  )}
                   <NotificationBell />
                 </>
               ) : (
