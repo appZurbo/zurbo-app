@@ -25,13 +25,9 @@ export const BecomeProviderButton = () => {
 
     setIsLoading(true);
     try {
-      // Call the migration function
+      // Call the migration function with proper parameter types
       const { error } = await supabase.rpc('migrate_client_to_provider', {
-        user_uuid: profile.id,
-        description: '',
-        service_categories: [],
-        service_area: [],
-        gallery: []
+        user_uuid: profile.id
       });
 
       if (error) {
