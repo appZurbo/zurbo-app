@@ -16,13 +16,11 @@ import {
   ArrowLeft,
   TrendingUp,
   Calendar,
-  Star,
-  Database
+  Star
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
-import { CreateTestData } from '@/components/admin/CreateTestData';
 
 export const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -154,35 +152,6 @@ export const AdminDashboard = () => {
           </Card>
         </div>
 
-        {/* Admin Tools Section */}
-        <div className="mb-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Database className="h-5 w-5 text-blue-500" />
-                Ferramentas de Desenvolvimento
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <CreateTestData />
-                <Card className="border-dashed border-2 border-gray-300">
-                  <CardContent className="p-4 text-center">
-                    <Database className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                    <h3 className="font-semibold mb-2">Console do Navegador</h3>
-                    <p className="text-sm text-gray-600 mb-3">
-                      Execute comandos diretamente no console do navegador:
-                    </p>
-                    <code className="text-xs bg-gray-100 p-2 rounded block">
-                      await createAllFakeData()
-                    </code>
-                  </CardContent>
-                </Card>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Action Cards */}
         <div className={`grid gap-4 mb-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`}>
           <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/admin/moderacao')}>
@@ -219,7 +188,7 @@ export const AdminDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/admin/relatorios')}>
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-green-500" />
@@ -231,7 +200,7 @@ export const AdminDashboard = () => {
                 Visualizar métricas detalhadas e relatórios de desempenho
               </p>
               <Badge variant="secondary" className="bg-green-100 text-green-800">
-                Disponível
+                Em breve
               </Badge>
             </CardContent>
           </Card>

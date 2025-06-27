@@ -1,91 +1,112 @@
-
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Star, Users, CheckCircle } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { MoveRight, Wrench } from "lucide-react";
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
-
-export default function HeroDemo() {
+const buttonVariants = cva("inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50", {
+  variants: {
+    variant: {
+      default: "bg-primary text-primary-foreground hover:bg-primary/90",
+      destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+      secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+      ghost: "hover:bg-accent hover:text-accent-foreground",
+      link: "text-primary underline-offset-4 hover:underline"
+    },
+    size: {
+      default: "h-10 px-4 py-2",
+      sm: "h-9 rounded-md px-3",
+      lg: "h-11 rounded-md px-8",
+      icon: "h-10 w-10"
+    }
+  },
+  defaultVariants: {
+    variant: "default",
+    size: "default"
+  }
+});
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
+}
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
+  className,
+  variant,
+  size,
+  asChild = false,
+  ...props
+}, ref) => {
+  const Comp = asChild ? Slot : "button";
+  return <Comp className={cn(buttonVariants({
+    variant,
+    size,
+    className
+  }))} ref={ref} {...props} />;
+});
+Button.displayName = "Button";
+function Hero() {
+  const [titleNumber, setTitleNumber] = useState(0);
   const navigate = useNavigate();
+  const titles = useMemo(() => ["eletricista", "encanador", "pintor", "jardineiro", "diarista"], []);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (titleNumber === titles.length - 1) {
+        setTitleNumber(0);
+      } else {
+        setTitleNumber(titleNumber + 1);
+      }
+    }, 2000);
+    return () => clearTimeout(timeoutId);
+  }, [titleNumber, titles]);
+  const handleContrateServicos = () => {
+    navigate('/prestadores');
+  };
+  return <div className="w-full">
+      <div className="container mx-auto">
+        <div className="flex gap-8 py-20 items-center justify-center flex-col lg:py-[79px]">
+          
+          <div className="flex gap-4 flex-col">
+            <h1 className="text-5xl md:text-7xl max-w-2xl tracking-tighter text-center font-regular">
+              <span className="text-gray-900">Tá precisando de</span>
+              <span className="relative flex w-full justify-center overflow-hidden text-center md:pb-4 md:pt-1">
+                &nbsp;
+                {titles.map((title, index) => <motion.span key={index} className="absolute font-semibold text-orange-500" initial={{
+                opacity: 0,
+                y: "-100"
+              }} transition={{
+                type: "spring",
+                stiffness: 50
+              }} animate={titleNumber === index ? {
+                y: 0,
+                opacity: 1
+              } : {
+                y: titleNumber > index ? -150 : 150,
+                opacity: 0
+              }}>
+                    {title}?
+                  </motion.span>)}
+              </span>
+            </h1>
 
-  return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-white to-orange-50 py-12 sm:py-16 lg:py-20">
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-50/30 to-orange-100/20 opacity-30"></div>
-      
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
-          {/* Badge */}
-          <div className="mb-6 inline-flex">
-            <Badge variant="secondary" className="bg-orange-100 text-orange-800 px-4 py-2 text-sm font-medium">
-              <Star className="mr-2 h-4 w-4" />
-              Mais de 1000 prestadores ativos
-            </Badge>
+            <p className="text-lg md:text-xl leading-relaxed tracking-tight text-muted-foreground max-w-2xl text-center">Conecte-se com prestadores de serviços qualificados na sua região. Rápido, prático e de confiança.</p>
           </div>
-
-          {/* Heading */}
-          <h1 className="mx-auto max-w-4xl text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
-            Encontre o{" "}
-            <span className="bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
-              profissional ideal
-            </span>{" "}
-            para suas necessidades
-          </h1>
-
-          {/* Subheading */}
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-600">
-            Conectamos você aos melhores prestadores de serviços da sua região. 
-            Eletricistas, encanadores, faxineiras e muito mais, todos verificados e avaliados.
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button 
-              size="lg" 
-              className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
-              onClick={() => navigate('/prestadores')}
-            >
-              Encontrar Prestadores
-              <ArrowRight className="ml-2 h-5 w-5" />
+          <div className="flex flex-col gap-3 items-center">
+            <Button size="lg" className="gap-4" variant="outline" onClick={handleContrateServicos}>
+              Contrate Serviços <Wrench className="w-4 h-4" />
             </Button>
-            
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="border-2 border-orange-500 text-orange-500 hover:bg-orange-50 px-8 py-3 text-lg font-semibold rounded-xl transition-all duration-200"
-              onClick={() => navigate('/trabalhe-conosco')}
-            >
-              Trabalhe Conosco
-              <Users className="ml-2 h-5 w-5" />
+            <Button size="lg" className="gap-4 bg-orange-500 hover:bg-orange-600">
+              Trabalhe conosco <MoveRight className="w-4 h-4" />
             </Button>
-          </div>
-
-          {/* Stats */}
-          <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-3 lg:gap-16">
-            <div className="flex flex-col items-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-100">
-                <Users className="h-6 w-6 text-orange-600" />
-              </div>
-              <dt className="mt-4 text-base font-medium text-gray-900">1000+ Prestadores</dt>
-              <dd className="mt-1 text-sm text-gray-600">Profissionais verificados</dd>
-            </div>
-            
-            <div className="flex flex-col items-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-100">
-                <Star className="h-6 w-6 text-orange-600" />
-              </div>
-              <dt className="mt-4 text-base font-medium text-gray-900">4.8/5 Estrelas</dt>
-              <dd className="mt-1 text-sm text-gray-600">Avaliação média</dd>
-            </div>
-            
-            <div className="flex flex-col items-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-100">
-                <CheckCircle className="h-6 w-6 text-orange-600" />
-              </div>
-              <dt className="mt-4 text-base font-medium text-gray-900">50k+ Serviços</dt>
-              <dd className="mt-1 text-sm text-gray-600">Realizados com sucesso</dd>
-            </div>
           </div>
         </div>
       </div>
-    </section>
-  );
+    </div>;
 }
+function HeroDemo() {
+  return <div className="flex text-center items-center justify-center">
+      <Hero />
+    </div>;
+}
+export default HeroDemo;

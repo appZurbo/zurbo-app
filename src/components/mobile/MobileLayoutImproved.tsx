@@ -1,15 +1,12 @@
-
 import { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Home, Search, Calendar, Crown, User } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
-
 interface MobileLayoutImprovedProps {
-  children?: ReactNode;
+  children: ReactNode;
 }
-
 export const MobileLayoutImproved = ({
   children
 }: MobileLayoutImprovedProps) => {
@@ -19,13 +16,10 @@ export const MobileLayoutImproved = ({
     profile
   } = useAuth();
   const isMobile = useMobile();
-
   if (!isMobile) {
     return <>{children}</>;
   }
-
   const isActive = (path: string) => location.pathname === path;
-
   const navigationItems = [{
     icon: Home,
     label: 'Início',
@@ -53,7 +47,6 @@ export const MobileLayoutImproved = ({
     path: '/configuracoes',
     isActive: isActive('/configuracoes') || isActive('/perfil')
   }];
-
   return <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white flex flex-col">
       {/* Header mobile */}
       
