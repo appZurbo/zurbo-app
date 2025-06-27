@@ -1,5 +1,5 @@
 
-import { Home, Search, MessageCircle, User, Calendar } from 'lucide-react';
+import { Home, Search, MessageCircle, User, Calendar, Crown } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
@@ -73,6 +73,17 @@ const MobileDock = () => {
             </Link>
           );
         })}
+        
+        {/* Premium Crown for mobile - only show for non-premium users */}
+        {isAuthenticated && !profile?.premium && (
+          <Link 
+            to="/planos" 
+            className="flex flex-col items-center justify-center p-2 rounded-lg transition-colors text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
+          >
+            <Crown className="h-5 w-5" />
+            <span className="text-xs mt-1">Premium</span>
+          </Link>
+        )}
       </div>
     </div>
   );
