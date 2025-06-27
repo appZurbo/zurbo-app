@@ -1,69 +1,33 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { Camera, Save, X } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Camera, Save, Mail, MapPin, Calendar } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { updateUserProfile } from '@/utils/database/users';
 import { useProfilePicture } from '@/hooks/useProfilePicture';
-import { useRef } from 'react';
+import { BecomeProviderButton } from '@/components/migration/BecomeProviderButton';
+import { supabase } from '@/integrations/supabase/client';
 
 export const ProfileTab = () => {
   const { profile, updateLocalProfile } = useAuth();
   const { toast } = useToast();
   const { uploadProfilePicture, uploading } = useProfilePicture();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [editing, setEditing] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
-    nome: '',
-    email: '',
-    cpf: '',
-    data_nascimento: '',
-    endereco_cidade: '',
-    endereco_rua: '',
-    endereco_numero: '',
-    endereco_bairro: '',
-    endereco_cep: '',
-    bio: ''
+    nome: profile?.nome || '',
+    endereco_cidade: profile?.endereco_cidade || '',
+    endereco_rua: profile?.endereco_rua || '',
+    endereco_numero: profile?.endereco_numero || '',
+    endereco_bairro: profile?.endereco_bairro || '',
+    endereco_cep: profile?.endereco_cep || '',
+    bio: profile?.bio || ''
   });
-
-  useEffect(() => {
-    if (profile) {
-      setFormData({
-        nome: profile.nome || '',
-        email: profile.email || '',
-        cpf: profile.cpf || generateFakeCPF(),
-        data_nascimento: profile.data_nascimento || '',
-        endereco_cidade: profile.endereco_cidade || '',
-        endereco_rua: profile.endereco_rua || '',
-        endereco_numero: profile.endereco_numero || '',
-        endereco_bairro: profile.endereco_bairro || '',
-        endereco_cep: profile.endereco_cep || '',
-        bio: profile.bio || ''
-      });
-    }
-  }, [profile]);
-
-  const generateFakeCPF = () => {
-    const randomNum = Math.floor(Math.random() * 900000000) + 100000000;
-    return `${randomNum.toString().slice(0, 3)}.${randomNum.toString().slice(3, 6)}.${randomNum.toString().slice(6, 9)}-${Math.floor(Math.random() * 90) + 10}`;
-  };
-
-  const formatCPF = (value: string) => {
-    const numbers = value.replace(/\D/g, '');
-    return numbers.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-  };
-
-  const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatCPF(e.target.value);
-    setFormData(prev => ({ ...prev, cpf: formatted }));
-  };
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -93,296 +57,215 @@ export const ProfileTab = () => {
   const handleSave = async () => {
     if (!profile) return;
 
-    if (!formData.nome.trim()) {
-      toast({
-        title: "Nome obrigatório",
-        description: "Por favor, preencha seu nome completo.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!formData.cpf.trim()) {
-      toast({
-        title: "CPF obrigatório",
-        description: "Por favor, preencha seu CPF.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setLoading(true);
+    setIsSaving(true);
     try {
-      const updatedProfile = await updateUserProfile(profile.id, {
-        nome: formData.nome.trim(),
-        cpf: formData.cpf.trim(),
-        data_nascimento: formData.data_nascimento,
-        endereco_cidade: formData.endereco_cidade.trim(),
-        endereco_rua: formData.endereco_rua.trim(),
-        endereco_numero: formData.endereco_numero.trim(),
-        endereco_bairro: formData.endereco_bairro.trim(),
-        endereco_cep: formData.endereco_cep.trim(),
-        bio: formData.bio.trim()
-      });
+      const { error } = await supabase
+        .from('users')
+        .update({
+          nome: formData.nome.trim(),
+          endereco_cidade: formData.endereco_cidade.trim(),
+          endereco_rua: formData.endereco_rua.trim(),
+          endereco_numero: formData.endereco_numero.trim(),
+          endereco_bairro: formData.endereco_bairro.trim(),
+          endereco_cep: formData.endereco_cep.trim(),
+          bio: formData.bio.trim(),
+        })
+        .eq('id', profile.id);
 
-      if (updatedProfile) {
-        updateLocalProfile(updatedProfile);
-        setEditing(false);
-        toast({
-          title: "Perfil atualizado!",
-          description: "Suas informações foram salvas com sucesso.",
-        });
-      } else {
-        throw new Error('Falha ao atualizar perfil');
-      }
-    } catch (error) {
-      console.error('Error updating profile:', error);
+      if (error) throw error;
+
+      updateLocalProfile(formData);
+      setIsEditing(false);
+      
       toast({
-        title: "Erro ao salvar",
-        description: "Não foi possível salvar as alterações.",
+        title: "Perfil atualizado!",
+        description: "Suas informações foram salvas com sucesso.",
+      });
+    } catch (error: any) {
+      console.error('Profile update error:', error);
+      toast({
+        title: "Erro ao atualizar perfil",
+        description: error.message,
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setIsSaving(false);
     }
   };
 
-  const handleCancel = () => {
-    if (profile) {
-      setFormData({
-        nome: profile.nome || '',
-        email: profile.email || '',
-        cpf: profile.cpf || generateFakeCPF(),
-        data_nascimento: profile.data_nascimento || '',
-        endereco_cidade: profile.endereco_cidade || '',
-        endereco_rua: profile.endereco_rua || '',
-        endereco_numero: profile.endereco_numero || '',
-        endereco_bairro: profile.endereco_bairro || '',
-        endereco_cep: profile.endereco_cep || '',
-        bio: profile.bio || ''
-      });
-    }
-    setEditing(false);
-  };
-
-  if (!profile) return null;
+  if (!profile) {
+    return <div className="text-center py-4">Carregando perfil...</div>;
+  }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Informações Pessoais</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Photo Section */}
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <Avatar className="w-20 h-20">
-              <AvatarImage src={profile.foto_url} alt={profile.nome} />
-              <AvatarFallback className="text-lg">
-                {profile.nome?.charAt(0)?.toUpperCase() || '?'}
-              </AvatarFallback>
-            </Avatar>
-            <Button
-              size="sm"
-              variant="outline"
-              className="absolute -bottom-2 -right-2 rounded-full p-2"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-            >
-              <Camera className="h-3 w-3" />
-            </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-          </div>
-          <div>
-            <h3 className="font-semibold">{profile.nome}</h3>
-            <p className="text-sm text-gray-600 capitalize">{profile.tipo}</p>
-            {uploading && (
-              <p className="text-xs text-orange-500 mt-1">Enviando foto...</p>
-            )}
-          </div>
+    <div className="space-y-6">
+      {/* Profile Picture Section */}
+      <div className="flex flex-col items-center space-y-4">
+        <div className="relative">
+          <Avatar className="w-24 h-24">
+            <AvatarImage src={profile.foto_url} alt={profile.nome} />
+            <AvatarFallback className="text-xl bg-orange-100 text-orange-600">
+              {profile.nome?.charAt(0)?.toUpperCase() || '?'}
+            </AvatarFallback>
+          </Avatar>
+          <Button
+            size="sm"
+            variant="outline"
+            className="absolute -bottom-2 -right-2 rounded-full p-2 bg-white shadow-md"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+          >
+            <Camera className="h-3 w-3" />
+          </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
         </div>
-
-        {/* Form Fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="nome">Nome Completo *</Label>
-            {editing ? (
-              <Input
-                id="nome"
-                value={formData.nome}
-                onChange={(e) => setFormData(prev => ({ ...prev, nome: e.target.value }))}
-                className="mt-1"
-                required
-              />
-            ) : (
-              <p className="mt-1 p-2 bg-gray-50 rounded">{profile.nome}</p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <p className="mt-1 p-2 bg-gray-50 rounded text-gray-600">{profile.email}</p>
-          </div>
-
-          <div>
-            <Label htmlFor="cpf">CPF *</Label>
-            {editing ? (
-              <Input
-                id="cpf"
-                value={formData.cpf}
-                onChange={handleCPFChange}
-                placeholder="000.000.000-00"
-                maxLength={14}
-                className="mt-1"
-                required
-              />
-            ) : (
-              <p className="mt-1 p-2 bg-gray-50 rounded">{formData.cpf}</p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="data_nascimento">Data de Nascimento</Label>
-            {editing ? (
-              <Input
-                id="data_nascimento"
-                type="date"
-                value={formData.data_nascimento}
-                onChange={(e) => setFormData(prev => ({ ...prev, data_nascimento: e.target.value }))}
-                className="mt-1"
-              />
-            ) : (
-              <p className="mt-1 p-2 bg-gray-50 rounded">
-                {formData.data_nascimento ? new Date(formData.data_nascimento).toLocaleDateString('pt-BR') : 'Não informado'}
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Address Section */}
-        <div className="space-y-4">
-          <h4 className="font-medium">Endereço</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="endereco_cidade">Cidade</Label>
-              {editing ? (
-                <Input
-                  id="endereco_cidade"
-                  value={formData.endereco_cidade}
-                  onChange={(e) => setFormData(prev => ({ ...prev, endereco_cidade: e.target.value }))}
-                  className="mt-1"
-                />
-              ) : (
-                <p className="mt-1 p-2 bg-gray-50 rounded">{formData.endereco_cidade || 'Não informado'}</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="endereco_bairro">Bairro</Label>
-              {editing ? (
-                <Input
-                  id="endereco_bairro"
-                  value={formData.endereco_bairro}
-                  onChange={(e) => setFormData(prev => ({ ...prev, endereco_bairro: e.target.value }))}
-                  className="mt-1"
-                />
-              ) : (
-                <p className="mt-1 p-2 bg-gray-50 rounded">{formData.endereco_bairro || 'Não informado'}</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="endereco_rua">Rua</Label>
-              {editing ? (
-                <Input
-                  id="endereco_rua"
-                  value={formData.endereco_rua}
-                  onChange={(e) => setFormData(prev => ({ ...prev, endereco_rua: e.target.value }))}
-                  className="mt-1"
-                />
-              ) : (
-                <p className="mt-1 p-2 bg-gray-50 rounded">{formData.endereco_rua || 'Não informado'}</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="endereco_numero">Número</Label>
-              {editing ? (
-                <Input
-                  id="endereco_numero"
-                  value={formData.endereco_numero}
-                  onChange={(e) => setFormData(prev => ({ ...prev, endereco_numero: e.target.value }))}
-                  className="mt-1"
-                />
-              ) : (
-                <p className="mt-1 p-2 bg-gray-50 rounded">{formData.endereco_numero || 'Não informado'}</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="endereco_cep">CEP</Label>
-              {editing ? (
-                <Input
-                  id="endereco_cep"
-                  value={formData.endereco_cep}
-                  onChange={(e) => setFormData(prev => ({ ...prev, endereco_cep: e.target.value }))}
-                  placeholder="00000-000"
-                  className="mt-1"
-                />
-              ) : (
-                <p className="mt-1 p-2 bg-gray-50 rounded">{formData.endereco_cep || 'Não informado'}</p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Bio for Providers */}
-        {profile.tipo === 'prestador' && (
-          <div>
-            <Label htmlFor="bio">Descrição dos Serviços</Label>
-            {editing ? (
-              <Textarea
-                id="bio"
-                rows={3}
-                value={formData.bio}
-                onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
-                placeholder="Descreva seus serviços e experiência..."
-                className="mt-1"
-              />
-            ) : (
-              <p className="mt-1 p-2 bg-gray-50 rounded">
-                {formData.bio || 'Nenhuma descrição adicionada'}
-              </p>
-            )}
-          </div>
+        {uploading && (
+          <p className="text-sm text-orange-500">Enviando foto...</p>
         )}
+      </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-2 pt-4 border-t">
-          {editing ? (
-            <>
-              <Button onClick={handleSave} disabled={loading}>
-                <Save className="h-4 w-4 mr-2" />
-                {loading ? 'Salvando...' : 'Salvar Alterações'}
-              </Button>
-              <Button variant="outline" onClick={handleCancel}>
-                <X className="h-4 w-4 mr-2" />
-                Cancelar
-              </Button>
-            </>
+      {/* Form Fields */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="nome">Nome Completo</Label>
+          {isEditing ? (
+            <Input
+              id="nome"
+              value={formData.nome}
+              onChange={(e) => setFormData({...formData, nome: e.target.value})}
+              placeholder="Seu nome completo"
+            />
           ) : (
-            <Button onClick={() => setEditing(true)}>
-              Editar Perfil
-            </Button>
+            <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+              <span>{profile.nome}</span>
+            </div>
           )}
         </div>
-      </CardContent>
-    </Card>
+
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+            <Mail className="h-4 w-4 text-gray-500" />
+            <span className="text-sm">{profile.email}</span>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="cidade">Cidade</Label>
+          {isEditing ? (
+            <Input
+              id="cidade"
+              value={formData.endereco_cidade}
+              onChange={(e) => setFormData({...formData, endereco_cidade: e.target.value})}
+              placeholder="Sua cidade"
+            />
+          ) : (
+            <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+              <MapPin className="h-4 w-4 text-gray-500" />
+              <span className="text-sm">{profile.endereco_cidade || 'Não informado'}</span>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="bairro">Bairro</Label>
+          {isEditing ? (
+            <Input
+              id="bairro"
+              value={formData.endereco_bairro}
+              onChange={(e) => setFormData({...formData, endereco_bairro: e.target.value})}
+              placeholder="Seu bairro"
+            />
+          ) : (
+            <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+              <span className="text-sm">{profile.endereco_bairro || 'Não informado'}</span>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="rua">Rua</Label>
+          {isEditing ? (
+            <Input
+              id="rua"
+              value={formData.endereco_rua}
+              onChange={(e) => setFormData({...formData, endereco_rua: e.target.value})}
+              placeholder="Nome da rua"
+            />
+          ) : (
+            <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+              <span className="text-sm">{profile.endereco_rua || 'Não informado'}</span>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="numero">Número</Label>
+          {isEditing ? (
+            <Input
+              id="numero"
+              value={formData.endereco_numero}
+              onChange={(e) => setFormData({...formData, endereco_numero: e.target.value})}
+              placeholder="Número da casa/apt"
+            />
+          ) : (
+            <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+              <span className="text-sm">{profile.endereco_numero || 'Não informado'}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Bio Section for Providers */}
+      {(profile.tipo === 'prestador' || isEditing) && (
+        <div className="space-y-2">
+          <Label htmlFor="bio">Descrição dos Serviços</Label>
+          {isEditing ? (
+            <Textarea
+              id="bio"
+              rows={3}
+              value={formData.bio}
+              onChange={(e) => setFormData({...formData, bio: e.target.value})}
+              placeholder="Descreva seus serviços e experiência..."
+              maxLength={500}
+            />
+          ) : (
+            <div className="p-2 bg-gray-50 rounded">
+              <span className="text-sm">{profile.bio || 'Nenhuma descrição adicionada'}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div className="flex gap-2 pt-4 border-t">
+        {isEditing ? (
+          <>
+            <Button onClick={handleSave} disabled={isSaving} className="flex-1">
+              <Save className="h-4 w-4 mr-2" />
+              {isSaving ? 'Salvando...' : 'Salvar Alterações'}
+            </Button>
+            <Button variant="outline" onClick={() => setIsEditing(false)} className="flex-1">
+              Cancelar
+            </Button>
+          </>
+        ) : (
+          <Button onClick={() => setIsEditing(true)} className="flex-1">
+            Editar Perfil
+          </Button>
+        )}
+      </div>
+
+      {/* Become Provider Button - Only for clients */}
+      <div className="pt-4 border-t">
+        <BecomeProviderButton />
+      </div>
+    </div>
   );
 };

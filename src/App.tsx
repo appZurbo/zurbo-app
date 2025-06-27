@@ -5,6 +5,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { MobileDock } from '@/components/mobile/MobileDock';
 
 // Lazy loading das páginas
 const Index = lazy(() => import('@/pages/Index'));
@@ -16,6 +17,7 @@ const PrestadoresPage = lazy(() => import('@/pages/PrestadoresPage'));
 const AuthPage = lazy(() => import('@/pages/AuthPage'));
 const TrabalheConosco = lazy(() => import('@/pages/TrabalheConosco'));
 const PrestadorSettings = lazy(() => import('@/pages/PrestadorSettings'));
+const Planos = lazy(() => import('@/pages/Planos'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,10 +51,12 @@ function App() {
                   <Route path="/auth" element={<AuthPage />} />
                   <Route path="/trabalhe-conosco" element={<TrabalheConosco />} />
                   <Route path="/prestador-settings" element={<PrestadorSettings />} />
+                  <Route path="/planos" element={<Planos />} />
                   <Route path="/admin/relatorios" element={<AdminRelatorios />} />
                 </Routes>
               </Suspense>
               <Toaster />
+              <MobileDock />
             </div>
           </BrowserRouter>
         </TooltipProvider>

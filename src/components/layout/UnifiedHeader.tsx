@@ -6,14 +6,17 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
-import { LogOut, User, Settings, Shield, MessageCircle, Wrench, Bell, BellOff } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { LogOut, User, Settings, Shield, MessageCircle, Wrench, Bell, BellOff, Home, Users, Crown } from 'lucide-react';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { useToast } from '@/hooks/use-toast';
+import { useMobile } from '@/hooks/useMobile';
 
 export const UnifiedHeader = () => {
   const { user, profile, logout, isAuthenticated, isAdmin, isPrestador } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isMobile = useMobile();
   const [isOnDuty, setIsOnDuty] = useState(false);
   const { toast } = useToast();
 
@@ -77,6 +80,14 @@ export const UnifiedHeader = () => {
     }
   };
 
+  const mobileShortcuts = [
+    { icon: Home, label: 'Início', path: '/' },
+    { icon: Users, label: 'Prestadores', path: '/prestadores' },
+    { icon: Crown, label: 'Planos', path: '/planos' }
+  ];
+
+  const isActive = (path: string) => location.pathname === path;
+
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-white shadow-sm">
       <div className="container flex h-16 items-center justify-between px-4 mx-auto max-w-7xl">
@@ -90,14 +101,36 @@ export const UnifiedHeader = () => {
           <span className="text-xl font-bold text-gray-900">Zurbo</span>
         </div>
 
+        {/* Mobile shortcuts */}
+        {isMobile && (
+          <div className="flex items-center gap-1">
+            {mobileShortcuts.map((shortcut) => {
+              const Icon = shortcut.icon;
+              return (
+                <Button
+                  key={shortcut.path}
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate(shortcut.path)}
+                  className={`p-2 ${isActive(shortcut.path) ? 'text-orange-500 bg-orange-50' : 'text-gray-600'}`}
+                >
+                  <Icon className="h-4 w-4" />
+                </Button>
+              );
+            })}
+          </div>
+        )}
+
         <div className="flex items-center gap-4">
-          {/* Trabalhe Conosco Button */}
-          <Button
-            onClick={() => navigate('/trabalhe-conosco')}
-            className="bg-orange-500 hover:bg-orange-600 text-white hidden sm:flex"
-          >
-            Trabalhe Conosco
-          </Button>
+          {/* Trabalhe Conosco Button - Desktop only */}
+          {!isMobile && (
+            <Button
+              onClick={() => navigate('/trabalhe-conosco')}
+              className="bg-orange-500 hover:bg-orange-600 text-white"
+            >
+              Trabalhe Conosco
+            </Button>
+          )}
 
           {isAuthenticated ? (
             <>

@@ -7,7 +7,6 @@ import { ModernFilters } from '@/components/filters/ModernFilters';
 import { PrestadorCardImproved } from '@/components/prestadores/PrestadorCardImproved';
 import { PrestadorProfileModal } from '@/components/prestadores/PrestadorProfileModal';
 import { ContactModal } from '@/components/contact/ContactModal';
-import { EmergencyButton } from '@/components/emergency/EmergencyButton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -92,13 +91,6 @@ const Index = () => {
         <div className="mt-12">
           <ModernFilters onFiltersChange={handleFiltersChange} servicos={[]} />
         </div>
-
-        {/* Emergency SOS Button for authenticated users */}
-        {isAuthenticated && (
-          <div className="mt-8">
-            <EmergencyButton />
-          </div>
-        )}
 
         <div className="mt-12">
           <div className="flex items-center justify-between mb-8">

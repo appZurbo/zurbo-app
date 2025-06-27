@@ -8,15 +8,18 @@ import { ModernFilters } from '@/components/filters/ModernFilters';
 import { PrestadorCardImproved } from '@/components/prestadores/PrestadorCardImproved';
 import { PrestadorProfileModal } from '@/components/prestadores/PrestadorProfileModal';
 import { ContactModal } from '@/components/contact/ContactModal';
+import { EmergencyButton } from '@/components/emergency/EmergencyButton';
 import { getPrestadores } from '@/utils/database/prestadores';
 import { UserProfile } from '@/utils/database/types';
 import { useToast } from '@/hooks/use-toast';
 import { useMobile } from '@/hooks/useMobile';
+import { useAuth } from '@/hooks/useAuth';
 
 const PrestadoresPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useMobile();
+  const { isAuthenticated } = useAuth();
   const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPrestador, setSelectedPrestador] = useState<UserProfile | null>(null);
@@ -83,6 +86,13 @@ const PrestadoresPage = () => {
             </p>
           </div>
         </div>
+
+        {/* Emergency SOS Button - moved from Index page */}
+        {isAuthenticated && (
+          <div className="mb-8">
+            <EmergencyButton />
+          </div>
+        )}
 
         {/* Filtros */}
         <div className="mb-8">
