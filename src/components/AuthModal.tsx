@@ -22,6 +22,12 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = 'login' }: AuthModal
     onClose();
   };
 
+  const handleTabChange = (value: string) => {
+    if (value === 'login' || value === 'register') {
+      setActiveTab(value);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[480px] max-h-[90vh] overflow-y-auto">
@@ -43,7 +49,7 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = 'login' }: AuthModal
           </div>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tabs value={activeTab} onValueChange={handleTabChange}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">Entrar</TabsTrigger>
             <TabsTrigger value="register">Cadastrar</TabsTrigger>
