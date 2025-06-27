@@ -343,7 +343,7 @@ const InteractiveCalendarAgenda = React.forwardRef<HTMLDivElement, React.HTMLAtt
       }}>
             <motion.div key="more-view" className="mt-4 flex w-full flex-col gap-4">
               <div className="flex w-full flex-col items-start justify-between">
-                <motion.h2 className="mb-2 text-4xl font-bold tracking-wider text-gray-800">
+                <motion.h2 className="mb-2 tracking-wider text-gray-800 text-2xl font-medium">
                   Agendamentos
                 </motion.h2>
                 <p className="font-medium text-gray-600">
