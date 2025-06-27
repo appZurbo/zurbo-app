@@ -42,14 +42,14 @@ const Index = () => {
   const loadPrestadores = async () => {
     setLoading(true);
     try {
-      const data = await getPrestadores(filters);
+      const result = await getPrestadores(filters);
       
       if (showFavoritesOnly && isAuthenticated) {
         const favorites = JSON.parse(localStorage.getItem('user_favorites') || '[]');
-        const filteredData = data.filter(prestador => favorites.includes(prestador.id));
+        const filteredData = result.prestadores.filter(prestador => favorites.includes(prestador.id));
         setPrestadores(filteredData);
       } else {
-        setPrestadores(data);
+        setPrestadores(result.prestadores);
       }
     } catch (error) {
       console.error('Error loading prestadores:', error);

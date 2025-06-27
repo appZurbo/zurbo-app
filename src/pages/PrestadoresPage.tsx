@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,12 +27,12 @@ const PrestadoresPage = () => {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedPrestador, setSelectedPrestador] = useState<UserProfile | null>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const [filters, setFilters] = useState({
-    cidade: 'Sinop, MT',
+    cidade: 'Sinop, Mato Grosso',
     servicos: [] as string[],
     precoMin: 0,
     precoMax: 500,
@@ -63,7 +62,7 @@ const PrestadoresPage = () => {
   const loadPrestadores = async (reset = false) => {
     if (reset) {
       setLoading(true);
-      setCurrentPage(0);
+      setCurrentPage(1);
       setPrestadores([]);
       setHasMore(true);
     } else {
@@ -71,23 +70,20 @@ const PrestadoresPage = () => {
     }
 
     try {
-      const offset = reset ? 0 : (currentPage + 1) * ITEMS_PER_PAGE;
-      const data = await getPrestadores({
+      const page = reset ? 1 : currentPage + 1;
+      const result = await getPrestadores({
         ...filters,
         limit: ITEMS_PER_PAGE,
-        offset
+        page
       });
 
       if (reset) {
-        setPrestadores(data);
+        setPrestadores(result.prestadores);
       } else {
-        setPrestadores(prev => [...prev, ...data]);
+        setPrestadores(prev => [...prev, ...result.prestadores]);
       }
 
-      // Check if there are more items
-      if (data.length < ITEMS_PER_PAGE) {
-        setHasMore(false);
-      }
+      setHasMore(result.hasMore);
 
       if (!reset) {
         setCurrentPage(prev => prev + 1);
@@ -189,7 +185,7 @@ const PrestadoresPage = () => {
                   Não encontramos prestadores que correspondam aos seus filtros.
                 </p>
                 <Button onClick={() => setFilters({
-                  cidade: 'Sinop, MT',
+                  cidade: 'Sinop, Mato Grosso',
                   servicos: [],
                   precoMin: 0,
                   precoMax: 500,

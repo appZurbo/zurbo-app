@@ -42,6 +42,40 @@ export interface UserProfile {
   }[];
 }
 
+export interface PrestadorCompleto extends UserProfile {
+  prestador_servicos?: {
+    servico_id: string;
+    preco_min?: number;
+    preco_max?: number;
+    servicos?: {
+      nome: string;
+      icone?: string;
+      cor?: string;
+    };
+  }[];
+  avaliacoes?: {
+    id: string;
+    nota: number;
+    comentario?: string;
+    criado_em: string;
+    avaliador?: {
+      nome: string;
+      foto_url?: string;
+    };
+  }[];
+  portfolio_fotos?: {
+    id: string;
+    foto_url: string;
+    titulo?: string;
+    descricao?: string;
+    ordem: number;
+  }[];
+  plano_premium?: {
+    ativo: boolean;
+    expira_em: string;
+  }[];
+}
+
 export interface Pedido {
   id: string;
   cliente_id: string;
