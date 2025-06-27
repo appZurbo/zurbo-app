@@ -206,6 +206,32 @@ export const AdminDashboard = () => {
           </Card>
         </div>
 
+        {/* Create Test Data Section */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-purple-500" />
+              Ferramentas de Desenvolvimento
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold mb-2">Criar Dados de Teste</h3>
+                <p className="text-gray-600 text-sm">
+                  Gerar dados fictícios para desenvolvimento e demonstração do sistema
+                </p>
+              </div>
+              <Button 
+                variant="outline" 
+                className="bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100"
+              >
+                Criar Dados de Teste
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Recent Activity */}
         <Card>
           <CardHeader>

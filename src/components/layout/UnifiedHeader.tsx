@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -16,7 +17,13 @@ import {
   Bell,
   Home,
   Users,
-  Crown
+  Crown,
+  MessageCircle,
+  Calendar,
+  BarChart3,
+  Shield,
+  ShoppingBag,
+  Wrench
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -24,13 +31,15 @@ import { useMobile } from '@/hooks/useMobile';
 
 export const UnifiedHeader = () => {
   const navigate = useNavigate();
-  const { profile, isAuthenticated, logout } = useAuth();
+  const { profile, isAuthenticated, logout, isAdmin, isPrestador } = useAuth();
   const isMobile = useMobile();
 
   const handleLogout = async () => {
     await logout();
     navigate('/');
   };
+
+  const isPremium = profile?.plano_premium === 'ativo';
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
@@ -85,6 +94,37 @@ export const UnifiedHeader = () => {
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
               <>
+                {/* Premium Button for Non-Premium Users */}
+                {!isPremium && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate('/planos')}
+                    className="text-orange-500 hover:text-orange-600 hover:bg-orange-50"
+                  >
+                    {isMobile ? (
+                      <Crown className="h-4 w-4" />
+                    ) : (
+                      <>
+                        <Crown className="h-4 w-4 mr-2" />
+                        Premium
+                      </>
+                    )}
+                  </Button>
+                )}
+
+                {/* Chat Icon - Desktop Only */}
+                {!isMobile && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate('/conversas')}
+                    className="relative"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                  </Button>
+                )}
+
                 {/* Notifications */}
                 <Button
                   variant="ghost"
@@ -114,23 +154,72 @@ export const UnifiedHeader = () => {
                         <p className="w-[200px] truncate text-sm text-muted-foreground">
                           {profile?.email}
                         </p>
+                        {isAdmin && (
+                          <Badge className="w-fit bg-red-100 text-red-800 border-red-200">
+                            <Shield className="h-3 w-3 mr-1" />
+                            Admin
+                          </Badge>
+                        )}
                       </div>
                     </div>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
-                      <User className="mr-2 h-4 w-4" />
-                      Perfil
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
-                      <Settings className="mr-2 h-4 w-4" />
-                      Configurações
-                    </DropdownMenuItem>
-                    {profile?.tipo === 'prestador' && (
-                      <DropdownMenuItem onClick={() => navigate('/prestador-dashboard')}>
+                    
+                    {/* Provider Menu Items */}
+                    {isPrestador && (
+                      <>
+                        <DropdownMenuItem onClick={() => navigate('/prestador-settings')}>
+                          <Wrench className="mr-2 h-4 w-4" />
+                          Configurações do Prestador
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/agenda-prestador')}>
+                          <Calendar className="mr-2 h-4 w-4" />
+                          Agenda
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/prestador-dashboard')}>
+                          <BarChart3 className="mr-2 h-4 w-4" />
+                          Painel do Prestador
+                        </DropdownMenuItem>
+                      </>
+                    )}
+
+                    {/* Client Menu Items */}
+                    {!isPrestador && !isAdmin && (
+                      <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
                         <User className="mr-2 h-4 w-4" />
-                        Dashboard
+                        Configurações de Perfil
                       </DropdownMenuItem>
                     )}
+
+                    {/* Admin Menu Items */}
+                    {isAdmin && (
+                      <>
+                        <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
+                          <Settings className="mr-2 h-4 w-4" />
+                          Configurações de Perfil
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/admin/relatorios')}>
+                          <BarChart3 className="mr-2 h-4 w-4" />
+                          Admin Dashboard
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/admin/moderacao')}>
+                          <Shield className="mr-2 h-4 w-4" />
+                          Painel de Moderação
+                        </DropdownMenuItem>
+                      </>
+                    )}
+
+                    {/* Common Menu Items for All Users */}
+                    <DropdownMenuItem onClick={() => navigate('/pedidos')}>
+                      <ShoppingBag className="mr-2 h-4 w-4" />
+                      Pedidos
+                    </DropdownMenuItem>
+
+                    {/* Premium Menu Item */}
+                    <DropdownMenuItem onClick={() => navigate(isPremium ? '/premium-overview' : '/planos')}>
+                      <Crown className="mr-2 h-4 w-4" />
+                      {isPremium ? 'Visão Geral Premium' : 'Tornar-se Premium'}
+                    </DropdownMenuItem>
+
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />

@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { MoveRight, Wrench } from "lucide-react";
@@ -6,6 +7,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+
 const buttonVariants = cva("inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50", {
   variants: {
     variant: {
@@ -28,9 +30,11 @@ const buttonVariants = cva("inline-flex items-center justify-center whitespace-n
     size: "default"
   }
 });
+
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
+
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   className,
   variant,
@@ -46,10 +50,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   }))} ref={ref} {...props} />;
 });
 Button.displayName = "Button";
+
 function Hero() {
   const [titleNumber, setTitleNumber] = useState(0);
   const navigate = useNavigate();
   const titles = useMemo(() => ["eletricista", "encanador", "pintor", "jardineiro", "diarista"], []);
+  
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (titleNumber === titles.length - 1) {
@@ -60,53 +66,75 @@ function Hero() {
     }, 2000);
     return () => clearTimeout(timeoutId);
   }, [titleNumber, titles]);
+  
   const handleContrateServicos = () => {
     navigate('/prestadores');
   };
-  return <div className="w-full">
+
+  const handleTrabalheConosco = () => {
+    navigate('/trabalhe-conosco');
+  };
+  
+  return (
+    <div className="w-full">
       <div className="container mx-auto">
         <div className="flex gap-8 py-20 items-center justify-center flex-col lg:py-[79px]">
-          
           <div className="flex gap-4 flex-col">
             <h1 className="text-5xl md:text-7xl max-w-2xl tracking-tighter text-center font-regular">
               <span className="text-gray-900">Tá precisando de</span>
               <span className="relative flex w-full justify-center overflow-hidden text-center md:pb-4 md:pt-1">
                 &nbsp;
-                {titles.map((title, index) => <motion.span key={index} className="absolute font-semibold text-orange-500" initial={{
-                opacity: 0,
-                y: "-100"
-              }} transition={{
-                type: "spring",
-                stiffness: 50
-              }} animate={titleNumber === index ? {
-                y: 0,
-                opacity: 1
-              } : {
-                y: titleNumber > index ? -150 : 150,
-                opacity: 0
-              }}>
+                {titles.map((title, index) => (
+                  <motion.span 
+                    key={index} 
+                    className="absolute font-semibold text-orange-500" 
+                    initial={{
+                      opacity: 0,
+                      y: "-100"
+                    }} 
+                    transition={{
+                      type: "spring",
+                      stiffness: 50
+                    }} 
+                    animate={titleNumber === index ? {
+                      y: 0,
+                      opacity: 1
+                    } : {
+                      y: titleNumber > index ? -150 : 150,
+                      opacity: 0
+                    }}
+                  >
                     {title}?
-                  </motion.span>)}
+                  </motion.span>
+                ))}
               </span>
             </h1>
 
-            <p className="text-lg md:text-xl leading-relaxed tracking-tight text-muted-foreground max-w-2xl text-center">Conecte-se com prestadores de serviços qualificados na sua região. Rápido, prático e de confiança.</p>
+            <p className="text-lg md:text-xl leading-relaxed tracking-tight text-muted-foreground max-w-2xl text-center">
+              Conecte-se com prestadores de serviços qualificados na sua região. Rápido, prático e de confiança.
+            </p>
           </div>
+          
           <div className="flex flex-col gap-3 items-center">
             <Button size="lg" className="gap-4" variant="outline" onClick={handleContrateServicos}>
               Contrate Serviços <Wrench className="w-4 h-4" />
             </Button>
-            <Button size="lg" className="gap-4 bg-orange-500 hover:bg-orange-600">
+            <Button size="lg" className="gap-4 bg-orange-500 hover:bg-orange-600" onClick={handleTrabalheConosco}>
               Trabalhe conosco <MoveRight className="w-4 h-4" />
             </Button>
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 }
+
 function HeroDemo() {
-  return <div className="flex text-center items-center justify-center">
+  return (
+    <div className="flex text-center items-center justify-center">
       <Hero />
-    </div>;
+    </div>
+  );
 }
+
 export default HeroDemo;

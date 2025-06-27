@@ -19,6 +19,8 @@ const PrestadorSettings = lazy(() => import('@/pages/PrestadorSettings'));
 const PrestadorDashboard = lazy(() => import('@/pages/PrestadorDashboard'));
 const AgendaPrestador = lazy(() => import('@/pages/AgendaPrestador'));
 const Planos = lazy(() => import('@/pages/Planos'));
+const PremiumOverview = lazy(() => import('@/pages/PremiumOverview'));
+const AdminModeracao = lazy(() => import('@/pages/admin/Moderacao'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -55,7 +57,9 @@ function App() {
                   <Route path="/prestador-dashboard" element={<PrestadorDashboard />} />
                   <Route path="/agenda-prestador" element={<AgendaPrestador />} />
                   <Route path="/planos" element={<Planos />} />
+                  <Route path="/premium-overview" element={<PremiumOverview />} />
                   <Route path="/admin/relatorios" element={<AdminRelatorios />} />
+                  <Route path="/admin/moderacao" element={<AdminModeracao />} />
                 </Routes>
               </Suspense>
               <Toaster />
