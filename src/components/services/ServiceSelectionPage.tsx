@@ -241,9 +241,7 @@ const ServiceSelectionPage = ({
           </Card>}
 
         <div className="flex justify-center gap-4">
-          <Button variant="outline" onClick={onComplete} disabled={saving}>
-            Pular por Agora
-          </Button>
+          
           <Button onClick={salvarServicos} disabled={saving || servicosSelecionados.length === 0} className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700">
             {saving ? 'Salvando...' : 'Salvar e Continuar'}
           </Button>
