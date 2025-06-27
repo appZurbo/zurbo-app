@@ -15,6 +15,7 @@ export interface UserProfile {
   latitude?: number;
   longitude?: number;
   cpf?: string;
+  data_nascimento?: string;
   nota_media?: number;
   ocultar_nota?: boolean;
   premium?: boolean;
