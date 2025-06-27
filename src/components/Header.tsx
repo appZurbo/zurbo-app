@@ -18,7 +18,9 @@ import {
   Search,
   Menu,
   X,
-  Crown
+  Crown,
+  BarChart3,
+  Calendar
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
@@ -119,10 +121,24 @@ const Header = () => {
                         </div>
                       </div>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleProfileClick}>
-                        <User className="mr-2 h-4 w-4" />
-                        Perfil
-                      </DropdownMenuItem>
+                      {isPrestador && (
+                        <>
+                          <DropdownMenuItem onClick={() => navigate('/prestador-dashboard')}>
+                            <BarChart3 className="mr-2 h-4 w-4" />
+                            Painel do Prestador
+                          </DropdownMenuItem>
+                          
+                          <DropdownMenuItem onClick={() => navigate('/agenda-prestador')}>
+                            <Calendar className="mr-2 h-4 w-4" />
+                            Agenda Profissional
+                          </DropdownMenuItem>
+                          
+                          <DropdownMenuItem onClick={() => navigate('/planos')}>
+                            <Crown className="mr-2 h-4 w-4" />
+                            Planos Premium
+                          </DropdownMenuItem>
+                        </>
+                      )}
                       <DropdownMenuItem onClick={handleSettingsClick}>
                         <Settings className="mr-2 h-4 w-4" />
                         {isPrestador ? 'Configurações do Prestador' : 'Configurações'}
@@ -150,7 +166,7 @@ const Header = () => {
               )}
             </div>
 
-            {/* Mobile/Tablet Actions - Only Crown and Notifications for logged users */}
+            {/* Mobile/Tablet Actions - Updated to show Crown for all users */}
             <div className="flex lg:hidden items-center space-x-2">
               {user ? (
                 <>
@@ -165,12 +181,22 @@ const Header = () => {
                   <NotificationBell />
                 </>
               ) : (
-                <Button 
-                  onClick={() => setShowAuthModal(true)}
-                  className="gradient-bg text-sm px-3 py-2"
-                >
-                  Entrar
-                </Button>
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate('/planos')}
+                    className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
+                  >
+                    <Crown className="h-5 w-5" />
+                  </Button>
+                  <Button 
+                    onClick={() => setShowAuthModal(true)}
+                    className="gradient-bg text-sm px-3 py-2"
+                  >
+                    Entrar
+                  </Button>
+                </>
               )}
             </div>
           </div>

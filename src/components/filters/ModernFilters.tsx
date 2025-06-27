@@ -21,7 +21,7 @@ interface ModernFiltersProps {
 
 export const ModernFilters = ({ onFiltersChange, servicos }: ModernFiltersProps) => {
   const [filters, setFilters] = useState<FilterState>({
-    cidade: 'Sinop, Mato Grosso',
+    cidade: 'Sinop, Mato Grosso', // Updated to use normalized city name
     precoMin: 0,
     precoMax: 500,
     notaMin: 0,
@@ -44,7 +44,7 @@ export const ModernFilters = ({ onFiltersChange, servicos }: ModernFiltersProps)
 
   const clearFilters = () => {
     const defaultFilters: FilterState = {
-      cidade: 'Sinop, Mato Grosso',
+      cidade: 'Sinop, Mato Grosso', // Updated to use normalized city name
       precoMin: 0,
       precoMax: 500,
       notaMin: 0,

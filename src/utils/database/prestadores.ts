@@ -1,18 +1,51 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { UserProfile } from './types';
 
+// Function to normalize city names for filtering
+const normalizeCityForFilter = (cityName: string): string => {
+  if (!cityName) return '';
+  
+  const normalized = cityName
+    .trim()
+    .replace(/\s*,\s*MT\s*$/i, ', Mato Grosso')
+    .replace(/\s*,\s*Mato\s+Grosso\s*$/i, ', Mato Grosso')
+    .replace(/\s+/g, ' ');
+  
+  return normalized;
+};
+
+// Function to check if two city names match (handles variations)
+const citiesMatch = (city1: string, city2: string): boolean => {
+  if (!city1 || !city2) return false;
+  
+  const norm1 = normalizeCityForFilter(city1).toLowerCase();
+  const norm2 = normalizeCityForFilter(city2).toLowerCase();
+  
+  // Direct match
+  if (norm1 === norm2) return true;
+  
+  // Extract city names (before comma) and compare
+  const cityPart1 = norm1.split(',')[0].trim();
+  const cityPart2 = norm2.split(',')[0].trim();
+  
+  return cityPart1 === cityPart2;
+};
+
 export const getPrestadores = async (filters?: {
   cidade?: string;
-  servico?: string;
   servicos?: string[];
+  notaMin?: number;
   precoMin?: number;
   precoMax?: number;
-  notaMin?: number;
+  apenasPremium?: boolean;
+  page?: number;
   limit?: number;
-  offset?: number;
-}) => {
+}): Promise<{ prestadores: PrestadorCompleto[]; hasMore: boolean; total: number }> => {
   try {
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 5;
+    const offset = (page - 1) * limit;
+
     let query = supabase
       .from('users')
       .select(`
@@ -23,68 +56,141 @@ export const getPrestadores = async (filters?: {
           preco_max,
           servicos (nome, icone, cor)
         ),
-        avaliacoes!avaliacoes_avaliado_id_fkey (
+        avaliacoes:avaliacoes!avaliacoes_avaliado_id_fkey (
+          id,
           nota,
           comentario,
           criado_em,
-          avaliador:users!avaliacoes_avaliador_id_fkey (nome, foto_url)
+          avaliador:avaliador_id (nome, foto_url)
+        ),
+        portfolio_fotos (
+          id,
+          foto_url,
+          titulo,
+          descricao,
+          ordem
+        ),
+        plano_premium (
+          ativo,
+          expira_em
         )
       `)
       .eq('tipo', 'prestador');
 
+    // City filtering with normalization
     if (filters?.cidade) {
-      // Flexible city matching - match both "Sinop, MT" and "Sinop, Mato Grosso"
-      const cityVariations = [
-        filters.cidade,
-        filters.cidade.replace(', Mato Grosso', ', MT'),
-        filters.cidade.replace(', MT', ', Mato Grosso')
-      ];
+      const normalizedFilterCity = normalizeCityForFilter(filters.cidade);
       
-      query = query.or(
-        cityVariations.map(city => `endereco_cidade.ilike.%${city}%`).join(',')
-      );
+      // Get all prestadores first, then filter by city match
+      const { data: allPrestadores, error: allError } = await query;
+      
+      if (allError) throw allError;
+      
+      const filteredByCity = allPrestadores?.filter(prestador => 
+        citiesMatch(prestador.endereco_cidade, normalizedFilterCity)
+      ) || [];
+      
+      // Continue with other filters on the city-filtered results
+      let filteredPrestadores = filteredByCity;
+      
+      // Service filtering
+      if (filters.servicos && filters.servicos.length > 0) {
+        filteredPrestadores = filteredPrestadores.filter(prestador =>
+          prestador.prestador_servicos?.some((ps: any) =>
+            filters.servicos!.includes(ps.servico_id)
+          )
+        );
+      }
+
+      // Rating filtering
+      if (filters.notaMin && filters.notaMin > 0) {
+        filteredPrestadores = filteredPrestadores.filter(prestador =>
+          (prestador.nota_media || 0) >= filters.notaMin!
+        );
+      }
+
+      // Premium filtering
+      if (filters.apenasPremium) {
+        filteredPrestadores = filteredPrestadores.filter(prestador =>
+          prestador.plano_premium?.some((plano: any) => 
+            plano.ativo && new Date(plano.expira_em) > new Date()
+          )
+        );
+      }
+
+      // Sort: best rated first (4), then random
+      const sortedPrestadores = filteredPrestadores.sort((a, b) => {
+        const ratingA = a.nota_media || 0;
+        const ratingB = b.nota_media || 0;
+        
+        // If both have high ratings (4+), randomize
+        if (ratingA >= 4 && ratingB >= 4) {
+          return Math.random() - 0.5;
+        }
+        
+        // Otherwise sort by rating desc
+        return ratingB - ratingA;
+      });
+
+      const total = sortedPrestadores.length;
+      const paginatedResults = sortedPrestadores.slice(offset, offset + limit);
+      const hasMore = offset + limit < total;
+
+      return {
+        prestadores: paginatedResults as PrestadorCompleto[],
+        hasMore,
+        total
+      };
     }
 
-    if (filters?.notaMin) {
+    // Original logic for non-city filters
+    if (filters?.servicos && filters.servicos.length > 0) {
+      query = query.in('prestador_servicos.servico_id', filters.servicos);
+    }
+
+    if (filters?.notaMin && filters.notaMin > 0) {
       query = query.gte('nota_media', filters.notaMin);
     }
 
-    // Apply pagination
-    const limit = filters?.limit || 50;
-    const offset = filters?.offset || 0;
-    
-    query = query.range(offset, offset + limit - 1);
-
-    const { data, error } = await query;
-
-    if (error) throw error;
-    
-    let prestadores = (data || []) as UserProfile[];
-
-    // Filter by services if specified
-    if (filters?.servicos && filters.servicos.length > 0) {
-      prestadores = prestadores.filter(prestador => 
-        prestador.prestador_servicos?.some(ps => 
-          filters.servicos!.includes(ps.servico_id)
-        )
-      );
+    if (filters?.apenasPremium) {
+      query = query.not('plano_premium', 'is', null);
     }
 
-    // Sort: first 4 by rating, then random
-    prestadores.sort((a, b) => {
+    // Get total count
+    const { count } = await supabase
+      .from('users')
+      .select('*', { count: 'exact', head: true })
+      .eq('tipo', 'prestador');
+
+    const { data, error } = await query
+      .range(offset, offset + limit - 1)
+      .order('nota_media', { ascending: false });
+
+    if (error) throw error;
+
+    // Sort results: best rated first (4), then random
+    const sortedData = (data || []).sort((a, b) => {
       const ratingA = a.nota_media || 0;
       const ratingB = b.nota_media || 0;
+      
+      if (ratingA >= 4 && ratingB >= 4) {
+        return Math.random() - 0.5;
+      }
+      
       return ratingB - ratingA;
     });
 
-    // Take top 4 rated, then randomize the rest
-    const topRated = prestadores.slice(0, 4);
-    const remaining = prestadores.slice(4).sort(() => Math.random() - 0.5);
-    
-    return [...topRated, ...remaining];
+    const hasMore = offset + limit < (count || 0);
+
+    return {
+      prestadores: sortedData as PrestadorCompleto[],
+      hasMore,
+      total: count || 0
+    };
+
   } catch (error) {
     console.error('Error fetching prestadores:', error);
-    return [];
+    return { prestadores: [], hasMore: false, total: 0 };
   }
 };
 
