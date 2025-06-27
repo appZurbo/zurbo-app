@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -84,7 +83,7 @@ const Header = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => navigate('/plano-premium')}
+                    onClick={() => navigate('/planos')}
                     className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
                   >
                     <Crown className="h-5 w-5" />
@@ -209,7 +208,7 @@ const Header = () => {
                       variant="ghost" 
                       className="justify-start px-2" 
                       onClick={() => {
-                        navigate('/plano-premium');
+                        navigate('/planos');
                         setMobileMenuOpen(false);
                       }}
                     >
