@@ -6,6 +6,7 @@ import { Loader2, Users, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ModernFilters } from '@/components/filters/ModernFilters';
 import { PrestadorCardImproved } from '@/components/prestadores/PrestadorCardImproved';
+import { PremiumHighlightSection } from '@/components/prestadores/PremiumHighlightSection';
 import { PrestadorMiniProfileModal } from '@/components/prestadores/PrestadorMiniProfileModal';
 import { ContactModal } from '@/components/contact/ContactModal';
 import { EmergencyButton } from '@/components/emergency/EmergencyButton';
@@ -25,23 +26,29 @@ const PrestadoresPage = () => {
   const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
   const [servicos, setServicos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [currentPage, setCurrentPage] = useState(0);
   const [selectedPrestador, setSelectedPrestador] = useState<UserProfile | null>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const [filters, setFilters] = useState({
-    cidade: 'Sinop, Mato Grosso',
-    servico: '',
-    precoMin: undefined as number | undefined,
-    precoMax: undefined as number | undefined,
-    notaMin: undefined as number | undefined
+    cidade: 'Sinop, MT',
+    servicos: [] as string[],
+    precoMin: 0,
+    precoMax: 500,
+    notaMin: 0,
+    apenasPremium: false
   });
+
+  const ITEMS_PER_PAGE = 5;
 
   useEffect(() => {
     loadInitialData();
   }, []);
 
   useEffect(() => {
-    loadPrestadores();
+    loadPrestadores(true);
   }, [filters]);
 
   const loadInitialData = async () => {
@@ -53,11 +60,38 @@ const PrestadoresPage = () => {
     }
   };
 
-  const loadPrestadores = async () => {
-    setLoading(true);
+  const loadPrestadores = async (reset = false) => {
+    if (reset) {
+      setLoading(true);
+      setCurrentPage(0);
+      setPrestadores([]);
+      setHasMore(true);
+    } else {
+      setLoadingMore(true);
+    }
+
     try {
-      const data = await getPrestadores(filters);
-      setPrestadores(data);
+      const offset = reset ? 0 : (currentPage + 1) * ITEMS_PER_PAGE;
+      const data = await getPrestadores({
+        ...filters,
+        limit: ITEMS_PER_PAGE,
+        offset
+      });
+
+      if (reset) {
+        setPrestadores(data);
+      } else {
+        setPrestadores(prev => [...prev, ...data]);
+      }
+
+      // Check if there are more items
+      if (data.length < ITEMS_PER_PAGE) {
+        setHasMore(false);
+      }
+
+      if (!reset) {
+        setCurrentPage(prev => prev + 1);
+      }
     } catch (error) {
       console.error('Error loading prestadores:', error);
       toast({
@@ -67,6 +101,13 @@ const PrestadoresPage = () => {
       });
     } finally {
       setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  const handleLoadMore = () => {
+    if (!loadingMore && hasMore) {
+      loadPrestadores(false);
     }
   };
 
@@ -122,43 +163,88 @@ const PrestadoresPage = () => {
           <ModernFilters onFiltersChange={handleFiltersChange} servicos={servicos} />
         </div>
 
-        {/* Lista de Prestadores */}
-        {loading ? (
-          <div className="flex justify-center items-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
-            <span className="ml-2 text-gray-600">Carregando prestadores...</span>
-          </div>
-        ) : prestadores.length === 0 ? (
-          <Card>
-            <CardContent className="p-12 text-center">
-              <Users className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-xl font-semibold mb-2">Nenhum prestador encontrado</h3>
-              <p className="text-gray-600 mb-4">
-                Não encontramos prestadores que correspondam aos seus filtros.
-              </p>
-              <Button onClick={() => setFilters({
-                cidade: 'Sinop, Mato Grosso',
-                servico: '',
-                precoMin: undefined,
-                precoMax: undefined,
-                notaMin: undefined
-              })}>
-                Limpar Filtros
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
-            {prestadores.map(prestador => (
-              <PrestadorCardImproved
-                key={prestador.id}
-                prestador={prestador}
-                onContact={handleContact}
-                onViewProfile={handleViewProfile}
-              />
-            ))}
-          </div>
-        )}
+        {/* Premium/Highlight Section */}
+        <PremiumHighlightSection
+          onContact={handleContact}
+          onViewProfile={handleViewProfile}
+        />
+
+        {/* Lista Normal de Prestadores */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            Todos os Prestadores
+          </h2>
+          
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
+              <span className="ml-2 text-gray-600">Carregando prestadores...</span>
+            </div>
+          ) : prestadores.length === 0 ? (
+            <Card>
+              <CardContent className="p-12 text-center">
+                <Users className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                <h3 className="text-xl font-semibold mb-2">Nenhum prestador encontrado</h3>
+                <p className="text-gray-600 mb-4">
+                  Não encontramos prestadores que correspondam aos seus filtros.
+                </p>
+                <Button onClick={() => setFilters({
+                  cidade: 'Sinop, MT',
+                  servicos: [],
+                  precoMin: 0,
+                  precoMax: 500,
+                  notaMin: 0,
+                  apenasPremium: false
+                })}>
+                  Limpar Filtros
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
+                {prestadores.map(prestador => (
+                  <PrestadorCardImproved
+                    key={prestador.id}
+                    prestador={prestador}
+                    onContact={handleContact}
+                    onViewProfile={handleViewProfile}
+                  />
+                ))}
+              </div>
+
+              {/* Load More Button */}
+              {(hasMore || loadingMore) && (
+                <div className="flex justify-center mt-8">
+                  <Button
+                    onClick={handleLoadMore}
+                    disabled={loadingMore}
+                    variant="outline"
+                    size="lg"
+                  >
+                    {loadingMore ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Carregando...
+                      </>
+                    ) : (
+                      'Carregar mais prestadores'
+                    )}
+                  </Button>
+                </div>
+              )}
+
+              {/* End of results message */}
+              {!hasMore && !loadingMore && prestadores.length > 0 && (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">
+                    Não há mais prestadores disponíveis para os filtros selecionados.
+                  </p>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
       {/* Modals */}

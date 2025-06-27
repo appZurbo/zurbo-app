@@ -3,17 +3,18 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { MapPin, DollarSign, Star, Sparkles, Filter } from 'lucide-react';
+import { ServiceFilterPopover } from './ServiceFilterPopover';
+import { CityAutocomplete } from './CityAutocomplete';
 
 interface FilterState {
   cidade: string;
   precoMin: number;
   precoMax: number;
   notaMin: number;
-  servico: string;
+  servicos: string[];
   apenasPremium: boolean;
 }
 
@@ -24,17 +25,17 @@ interface ModernFiltersProps {
 
 export const ModernFilters = ({ onFiltersChange, servicos }: ModernFiltersProps) => {
   const [filters, setFilters] = useState<FilterState>({
-    cidade: 'Sinop, Mato Grosso', // Default city
+    cidade: 'Sinop, MT', // Default to match prestadores data
     precoMin: 0,
     precoMax: 500,
     notaMin: 0,
-    servico: '',
+    servicos: [],
     apenasPremium: false
   });
 
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  // Apply default city on mount
+  // Apply default filters on mount
   useEffect(() => {
     onFiltersChange(filters);
   }, []);
@@ -47,11 +48,11 @@ export const ModernFilters = ({ onFiltersChange, servicos }: ModernFiltersProps)
 
   const clearFilters = () => {
     const defaultFilters: FilterState = {
-      cidade: 'Sinop, Mato Grosso', // Keep default city
+      cidade: 'Sinop, MT', // Keep default city
       precoMin: 0,
       precoMax: 500,
       notaMin: 0,
-      servico: '',
+      servicos: [],
       apenasPremium: false
     };
     setFilters(defaultFilters);
@@ -59,7 +60,8 @@ export const ModernFilters = ({ onFiltersChange, servicos }: ModernFiltersProps)
   };
 
   const activeFiltersCount = Object.entries(filters).filter(([key, value]) => {
-    if (key === 'cidade' && value === 'Sinop, Mato Grosso') return false; // Don't count default city
+    if (key === 'cidade' && (value === 'Sinop, MT' || value === 'Sinop, Mato Grosso')) return false;
+    if (key === 'servicos') return Array.isArray(value) && value.length > 0;
     return value !== '' && value !== 0 && value !== 500 && value !== false;
   }).length;
 
@@ -104,52 +106,19 @@ export const ModernFilters = ({ onFiltersChange, servicos }: ModernFiltersProps)
             <MapPin className="w-4 h-4" />
             Cidade
           </label>
-          <Input
-            placeholder="Ex: São Paulo, Rio de Janeiro..."
+          <CityAutocomplete
             value={filters.cidade}
-            onChange={(e) => updateFilter('cidade', e.target.value)}
-            className="border-gray-300 focus:border-orange-500"
+            onChange={(value) => updateFilter('cidade', value)}
           />
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Serviço</label>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant={filters.servico === '' ? "default" : "outline"}
-              size="sm"
-              onClick={() => updateFilter('servico', '')}
-              className={filters.servico === '' ? "bg-orange-500 hover:bg-orange-600" : ""}
-            >
-              Todos
-            </Button>
-            {servicos.slice(0, 4).map((servico) => (
-              <Button
-                key={servico.id}
-                variant={filters.servico === servico.id ? "default" : "outline"}
-                size="sm"
-                onClick={() => updateFilter('servico', servico.id)}
-                className={filters.servico === servico.id ? "bg-orange-500 hover:bg-orange-600" : ""}
-              >
-                {servico.nome}
-              </Button>
-            ))}
-            {servicos.length > 4 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {servicos.slice(4).map((servico) => (
-                  <Button
-                    key={servico.id}
-                    variant={filters.servico === servico.id ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => updateFilter('servico', servico.id)}
-                    className={filters.servico === servico.id ? "bg-orange-500 hover:bg-orange-600" : ""}
-                  >
-                    {servico.nome}
-                  </Button>
-                ))}
-              </div>
-            )}
-          </div>
+          <label className="text-sm font-medium text-gray-700">Serviços</label>
+          <ServiceFilterPopover
+            servicos={servicos}
+            selectedServices={filters.servicos}
+            onSelectionChange={(services) => updateFilter('servicos', services)}
+          />
         </div>
 
         <div className="space-y-2">
