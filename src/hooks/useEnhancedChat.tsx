@@ -74,8 +74,9 @@ export const useEnhancedChat = () => {
           
           return {
             ...conv,
+            status: conv.status as ChatConversation['status'],
             last_message: lastMsg?.content || 'Nova conversa'
-          };
+          } as ChatConversation;
         })
       );
       
@@ -102,7 +103,13 @@ export const useEnhancedChat = () => {
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setMessages(data || []);
+      
+      const typedMessages = (data || []).map(msg => ({
+        ...msg,
+        message_type: msg.message_type as ChatMessage['message_type']
+      })) as ChatMessage[];
+      
+      setMessages(typedMessages);
     } catch (error) {
       console.error('Error loading messages:', error);
       toast({
@@ -293,21 +300,30 @@ export const useEnhancedChat = () => {
       if (error) throw error;
 
       if (accept) {
-        // Create pedido
+        // Create pedido - get a default service ID first
         const conversation = conversations.find(c => c.id === conversationId);
         if (conversation) {
-          const { error: pedidoError } = await supabase
-            .from('pedidos')
-            .insert({
-              cliente_id: conversation.cliente_id,
-              prestador_id: conversation.prestador_id,
-              titulo: conversation.servico_solicitado,
-              descricao: `Serviço solicitado via chat`,
-              preco_acordado: conversation.preco_proposto,
-              status: 'aceito'
-            });
+          const { data: defaultService } = await supabase
+            .from('servicos')
+            .select('id')
+            .limit(1)
+            .single();
 
-          if (pedidoError) throw pedidoError;
+          if (defaultService) {
+            const { error: pedidoError } = await supabase
+              .from('pedidos')
+              .insert({
+                cliente_id: conversation.cliente_id,
+                prestador_id: conversation.prestador_id,
+                servico_id: defaultService.id,
+                titulo: conversation.servico_solicitado,
+                descricao: `Serviço solicitado via chat`,
+                preco_acordado: conversation.preco_proposto,
+                status: 'aceito'
+              });
+
+            if (pedidoError) throw pedidoError;
+          }
         }
       }
 

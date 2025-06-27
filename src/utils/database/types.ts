@@ -21,6 +21,7 @@ export interface UserProfile {
   premium?: boolean;
   criado_em: string;
   updated_at?: string;
+  servicos_oferecidos?: string[];
   prestador_servicos?: {
     servico_id: string;
     preco_min?: number;
