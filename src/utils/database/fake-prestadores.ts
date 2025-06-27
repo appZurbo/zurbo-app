@@ -272,20 +272,20 @@ export const createFakePrestadores = async () => {
         }
       }
 
-      // Add premium plan if applicable
+      // Add premium plan if applicable - using 'usuarios_premium' table instead of 'plano_premium'
       if (prestador.premium) {
         await supabase
-          .from('plano_premium')
+          .from('usuarios_premium')
           .upsert({
-            prestador_id: insertedUser.id,
+            usuario_id: insertedUser.id,
             ativo: true,
-            desde: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
-            expira_em: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
+            desde: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+            expira_em: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
           });
       }
 
       // Add some fake service history
-      for (let i = 0; i < prestador.servicos_concluidos; i++) {
+      for (let i = 0; i < Math.min(prestador.servicos_concluidos, 10); i++) {
         const servicoId = servicosMap.get(prestador.servicos[0]);
         if (servicoId) {
           await supabase
