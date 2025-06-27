@@ -87,7 +87,7 @@ export const ProviderProfileSection = () => {
             <Phone className="h-5 w-5 text-gray-500" />
             <div>
               <Label className="text-sm font-medium text-gray-700">Telefone</Label>
-              <p className="text-sm text-gray-900">{profile.telefone || 'Não informado'}</p>
+              <p className="text-sm text-gray-900">Não informado</p>
             </div>
           </div>
 
@@ -109,7 +109,7 @@ export const ProviderProfileSection = () => {
             <div>
               <Label className="text-sm font-medium text-gray-700">Cadastro</Label>
               <p className="text-sm text-gray-900">
-                {formatDate(profile.created_at)}
+                {formatDate(profile.criado_em)}
               </p>
             </div>
           </div>
