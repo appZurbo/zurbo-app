@@ -108,7 +108,7 @@ export const PrestadorCardImproved: React.FC<PrestadorCardImprovedProps> = ({
             <div className="flex items-center gap-1 mt-1">
               <StarRating 
                 rating={Number(prestador.nota_media) || 0} 
-                size={16} 
+                size="sm" 
                 readonly 
               />
               <span className="text-sm text-gray-600 ml-1">
