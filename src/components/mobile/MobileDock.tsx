@@ -12,8 +12,11 @@ export const MobileDock = () => {
   const isMobile = useMobile();
   const { isAuthenticated, profile } = useAuth();
 
-  // Don't show dock on login/auth pages or if not mobile
-  if (!isMobile || location.pathname === '/auth' || location.pathname === '/login') {
+  // Check if it's mobile or tablet (up to 1024px)
+  const isTabletOrMobile = window.innerWidth <= 1024;
+
+  // Don't show dock on login/auth pages or if desktop
+  if (!isTabletOrMobile || location.pathname === '/auth' || location.pathname === '/login') {
     return null;
   }
 
@@ -60,30 +63,44 @@ export const MobileDock = () => {
     return location.pathname === path;
   };
 
+  const visibleItems = dockItems.filter(item => item.show);
+
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg">
-      <div className="flex items-center justify-around py-2 px-4">
-        {dockItems.filter(item => item.show).map((item) => {
-          const Icon = item.icon;
-          const active = isActive(item.path);
-          
-          return (
-            <Button
-              key={item.path}
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate(item.path)}
-              className={`flex flex-col items-center gap-1 h-auto py-2 px-3 ${
-                active 
-                  ? 'text-orange-500 bg-orange-50' 
-                  : 'text-gray-600 hover:text-orange-500'
-              }`}
-            >
-              <Icon className="h-5 w-5" />
-              <span className="text-xs font-medium">{item.label}</span>
-            </Button>
-          );
-        })}
+      {/* Container with max width and centering for tablets */}
+      <div className="max-w-md mx-auto px-4">
+        <div className="flex items-center justify-center py-2">
+          {/* Grid that adapts to number of visible items and centers them */}
+          <div 
+            className="grid gap-2 px-4"
+            style={{ 
+              gridTemplateColumns: `repeat(${visibleItems.length}, 1fr)`,
+              minWidth: `${visibleItems.length * 80}px` // Ensure minimum width for proper spacing
+            }}
+          >
+            {visibleItems.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(item.path);
+              
+              return (
+                <Button
+                  key={item.path}
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate(item.path)}
+                  className={`flex flex-col items-center gap-1 h-auto py-3 px-4 rounded-xl transition-all duration-200 ${
+                    active 
+                      ? 'text-orange-500 bg-orange-50 shadow-sm scale-105' 
+                      : 'text-gray-600 hover:text-orange-500 hover:bg-orange-50'
+                  }`}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span className="text-xs font-medium">{item.label}</span>
+                </Button>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );

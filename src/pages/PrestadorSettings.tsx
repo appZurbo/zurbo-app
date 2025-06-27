@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,17 +12,17 @@ import { PortfolioUpload } from '@/components/prestador/PortfolioUpload';
 import { NotificationSettings } from '@/components/prestador/NotificationSettings';
 import { LocationSettings } from '@/components/location/LocationSettings';
 import { OnDutyToggle } from '@/components/provider/OnDutyToggle';
-import { EmergencyButton } from '@/components/emergency/EmergencyButton';
+import { ProviderProfileSection } from '@/components/settings/ProviderProfileSection';
+
 const PrestadorSettings = () => {
   const navigate = useNavigate();
-  const {
-    profile,
-    isPrestador
-  } = useAuth();
-  const [activeTab, setActiveTab] = useState('services');
+  const { profile, isPrestador } = useAuth();
+  const [activeTab, setActiveTab] = useState('profile');
   const isMobile = useMobile();
+
   if (!isPrestador) {
-    return <div className="min-h-screen flex items-center justify-center">
+    return (
+      <div className="min-h-screen flex items-center justify-center">
         <Card className="max-w-md">
           <CardContent className="p-6 text-center">
             <h3 className="text-lg font-semibold mb-2">Acesso Restrito</h3>
@@ -33,13 +34,20 @@ const PrestadorSettings = () => {
             </Button>
           </CardContent>
         </Card>
-      </div>;
+      </div>
+    );
   }
-  return <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
+
+  return (
+    <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
       <div className={`${isMobile ? 'px-4 py-4' : 'max-w-6xl mx-auto p-4'}`}>
         {/* Header melhorado para mobile */}
         <div className={`flex items-center gap-3 mb-6 ${isMobile ? 'sticky top-0 bg-gray-50 py-2 z-10' : ''}`}>
-          <Button variant="ghost" onClick={() => navigate('/')} className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}>
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/')} 
+            className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             {!isMobile && 'Voltar'}
           </Button>
@@ -48,21 +56,21 @@ const PrestadorSettings = () => {
               Configurações do Prestador
             </h1>
             <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
-              Gerencie seus serviços, localização, portfólio e configurações
+              Gerencie seus dados, serviços, localização e configurações
             </p>
           </div>
-          {/* Espaço vazio para balancear o layout */}
           <div className={`${isMobile ? 'w-10' : 'w-20'}`}></div>
         </div>
 
         {/* Status Em Serviço */}
         <OnDutyToggle />
 
-        {/* Botão SOS Emergência */}
-        
-
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className={`${isMobile ? 'grid grid-cols-2 gap-2 h-auto p-2' : 'grid grid-cols-4'} w-full ${isMobile ? 'max-w-full' : 'max-w-2xl'}`}>
+          <TabsList className={`${isMobile ? 'grid grid-cols-2 gap-2 h-auto p-2' : 'grid grid-cols-5'} w-full ${isMobile ? 'max-w-full' : 'max-w-3xl'}`}>
+            <TabsTrigger value="profile" className={`flex items-center gap-2 ${isMobile ? 'flex-col p-3 h-auto' : ''}`}>
+              <Settings className="h-4 w-4" />
+              <span className={`${isMobile ? 'text-xs' : ''}`}>Dados</span>
+            </TabsTrigger>
             <TabsTrigger value="services" className={`flex items-center gap-2 ${isMobile ? 'flex-col p-3 h-auto' : ''}`}>
               <Wrench className="h-4 w-4" />
               <span className={`${isMobile ? 'text-xs' : ''}`}>Serviços</span>
@@ -81,6 +89,10 @@ const PrestadorSettings = () => {
             </TabsTrigger>
           </TabsList>
 
+          <TabsContent value="profile">
+            <ProviderProfileSection />
+          </TabsContent>
+
           <TabsContent value="services">
             <ServiceSelectionPage onComplete={() => {}} />
           </TabsContent>
@@ -98,6 +110,8 @@ const PrestadorSettings = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default PrestadorSettings;

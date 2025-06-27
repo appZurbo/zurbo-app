@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -23,12 +24,14 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
 import AuthModal from './AuthModal';
 import { NotificationBell } from './notifications/NotificationBell';
+import { useMobile } from '@/hooks/useMobile';
 
 const Header = () => {
   const { user, profile, logout, isPrestador } = useAuth();
   const navigate = useNavigate();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isMobile = useMobile();
 
   const handleLogin = (userData: any) => {
     console.log('Login realizado:', userData);
@@ -64,7 +67,7 @@ const Header = () => {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
+            <nav className="hidden lg:flex items-center space-x-8">
               <Link to="/" className="text-gray-700 hover:text-orange-500 transition-colors">
                 Início
               </Link>
@@ -77,7 +80,7 @@ const Header = () => {
             </nav>
 
             {/* Desktop Actions */}
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="hidden lg:flex items-center space-x-4">
               {user ? (
                 <>
                   <Button
@@ -147,133 +150,30 @@ const Header = () => {
               )}
             </div>
 
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              >
-                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </Button>
+            {/* Mobile/Tablet Actions - Only Crown and Notifications for logged users */}
+            <div className="flex lg:hidden items-center space-x-2">
+              {user ? (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate('/planos')}
+                    className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
+                  >
+                    <Crown className="h-5 w-5" />
+                  </Button>
+                  <NotificationBell />
+                </>
+              ) : (
+                <Button 
+                  onClick={() => setShowAuthModal(true)}
+                  className="gradient-bg text-sm px-3 py-2"
+                >
+                  Entrar
+                </Button>
+              )}
             </div>
           </div>
-
-          {/* Mobile Navigation */}
-          {mobileMenuOpen && (
-            <div className="md:hidden border-t bg-white py-4">
-              <nav className="flex flex-col space-y-4">
-                <Link 
-                  to="/" 
-                  className="text-gray-700 hover:text-orange-500 transition-colors px-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Início
-                </Link>
-                <Link 
-                  to="/prestadores" 
-                  className="text-gray-700 hover:text-orange-500 transition-colors px-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Prestadores
-                </Link>
-                <Link 
-                  to="/como-funciona" 
-                  className="text-gray-700 hover:text-orange-500 transition-colors px-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Como Funciona
-                </Link>
-                
-                {user ? (
-                  <div className="flex flex-col space-y-2 pt-4 border-t">
-                    <div className="flex items-center gap-2 px-2">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={profile?.foto_url} alt={profile?.nome} />
-                        <AvatarFallback>
-                          {profile?.nome?.charAt(0) || user.email?.charAt(0) || '?'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium text-sm">{profile?.nome || 'Usuário'}</p>
-                        {isPrestador && (
-                          <span className="inline-flex items-center gap-1 text-xs text-orange-600">
-                            <Wrench className="h-3 w-3" />
-                            Prestador
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <Button 
-                      variant="ghost" 
-                      className="justify-start px-2" 
-                      onClick={() => {
-                        navigate('/planos');
-                        setMobileMenuOpen(false);
-                      }}
-                    >
-                      <Crown className="mr-2 h-4 w-4 text-yellow-600" />
-                      Premium
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      className="justify-start px-2" 
-                      onClick={() => {
-                        handleProfileClick();
-                        setMobileMenuOpen(false);
-                      }}
-                    >
-                      <User className="mr-2 h-4 w-4" />
-                      Perfil
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      className="justify-start px-2" 
-                      onClick={() => {
-                        handleSettingsClick();
-                        setMobileMenuOpen(false);
-                      }}
-                    >
-                      <Settings className="mr-2 h-4 w-4" />
-                      {isPrestador ? 'Configurações do Prestador' : 'Configurações'}
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      className="justify-start px-2" 
-                      onClick={() => {
-                        handleLogout();
-                        setMobileMenuOpen(false);
-                      }}
-                    >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Sair
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex flex-col space-y-2 pt-4 border-t">
-                    <Button 
-                      variant="ghost" 
-                      onClick={() => {
-                        setShowAuthModal(true);
-                        setMobileMenuOpen(false);
-                      }}
-                    >
-                      Entrar
-                    </Button>
-                    <Button 
-                      onClick={() => {
-                        setShowAuthModal(true);
-                        setMobileMenuOpen(false);
-                      }}
-                      className="gradient-bg"
-                    >
-                      Cadastrar
-                    </Button>
-                  </div>
-                )}
-              </nav>
-            </div>
-          )}
         </div>
       </header>
 
