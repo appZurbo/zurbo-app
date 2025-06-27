@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
@@ -25,10 +24,10 @@ export const BecomeProviderButton = () => {
 
     setIsLoading(true);
     try {
-      // Call the migration function with explicit typing
-      const { error } = await supabase.rpc('migrate_client_to_provider', {
+      // Call the migration function with explicit typing to fix TS error
+      const { error } = await supabase.rpc('migrate_client_to_provider' as any, {
         user_uuid: profile.id
-      });
+      } as any);
 
       if (error) {
         console.error('Migration error:', error);
