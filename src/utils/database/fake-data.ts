@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 // Dados fake para testes - 10 usuários completos
@@ -296,3 +295,33 @@ export const createFakeAgendamentos = async () => {
     console.error('Erro geral ao criar agendamentos:', error);
   }
 };
+
+import { createFakePrestadores } from './fake-prestadores';
+
+// Add the new function to create all fake data
+export const createAllFakeData = async () => {
+  try {
+    console.log('Iniciando criação de dados de teste...');
+    
+    // Create original fake users
+    await createFakeUsers();
+    
+    // Create fake prestadores with enhanced data
+    await createFakePrestadores();
+    
+    // Create fake agendamentos
+    await createFakeAgendamentos();
+    
+    // Create fake historico
+    await createFakeHistorico();
+    
+    console.log('Todos os dados de teste foram criados com sucesso!');
+    return true;
+  } catch (error) {
+    console.error('Erro ao criar dados de teste:', error);
+    return false;
+  }
+};
+
+// Export the new enhanced prestadores creation function
+export { createFakePrestadores } from './fake-prestadores';

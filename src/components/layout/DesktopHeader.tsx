@@ -13,7 +13,12 @@ import {
   User, 
   Settings, 
   LogOut, 
-  Wrench
+  Wrench,
+  MessageCircle,
+  Calendar,
+  LayoutDashboard,
+  FileText,
+  Crown
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
@@ -67,54 +72,94 @@ const DesktopHeader = () => {
           {/* User Actions */}
           <div className="flex items-center space-x-4">
             {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={profile?.foto_url} alt={profile?.nome} />
-                      <AvatarFallback>
-                        {profile?.nome?.charAt(0) || user.email?.charAt(0) || '?'}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <div className="flex items-center justify-start gap-2 p-2">
-                    <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">{profile?.nome || 'Usuário'}</p>
-                      <p className="w-[200px] truncate text-sm text-muted-foreground">
-                        {user.email}
-                      </p>
-                      {isPrestador && (
-                        <span className="inline-flex items-center gap-1 text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded-full">
-                          <Wrench className="h-3 w-3" />
-                          Prestador
-                        </span>
-                      )}
+              <>
+                {/* Conversations Button */}
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => navigate('/conversas')}
+                  className="relative"
+                >
+                  <MessageCircle className="h-5 w-5" />
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                    2
+                  </span>
+                </Button>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={profile?.foto_url} alt={profile?.nome} />
+                        <AvatarFallback>
+                          {profile?.nome?.charAt(0) || user.email?.charAt(0) || '?'}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <div className="flex items-center justify-start gap-2 p-2">
+                      <div className="flex flex-col space-y-1 leading-none">
+                        <p className="font-medium">{profile?.nome || 'Usuário'}</p>
+                        <p className="w-[200px] truncate text-sm text-muted-foreground">
+                          {user.email}
+                        </p>
+                        {isPrestador && (
+                          <span className="inline-flex items-center gap-1 text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded-full">
+                            <Wrench className="h-3 w-3" />
+                            Prestador
+                          </span>
+                        )}
+                        {profile?.premium && (
+                          <span className="inline-flex items-center gap-1 text-xs text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full">
+                            <Crown className="h-3 w-3" />
+                            Premium
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/perfil')}>
-                    <User className="mr-2 h-4 w-4" />
-                    Perfil
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
-                    <Settings className="mr-2 h-4 w-4" />
-                    Configurações
-                  </DropdownMenuItem>
-                  {isPrestador && (
-                    <DropdownMenuItem onClick={() => navigate('/prestador/configuracoes')}>
-                      <Wrench className="mr-2 h-4 w-4" />
-                      Configurações de Prestador
+                    <DropdownMenuSeparator />
+                    
+                    {/* Profile Settings */}
+                    <DropdownMenuItem onClick={() => navigate(isPrestador ? '/prestador-settings' : '/configuracoes')}>
+                      <User className="mr-2 h-4 w-4" />
+                      {isPrestador ? 'Prestador Configurações' : 'Configurações de Perfil'}
                     </DropdownMenuItem>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sair
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+
+                    {/* Agenda */}
+                    <DropdownMenuItem onClick={() => navigate(isPrestador ? '/agenda-prestador' : '/pedidos')}>
+                      <Calendar className="mr-2 h-4 w-4" />
+                      Agenda
+                    </DropdownMenuItem>
+
+                    {/* Dashboard (Prestadores only) */}
+                    {isPrestador && (
+                      <DropdownMenuItem onClick={() => navigate('/prestador-dashboard')}>
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        Painel do Prestador
+                      </DropdownMenuItem>
+                    )}
+
+                    {/* Orders */}
+                    <DropdownMenuItem onClick={() => navigate('/pedidos')}>
+                      <FileText className="mr-2 h-4 w-4" />
+                      Pedidos
+                    </DropdownMenuItem>
+
+                    {/* Premium Settings */}
+                    <DropdownMenuItem onClick={() => navigate('/planos')}>
+                      <Crown className="mr-2 h-4 w-4" />
+                      Premium
+                    </DropdownMenuItem>
+
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sair
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
             ) : (
               <div className="flex items-center space-x-2">
                 <Button variant="ghost" onClick={() => navigate('/auth')}>
