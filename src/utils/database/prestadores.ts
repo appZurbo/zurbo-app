@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { UserProfile, PrestadorCompleto } from './types';
 
@@ -61,7 +62,7 @@ export const getPrestadores = async (filters?: {
           nota,
           comentario,
           criado_em,
-          avaliador:avaliador_id (nome, foto_url)
+          avaliador:users!avaliacoes_avaliador_id_fkey (nome, foto_url)
         ),
         portfolio_fotos (
           id,
@@ -207,7 +208,7 @@ export const getPrestadoresPremiumDestaque = async (): Promise<UserProfile[]> =>
           preco_max,
           servicos (nome, icone, cor)
         ),
-        avaliacoes!avaliacoes_avaliado_id_fkey (
+        avaliacoes:avaliacoes!avaliacoes_avaliado_id_fkey (
           nota,
           comentario,
           criado_em,
@@ -231,7 +232,7 @@ export const getPrestadoresPremiumDestaque = async (): Promise<UserProfile[]> =>
           preco_max,
           servicos (nome, icone, cor)
         ),
-        avaliacoes!avaliacoes_avaliado_id_fkey (
+        avaliacoes:avaliacoes!avaliacoes_avaliado_id_fkey (
           nota,
           comentario,
           criado_em,
