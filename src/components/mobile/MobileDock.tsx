@@ -3,20 +3,18 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Home, Users, Crown, MessageCircle, User, Calendar } from 'lucide-react';
-import { useMobile } from '@/hooks/useMobile';
+import { useMobile, useMobileOrTablet } from '@/hooks/useMobile';
 import { useAuth } from '@/hooks/useAuth';
 
 export const MobileDock = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useMobile();
+  const isMobileOrTablet = useMobileOrTablet();
   const { isAuthenticated, profile } = useAuth();
 
-  // Check if it's mobile or tablet (up to 1024px)
-  const isTabletOrMobile = window.innerWidth <= 1024;
-
   // Don't show dock on login/auth pages or if desktop
-  if (!isTabletOrMobile || location.pathname === '/auth' || location.pathname === '/login') {
+  if (!isMobileOrTablet || location.pathname === '/auth' || location.pathname === '/login') {
     return null;
   }
 
@@ -68,14 +66,15 @@ export const MobileDock = () => {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg">
       {/* Container with max width and centering for tablets */}
-      <div className="max-w-md mx-auto px-4">
-        <div className="flex items-center justify-center py-2">
+      <div className="max-w-md mx-auto">
+        <div className="flex items-center justify-center py-1.5 px-2">
           {/* Grid that adapts to number of visible items and centers them */}
           <div 
-            className="grid gap-2 px-4"
+            className="grid gap-1"
             style={{ 
               gridTemplateColumns: `repeat(${visibleItems.length}, 1fr)`,
-              minWidth: `${visibleItems.length * 80}px` // Ensure minimum width for proper spacing
+              width: '100%',
+              maxWidth: `${visibleItems.length * 70}px` // Reduced from 80px to 70px
             }}
           >
             {visibleItems.map((item) => {
@@ -88,14 +87,14 @@ export const MobileDock = () => {
                   variant="ghost"
                   size="sm"
                   onClick={() => navigate(item.path)}
-                  className={`flex flex-col items-center gap-1 h-auto py-3 px-4 rounded-xl transition-all duration-200 ${
+                  className={`flex flex-col items-center gap-0.5 h-auto py-2 px-2 rounded-lg transition-all duration-200 ${
                     active 
                       ? 'text-orange-500 bg-orange-50 shadow-sm scale-105' 
                       : 'text-gray-600 hover:text-orange-500 hover:bg-orange-50'
                   }`}
                 >
-                  <Icon className="h-5 w-5" />
-                  <span className="text-xs font-medium">{item.label}</span>
+                  <Icon className="h-4 w-4" />
+                  <span className="text-xs font-medium leading-tight">{item.label}</span>
                 </Button>
               );
             })}

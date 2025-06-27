@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +14,7 @@ interface FilterState {
   precoMax: number;
   notaMin: number;
   servico: string;
-  apenasPremium: boolean; // Fixed: changed from apenasПремium to apenasPremium
+  apenasPremium: boolean;
 }
 
 interface ModernFiltersProps {
@@ -24,15 +24,20 @@ interface ModernFiltersProps {
 
 export const ModernFilters = ({ onFiltersChange, servicos }: ModernFiltersProps) => {
   const [filters, setFilters] = useState<FilterState>({
-    cidade: '',
+    cidade: 'Sinop, Mato Grosso', // Default city
     precoMin: 0,
     precoMax: 500,
     notaMin: 0,
     servico: '',
-    apenasPremium: false // Fixed: changed from apenasПремium to apenasPremium
+    apenasPremium: false
   });
 
   const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Apply default city on mount
+  useEffect(() => {
+    onFiltersChange(filters);
+  }, []);
 
   const updateFilter = (key: keyof FilterState, value: any) => {
     const newFilters = { ...filters, [key]: value };
@@ -42,20 +47,21 @@ export const ModernFilters = ({ onFiltersChange, servicos }: ModernFiltersProps)
 
   const clearFilters = () => {
     const defaultFilters: FilterState = {
-      cidade: '',
+      cidade: 'Sinop, Mato Grosso', // Keep default city
       precoMin: 0,
       precoMax: 500,
       notaMin: 0,
       servico: '',
-      apenasPremium: false // Fixed: changed from apenasПремium to apenasPremium
+      apenasPremium: false
     };
     setFilters(defaultFilters);
     onFiltersChange(defaultFilters);
   };
 
-  const activeFiltersCount = Object.values(filters).filter(value => 
-    value !== '' && value !== 0 && value !== 500 && value !== false
-  ).length;
+  const activeFiltersCount = Object.entries(filters).filter(([key, value]) => {
+    if (key === 'cidade' && value === 'Sinop, Mato Grosso') return false; // Don't count default city
+    return value !== '' && value !== 0 && value !== 500 && value !== false;
+  }).length;
 
   return (
     <Card className="p-4 mb-6 bg-white shadow-sm border border-gray-100">
@@ -117,7 +123,7 @@ export const ModernFilters = ({ onFiltersChange, servicos }: ModernFiltersProps)
             >
               Todos
             </Button>
-            {servicos.slice(0, 3).map((servico) => (
+            {servicos.slice(0, 4).map((servico) => (
               <Button
                 key={servico.id}
                 variant={filters.servico === servico.id ? "default" : "outline"}
@@ -128,6 +134,21 @@ export const ModernFilters = ({ onFiltersChange, servicos }: ModernFiltersProps)
                 {servico.nome}
               </Button>
             ))}
+            {servicos.length > 4 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {servicos.slice(4).map((servico) => (
+                  <Button
+                    key={servico.id}
+                    variant={filters.servico === servico.id ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => updateFilter('servico', servico.id)}
+                    className={filters.servico === servico.id ? "bg-orange-500 hover:bg-orange-600" : ""}
+                  >
+                    {servico.nome}
+                  </Button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

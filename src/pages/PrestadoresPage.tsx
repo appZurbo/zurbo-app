@@ -11,6 +11,7 @@ import { ContactModal } from '@/components/contact/ContactModal';
 import { EmergencyButton } from '@/components/emergency/EmergencyButton';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { getPrestadores } from '@/utils/database/prestadores';
+import { getServicos } from '@/utils/database/servicos';
 import { UserProfile } from '@/utils/database/types';
 import { useToast } from '@/hooks/use-toast';
 import { useMobile } from '@/hooks/useMobile';
@@ -22,12 +23,13 @@ const PrestadoresPage = () => {
   const isMobile = useMobile();
   const { isAuthenticated } = useAuth();
   const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
+  const [servicos, setServicos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPrestador, setSelectedPrestador] = useState<UserProfile | null>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const [filters, setFilters] = useState({
-    cidade: '',
+    cidade: 'Sinop, Mato Grosso',
     servico: '',
     precoMin: undefined as number | undefined,
     precoMax: undefined as number | undefined,
@@ -35,8 +37,21 @@ const PrestadoresPage = () => {
   });
 
   useEffect(() => {
+    loadInitialData();
+  }, []);
+
+  useEffect(() => {
     loadPrestadores();
   }, [filters]);
+
+  const loadInitialData = async () => {
+    try {
+      const servicosData = await getServicos();
+      setServicos(servicosData);
+    } catch (error) {
+      console.error('Error loading initial data:', error);
+    }
+  };
 
   const loadPrestadores = async () => {
     setLoading(true);
@@ -95,7 +110,7 @@ const PrestadoresPage = () => {
           </div>
         </div>
 
-        {/* Emergency SOS Button - moved from Index page */}
+        {/* Emergency SOS Button */}
         {isAuthenticated && (
           <div className="mb-8">
             <EmergencyButton />
@@ -104,7 +119,7 @@ const PrestadoresPage = () => {
 
         {/* Filtros */}
         <div className="mb-8">
-          <ModernFilters onFiltersChange={handleFiltersChange} servicos={[]} />
+          <ModernFilters onFiltersChange={handleFiltersChange} servicos={servicos} />
         </div>
 
         {/* Lista de Prestadores */}
@@ -122,7 +137,7 @@ const PrestadoresPage = () => {
                 Não encontramos prestadores que correspondam aos seus filtros.
               </p>
               <Button onClick={() => setFilters({
-                cidade: '',
+                cidade: 'Sinop, Mato Grosso',
                 servico: '',
                 precoMin: undefined,
                 precoMax: undefined,
