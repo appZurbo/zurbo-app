@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Home, Users, Crown, MessageCircle, User } from 'lucide-react';
+import { Home, Users, Crown, MessageCircle, User, Calendar } from 'lucide-react';
 import { useMobile } from '@/hooks/useMobile';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -10,12 +10,18 @@ export const MobileDock = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useMobile();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, profile } = useAuth();
 
   // Don't show dock on login/auth pages or if not mobile
   if (!isMobile || location.pathname === '/auth' || location.pathname === '/login') {
     return null;
   }
+
+  // Dynamic agenda path based on user type
+  const getAgendaPath = () => {
+    if (!profile) return '/pedidos';
+    return profile.tipo === 'prestador' ? '/agenda-prestador' : '/pedidos';
+  };
 
   const dockItems = [
     {
@@ -31,10 +37,10 @@ export const MobileDock = () => {
       show: true
     },
     {
-      icon: Crown,
-      label: 'Planos',
-      path: '/planos',
-      show: true
+      icon: Calendar,
+      label: 'Agenda',
+      path: getAgendaPath(),
+      show: isAuthenticated
     },
     {
       icon: MessageCircle,

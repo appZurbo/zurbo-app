@@ -17,6 +17,8 @@ const PrestadoresPage = lazy(() => import('@/pages/PrestadoresPage'));
 const AuthPage = lazy(() => import('@/pages/AuthPage'));
 const TrabalheConosco = lazy(() => import('@/pages/TrabalheConosco'));
 const PrestadorSettings = lazy(() => import('@/pages/PrestadorSettings'));
+const PrestadorDashboard = lazy(() => import('@/pages/PrestadorDashboard'));
+const AgendaPrestador = lazy(() => import('@/pages/AgendaPrestador'));
 const Planos = lazy(() => import('@/pages/Planos'));
 
 const queryClient = new QueryClient({
@@ -51,6 +53,8 @@ function App() {
                   <Route path="/auth" element={<AuthPage />} />
                   <Route path="/trabalhe-conosco" element={<TrabalheConosco />} />
                   <Route path="/prestador-settings" element={<PrestadorSettings />} />
+                  <Route path="/prestador-dashboard" element={<PrestadorDashboard />} />
+                  <Route path="/agenda-prestador" element={<AgendaPrestador />} />
                   <Route path="/planos" element={<Planos />} />
                   <Route path="/admin/relatorios" element={<AdminRelatorios />} />
                 </Routes>

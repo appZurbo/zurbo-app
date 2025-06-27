@@ -6,9 +6,10 @@ import { Loader2, Users, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ModernFilters } from '@/components/filters/ModernFilters';
 import { PrestadorCardImproved } from '@/components/prestadores/PrestadorCardImproved';
-import { PrestadorProfileModal } from '@/components/prestadores/PrestadorProfileModal';
+import { PrestadorMiniProfileModal } from '@/components/prestadores/PrestadorMiniProfileModal';
 import { ContactModal } from '@/components/contact/ContactModal';
 import { EmergencyButton } from '@/components/emergency/EmergencyButton';
+import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { getPrestadores } from '@/utils/database/prestadores';
 import { UserProfile } from '@/utils/database/types';
 import { useToast } from '@/hooks/use-toast';
@@ -59,13 +60,20 @@ const PrestadoresPage = () => {
     setShowContactModal(true);
   };
 
+  const handleViewProfile = (prestador: UserProfile) => {
+    setSelectedPrestador(prestador);
+    setShowProfileModal(true);
+  };
+
   const handleFiltersChange = (newFilters: any) => {
     setFilters(newFilters);
   };
 
   return (
-    <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
-      <div className={`${isMobile ? 'px-4 py-4' : 'max-w-7xl mx-auto p-6'}`}>
+    <div className="min-h-screen bg-gray-50">
+      <UnifiedHeader />
+      
+      <div className={`${isMobile ? 'px-4 py-4 pb-20' : 'max-w-7xl mx-auto p-6'}`}>
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
           <Button 
@@ -131,6 +139,7 @@ const PrestadoresPage = () => {
                 key={prestador.id}
                 prestador={prestador}
                 onContact={handleContact}
+                onViewProfile={handleViewProfile}
               />
             ))}
           </div>
@@ -140,7 +149,7 @@ const PrestadoresPage = () => {
       {/* Modals */}
       {selectedPrestador && (
         <>
-          <PrestadorProfileModal
+          <PrestadorMiniProfileModal
             prestador={selectedPrestador}
             isOpen={showProfileModal}
             onClose={() => setShowProfileModal(false)}

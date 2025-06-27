@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Camera, Save, Mail, MapPin, Calendar } from 'lucide-react';
+import { Camera, Save, Mail, MapPin, Calendar, CreditCard } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useProfilePicture } from '@/hooks/useProfilePicture';
@@ -93,6 +93,12 @@ export const ProfileTab = () => {
     }
   };
 
+  const formatCPF = (cpf: string) => {
+    if (!cpf) return 'Não informado';
+    // Format CPF as XXX.XXX.XXX-XX
+    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  };
+
   if (!profile) {
     return <div className="text-center py-4">Carregando perfil...</div>;
   }
@@ -157,6 +163,19 @@ export const ProfileTab = () => {
         </div>
 
         <div className="space-y-2">
+          <Label htmlFor="cpf">CPF (Cadastrado na criação da conta)</Label>
+          <div className="flex items-center gap-2 p-2 bg-gray-100 rounded border">
+            <CreditCard className="h-4 w-4 text-gray-500" />
+            <span className="text-sm font-mono text-gray-700">
+              {formatCPF(profile.cpf)}
+            </span>
+          </div>
+          <p className="text-xs text-gray-500">
+            CPF registrado no momento da criação da conta (não modificável)
+          </p>
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="cidade">Cidade</Label>
           {isEditing ? (
             <Input
@@ -217,6 +236,22 @@ export const ProfileTab = () => {
           ) : (
             <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
               <span className="text-sm">{profile.endereco_numero || 'Não informado'}</span>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="cep">CEP</Label>
+          {isEditing ? (
+            <Input
+              id="cep"
+              value={formData.endereco_cep}
+              onChange={(e) => setFormData({...formData, endereco_cep: e.target.value})}
+              placeholder="00000-000"
+            />
+          ) : (
+            <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+              <span className="text-sm">{profile.endereco_cep || 'Não informado'}</span>
             </div>
           )}
         </div>
