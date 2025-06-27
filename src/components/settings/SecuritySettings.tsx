@@ -1,29 +1,31 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Shield, Key, Eye, Download, Trash2, AlertCircle } from 'lucide-react';
+import { Shield, Key, Eye, Download, Trash2, AlertCircle, User, MapPin, Phone, Mail } from 'lucide-react';
 import { securityLogger } from '@/utils/securityLogger';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useMobile } from '@/hooks/useMobile';
+
 const SecuritySettings = () => {
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [loginNotifications, setLoginNotifications] = useState(true);
   const [securityAlerts, setSecurityAlerts] = useState(true);
   const [sessionTimeout, setSessionTimeout] = useState(30); // minutos
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
-  const {
-    profile
-  } = useAuth();
-  const {
-    toast
-  } = useToast();
+  const { profile, isPrestador } = useAuth();
+  const { toast } = useToast();
+  const isMobile = useMobile();
+
   useEffect(() => {
     loadSecuritySettings();
     loadRecentActivity();
   }, []);
+
   const loadSecuritySettings = () => {
     // Carregar configurações do localStorage ou API
     const settings = JSON.parse(localStorage.getItem('security_settings') || '{}');
@@ -32,29 +34,28 @@ const SecuritySettings = () => {
     setSecurityAlerts(settings.securityAlerts !== false);
     setSessionTimeout(settings.sessionTimeout || 30);
   };
+
   const saveSecuritySettings = (newSettings: any) => {
     const currentSettings = JSON.parse(localStorage.getItem('security_settings') || '{}');
-    const updatedSettings = {
-      ...currentSettings,
-      ...newSettings
-    };
+    const updatedSettings = { ...currentSettings, ...newSettings };
     localStorage.setItem('security_settings', JSON.stringify(updatedSettings));
+    
     if (profile?.id) {
       securityLogger.logEvent({
         event_type: 'profile_update',
         user_id: profile.id,
-        details: {
-          securitySettingsChanged: Object.keys(newSettings)
-        },
+        details: { securitySettingsChanged: Object.keys(newSettings) },
         severity: 'low'
       });
     }
   };
+
   const loadRecentActivity = () => {
     const logs = securityLogger.getSecurityLogs();
     const userLogs = logs.filter((log: any) => log.user_id === profile?.id).slice(-10).reverse();
     setRecentActivity(userLogs);
   };
+
   const enableTwoFactor = async () => {
     // Implementar 2FA aqui (QR code, backup codes, etc.)
     toast({
@@ -62,6 +63,7 @@ const SecuritySettings = () => {
       description: "Esta funcionalidade estará disponível na próxima atualização"
     });
   };
+
   const downloadSecurityReport = () => {
     const logs = securityLogger.getSecurityLogs();
     const userLogs = logs.filter((log: any) => log.user_id === profile?.id);
@@ -77,14 +79,17 @@ const SecuritySettings = () => {
         sessionTimeout
       }
     };
+
     const dataStr = JSON.stringify(report, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
     const exportFileDefaultName = `security_report_${new Date().toISOString().split('T')[0]}.json`;
+    
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
     linkElement.click();
   };
+
   const clearSecurityLogs = () => {
     localStorage.removeItem('security_logs');
     setRecentActivity([]);
@@ -93,7 +98,61 @@ const SecuritySettings = () => {
       description: "Histórico de segurança foi removido"
     });
   };
-  return <div className="max-w-4xl mx-auto space-y-6">
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Informações Pessoais - Apenas para Prestadores */}
+      {isPrestador && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="h-5 w-5 text-blue-500" />
+              Informações Pessoais
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <User className="h-5 w-5 text-gray-500" />
+                <div>
+                  <Label className="text-sm font-medium">Nome Completo</Label>
+                  <p className="text-sm text-gray-600">{profile?.nome || 'Não informado'}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <Mail className="h-5 w-5 text-gray-500" />
+                <div>
+                  <Label className="text-sm font-medium">Email</Label>
+                  <p className="text-sm text-gray-600">{profile?.email || 'Não informado'}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <Phone className="h-5 w-5 text-gray-500" />
+                <div>
+                  <Label className="text-sm font-medium">CPF</Label>
+                  <p className="text-sm text-gray-600">{profile?.cpf || 'Não informado'}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <MapPin className="h-5 w-5 text-gray-500" />
+                <div>
+                  <Label className="text-sm font-medium">Localização</Label>
+                  <p className="text-sm text-gray-600">
+                    {profile?.endereco_cidade && profile?.endereco_bairro 
+                      ? `${profile.endereco_bairro}, ${profile.endereco_cidade}`
+                      : 'Não informado'
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -115,7 +174,11 @@ const SecuritySettings = () => {
             </div>
             <div className="flex items-center gap-2">
               {twoFactorEnabled && <Badge variant="secondary">Ativado</Badge>}
-              <Button variant={twoFactorEnabled ? "destructive" : "default"} size="sm" onClick={enableTwoFactor}>
+              <Button 
+                variant={twoFactorEnabled ? "destructive" : "default"} 
+                size="sm" 
+                onClick={enableTwoFactor}
+              >
                 {twoFactorEnabled ? 'Desativar' : 'Ativar'}
               </Button>
             </div>
@@ -132,12 +195,14 @@ const SecuritySettings = () => {
                 </p>
               </div>
             </div>
-            <Switch id="login-notifications" checked={loginNotifications} onCheckedChange={checked => {
-            setLoginNotifications(checked);
-            saveSecuritySettings({
-              loginNotifications: checked
-            });
-          }} />
+            <Switch 
+              id="login-notifications" 
+              checked={loginNotifications} 
+              onCheckedChange={(checked) => {
+                setLoginNotifications(checked);
+                saveSecuritySettings({ loginNotifications: checked });
+              }} 
+            />
           </div>
 
           {/* Alertas de Segurança */}
@@ -151,12 +216,14 @@ const SecuritySettings = () => {
                 </p>
               </div>
             </div>
-            <Switch id="security-alerts" checked={securityAlerts} onCheckedChange={checked => {
-            setSecurityAlerts(checked);
-            saveSecuritySettings({
-              securityAlerts: checked
-            });
-          }} />
+            <Switch 
+              id="security-alerts" 
+              checked={securityAlerts} 
+              onCheckedChange={(checked) => {
+                setSecurityAlerts(checked);
+                saveSecuritySettings({ securityAlerts: checked });
+              }} 
+            />
           </div>
         </CardContent>
       </Card>
@@ -164,26 +231,40 @@ const SecuritySettings = () => {
       {/* Atividade Recente */}
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center">
+          <div className={`flex ${isMobile ? 'flex-col gap-4' : 'justify-between items-center'}`}>
             <CardTitle className="flex items-center gap-2">
               <Eye className="h-5 w-5" />
               Atividade Recente
             </CardTitle>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={downloadSecurityReport} className="flex items-center gap-0">
+            <div className={`flex gap-2 ${isMobile ? 'flex-col' : 'flex-row'}`}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={downloadSecurityReport} 
+                className={`flex items-center gap-2 ${isMobile ? 'w-full justify-center' : ''}`}
+              >
                 <Download className="h-4 w-4" />
-                Baixar Relatório
+                {isMobile ? 'Baixar Relatório' : 'Baixar'}
               </Button>
-              <Button variant="outline" size="sm" onClick={clearSecurityLogs} className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={clearSecurityLogs} 
+                className={`flex items-center gap-2 ${isMobile ? 'w-full justify-center' : ''}`}
+              >
                 <Trash2 className="h-4 w-4" />
-                Limpar Histórico
+                {isMobile ? 'Limpar Histórico' : 'Limpar'}
               </Button>
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {recentActivity.length === 0 ? <p className="text-gray-500 text-center py-4">Nenhuma atividade registrada</p> : recentActivity.map((activity, index) => <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+            {recentActivity.length === 0 ? (
+              <p className="text-gray-500 text-center py-4">Nenhuma atividade registrada</p>
+            ) : (
+              recentActivity.map((activity, index) => (
+                <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
                   <div>
                     <p className="font-medium">
                       {activity.event_type.replace('_', ' ').toUpperCase()}
@@ -191,17 +272,23 @@ const SecuritySettings = () => {
                     <p className="text-sm text-gray-600">
                       {new Date(activity.timestamp).toLocaleString('pt-BR')}
                     </p>
-                    {activity.details && <p className="text-xs text-gray-500">
+                    {activity.details && (
+                      <p className="text-xs text-gray-500">
                         {activity.user_agent ? `${activity.user_agent.split(' ')[0]}...` : 'Detalhes disponíveis'}
-                      </p>}
+                      </p>
+                    )}
                   </div>
                   <Badge variant={activity.severity === 'high' ? 'destructive' : 'secondary'}>
                     {activity.severity}
                   </Badge>
-                </div>)}
+                </div>
+              ))
+            )}
           </div>
         </CardContent>
       </Card>
-    </div>;
+    </div>
+  );
 };
+
 export default SecuritySettings;

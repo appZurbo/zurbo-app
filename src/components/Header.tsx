@@ -17,7 +17,8 @@ import {
   Wrench,
   Search,
   Menu,
-  X
+  X,
+  Crown
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
@@ -80,6 +81,14 @@ const Header = () => {
             <div className="hidden md:flex items-center space-x-4">
               {user ? (
                 <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate('/plano-premium')}
+                    className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
+                  >
+                    <Crown className="h-5 w-5" />
+                  </Button>
                   <NotificationBell />
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -196,6 +205,17 @@ const Header = () => {
                         )}
                       </div>
                     </div>
+                    <Button 
+                      variant="ghost" 
+                      className="justify-start px-2" 
+                      onClick={() => {
+                        navigate('/plano-premium');
+                        setMobileMenuOpen(false);
+                      }}
+                    >
+                      <Crown className="mr-2 h-4 w-4 text-yellow-600" />
+                      Premium
+                    </Button>
                     <Button 
                       variant="ghost" 
                       className="justify-start px-2" 
