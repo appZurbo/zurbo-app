@@ -1,51 +1,54 @@
 
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Toaster } from '@/components/ui/sonner';
+import { Suspense, lazy } from 'react';
+import { Toaster } from '@/components/ui/toaster';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from '@/contexts/AuthContext';
 
-import Index from './pages/Index';
-import AuthPage from './pages/AuthPage';
-import Settings from './pages/Settings';
-import PrestadoresPage from './pages/PrestadoresPage';
-import PrestadorDashboard from './pages/PrestadorDashboard';
-import AgendaPrestador from './pages/AgendaPrestador';
-import TrabalheConosco from './pages/TrabalheConosco';
-import { AdminDashboard } from './pages/AdminDashboard';
-import AdminContentModeration from './pages/AdminContentModeration';
-import SystemSettings from './pages/SystemSettings';
-import FavoritosPage from './pages/FavoritosPage';
-import NotificacoesPage from './pages/NotificacoesPage';
-import { MobileLayoutImproved } from './components/mobile/MobileLayoutImproved';
-import Pedidos from './pages/Pedidos';
-import Planos from './pages/Planos';
+// Lazy loading das páginas
+const Index = lazy(() => import('@/pages/Index'));
+const Settings = lazy(() => import('@/pages/Settings'));
+const Pedidos = lazy(() => import('@/pages/Pedidos'));
+const Conversas = lazy(() => import('@/pages/Conversas'));
+const AdminRelatorios = lazy(() => import('@/pages/admin/Relatorios'));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Toaster />
-        <MobileLayoutImproved>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/configuracoes" element={<Settings />} />
-            <Route path="/prestadores" element={<PrestadoresPage />} />
-            <Route path="/prestador-dashboard" element={<PrestadorDashboard />} />
-            <Route path="/agenda-prestador" element={<AgendaPrestador />} />
-            <Route path="/trabalhe-conosco" element={<TrabalheConosco />} />
-            <Route path="/pedidos" element={<Pedidos />} />
-            <Route path="/planos" element={<Planos />} />
-            <Route path="/favoritos" element={<FavoritosPage />} />
-            <Route path="/notificacoes" element={<NotificacoesPage />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/moderacao" element={<AdminContentModeration />} />
-            <Route path="/admin/sistema" element={<SystemSettings />} />
-          </Routes>
-        </MobileLayoutImproved>
-      </BrowserRouter>
+      <AuthProvider>
+        <TooltipProvider>
+          <BrowserRouter>
+            <div className="min-h-screen bg-background font-sans antialiased">
+              <Suspense fallback={
+                <div className="flex items-center justify-center min-h-screen">
+                  <div className="w-16 h-16 bg-orange-500 rounded-xl flex items-center justify-center animate-pulse">
+                    <span className="text-white font-bold text-2xl">Z</span>
+                  </div>
+                </div>
+              }>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/configuracoes" element={<Settings />} />
+                  <Route path="/pedidos" element={<Pedidos />} />
+                  <Route path="/conversas" element={<Conversas />} />
+                  <Route path="/admin/relatorios" element={<AdminRelatorios />} />
+                </Routes>
+              </Suspense>
+              <Toaster />
+            </div>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

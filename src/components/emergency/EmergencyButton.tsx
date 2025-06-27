@@ -1,14 +1,14 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { AlertTriangle, MapPin, Clock, DollarSign } from 'lucide-react';
+import { AlertTriangle, MapPin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { StarBorder } from '@/components/ui/star-border';
 
 export const EmergencyButton = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -62,13 +62,16 @@ export const EmergencyButton = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button 
-          className="w-full bg-red-500 hover:bg-red-600 text-white mb-6 animate-pulse"
-          size="lg"
+        <StarBorder 
+          className="w-full cursor-pointer"
+          color="#ef4444"
+          speed="2s"
         >
-          <AlertTriangle className="h-5 w-5 mr-2" />
-          Emergency SOS
-        </Button>
+          <div className="flex items-center justify-center gap-2 text-red-600">
+            <AlertTriangle className="h-5 w-5" />
+            SOS Emergência
+          </div>
+        </StarBorder>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

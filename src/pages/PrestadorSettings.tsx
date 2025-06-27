@@ -11,6 +11,8 @@ import ServiceSelectionPage from '@/components/services/ServiceSelectionPage';
 import { PortfolioUpload } from '@/components/prestador/PortfolioUpload';
 import { NotificationSettings } from '@/components/prestador/NotificationSettings';
 import { LocationSettings } from '@/components/location/LocationSettings';
+import { OnDutyToggle } from '@/components/provider/OnDutyToggle';
+import { EmergencyButton } from '@/components/emergency/EmergencyButton';
 
 const PrestadorSettings = () => {
   const navigate = useNavigate();
@@ -59,6 +61,14 @@ const PrestadorSettings = () => {
           </div>
           {/* Espaço vazio para balancear o layout */}
           <div className={`${isMobile ? 'w-10' : 'w-20'}`}></div>
+        </div>
+
+        {/* Status Em Serviço */}
+        <OnDutyToggle />
+
+        {/* Botão SOS Emergência */}
+        <div className="mb-6">
+          <EmergencyButton />
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">

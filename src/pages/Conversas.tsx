@@ -1,134 +1,105 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, MessageCircle, Clock, Search, Info, Users, Download } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { ArrowLeft, Search, MessageCircle, Users, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { Chat } from '@/utils/database/types';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { ChatHistoryDownload } from '@/components/chat/ChatHistoryDownload';
+import { useMobile } from '@/hooks/useMobile';
+import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+
+interface ChatItem {
+  id: string;
+  otherUser: {
+    id: string;
+    nome: string;
+    foto_url?: string;
+    tipo: 'cliente' | 'prestador';
+  };
+  lastMessage: string;
+  lastMessageTime: string;
+  unreadCount: number;
+  isOnline: boolean;
+}
 
 const Conversas = () => {
   const navigate = useNavigate();
   const { profile, loading } = useAuth();
-  const { toast } = useToast();
-  const [chats, setChats] = useState<Chat[]>([]);
-  const [loadingChats, setLoadingChats] = useState(true);
+  const isMobile = useMobile();
   const [searchTerm, setSearchTerm] = useState('');
+  const [chats, setChats] = useState<ChatItem[]>([]);
 
+  // Mock data - em uma aplicação real, isso viria do banco de dados
   useEffect(() => {
-    if (profile) {
-      loadChats();
-    }
-  }, [profile]);
-
-  const loadChats = async () => {
-    if (!profile) return;
-    
-    setLoadingChats(true);
-    try {
-      // Carregar chats reais do banco de dados
-      const { data: realChats, error } = await supabase
-        .from('chats')
-        .select(`
-          *,
-          cliente:users!cliente_id(id, nome, foto_url, email),
-          prestador:users!prestador_id(id, nome, foto_url, email)
-        `)
-        .or(`cliente_id.eq.${profile.id},prestador_id.eq.${profile.id}`)
-        .order('updated_at', { ascending: false });
-
-      if (error) {
-        console.error('Error loading chats:', error);
+    const mockChats: ChatItem[] = [
+      {
+        id: '1',
+        otherUser: {
+          id: 'prestador1',
+          nome: 'João Silva',
+          foto_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
+          tipo: 'prestador'
+        },
+        lastMessage: 'Olá! Posso ajudar com o reparo elétrico hoje às 14h.',
+        lastMessageTime: '2024-01-20T10:30:00',
+        unreadCount: 2,
+        isOnline: true
+      },
+      {
+        id: '2',
+        otherUser: {
+          id: 'prestador2',
+          nome: 'Maria Santos',
+          foto_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150',
+          tipo: 'prestador'
+        },
+        lastMessage: 'Serviço de limpeza finalizado com sucesso!',
+        lastMessageTime: '2024-01-19T16:45:00',
+        unreadCount: 0,
+        isOnline: false
+      },
+      {
+        id: '3',
+        otherUser: {
+          id: 'suporte',
+          nome: 'Suporte Zurbo',
+          foto_url: undefined,
+          tipo: 'prestador'
+        },
+        lastMessage: 'Obrigado pelo seu feedback! Estamos sempre melhorando.',
+        lastMessageTime: '2024-01-18T09:15:00',
+        unreadCount: 0,
+        isOnline: true
       }
+    ];
+    setChats(mockChats);
+  }, []);
 
-      // Se não houver chats reais, criar alguns dados de exemplo
-      if (!realChats || realChats.length === 0) {
-        const mockChats: Chat[] = [
-          {
-            id: '1',
-            cliente_id: profile.tipo === 'cliente' ? profile.id : 'cliente-exemplo-1',
-            prestador_id: profile.tipo === 'prestador' ? profile.id : 'prestador-exemplo-1',
-            last_message: 'Olá, gostaria de solicitar um orçamento para limpeza residencial.',
-            created_at: new Date(Date.now() - 86400000).toISOString(),
-            updated_at: new Date(Date.now() - 3600000).toISOString(),
-            cliente: profile.tipo === 'cliente' ? profile : {
-              id: 'cliente-exemplo-1',
-              nome: 'Maria Silva',
-              foto_url: '',
-              email: 'maria@email.com'
-            } as any,
-            prestador: profile.tipo === 'prestador' ? profile : {
-              id: 'prestador-exemplo-1',
-              nome: 'João Limpeza Profissional',
-              foto_url: '',
-              email: 'joao.limpeza@email.com'
-            } as any
-          },
-          {
-            id: '2',
-            cliente_id: profile.tipo === 'cliente' ? profile.id : 'cliente-exemplo-2',
-            prestador_id: profile.tipo === 'prestador' ? profile.id : 'prestador-exemplo-2',
-            last_message: 'Perfeito! O serviço foi realizado com excelência. Muito obrigada!',
-            created_at: new Date(Date.now() - 172800000).toISOString(),
-            updated_at: new Date(Date.now() - 7200000).toISOString(),
-            cliente: profile.tipo === 'cliente' ? profile : {
-              id: 'cliente-exemplo-2',
-              nome: 'Carlos Mendes',
-              foto_url: '',
-              email: 'carlos@email.com'
-            } as any,
-            prestador: profile.tipo === 'prestador' ? profile : {
-              id: 'prestador-exemplo-2',
-              nome: 'Ana Jardinagem',
-              foto_url: '',
-              email: 'ana.jardim@email.com'
-            } as any
-          }
-        ];
-        setChats(mockChats);
-      } else {
-        setChats(realChats as Chat[]);
-      }
-    } catch (error) {
-      console.error('Error loading chats:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível carregar as conversas.",
-        variant: "destructive"
-      });
-    } finally {
-      setLoadingChats(false);
-    }
+  const filteredChats = chats.filter(chat =>
+    chat.otherUser.nome.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleChatClick = (chatId: string) => {
+    // Navegar para a conversa específica
+    navigate(`/chat/${chatId}`);
   };
 
-  const handleOpenChat = (chat: Chat) => {
-    // Mostrar toast informativo sobre funcionalidade em desenvolvimento
-    toast({
-      title: "Chat em desenvolvimento",
-      description: "A funcionalidade de chat completa está sendo desenvolvida. Em breve você poderá trocar mensagens em tempo real.",
-    });
-    console.log('Opening chat:', chat.id);
-  };
-
-  const filteredChats = chats.filter(chat => {
-    const otherUser = chat.cliente_id === profile?.id ? chat.prestador : chat.cliente;
-    return otherUser?.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           chat.last_message?.toLowerCase().includes(searchTerm.toLowerCase());
-  });
-
-  if (loading || loadingChats) {
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-orange-500 rounded-xl flex items-center justify-center animate-pulse">
-            <MessageCircle className="h-8 w-8 text-white" />
+      <div>
+        <UnifiedHeader />
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto mb-4 bg-orange-500 rounded-xl flex items-center justify-center animate-pulse">
+              <span className="text-white font-bold text-2xl">Z</span>
+            </div>
+            <p className="text-gray-600">Carregando conversas...</p>
           </div>
-          <p>Carregando conversas...</p>
         </div>
       </div>
     );
@@ -136,211 +107,132 @@ const Conversas = () => {
 
   if (!profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="max-w-md">
-          <CardContent className="p-6 text-center">
-            <h3 className="text-lg font-semibold mb-2">Acesso Restrito</h3>
-            <p className="text-gray-600 mb-4">
-              Você precisa estar logado para ver suas conversas.
-            </p>
-            <Button onClick={() => navigate('/')}>
-              Voltar ao Início
-            </Button>
-          </CardContent>
-        </Card>
+      <div>
+        <UnifiedHeader />
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <CardContent className="p-6 text-center">
+              <h3 className="text-lg font-semibold mb-2">Acesso Restrito</h3>
+              <p className="text-gray-600 mb-4">
+                Você precisa estar logado para ver suas conversas.
+              </p>
+              <Button onClick={() => navigate('/auth')} className="w-full">
+                Fazer Login
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto p-4">
-        <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" onClick={() => navigate('/')}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <MessageCircle className="h-6 w-6" />
-              Conversas
-              {chats.length > 0 && (
-                <Badge variant="secondary" className="ml-2">
-                  {chats.length}
-                </Badge>
-              )}
-            </h1>
-            <p className="text-gray-600">
-              Histórico de conversas com {profile.tipo === 'cliente' ? 'prestadores' : 'clientes'}
-            </p>
-          </div>
-        </div>
-
-        {/* Busca */}
-        <Card className="mb-6">
-          <CardContent className="p-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Buscar conversas por nome ou mensagem..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Informativo sobre histórico permanente */}
-        <Card className="mb-6 bg-blue-50 border-blue-200">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <Info className="h-5 w-5 text-blue-600 mt-0.5" />
-              <div>
-                <h4 className="font-medium text-blue-900 mb-1">
-                  Histórico Permanente
-                </h4>
-                <p className="text-sm text-blue-700">
-                  Todas as suas conversas ficam salvas permanentemente para futuras consultas. 
-                  Use o botão de download em cada conversa para obter um arquivo completo do histórico.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Lista de Conversas */}
-        {filteredChats.length === 0 ? (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <MessageCircle className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-lg font-semibold mb-2">
-                {searchTerm ? 'Nenhuma conversa encontrada' : 'Nenhuma conversa ainda'}
-              </h3>
-              <p className="text-gray-600 mb-4">
-                {searchTerm 
-                  ? 'Tente buscar por outro termo.'
-                  : `Suas conversas aparecerão aqui quando você entrar em contato com ${profile.tipo === 'cliente' ? 'prestadores' : 'clientes'}.`
-                }
+    <div>
+      <UnifiedHeader />
+      <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
+        <div className={`${isMobile ? 'px-4 py-4' : 'max-w-4xl mx-auto p-6'}`}>
+          {/* Header */}
+          <div className="flex items-center gap-3 mb-6">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/')}
+              className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              {!isMobile && 'Voltar'}
+            </Button>
+            <div className="flex-1">
+              <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
+                Suas Conversas
+              </h1>
+              <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
+                Histórico de mensagens com prestadores e suporte
               </p>
-              {searchTerm && (
-                <Button variant="outline" onClick={() => setSearchTerm('')}>
-                  Limpar busca
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-3">
-            {filteredChats.map((chat) => {
-              const otherUser = chat.cliente_id === profile.id ? chat.prestador : chat.cliente;
-              const isUnread = Math.random() > 0.7;
-              
-              return (
-                <Card key={chat.id} className="hover:shadow-md transition-shadow">
+            </div>
+          </div>
+
+          {/* Search */}
+          <div className="relative mb-6">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Buscar conversas..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          {/* Chat List */}
+          {filteredChats.length === 0 ? (
+            <Card>
+              <CardContent className="p-12 text-center">
+                <MessageCircle className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                <h3 className="text-xl font-semibold mb-2">
+                  {searchTerm ? 'Nenhuma conversa encontrada' : 'Nenhuma conversa ainda'}
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  {searchTerm 
+                    ? 'Tente buscar por um nome diferente.'
+                    : 'Suas conversas com prestadores aparecerão aqui.'
+                  }
+                </p>
+                {!searchTerm && (
+                  <Button onClick={() => navigate('/')}>
+                    Encontrar Prestadores
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-2">
+              {filteredChats.map(chat => (
+                <Card 
+                  key={chat.id}
+                  className="cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => handleChatClick(chat.id)}
+                >
                   <CardContent className="p-4">
-                    <div className="flex items-center gap-4">
-                      <div className="relative cursor-pointer" onClick={() => handleOpenChat(chat)}>
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
                         <Avatar className="h-12 w-12">
-                          <AvatarImage src={otherUser?.foto_url} />
+                          <AvatarImage src={chat.otherUser.foto_url} alt={chat.otherUser.nome} />
                           <AvatarFallback>
-                            {otherUser?.nome.split(' ').map(n => n[0]).join('').toUpperCase()}
+                            {chat.otherUser.nome.charAt(0).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
-                        {isUnread && (
-                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full"></div>
+                        {chat.isOnline && (
+                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full" />
                         )}
                       </div>
                       
-                      <div className="flex-1 min-w-0 cursor-pointer" onClick={() => handleOpenChat(chat)}>
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
+                          <h4 className="font-semibold text-gray-900 truncate">
+                            {chat.otherUser.nome}
+                          </h4>
                           <div className="flex items-center gap-2">
-                            <h3 className={`font-semibold text-gray-900 truncate ${isUnread ? 'font-bold' : ''}`}>
-                              {otherUser?.nome}
-                            </h3>
-                            <Badge variant="outline" className="text-xs">
-                              {profile.tipo === 'cliente' ? 'Prestador' : 'Cliente'}
-                            </Badge>
-                            {isUnread && (
-                              <Badge variant="destructive" className="text-xs">
-                                Nova
+                            {chat.unreadCount > 0 && (
+                              <Badge className="bg-orange-500 text-white">
+                                {chat.unreadCount}
                               </Badge>
                             )}
-                          </div>
-                          <div className="flex items-center text-xs text-gray-500 gap-1">
-                            <Clock className="h-3 w-3" />
-                            {new Date(chat.updated_at).toLocaleDateString('pt-BR', {
-                              day: '2-digit',
-                              month: '2-digit',
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
+                            <span className="text-xs text-gray-500">
+                              <Clock className="h-3 w-3 inline mr-1" />
+                              {format(new Date(chat.lastMessageTime), 'HH:mm', { locale: ptBR })}
+                            </span>
                           </div>
                         </div>
-                        
-                        <p className={`text-sm text-gray-600 truncate ${isUnread ? 'font-medium' : ''}`}>
-                          {chat.last_message || 'Conversa iniciada'}
+                        <p className="text-sm text-gray-600 truncate">
+                          {chat.lastMessage}
                         </p>
-                        
-                        <p className="text-xs text-gray-500 mt-1">
-                          {otherUser?.email}
-                        </p>
-                      </div>
-
-                      <div className="flex flex-col gap-2">
-                        <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => handleOpenChat(chat)}>
-                          <MessageCircle className="h-4 w-4" />
-                        </Button>
-                        <ChatHistoryDownload 
-                          chat={chat} 
-                          messages={[]} // Por enquanto vazio, mas funcionará quando tivermos mensagens reais
-                        />
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Estatísticas */}
-        {chats.length > 0 && (
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Estatísticas das Conversas
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                <div>
-                  <div className="text-2xl font-bold text-orange-600">{chats.length}</div>
-                  <div className="text-sm text-gray-600">Total de conversas</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-blue-600">
-                    {Math.floor(chats.length * 0.3)}
-                  </div>
-                  <div className="text-sm text-gray-600">Não lidas</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-green-600">
-                    {Math.floor(chats.length * 0.7)}
-                  </div>
-                  <div className="text-sm text-gray-600">Respondidas</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-purple-600">
-                    {Math.floor(chats.length * 0.4)}
-                  </div>
-                  <div className="text-sm text-gray-600">Esta semana</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
