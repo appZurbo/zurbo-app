@@ -1,8 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -28,18 +30,55 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 export const UnifiedHeader = () => {
   const navigate = useNavigate();
   const { profile, isAuthenticated, logout, isAdmin, isPrestador } = useAuth();
   const isMobile = useMobile();
+  const { toast } = useToast();
+  const [emServico, setEmServico] = useState(profile?.em_servico ?? true);
 
   const handleLogout = async () => {
     await logout();
     navigate('/');
   };
 
-  const isPremium = profile?.plano_premium === 'ativo';
+  const handleServiceToggle = async (checked: boolean) => {
+    if (!profile) return;
+    
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ em_servico: checked })
+        .eq('id', profile.id);
+
+      if (error) throw error;
+      
+      setEmServico(checked);
+      toast({
+        title: checked ? "Em serviço" : "Fora de serviço",
+        description: checked ? "Você está disponível para novos pedidos" : "Você não receberá novos pedidos",
+      });
+    } catch (error) {
+      console.error('Error updating service status:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar o status de serviço",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const isPremium = profile?.premium || false;
+
+  const getPremiumLabel = () => {
+    if (!isPremium) return null;
+    if (isPrestador) return "Premium - Prestador";
+    if (isAdmin) return "Premium - Admin";
+    return "Premium - Cliente";
+  };
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
@@ -60,7 +99,7 @@ export const UnifiedHeader = () => {
             </button>
           </div>
 
-          {/* Desktop Navigation - Only show on desktop */}
+          {/* Desktop Navigation */}
           {!isMobile && (
             <nav className="hidden md:flex items-center gap-6">
               <Button
@@ -100,14 +139,14 @@ export const UnifiedHeader = () => {
                     variant="ghost"
                     size="sm"
                     onClick={() => navigate('/planos')}
-                    className="text-orange-500 hover:text-orange-600 hover:bg-orange-50"
+                    className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
                   >
                     {isMobile ? (
                       <Crown className="h-4 w-4" />
                     ) : (
                       <>
                         <Crown className="h-4 w-4 mr-2" />
-                        Premium
+                        <span className="font-medium">Premium</span>
                       </>
                     )}
                   </Button>
@@ -160,6 +199,12 @@ export const UnifiedHeader = () => {
                             Admin
                           </Badge>
                         )}
+                        {isPremium && (
+                          <Badge className="w-fit bg-yellow-100 text-yellow-800 border-yellow-200">
+                            <Crown className="h-3 w-3 mr-1" />
+                            {getPremiumLabel()}
+                          </Badge>
+                        )}
                       </div>
                     </div>
                     <DropdownMenuSeparator />
@@ -167,6 +212,19 @@ export const UnifiedHeader = () => {
                     {/* Provider Menu Items */}
                     {isPrestador && (
                       <>
+                        <div className="px-3 py-2">
+                          <div className="flex items-center space-x-2">
+                            <Switch
+                              id="em-servico"
+                              checked={emServico}
+                              onCheckedChange={handleServiceToggle}
+                            />
+                            <Label htmlFor="em-servico" className="text-sm">
+                              Em Serviço
+                            </Label>
+                          </div>
+                        </div>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => navigate('/prestador-settings')}>
                           <Wrench className="mr-2 h-4 w-4" />
                           Configurações do Prestador
@@ -230,6 +288,21 @@ export const UnifiedHeader = () => {
               </>
             ) : (
               <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate('/planos')}
+                  className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
+                >
+                  {isMobile ? (
+                    <Crown className="h-4 w-4" />
+                  ) : (
+                    <>
+                      <Crown className="h-4 w-4 mr-2" />
+                      <span className="font-medium">Premium</span>
+                    </>
+                  )}
+                </Button>
                 <Button
                   variant="ghost"
                   onClick={() => navigate('/auth')}

@@ -1,282 +1,280 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Users, 
-  Shield, 
-  BarChart3, 
-  Settings, 
-  AlertTriangle,
-  UserCheck,
-  Crown,
-  MessageSquare,
-  ArrowLeft,
-  TrendingUp,
-  Calendar,
-  Star
-} from 'lucide-react';
+import { ArrowLeft, Database, Plus, Users, CheckCircle, AlertTriangle, MessageCircle, ShoppingBag, Wrench } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
+import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { createFakeUsers, createFakePrestadores, createFakeAgendamentos, createFakeHistorico } from '@/utils/database/fake-data';
+import { createCompleteTestData } from '@/utils/database/create-complete-test-data';
 
-export const AdminDashboard = () => {
+const AdminDashboard = () => {
   const navigate = useNavigate();
   const { profile, isAdmin } = useAuth();
   const isMobile = useMobile();
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    totalPrestadores: 0,
-    totalClientes: 0,
-    totalPedidos: 0,
-    pedidosPendentes: 0,
-    pedidosCompletos: 0,
-    avaliacaoMedia: 0,
-    usuariosAtivos: 0
-  });
+  const { toast } = useToast();
+
+  const [userCount, setUserCount] = useState(0);
+  const [prestadorCount, setPrestadorCount] = useState(0);
+  const [pedidoCount, setPedidoCount] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
+  const [creatingTestData, setCreatingTestData] = useState(false);
 
   useEffect(() => {
-    // Simular dados para demonstração
-    setStats({
-      totalUsers: 1247,
-      totalPrestadores: 89,
-      totalClientes: 1158,
-      totalPedidos: 3428,
-      pedidosPendentes: 23,
-      pedidosCompletos: 3405,
-      avaliacaoMedia: 4.7,
-      usuariosAtivos: 847
-    });
-  }, []);
+    if (!isAdmin) {
+      navigate('/');
+    }
+  }, [isAdmin, navigate]);
 
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-6 text-center">
-            <Shield className="h-12 w-12 mx-auto mb-4 text-red-500" />
-            <h3 className="text-lg font-semibold mb-2">Acesso Restrito</h3>
-            <p className="text-gray-600 mb-4">
-              Esta área é exclusiva para administradores do sistema.
-            </p>
-            <Button onClick={() => navigate('/')} className="w-full">
-              Voltar à Página Inicial
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const loadStats = async () => {
+    try {
+      const { data: users, error: usersError, count: usersCount } = await supabase
+        .from('users')
+        .select('*', { count: 'exact', head: false });
+
+      if (usersError) throw usersError;
+      setUserCount(usersCount || 0);
+
+      const { data: prestadores, error: prestadoresError, count: prestadoresCount } = await supabase
+        .from('users')
+        .select('*', { count: 'exact', head: false })
+        .eq('tipo', 'prestador');
+
+      if (prestadoresError) throw prestadoresError;
+      setPrestadorCount(prestadoresCount || 0);
+
+      const { data: pedidos, error: pedidosError, count: pedidosCount } = await supabase
+        .from('pedidos')
+        .select('*', { count: 'exact', head: false });
+
+      if (pedidosError) throw pedidosError;
+      setPedidoCount(pedidosCount || 0);
+
+      const { data: reviews, error: reviewsError, count: reviewsCount } = await supabase
+        .from('avaliacoes')
+        .select('*', { count: 'exact', head: false });
+
+      if (reviewsError) throw reviewsError;
+      setReviewCount(reviewsCount || 0);
+
+    } catch (error) {
+      console.error('Error loading stats:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar as estatísticas.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (isAdmin) {
+      loadStats();
+    }
+  }, [isAdmin]);
+
+  const handleCreateTestData = async () => {
+    setCreatingTestData(true);
+    try {
+      await createFakeUsers();
+      await createFakePrestadores();
+      await createFakeAgendamentos();
+      await createFakeHistorico();
+      toast({
+        title: "Sucesso",
+        description: "Dados de teste básicos criados com sucesso!",
+      });
+      loadStats();
+    } catch (error) {
+      console.error('Error creating test data:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível criar os dados de teste.",
+        variant: "destructive"
+      });
+    } finally {
+      setCreatingTestData(false);
+    }
+  };
+
+  const handleCreateCompleteTestData = async () => {
+    setCreatingTestData(true);
+    try {
+      const success = await createCompleteTestData();
+      if (success) {
+        toast({
+          title: "Sucesso",
+          description: "Dados de teste completos criados com sucesso! Inclui conversas, mensagens, pedidos e agendamentos.",
+        });
+        // Refresh data
+        loadStats();
+      } else {
+        throw new Error('Failed to create test data');
+      }
+    } catch (error) {
+      console.error('Error creating test data:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível criar os dados de teste.",
+        variant: "destructive"
+      });
+    } finally {
+      setCreatingTestData(false);
+    }
+  };
 
   return (
-    <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
-      <div className={`${isMobile ? 'px-4 py-4' : 'max-w-7xl mx-auto p-6'}`}>
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/')}
-            className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            {!isMobile && 'Voltar'}
-          </Button>
-          
-          <div className="flex-1">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-red-600 rounded-xl flex items-center justify-center">
-                <Shield className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
-                  Painel Administrativo
-                </h1>
-                <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
-                  Bem-vindo, {profile?.nome}
-                </p>
-              </div>
+    <div>
+      <UnifiedHeader />
+      <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
+        <div className={`${isMobile ? 'px-4 py-4' : 'max-w-7xl mx-auto p-6'}`}>
+          {/* Header */}
+          <div className="flex items-center gap-3 mb-6">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/')}
+              className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              {!isMobile && 'Voltar'}
+            </Button>
+            <div className="flex-1">
+              <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
+                Painel do Administrador
+              </h1>
+              <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
+                Visão geral e ferramentas de gestão
+              </p>
             </div>
           </div>
-        </div>
 
-        {/* Stats Cards */}
-        <div className={`grid gap-4 mb-6 ${isMobile ? 'grid-cols-2' : 'grid-cols-4'}`}>
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-blue-500" />
-                <div>
-                  <p className="text-sm text-gray-600">Total Usuários</p>
-                  <p className="text-2xl font-bold">{stats.totalUsers.toLocaleString()}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <UserCheck className="h-5 w-5 text-orange-500" />
-                <div>
-                  <p className="text-sm text-gray-600">Prestadores</p>
-                  <p className="text-2xl font-bold">{stats.totalPrestadores}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-green-500" />
-                <div>
-                  <p className="text-sm text-gray-600">Pedidos</p>
-                  <p className="text-2xl font-bold">{stats.totalPedidos.toLocaleString()}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <Star className="h-5 w-5 text-yellow-500" />
-                <div>
-                  <p className="text-sm text-gray-600">Avaliação</p>
-                  <p className="text-2xl font-bold">{stats.avaliacaoMedia}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Action Cards */}
-        <div className={`grid gap-4 mb-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`}>
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/admin/moderacao')}>
-            <CardHeader className="pb-4">
+          {/* Test Data Section */}
+          <Card className="mb-6">
+            <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-orange-500" />
-                Moderação de Conteúdo
+                <Database className="h-5 w-5 text-blue-500" />
+                Dados de Teste
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 mb-4">
-                Gerenciar denúncias, revisar conteúdo e moderar usuários
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Button
+                  onClick={handleCreateTestData}
+                  disabled={creatingTestData}
+                  className="flex items-center gap-2"
+                >
+                  {creatingTestData ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                  ) : (
+                    <Plus className="h-4 w-4" />
+                  )}
+                  Criar Dados Básicos
+                </Button>
+                
+                <Button
+                  onClick={handleCreateCompleteTestData}
+                  disabled={creatingTestData}
+                  className="flex items-center gap-2 bg-green-500 hover:bg-green-600"
+                >
+                  {creatingTestData ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                  ) : (
+                    <Database className="h-4 w-4" />
+                  )}
+                  Criar Sistema Completo de Teste
+                </Button>
+              </div>
+              <p className="text-sm text-gray-600 mt-2">
+                O sistema completo inclui: conversas em tempo real, mensagens, pedidos, agendamentos, 
+                contas premium e dados para teste de moderação.
               </p>
-              <Badge variant="secondary" className="bg-orange-100 text-orange-800">
-                {stats.pedidosPendentes} pendentes
-              </Badge>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/admin/sistema')}>
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5 text-blue-500" />
-                Configurações do Sistema
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 mb-4">
-                Ajustar configurações globais, preços e parâmetros do sistema
-              </p>
-              <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                Sistema ativo
-              </Badge>
-            </CardContent>
-          </Card>
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-gray-500" />
+                  Usuários
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-bold">{userCount}</p>
+                <p className="text-sm text-gray-500">Total de usuários cadastrados</p>
+              </CardContent>
+            </Card>
 
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <CardHeader className="pb-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Wrench className="h-5 w-5 text-orange-500" />
+                  Prestadores
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-bold">{prestadorCount}</p>
+                <p className="text-sm text-gray-500">Total de prestadores de serviço</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ShoppingBag className="h-5 w-5 text-blue-500" />
+                  Pedidos
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-bold">{pedidoCount}</p>
+                <p className="text-sm text-gray-500">Total de pedidos realizados</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  Avaliações
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-bold">{reviewCount}</p>
+                <p className="text-sm text-gray-500">Total de avaliações recebidas</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Alerts and Notices */}
+          <Card>
+            <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-green-500" />
-                Relatórios e Analytics
+                <AlertTriangle className="h-5 w-5 text-red-500" />
+                Alertas e Notificações
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 mb-4">
-                Visualizar métricas detalhadas e relatórios de desempenho
-              </p>
-              <Badge variant="secondary" className="bg-green-100 text-green-800">
-                Em breve
-              </Badge>
+              <ul className="list-disc pl-5">
+                <li>
+                  <span className="font-semibold">Aviso:</span> Monitorar a fila de denúncias de usuários.
+                </li>
+                <li>
+                  <span className="font-semibold">Alerta:</span> Verificar a integridade dos dados dos usuários.
+                </li>
+                <li>
+                  <span className="font-semibold">Aviso:</span> O sistema está em constante atualização.
+                </li>
+              </ul>
             </CardContent>
           </Card>
         </div>
-
-        {/* Create Test Data Section */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-purple-500" />
-              Ferramentas de Desenvolvimento
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold mb-2">Criar Dados de Teste</h3>
-                <p className="text-gray-600 text-sm">
-                  Gerar dados fictícios para desenvolvimento e demonstração do sistema
-                </p>
-              </div>
-              <Button 
-                variant="outline" 
-                className="bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100"
-              >
-                Criar Dados de Teste
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-purple-500" />
-              Atividade Recente
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between py-2 border-b">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm">Novo prestador cadastrado</span>
-                </div>
-                <span className="text-xs text-gray-500">há 5 min</span>
-              </div>
-              
-              <div className="flex items-center justify-between py-2 border-b">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-sm">Pedido concluído</span>
-                </div>
-                <span className="text-xs text-gray-500">há 12 min</span>
-              </div>
-              
-              <div className="flex items-center justify-between py-2 border-b">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                  <span className="text-sm">Nova avaliação recebida</span>
-                </div>
-                <span className="text-xs text-gray-500">há 18 min</span>
-              </div>
-              
-              <div className="flex items-center justify-between py-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                  <span className="text-sm">Sistema atualizado</span>
-                </div>
-                <span className="text-xs text-gray-500">há 1 hora</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
 };
+
+export default AdminDashboard;

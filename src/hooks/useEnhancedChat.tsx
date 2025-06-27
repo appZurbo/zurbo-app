@@ -179,7 +179,7 @@ export const useEnhancedChat = () => {
         });
 
       if (error) throw error;
-      await loadMessages(conversationId);
+      // Real-time updates will handle adding the message to the UI
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
@@ -188,7 +188,7 @@ export const useEnhancedChat = () => {
         variant: "destructive"
       });
     }
-  }, [profile, loadMessages, toast]);
+  }, [profile, toast]);
 
   // Upload image
   const uploadImage = useCallback(async (conversationId: string, file: File) => {
@@ -248,7 +248,6 @@ export const useEnhancedChat = () => {
           upload_count: currentCount + 1
         });
 
-      await loadMessages(conversationId);
       setImageUploadInfo({ remaining: 4 - currentCount, total: 5 });
     } catch (error) {
       console.error('Error uploading image:', error);
@@ -258,7 +257,7 @@ export const useEnhancedChat = () => {
         variant: "destructive"
       });
     }
-  }, [profile, loadMessages, toast]);
+  }, [profile, toast]);
 
   // Set price
   const setPrice = useCallback(async (conversationId: string, price: number) => {
@@ -273,6 +272,16 @@ export const useEnhancedChat = () => {
 
       if (error) throw error;
       
+      // Send system message
+      await supabase
+        .from('chat_messages')
+        .insert({
+          conversation_id: conversationId,
+          sender_id: profile?.id,
+          message_type: 'system',
+          content: `Preço definido: R$ ${price.toFixed(2)}`
+        });
+
       await loadConversations();
       toast({
         title: "Sucesso",
@@ -286,7 +295,7 @@ export const useEnhancedChat = () => {
         variant: "destructive"
       });
     }
-  }, [loadConversations, toast]);
+  }, [profile, loadConversations, toast]);
 
   // Accept/Reject price
   const respondToPrice = useCallback(async (conversationId: string, accept: boolean) => {
@@ -299,8 +308,18 @@ export const useEnhancedChat = () => {
 
       if (error) throw error;
 
+      // Send system message
+      await supabase
+        .from('chat_messages')
+        .insert({
+          conversation_id: conversationId,
+          sender_id: profile?.id,
+          message_type: 'system',
+          content: accept ? 'Preço aceito! Pedido criado.' : 'Preço rejeitado.'
+        });
+
       if (accept) {
-        // Create pedido - get a default service ID first
+        // Create pedido
         const conversation = conversations.find(c => c.id === conversationId);
         if (conversation) {
           const { data: defaultService } = await supabase
@@ -317,7 +336,7 @@ export const useEnhancedChat = () => {
                 prestador_id: conversation.prestador_id,
                 servico_id: defaultService.id,
                 titulo: conversation.servico_solicitado,
-                descricao: `Serviço solicitado via chat`,
+                descricao: `Serviço solicitado via chat - ${conversation.servico_solicitado}`,
                 preco_acordado: conversation.preco_proposto,
                 status: 'aceito'
               });
@@ -340,7 +359,7 @@ export const useEnhancedChat = () => {
         variant: "destructive"
       });
     }
-  }, [conversations, loadConversations, toast]);
+  }, [profile, conversations, loadConversations, toast]);
 
   // Report user
   const reportUser = useCallback(async (conversationId: string, reportedUserId: string, issueType: string, description: string) => {
@@ -364,6 +383,16 @@ export const useEnhancedChat = () => {
         .from('chat_conversations')
         .update({ status: 'bloqueado' })
         .eq('id', conversationId);
+
+      // Send system message
+      await supabase
+        .from('chat_messages')
+        .insert({
+          conversation_id: conversationId,
+          sender_id: profile.id,
+          message_type: 'system',
+          content: 'Conversa bloqueada devido a denúncia.'
+        });
 
       await loadConversations();
       toast({
@@ -396,7 +425,7 @@ export const useEnhancedChat = () => {
     setImageUploadInfo({ remaining: 5 - used, total: 5 });
   }, [profile]);
 
-  // Setup realtime subscription
+  // Setup realtime subscription for messages
   useEffect(() => {
     if (!currentConversation) return;
 
@@ -410,8 +439,13 @@ export const useEnhancedChat = () => {
           table: 'chat_messages',
           filter: `conversation_id=eq.${currentConversation.id}`
         },
-        () => {
-          loadMessages(currentConversation.id);
+        (payload) => {
+          const newMessage = {
+            ...payload.new,
+            message_type: payload.new.message_type as ChatMessage['message_type']
+          } as ChatMessage;
+          
+          setMessages(prev => [...prev, newMessage]);
         }
       )
       .subscribe();
@@ -419,7 +453,31 @@ export const useEnhancedChat = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [currentConversation, loadMessages]);
+  }, [currentConversation]);
+
+  // Setup realtime subscription for conversations
+  useEffect(() => {
+    if (!profile) return;
+
+    const channel = supabase
+      .channel('conversations-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'chat_conversations'
+        },
+        () => {
+          loadConversations();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [profile, loadConversations]);
 
   useEffect(() => {
     if (profile) {

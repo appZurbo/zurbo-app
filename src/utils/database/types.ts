@@ -1,3 +1,4 @@
+
 export interface UserProfile {
   id: string;
   auth_id: string;
@@ -25,6 +26,8 @@ export interface UserProfile {
   criado_em: string;
   updated_at?: string;
   servicos_oferecidos?: string[];
+  em_servico?: boolean; // Add this field
+  descricao_servico?: string; // Add this field
   prestador_servicos?: {
     servico_id: string;
     preco_min?: number;

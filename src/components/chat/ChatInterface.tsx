@@ -19,12 +19,14 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  Shield
+  Shield,
+  Download
 } from 'lucide-react';
 import { ChatConversation, ChatMessage, ImageUploadInfo } from '@/hooks/useEnhancedChat';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useAuth } from '@/hooks/useAuth';
+import { ChatHistoryDownload } from './ChatHistoryDownload';
 
 interface ChatInterfaceProps {
   conversation: ChatConversation;
@@ -105,7 +107,6 @@ export const ChatInterface = ({
 
   const handleReport = () => {
     if (reportIssue && reportDescription.trim()) {
-      const reportedUserId = isClient ? conversation.prestador_id : conversation.cliente_id;
       onReportUser(reportIssue, reportDescription.trim());
       setShowReportDialog(false);
       setReportIssue('');
@@ -157,47 +158,10 @@ export const ChatInterface = ({
     }
   };
 
-  const getPriceActionButton = () => {
-    if (conversation.status === 'aguardando_preco' && isClient) {
-      return (
-        <Button onClick={() => setShowPriceDialog(true)} size="sm">
-          <DollarSign className="h-4 w-4 mr-2" />
-          Combinar Preço
-        </Button>
-      );
-    }
-
-    if (conversation.status === 'preco_definido' && !isClient) {
-      return (
-        <div className="flex gap-2">
-          <Button onClick={() => onRespondToPrice(true)} size="sm" className="bg-green-500 hover:bg-green-600">
-            <CheckCircle className="h-4 w-4 mr-2" />
-            Aceitar
-          </Button>
-          <Button onClick={() => onRespondToPrice(false)} size="sm" variant="destructive">
-            <XCircle className="h-4 w-4 mr-2" />
-            Rejeitar
-          </Button>
-        </div>
-      );
-    }
-
-    if (conversation.status === 'aguardando_preco' && !isClient) {
-      return (
-        <Button disabled size="sm" variant="outline">
-          <Clock className="h-4 w-4 mr-2" />
-          Aguardando Valor
-        </Button>
-      );
-    }
-
-    return null;
-  };
-
   return (
     <div className="flex flex-col h-full">
-      {/* Chat Header */}
-      <CardHeader className="pb-4">
+      {/* Header */}
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10">
@@ -208,16 +172,29 @@ export const ChatInterface = ({
             </Avatar>
             <div>
               <CardTitle className="text-lg">{otherUser?.nome || 'Usuário'}</CardTitle>
-              <p className="text-sm text-gray-600">{conversation.servico_solicitado}</p>
+              <p className="text-sm text-gray-600">
+                <strong>Serviço:</strong> {conversation.servico_solicitado}
+              </p>
             </div>
           </div>
           
           <div className="flex items-center gap-2">
-            {getPriceActionButton()}
+            <ChatHistoryDownload 
+              chat={{
+                id: conversation.id,
+                cliente_id: conversation.cliente_id,
+                prestador_id: conversation.prestador_id,
+                created_at: conversation.created_at,
+                updated_at: conversation.updated_at,
+                cliente: conversation.cliente,
+                prestador: conversation.prestador
+              } as any}
+              messages={messages as any[]}
+            />
             
             <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm" disabled={conversation.status === 'bloqueado'}>
+                <Button variant="outline" size="sm">
                   <AlertTriangle className="h-4 w-4 mr-2" />
                   Denunciar
                 </Button>
@@ -228,40 +205,32 @@ export const ChatInterface = ({
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="issue-type">Tipo de problema</Label>
+                    <Label htmlFor="issue-type">Motivo da Denúncia</Label>
                     <Select value={reportIssue} onValueChange={setReportIssue}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione o tipo de problema" />
+                        <SelectValue placeholder="Selecione o motivo" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="offensive_language">Linguagem ofensiva</SelectItem>
-                        <SelectItem value="fraud">Fraude</SelectItem>
-                        <SelectItem value="inappropriate_content">Conteúdo inadequado</SelectItem>
                         <SelectItem value="spam">Spam</SelectItem>
+                        <SelectItem value="harassment">Assédio</SelectItem>
+                        <SelectItem value="inappropriate">Conteúdo Inapropriado</SelectItem>
+                        <SelectItem value="fraud">Fraude</SelectItem>
                         <SelectItem value="other">Outro</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  
                   <div>
-                    <Label htmlFor="description">Descrição</Label>
+                    <Label htmlFor="description">Descrição (opcional)</Label>
                     <Textarea
                       id="description"
+                      placeholder="Descreva o problema..."
                       value={reportDescription}
                       onChange={(e) => setReportDescription(e.target.value)}
-                      placeholder="Descreva o problema..."
-                      rows={3}
                     />
                   </div>
-                  
-                  <div className="flex gap-2">
-                    <Button onClick={handleReport} className="flex-1">
-                      Enviar Denúncia
-                    </Button>
-                    <Button variant="outline" onClick={() => setShowReportDialog(false)}>
-                      Cancelar
-                    </Button>
-                  </div>
+                  <Button onClick={handleReport} className="w-full">
+                    Enviar Denúncia
+                  </Button>
                 </div>
               </DialogContent>
             </Dialog>
@@ -277,37 +246,35 @@ export const ChatInterface = ({
 
       {/* Messages */}
       <CardContent className="flex-1 p-0">
-        <ScrollArea className="h-full p-4">
+        <ScrollArea className="h-[400px] p-4">
           <div className="space-y-4">
             {messages.map((message) => {
-              const isOwn = message.sender_id === profile?.id;
+              const isFromCurrentUser = message.sender_id === profile?.id;
+              
               return (
                 <div
                   key={message.id}
-                  className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
+                  className={`flex ${isFromCurrentUser ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-xs px-3 py-2 rounded-lg ${
-                      isOwn
+                    className={`max-w-[70%] rounded-lg p-3 ${
+                      isFromCurrentUser
                         ? 'bg-orange-500 text-white'
                         : 'bg-gray-100 text-gray-900'
                     }`}
                   >
-                    {message.message_type === 'text' && (
-                      <p className="text-sm">{message.content}</p>
-                    )}
-                    
-                    {message.message_type === 'image' && (
+                    {message.message_type === 'image' ? (
                       <img
                         src={message.image_url}
-                        alt="Imagem enviada"
+                        alt="Imagem"
                         className="max-w-full h-auto rounded"
                       />
+                    ) : (
+                      <p className="text-sm">{message.content}</p>
                     )}
-                    
                     <p
                       className={`text-xs mt-1 ${
-                        isOwn ? 'text-orange-100' : 'text-gray-500'
+                        isFromCurrentUser ? 'text-orange-100' : 'text-gray-500'
                       }`}
                     >
                       {format(new Date(message.created_at), 'HH:mm', { locale: ptBR })}
@@ -321,20 +288,79 @@ export const ChatInterface = ({
         </ScrollArea>
       </CardContent>
 
-      {/* Message Input */}
+      {/* Action Buttons */}
       {canSendMessages && (
         <>
           <Separator />
-          <div className="p-4">
+          <div className="p-4 space-y-3">
+            {/* Price Actions */}
+            {conversation.status === 'aguardando_preco' && !isClient && (
+              <Dialog open={showPriceDialog} onOpenChange={setShowPriceDialog}>
+                <DialogTrigger asChild>
+                  <Button className="w-full">
+                    <DollarSign className="h-4 w-4 mr-2" />
+                    Definir Preço
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Definir Preço do Serviço</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="price">Preço (R$)</Label>
+                      <Input
+                        id="price"
+                        type="number"
+                        placeholder="0,00"
+                        value={priceValue}
+                        onChange={(e) => setPriceValue(e.target.value)}
+                      />
+                    </div>
+                    <Button onClick={handleSetPrice} className="w-full">
+                      Confirmar Preço
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
+
+            {conversation.status === 'aguardando_preco' && isClient && (
+              <div className="text-center py-2">
+                <Badge variant="secondary">Aguardando definição de preço</Badge>
+              </div>
+            )}
+
+            {conversation.status === 'preco_definido' && isClient && (
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => onRespondToPrice(true)}
+                  className="flex-1 bg-green-500 hover:bg-green-600"
+                >
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Aceitar R$ {conversation.preco_proposto?.toFixed(2)}
+                </Button>
+                <Button
+                  onClick={() => onRespondToPrice(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  <XCircle className="h-4 w-4 mr-2" />
+                  Rejeitar
+                </Button>
+              </div>
+            )}
+
+            {conversation.status === 'preco_definido' && !isClient && (
+              <div className="text-center py-2">
+                <Badge variant="secondary">
+                  Aguardando resposta do cliente - R$ {conversation.preco_proposto?.toFixed(2)}
+                </Badge>
+              </div>
+            )}
+
+            {/* Message Input */}
             <div className="flex gap-2">
-              <Input
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Digite sua mensagem..."
-                className="flex-1"
-              />
-              
               <input
                 type="file"
                 ref={fileInputRef}
@@ -342,57 +368,40 @@ export const ChatInterface = ({
                 accept="image/*"
                 className="hidden"
               />
-              
               <Button
                 variant="outline"
-                size="sm"
+                size="icon"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={imageUploadInfo.remaining <= 0}
-                title={`${imageUploadInfo.remaining} uploads restantes hoje`}
               >
                 <ImageIcon className="h-4 w-4" />
-                <span className="ml-1 text-xs">({imageUploadInfo.remaining})</span>
               </Button>
-              
-              <Button onClick={handleSendMessage} size="sm">
+              <Input
+                placeholder="Digite sua mensagem..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                className="flex-1"
+              />
+              <Button onClick={handleSendMessage} disabled={!newMessage.trim()}>
                 <Send className="h-4 w-4" />
               </Button>
             </div>
+            
+            {imageUploadInfo.remaining < imageUploadInfo.total && (
+              <p className="text-xs text-gray-500 text-center">
+                {imageUploadInfo.remaining} imagens restantes hoje
+              </p>
+            )}
           </div>
         </>
       )}
 
-      {/* Price Dialog */}
-      <Dialog open={showPriceDialog} onOpenChange={setShowPriceDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Definir Preço do Serviço</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="price">Preço (R$)</Label>
-              <Input
-                id="price"
-                type="number"
-                value={priceValue}
-                onChange={(e) => setPriceValue(e.target.value)}
-                placeholder="0.00"
-                step="0.01"
-                min="0"
-              />
-            </div>
-            
-            <div className="flex gap-2">
-              <Button onClick={handleSetPrice} className="flex-1">
-                Definir Preço
-              </Button>
-              <Button variant="outline" onClick={() => setShowPriceDialog(false)}>
-                Cancelar
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {conversation.status === 'bloqueado' && (
+        <div className="p-4 text-center">
+          <Badge variant="destructive">Conversa Bloqueada</Badge>
+        </div>
+      )}
     </div>
   );
 };
