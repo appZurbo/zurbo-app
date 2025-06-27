@@ -104,7 +104,7 @@ export const UserSubmenu = () => {
             
             <DropdownMenuItem onClick={() => navigate('/agenda-prestador')}>
               <Calendar className="h-4 w-4 mr-2" />
-              Minha Agenda
+              Agenda Profissional
             </DropdownMenuItem>
           </>
         )}

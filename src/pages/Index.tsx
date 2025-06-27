@@ -5,7 +5,7 @@ import HeroDemo from '@/components/ui/hero-demo';
 import ServiceCategories from '@/components/ServiceCategories';
 import { ModernFilters } from '@/components/filters/ModernFilters';
 import { PrestadorCardImproved } from '@/components/prestadores/PrestadorCardImproved';
-import { PrestadorProfileModal } from '@/components/prestadores/PrestadorProfileModal';
+import { PrestadorMiniProfileModal } from '@/components/prestadores/PrestadorMiniProfileModal';
 import { ContactModal } from '@/components/contact/ContactModal';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -66,6 +66,11 @@ const Index = () => {
   const handleContact = (prestador: UserProfile) => {
     setSelectedPrestador(prestador);
     setShowContactModal(true);
+  };
+
+  const handleViewProfile = (prestador: UserProfile) => {
+    setSelectedPrestador(prestador);
+    setShowProfileModal(true);
   };
 
   const handleFiltersChange = (newFilters: any) => {
@@ -158,6 +163,7 @@ const Index = () => {
                   key={prestador.id}
                   prestador={prestador}
                   onContact={handleContact}
+                  onViewProfile={handleViewProfile}
                 />
               ))}
             </div>
@@ -170,7 +176,7 @@ const Index = () => {
       {/* Modals */}
       {selectedPrestador && (
         <>
-          <PrestadorProfileModal
+          <PrestadorMiniProfileModal
             prestador={selectedPrestador}
             isOpen={showProfileModal}
             onClose={() => setShowProfileModal(false)}

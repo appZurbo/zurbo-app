@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Crown, Check, Star } from 'lucide-react';
+import { ArrowLeft, Check, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useMobile } from '@/hooks/useMobile';
@@ -42,23 +42,6 @@ const Planos = () => {
       popular: true,
       buttonText: 'Assinar Premium',
       buttonVariant: 'default' as const
-    },
-    {
-      name: 'Prestador Premium',
-      price: 'R$ 49,90/mês',
-      description: 'Para prestadores profissionais',
-      features: [
-        'Perfil destacado',
-        'Selo de verificação',
-        'Prioridade nas buscas',
-        'Portfólio ilimitado',
-        'Analytics detalhadas',
-        'Suporte prioritário',
-        'Marketing personalizado'
-      ],
-      popular: false,
-      buttonText: 'Tornar-se Premium',
-      buttonVariant: 'default' as const
     }
   ];
 
@@ -90,7 +73,7 @@ const Planos = () => {
           </div>
 
           {/* Plans Grid */}
-          <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-3'}`}>
+          <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} max-w-4xl mx-auto`}>
             {plans.map((plan, index) => (
               <Card key={index} className={`relative ${plan.popular ? 'border-2 border-orange-500 shadow-lg' : ''}`}>
                 {plan.popular && (
@@ -104,7 +87,6 @@ const Planos = () => {
                 
                 <CardHeader className="text-center pb-4">
                   <CardTitle className="flex items-center justify-center gap-2">
-                    {plan.name === 'Prestador Premium' && <Crown className="h-5 w-5 text-yellow-500" />}
                     {plan.name}
                   </CardTitle>
                   <div className="text-3xl font-bold text-orange-600 mb-2">
