@@ -26,7 +26,17 @@ export const createUnifiedTestData = async () => {
 
     console.log('✅ Services created/updated');
 
-    // Step 2: Create comprehensive fake users (both clients and providers)
+    // Step 2: Delete existing fake users to avoid duplicates
+    const { error: deleteError } = await supabase
+      .from('users')
+      .delete()
+      .ilike('email', '%.test@zurbo.com');
+
+    if (deleteError) {
+      console.log('Note: Could not delete existing fake users:', deleteError.message);
+    }
+
+    // Step 3: Create comprehensive fake users (both clients and providers)
     const fakeUsers = [
       // Prestadores
       {
@@ -161,31 +171,42 @@ export const createUnifiedTestData = async () => {
       }
     ];
 
-    // Insert users
+    // Insert users one by one to handle errors gracefully
     const insertedUsers = [];
     for (const user of fakeUsers) {
       const { servicos, ...userData } = user;
       
-      const { data: insertedUser, error: userError } = await supabase
-        .from('users')
-        .upsert(userData, { onConflict: 'email' })
-        .select()
-        .single();
+      try {
+        const { data: insertedUser, error: userError } = await supabase
+          .from('users')
+          .insert(userData)
+          .select()
+          .single();
 
-      if (userError) {
-        console.error('Error creating user:', userError);
-        continue;
+        if (userError) {
+          console.error('Error creating user:', user.nome, userError);
+          return { success: false, error: `Error creating user ${user.nome}: ${userError.message}` };
+        }
+
+        insertedUsers.push({ ...insertedUser, servicos });
+        console.log(`✅ Created user: ${insertedUser.nome}`);
+      } catch (error) {
+        console.error('Exception creating user:', user.nome, error);
+        return { success: false, error: `Exception creating user ${user.nome}: ${error.message}` };
       }
-
-      insertedUsers.push({ ...insertedUser, servicos });
     }
 
     console.log(`✅ Created ${insertedUsers.length} users`);
 
-    // Step 3: Get services and create prestador_servicos relationships
-    const { data: servicos } = await supabase
+    // Step 4: Get services and create prestador_servicos relationships
+    const { data: servicos, error: servicosError } = await supabase
       .from('servicos')
       .select('*');
+
+    if (servicosError) {
+      console.error('Error fetching services:', servicosError);
+      return { success: false, error: `Error fetching services: ${servicosError.message}` };
+    }
 
     const servicosMap = new Map();
     servicos?.forEach(servico => {
@@ -197,40 +218,58 @@ export const createUnifiedTestData = async () => {
         for (const servicoNome of user.servicos) {
           const servicoId = servicosMap.get(servicoNome);
           if (servicoId) {
-            await supabase
-              .from('prestador_servicos')
-              .upsert({
-                prestador_id: user.id,
-                servico_id: servicoId,
-                preco_min: Math.floor(Math.random() * 100) + 50,
-                preco_max: Math.floor(Math.random() * 200) + 150
-              }, { onConflict: 'prestador_id,servico_id' });
+            try {
+              await supabase
+                .from('prestador_servicos')
+                .insert({
+                  prestador_id: user.id,
+                  servico_id: servicoId,
+                  preco_min: Math.floor(Math.random() * 100) + 50,
+                  preco_max: Math.floor(Math.random() * 200) + 150
+                });
+            } catch (error) {
+              console.log('Note: Could not create prestador_servicos relationship:', error);
+            }
           }
         }
       }
 
       // Add premium records
       if (user.premium) {
-        await supabase
-          .from('usuarios_premium')
-          .upsert({
-            usuario_id: user.id,
-            ativo: true,
-            desde: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-            expira_em: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-          }, { onConflict: 'usuario_id' });
+        try {
+          await supabase
+            .from('usuarios_premium')
+            .insert({
+              usuario_id: user.id,
+              ativo: true,
+              desde: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+              expira_em: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+            });
+        } catch (error) {
+          console.log('Note: Could not create premium record:', error);
+        }
       }
     }
 
     console.log('✅ Created prestador services and premium records');
 
-    // Step 4: Create conversations and messages
+    // Step 5: Create conversations and messages
     const prestadores = insertedUsers.filter(u => u.tipo === 'prestador');
     const clientes = insertedUsers.filter(u => u.tipo === 'cliente');
 
     if (prestadores.length === 0 || clientes.length === 0) {
       console.log('⚠️ Not enough users to create conversations');
-      return { success: true, message: 'Users created, but need both providers and clients for conversations' };
+      return { 
+        success: true, 
+        data: {
+          users: insertedUsers.length,
+          conversations: 0,
+          messages: 0,
+          pedidos: 0,
+          agendamentos: 0,
+          avaliacoes: 0
+        }
+      };
     }
 
     const conversationData = [];
@@ -304,44 +343,59 @@ export const createUnifiedTestData = async () => {
     }
 
     // Insert conversations
-    const { error: convError } = await supabase
-      .from('chat_conversations')
-      .upsert(conversationData, { onConflict: 'id' });
+    try {
+      const { error: convError } = await supabase
+        .from('chat_conversations')
+        .insert(conversationData);
 
-    if (convError) {
-      console.error('Error creating conversations:', convError);
-      throw convError;
+      if (convError) {
+        console.error('Error creating conversations:', convError);
+        return { success: false, error: `Error creating conversations: ${convError.message}` };
+      }
+
+      console.log(`✅ Created ${conversationData.length} conversations`);
+    } catch (error) {
+      console.error('Exception creating conversations:', error);
+      return { success: false, error: `Exception creating conversations: ${error.message}` };
     }
-
-    console.log(`✅ Created ${conversationData.length} conversations`);
 
     // Insert messages
-    const { error: msgError } = await supabase
-      .from('chat_messages')
-      .insert(messageData);
+    try {
+      const { error: msgError } = await supabase
+        .from('chat_messages')
+        .insert(messageData);
 
-    if (msgError) {
-      console.error('Error creating messages:', msgError);
-      throw msgError;
+      if (msgError) {
+        console.error('Error creating messages:', msgError);
+        return { success: false, error: `Error creating messages: ${msgError.message}` };
+      }
+
+      console.log(`✅ Created ${messageData.length} messages`);
+    } catch (error) {
+      console.error('Exception creating messages:', error);
+      return { success: false, error: `Exception creating messages: ${error.message}` };
     }
-
-    console.log(`✅ Created ${messageData.length} messages`);
 
     // Insert pedidos
     if (pedidoData.length > 0) {
-      const { error: pedidoError } = await supabase
-        .from('pedidos')
-        .insert(pedidoData);
+      try {
+        const { error: pedidoError } = await supabase
+          .from('pedidos')
+          .insert(pedidoData);
 
-      if (pedidoError) {
-        console.error('Error creating pedidos:', pedidoError);
-        throw pedidoError;
+        if (pedidoError) {
+          console.error('Error creating pedidos:', pedidoError);
+          // Don't return error, continue with other data
+        } else {
+          console.log(`✅ Created ${pedidoData.length} pedidos`);
+        }
+      } catch (error) {
+        console.error('Exception creating pedidos:', error);
+        // Don't return error, continue with other data
       }
-
-      console.log(`✅ Created ${pedidoData.length} pedidos`);
     }
 
-    // Step 5: Create agendamentos
+    // Step 6: Create agendamentos
     const agendamentoData = [];
     for (let i = 0; i < 8; i++) {
       const prestador = prestadores[i % prestadores.length];
@@ -370,19 +424,24 @@ export const createUnifiedTestData = async () => {
     }
 
     if (agendamentoData.length > 0) {
-      const { error: agendError } = await supabase
-        .from('agendamentos')
-        .insert(agendamentoData);
+      try {
+        const { error: agendError } = await supabase
+          .from('agendamentos')
+          .insert(agendamentoData);
 
-      if (agendError) {
-        console.error('Error creating agendamentos:', agendError);
-        throw agendError;
+        if (agendError) {
+          console.error('Error creating agendamentos:', agendError);
+          // Don't return error, continue with other data
+        } else {
+          console.log(`✅ Created ${agendamentoData.length} agendamentos`);
+        }
+      } catch (error) {
+        console.error('Exception creating agendamentos:', error);
+        // Don't return error, continue with other data
       }
-
-      console.log(`✅ Created ${agendamentoData.length} agendamentos`);
     }
 
-    // Step 6: Create some avaliacoes
+    // Step 7: Create some avaliacoes
     const avaliacaoData = [];
     for (let i = 0; i < 15; i++) {
       const prestador = prestadores[i % prestadores.length];
@@ -403,16 +462,21 @@ export const createUnifiedTestData = async () => {
       });
     }
 
-    const { error: avalError } = await supabase
-      .from('avaliacoes')
-      .insert(avaliacaoData);
+    try {
+      const { error: avalError } = await supabase
+        .from('avaliacoes')
+        .insert(avaliacaoData);
 
-    if (avalError) {
-      console.error('Error creating avaliacoes:', avalError);
-      throw avalError;
+      if (avalError) {
+        console.error('Error creating avaliacoes:', avalError);
+        // Don't return error, continue
+      } else {
+        console.log(`✅ Created ${avaliacaoData.length} avaliacoes`);
+      }
+    } catch (error) {
+      console.error('Exception creating avaliacoes:', error);
+      // Don't return error, continue
     }
-
-    console.log(`✅ Created ${avaliacaoData.length} avaliacoes`);
 
     console.log('🎉 Comprehensive test data creation completed successfully!');
     

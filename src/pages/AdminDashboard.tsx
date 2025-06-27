@@ -74,6 +74,27 @@ const AdminDashboard = () => {
     }
   }, [isAdmin]);
 
+  if (!isAdmin) {
+    return (
+      <div>
+        <UnifiedHeader />
+        <div className="min-h-screen flex items-center justify-center">
+          <Card className="max-w-md">
+            <CardContent className="p-6 text-center">
+              <h3 className="text-lg font-semibold mb-2">Acesso Restrito</h3>
+              <p className="text-gray-600 mb-4">
+                Esta página é exclusiva para administradores.
+              </p>
+              <Button onClick={() => navigate('/')}>
+                Voltar à Página Inicial
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <UnifiedHeader />
