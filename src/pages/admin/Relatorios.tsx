@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,6 +10,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useMobile } from '@/hooks/useMobile';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart as RechartsPieChart, Cell, Pie } from 'recharts';
+import { CreateTestData } from '@/components/admin/CreateTestData';
 
 const Relatorios = () => {
   const navigate = useNavigate();
@@ -128,6 +130,11 @@ const Relatorios = () => {
                 Exportar
               </Button>
             </div>
+          </div>
+
+          {/* Test Data Creation Section - MOVED TO TOP */}
+          <div className="mb-8">
+            <CreateTestData />
           </div>
 
           {/* KPIs */}

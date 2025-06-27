@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { getPrestadores } from '@/utils/database/prestadores';
 import { UserProfile } from '@/utils/database/types';
-import { Loader2, Users } from 'lucide-react';
+import { Loader2, Users, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import PartnersSection from '@/components/sections/PartnersSection';
 import { Button } from '@/components/ui/button';
@@ -22,6 +22,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 const Index = () => {
   const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedPrestador, setSelectedPrestador] = useState<UserProfile | null>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
@@ -42,11 +43,21 @@ const Index = () => {
 
   const loadPrestadores = async () => {
     setLoading(true);
+    setError(null);
     try {
+      console.log('🔍 Loading prestadores with filters:', filters);
       const result = await getPrestadores(filters);
       
-      // Validate data before setting
-      const validPrestadores = result.prestadores.filter(p => p && p.id && p.nome);
+      // Validate and filter data
+      const validPrestadores = result.prestadores.filter(p => {
+        if (!p || !p.id || !p.nome) {
+          console.warn('Invalid prestador data:', p);
+          return false;
+        }
+        return true;
+      });
+      
+      console.log(`✅ Loaded ${validPrestadores.length} valid prestadores`);
       
       if (showFavoritesOnly && isAuthenticated) {
         const favorites = JSON.parse(localStorage.getItem('user_favorites') || '[]');
@@ -56,13 +67,14 @@ const Index = () => {
         setPrestadores(validPrestadores);
       }
     } catch (error) {
-      console.error('Error loading prestadores:', error);
+      console.error('❌ Error loading prestadores:', error);
+      setError('Não foi possível carregar os prestadores');
       toast({
         title: "Erro",
-        description: "Não foi possível carregar os prestadores.",
+        description: "Não foi possível carregar os prestadores. Tente novamente.",
         variant: "destructive"
       });
-      setPrestadores([]); // Set empty array on error
+      setPrestadores([]);
     } finally {
       setLoading(false);
     }
@@ -70,7 +82,7 @@ const Index = () => {
 
   const handleContact = (prestador: UserProfile) => {
     if (!prestador || !prestador.id) {
-      console.error('Invalid prestador data:', prestador);
+      console.error('Invalid prestador data for contact:', prestador);
       toast({
         title: "Erro",
         description: "Dados do prestador inválidos.",
@@ -78,13 +90,14 @@ const Index = () => {
       });
       return;
     }
+    console.log('📞 Contacting prestador:', prestador.nome);
     setSelectedPrestador(prestador);
     setShowContactModal(true);
   };
 
   const handleViewProfile = (prestador: UserProfile) => {
     if (!prestador || !prestador.id) {
-      console.error('Invalid prestador data:', prestador);
+      console.error('Invalid prestador data for profile:', prestador);
       toast({
         title: "Erro",
         description: "Dados do prestador inválidos.",
@@ -92,19 +105,26 @@ const Index = () => {
       });
       return;
     }
+    console.log('👤 Viewing profile:', prestador.nome);
     setSelectedPrestador(prestador);
     setShowProfileModal(true);
   };
 
   const handleFiltersChange = (newFilters: any) => {
+    console.log('🔄 Filters changed:', newFilters);
     setFilters(newFilters);
   };
 
   const handleCategorySelect = (categoryId: string) => {
+    console.log('📂 Category selected:', categoryId);
     setFilters(prev => ({
       ...prev,
       servico: categoryId
     }));
+  };
+
+  const handleRetry = () => {
+    loadPrestadores();
   };
 
   return (
@@ -136,7 +156,6 @@ const Index = () => {
                 </p>
               </div>
 
-              {/* Show Favorites Filter */}
               {isAuthenticated && (
                 <div className="flex items-center space-x-2">
                   <Switch
@@ -154,6 +173,17 @@ const Index = () => {
                 <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
                 <span className="ml-2 text-gray-600">Carregando prestadores...</span>
               </div>
+            ) : error ? (
+              <Card>
+                <CardContent className="p-12 text-center">
+                  <AlertCircle className="h-16 w-16 mx-auto mb-4 text-red-400" />
+                  <h3 className="text-xl font-semibold mb-2 text-red-600">Erro ao Carregar</h3>
+                  <p className="text-gray-600 mb-4">{error}</p>
+                  <Button onClick={handleRetry} variant="outline">
+                    Tentar Novamente
+                  </Button>
+                </CardContent>
+              </Card>
             ) : prestadores.length === 0 ? (
               <Card>
                 <CardContent className="p-12 text-center">
@@ -167,21 +197,28 @@ const Index = () => {
                       : 'Não encontramos prestadores que correspondam aos seus filtros.'
                     }
                   </p>
-                  <Button onClick={() => {
-                    if (showFavoritesOnly) {
-                      setShowFavoritesOnly(false);
-                    } else {
-                      setFilters({
-                        cidade: '',
-                        servico: '',
-                        precoMin: undefined,
-                        precoMax: undefined,
-                        notaMin: undefined
-                      });
-                    }
-                  }}>
-                    {showFavoritesOnly ? 'Ver Todos Prestadores' : 'Limpar Filtros'}
-                  </Button>
+                  <div className="space-y-2">
+                    <Button onClick={() => {
+                      if (showFavoritesOnly) {
+                        setShowFavoritesOnly(false);
+                      } else {
+                        setFilters({
+                          cidade: '',
+                          servico: '',
+                          precoMin: undefined,
+                          precoMax: undefined,
+                          notaMin: undefined
+                        });
+                      }
+                    }}>
+                      {showFavoritesOnly ? 'Ver Todos Prestadores' : 'Limpar Filtros'}
+                    </Button>
+                    {!showFavoritesOnly && (
+                      <p className="text-sm text-gray-500 mt-2">
+                        💡 Dica: Vá para <strong>/admin/relatorios</strong> e clique em "Criar Sistema Completo" para adicionar dados de teste
+                      </p>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             ) : (
@@ -204,7 +241,6 @@ const Index = () => {
           <PartnersSection />
         </ErrorBoundary>
 
-        {/* Modals */}
         {selectedPrestador && (
           <ErrorBoundary>
             <PrestadorMiniProfileModal
