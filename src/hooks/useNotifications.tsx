@@ -125,12 +125,14 @@ export const useNotifications = () => {
 
   const unreadCount = notifications.filter(n => !n.read).length;
   const recentNotifications = notifications.slice(0, 5);
+  const hasNewMessages = unreadCount > 0; // Add this property
 
   return {
     notifications,
     recentNotifications,
     loading,
     unreadCount,
+    hasNewMessages, // Include this in the return object
     markAsRead,
     markAllAsRead,
     loadNotifications,

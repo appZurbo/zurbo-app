@@ -19,6 +19,7 @@ export interface UserProfile {
   nota_media?: number;
   ocultar_nota?: boolean;
   premium?: boolean;
+  plano_premium?: string; // Add this property
   criado_em: string;
   updated_at?: string;
   servicos_oferecidos?: string[];
