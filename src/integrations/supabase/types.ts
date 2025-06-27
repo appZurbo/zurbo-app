@@ -1161,6 +1161,8 @@ export type Database = {
           bio: string | null
           cpf: string | null
           criado_em: string | null
+          descricao_servico: string | null
+          em_servico: boolean | null
           email: string
           endereco_bairro: string | null
           endereco_cep: string | null
@@ -1183,6 +1185,8 @@ export type Database = {
           bio?: string | null
           cpf?: string | null
           criado_em?: string | null
+          descricao_servico?: string | null
+          em_servico?: boolean | null
           email: string
           endereco_bairro?: string | null
           endereco_cep?: string | null
@@ -1205,6 +1209,8 @@ export type Database = {
           bio?: string | null
           cpf?: string | null
           criado_em?: string | null
+          descricao_servico?: string | null
+          em_servico?: boolean | null
           email?: string
           endereco_bairro?: string | null
           endereco_cep?: string | null

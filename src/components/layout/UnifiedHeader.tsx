@@ -51,7 +51,7 @@ export const UnifiedHeader = () => {
     try {
       const { error } = await supabase
         .from('users')
-        .update({ em_servico: checked })
+        .update({ em_servico: checked } as any)
         .eq('id', profile.id);
 
       if (error) throw error;

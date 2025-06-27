@@ -244,7 +244,7 @@ export const createCompleteTestData = async () => {
         .update({ 
           descricao_servico: serviceDescriptions[i % serviceDescriptions.length],
           em_servico: true
-        })
+        } as any)
         .eq('id', prestadores[i].id);
 
       if (updateError) {
