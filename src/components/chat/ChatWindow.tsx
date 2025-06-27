@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageCircle, X } from 'lucide-react';
-import { useChat } from '@/hooks/useChat';
-import { MessageList } from './MessageList';
-import { MessageInput } from './MessageInput';
+import { useEnhancedChat } from '@/hooks/useEnhancedChat';
+import { ConversationList } from './ConversationList';
+import { ChatInterface } from './ChatInterface';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ChatWindowProps {
   isOpen: boolean;
@@ -14,18 +15,27 @@ interface ChatWindowProps {
 }
 
 export const ChatWindow = ({ isOpen, onClose }: ChatWindowProps) => {
-  const { chats, currentChat, setCurrentChat } = useChat();
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const { profile } = useAuth();
+  const {
+    conversations,
+    currentConversation,
+    setCurrentConversation,
+    messages,
+    imageUploadInfo,
+    sendMessage,
+    uploadImage,
+    setPrice,
+    respondToPrice,
+    reportUser,
+    loadMessages
+  } = useEnhancedChat();
 
-  if (!isOpen) return null;
-
-  const handleChatSelect = (chatId: string) => {
-    setSelectedChatId(chatId);
-    const selectedChat = chats.find(chat => chat.id === chatId);
-    if (selectedChat) {
-      setCurrentChat(selectedChat);
-    }
+  const handleConversationSelect = (conversation: any) => {
+    setCurrentConversation(conversation);
+    loadMessages(conversation.id);
   };
+
+  if (!isOpen || !profile) return null;
 
   return (
     <div className="fixed bottom-4 right-4 w-96 h-96 z-50">
@@ -42,41 +52,20 @@ export const ChatWindow = ({ isOpen, onClose }: ChatWindowProps) => {
           </div>
         </CardHeader>
         
-        <CardContent className="flex-1 p-0 flex">
-          {!selectedChatId ? (
+        <CardContent className="flex-1 p-0 flex flex-col">
+          {!currentConversation ? (
             <ScrollArea className="flex-1 p-3">
-              {chats.length === 0 ? (
+              {conversations.length === 0 ? (
                 <div className="text-center text-gray-500 py-8">
                   <MessageCircle className="h-12 w-12 mx-auto mb-2 opacity-30" />
-                  <p>Nenhuma conversa</p>
+                  <p className="text-sm">Nenhuma conversa</p>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  {chats.map((chat) => {
-                    const otherUser = chat.cliente?.nome !== undefined ? chat.cliente : chat.prestador;
-                    return (
-                      <div
-                        key={chat.id}
-                        className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
-                        onClick={() => handleChatSelect(chat.id)}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                            {otherUser?.nome?.[0]?.toUpperCase()}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-sm">{otherUser?.nome}</p>
-                            {chat.last_message && (
-                              <p className="text-xs text-gray-500 truncate">
-                                {chat.last_message}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                <ConversationList
+                  conversations={conversations}
+                  currentUserId={profile.id}
+                  onConversationSelect={handleConversationSelect}
+                />
               )}
             </ScrollArea>
           ) : (
@@ -85,14 +74,30 @@ export const ChatWindow = ({ isOpen, onClose }: ChatWindowProps) => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setSelectedChatId(null)}
+                  onClick={() => setCurrentConversation(null)}
                   className="mb-2"
                 >
                   ← Voltar
                 </Button>
               </div>
-              <MessageList />
-              <MessageInput />
+              
+              <div className="flex-1">
+                <ChatInterface
+                  conversation={currentConversation}
+                  messages={messages}
+                  imageUploadInfo={imageUploadInfo}
+                  onSendMessage={(content) => sendMessage(currentConversation.id, content)}
+                  onUploadImage={(file) => uploadImage(currentConversation.id, file)}
+                  onSetPrice={(price) => setPrice(currentConversation.id, price)}
+                  onRespondToPrice={(accept) => respondToPrice(currentConversation.id, accept)}
+                  onReportUser={(issueType, description) => {
+                    const reportedUserId = currentConversation.cliente_id === profile.id 
+                      ? currentConversation.prestador_id 
+                      : currentConversation.cliente_id;
+                    reportUser(currentConversation.id, reportedUserId, issueType, description);
+                  }}
+                />
+              </div>
             </div>
           )}
         </CardContent>

@@ -1,106 +1,80 @@
 
-import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Home, Users, Crown, MessageCircle, User, Calendar } from 'lucide-react';
-import { useMobile, useMobileOrTablet } from '@/hooks/useMobile';
+import { Home, Search, MessageCircle, User, AlertTriangle } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
+import { EnhancedEmergencyButton } from '@/components/emergency/EnhancedEmergencyButton';
 
-export const MobileDock = () => {
-  const navigate = useNavigate();
+const MobileDock = () => {
   const location = useLocation();
-  const isMobile = useMobile();
-  const isMobileOrTablet = useMobileOrTablet();
-  const { isAuthenticated, profile } = useAuth();
+  const { isAuthenticated } = useAuth();
 
-  // Don't show dock on login/auth pages or if desktop
-  if (!isMobileOrTablet || location.pathname === '/auth' || location.pathname === '/login') {
-    return null;
-  }
+  const isActive = (path: string) => location.pathname === path;
 
-  // Dynamic agenda path based on user type
-  const getAgendaPath = () => {
-    if (!profile) return '/pedidos';
-    return profile.tipo === 'prestador' ? '/agenda-prestador' : '/pedidos';
-  };
-
-  const dockItems = [
+  const navItems = [
     {
       icon: Home,
       label: 'Início',
       path: '/',
-      show: true
     },
     {
-      icon: Users,
-      label: 'Prestadores',
+      icon: Search,
+      label: 'Buscar',
       path: '/prestadores',
-      show: true
-    },
-    {
-      icon: Calendar,
-      label: 'Agenda',
-      path: getAgendaPath(),
-      show: isAuthenticated
     },
     {
       icon: MessageCircle,
       label: 'Conversas',
       path: '/conversas',
-      show: isAuthenticated
+      requiresAuth: true,
     },
     {
       icon: User,
       label: 'Perfil',
-      path: '/configuracoes',
-      show: isAuthenticated
-    }
+      path: isAuthenticated ? '/perfil' : '/auth',
+    },
   ];
 
-  const isActive = (path: string) => {
-    return location.pathname === path;
-  };
-
-  const visibleItems = dockItems.filter(item => item.show);
-
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg">
-      {/* Container with max width and centering for tablets */}
-      <div className="max-w-md mx-auto">
-        <div className="flex items-center justify-center py-1.5 px-2">
-          {/* Grid that adapts to number of visible items and centers them */}
-          <div 
-            className="grid gap-1"
-            style={{ 
-              gridTemplateColumns: `repeat(${visibleItems.length}, 1fr)`,
-              width: '100%',
-              maxWidth: `${visibleItems.length * 70}px` // Reduced from 80px to 70px
-            }}
-          >
-            {visibleItems.map((item) => {
-              const Icon = item.icon;
-              const active = isActive(item.path);
-              
-              return (
-                <Button
-                  key={item.path}
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate(item.path)}
-                  className={`flex flex-col items-center gap-0.5 h-auto py-2 px-2 rounded-lg transition-all duration-200 ${
-                    active 
-                      ? 'text-orange-500 bg-orange-50 shadow-sm scale-105' 
-                      : 'text-gray-600 hover:text-orange-500 hover:bg-orange-50'
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  <span className="text-xs font-medium leading-tight">{item.label}</span>
-                </Button>
-              );
-            })}
-          </div>
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 z-40 lg:hidden">
+      <div className="flex items-center justify-around">
+        {navItems.map((item) => {
+          if (item.requiresAuth && !isAuthenticated) return null;
+          
+          const IconComponent = item.icon;
+          const active = isActive(item.path);
+          
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`flex flex-col items-center justify-center p-2 rounded-lg transition-colors ${
+                active
+                  ? 'text-orange-500 bg-orange-50'
+                  : 'text-gray-600 hover:text-orange-500 hover:bg-orange-50'
+              }`}
+            >
+              <div className="relative">
+                <IconComponent className="h-5 w-5" />
+                {item.label === 'Conversas' && (
+                  <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 text-xs">
+                    2
+                  </Badge>
+                )}
+              </div>
+              <span className="text-xs mt-1">{item.label}</span>
+            </Link>
+          );
+        })}
+        
+        {/* Emergency Button - Special placement */}
+        <div className="flex flex-col items-center justify-center">
+          <EnhancedEmergencyButton />
+          <span className="text-xs mt-1 text-red-600 font-medium">SOS</span>
         </div>
       </div>
     </div>
   );
 };
+
+export default MobileDock;

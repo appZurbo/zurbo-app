@@ -147,6 +147,102 @@ export type Database = {
           },
         ]
       }
+      chat_conversations: {
+        Row: {
+          cliente_id: string | null
+          created_at: string | null
+          id: string
+          pedido_id: string | null
+          preco_proposto: number | null
+          prestador_id: string | null
+          servico_solicitado: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          cliente_id?: string | null
+          created_at?: string | null
+          id?: string
+          pedido_id?: string | null
+          preco_proposto?: number | null
+          prestador_id?: string | null
+          servico_solicitado: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          cliente_id?: string | null
+          created_at?: string | null
+          id?: string
+          pedido_id?: string | null
+          preco_proposto?: number | null
+          prestador_id?: string | null
+          servico_solicitado?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_conversations_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_conversations_prestador_id_fkey"
+            columns: ["prestador_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_messages: {
+        Row: {
+          content: string | null
+          conversation_id: string | null
+          created_at: string | null
+          id: string
+          image_url: string | null
+          message_type: string | null
+          sender_id: string | null
+        }
+        Insert: {
+          content?: string | null
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          message_type?: string | null
+          sender_id?: string | null
+        }
+        Update: {
+          content?: string | null
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          message_type?: string | null
+          sender_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chats: {
         Row: {
           cliente_id: string | null
@@ -331,6 +427,35 @@ export type Database = {
           {
             foreignKeyName: "cupons_usados_usuario_id_fkey"
             columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_image_uploads: {
+        Row: {
+          id: string
+          upload_count: number | null
+          upload_date: string | null
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          upload_count?: number | null
+          upload_date?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          upload_count?: number | null
+          upload_date?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_image_uploads_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
@@ -824,6 +949,35 @@ export type Database = {
         }
         Relationships: []
       }
+      sos_usage: {
+        Row: {
+          id: string
+          usage_count: number | null
+          usage_month: string | null
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          usage_count?: number | null
+          usage_month?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          usage_count?: number | null
+          usage_month?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sos_usage_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       system_settings: {
         Row: {
           description: string | null
@@ -898,6 +1052,58 @@ export type Database = {
           {
             foreignKeyName: "user_bans_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_chat_reports: {
+        Row: {
+          conversation_id: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          issue_type: string
+          reported_user_id: string | null
+          reporter_id: string | null
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          issue_type: string
+          reported_user_id?: string | null
+          reporter_id?: string | null
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          issue_type?: string
+          reported_user_id?: string | null
+          reporter_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_chat_reports_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_chat_reports_reported_user_id_fkey"
+            columns: ["reported_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_chat_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
@@ -1055,7 +1261,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_current_user_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
