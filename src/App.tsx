@@ -31,9 +31,9 @@ import ReportPage from "./pages/ReportPage";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import AdminContentModeration from "./pages/AdminContentModeration";
 import SystemSettings from "./pages/SystemSettings";
-import { Relatorios } from "./pages/admin/Relatorios";
+import Relatorios from "./pages/admin/Relatorios";
 import NotFound from "./pages/NotFound";
-import MobileLayoutImproved from "./components/mobile/MobileLayoutImproved";
+import { MobileLayoutImproved } from "./components/mobile/MobileLayoutImproved";
 
 const queryClient = new QueryClient();
 
