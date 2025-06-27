@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export const createCompleteTestData = async () => {
@@ -240,13 +239,17 @@ export const createCompleteTestData = async () => {
     ];
 
     for (let i = 0; i < prestadores.length; i++) {
-      await supabase
+      const { error: updateError } = await supabase
         .from('users')
         .update({ 
           descricao_servico: serviceDescriptions[i % serviceDescriptions.length],
           em_servico: true
         })
         .eq('id', prestadores[i].id);
+
+      if (updateError) {
+        console.error('Error updating provider description:', updateError);
+      }
     }
 
     console.log('Comprehensive test data created successfully!');

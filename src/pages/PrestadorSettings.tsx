@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -9,10 +10,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useMobile } from '@/hooks/useMobile';
 import { useToast } from '@/hooks/use-toast';
+import { ArrowLeft } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 const PrestadorSettings = () => {
   const navigate = useNavigate();
-  const { profile, loading: authLoading, updateProfile } = useAuth();
+  const { profile, loading: authLoading, updateLocalProfile } = useAuth();
   const isMobile = useMobile();
   const { toast } = useToast();
   
@@ -54,24 +57,35 @@ const PrestadorSettings = () => {
         return;
       }
 
-      // Prepare updates
-      const updates = {
-        ...formData,
-        id: profile.id, // Ensure ID is included
-      };
+      // Update profile in Supabase
+      const { error } = await supabase
+        .from('users')
+        .update({
+          nome: formData.nome,
+          email: formData.email,
+          bio: formData.bio,
+          descricao_servico: formData.descricao_servico,
+          endereco_cidade: formData.endereco_cidade,
+          endereco_bairro: formData.endereco_bairro,
+          endereco_rua: formData.endereco_rua,
+          endereco_numero: formData.endereco_numero,
+          endereco_cep: formData.endereco_cep,
+          cpf: formData.cpf,
+          foto_url: formData.foto_url,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', profile.id);
       
-      // Attempt to update profile
-      const updatedProfile = await updateProfile(profile.id, updates);
+      if (error) throw error;
+
+      // Update local profile
+      updateLocalProfile(formData);
       
-      if (updatedProfile) {
-        toast({
-          title: "Sucesso",
-          description: "Perfil atualizado com sucesso!",
-        });
-        navigate('/prestador-dashboard');
-      } else {
-        throw new Error('Não foi possível atualizar o perfil.');
-      }
+      toast({
+        title: "Sucesso",
+        description: "Perfil atualizado com sucesso!",
+      });
+      navigate('/prestador-dashboard');
     } catch (error: any) {
       console.error('Erro ao atualizar perfil:', error);
       toast({
