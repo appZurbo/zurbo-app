@@ -26,8 +26,10 @@ export const EnhancedContractButton = ({ prestador, className }: EnhancedContrac
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Get prestador services from their profile
-  const prestadorServices = prestador.servicos_oferecidos || [];
+  // Safely get prestador services with proper null checks
+  const prestadorServices = Array.isArray(prestador?.servicos_oferecidos) 
+    ? prestador.servicos_oferecidos 
+    : [];
 
   const handleContractService = async () => {
     if (!profile) {
@@ -48,29 +50,41 @@ export const EnhancedContractButton = ({ prestador, className }: EnhancedContrac
       return;
     }
 
-    // Create conversation
-    const conversation = await createConversation(prestador.id, selectedService);
-    
-    if (conversation) {
-      setShowConfirm(false);
-      toast({
-        title: "Conversa iniciada",
-        description: "Sua conversa com o prestador foi criada. Redirecionando...",
-      });
+    try {
+      // Create conversation
+      const conversation = await createConversation(prestador.id, selectedService);
       
-      // Navigate to conversations page
-      setTimeout(() => {
-        navigate('/conversas');
-      }, 1500);
+      if (conversation) {
+        setShowConfirm(false);
+        toast({
+          title: "Conversa iniciada",
+          description: "Sua conversa com o prestador foi criada. Redirecionando...",
+        });
+        
+        // Navigate to conversations page
+        setTimeout(() => {
+          navigate('/conversas');
+        }, 1500);
+      }
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível iniciar a conversa. Tente novamente.",
+        variant: "destructive"
+      });
     }
   };
 
-  if (!prestador) return null;
+  if (!prestador) {
+    console.warn('EnhancedContractButton: prestador is undefined');
+    return null;
+  }
 
   return (
     <Dialog open={showConfirm} onOpenChange={setShowConfirm}>
       <DialogTrigger asChild>
-        <Button className={`gradient-bg ${className}`}>
+        <Button className={`gradient-bg ${className || ''}`}>
           <CheckCircle className="h-4 w-4 mr-2" />
           Contratar
         </Button>
@@ -90,17 +104,17 @@ export const EnhancedContractButton = ({ prestador, className }: EnhancedContrac
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <Avatar className="h-12 w-12">
-                  <AvatarImage src={prestador.foto_url} alt={prestador.nome} />
+                  <AvatarImage src={prestador.foto_url || ''} alt={prestador.nome || ''} />
                   <AvatarFallback>
-                    {prestador.nome.charAt(0).toUpperCase()}
+                    {(prestador.nome || '?').charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg">{prestador.nome}</h3>
+                  <h3 className="font-semibold text-lg">{prestador.nome || 'Nome não informado'}</h3>
                   
                   <div className="flex items-center gap-4 text-sm text-gray-600">
-                    {prestador.nota_media > 0 && (
+                    {prestador.nota_media && prestador.nota_media > 0 && (
                       <div className="flex items-center gap-1">
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                         <span>{prestador.nota_media.toFixed(1)}</span>
@@ -132,9 +146,32 @@ export const EnhancedContractButton = ({ prestador, className }: EnhancedContrac
             <h4 className="font-medium mb-3">Selecione o serviço:</h4>
             
             {prestadorServices.length === 0 ? (
-              <p className="text-sm text-gray-600 text-center py-4">
-                Nenhum serviço específico cadastrado
-              </p>
+              <div className="text-center py-8">
+                <p className="text-sm text-gray-600 mb-4">
+                  Nenhum serviço específico cadastrado
+                </p>
+                <Card
+                  className={`cursor-pointer transition-all ${
+                    selectedService === 'Serviço Geral' ? 'ring-2 ring-orange-500 bg-orange-50' : 'hover:bg-gray-50'
+                  }`}
+                  onClick={() => setSelectedService('Serviço Geral')}
+                >
+                  <CardContent className="p-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">Serviço Geral</span>
+                      <div className={`w-4 h-4 rounded-full border-2 ${
+                        selectedService === 'Serviço Geral' 
+                          ? 'bg-orange-500 border-orange-500' 
+                          : 'border-gray-300'
+                      }`}>
+                        {selectedService === 'Serviço Geral' && (
+                          <CheckCircle className="h-4 w-4 text-white -m-0.5" />
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             ) : (
               <div className="space-y-2">
                 {prestadorServices.map((servico, index) => (

@@ -1,4 +1,3 @@
-
 export interface UserProfile {
   id: string;
   auth_id: string;
@@ -22,12 +21,12 @@ export interface UserProfile {
   plano_premium?: string | {
     ativo: boolean;
     expira_em: string;
-  }[]; // Allow both string and array types
+  }[];
   criado_em: string;
   updated_at?: string;
   servicos_oferecidos?: string[];
-  em_servico?: boolean; // Add this field
-  descricao_servico?: string; // Add this field
+  em_servico?: boolean;
+  descricao_servico?: string;
   prestador_servicos?: {
     servico_id: string;
     preco_min?: number;

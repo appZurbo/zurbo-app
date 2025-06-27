@@ -26,11 +26,17 @@ export const PrestadorCardImproved = ({ prestador, onContact, onViewProfile }: P
     { id: 3, nota: 5, comentario: 'Recomendo! Ficou perfeito.', cliente: 'Ana L.' }
   ];
 
-  // Calculate average price from prestador_servicos
-  const averagePrice = prestador.prestador_servicos?.length > 0 
+  // Safety check for prestador
+  if (!prestador) {
+    console.warn('PrestadorCardImproved: prestador is undefined');
+    return null;
+  }
+
+  // Calculate average price from prestador_servicos with null checks
+  const averagePrice = Array.isArray(prestador.prestador_servicos) && prestador.prestador_servicos.length > 0 
     ? prestador.prestador_servicos.reduce((acc, ps) => {
-        const min = ps.preco_min || 0;
-        const max = ps.preco_max || 0;
+        const min = ps?.preco_min || 0;
+        const max = ps?.preco_max || 0;
         return acc + (min + max) / 2;
       }, 0) / prestador.prestador_servicos.length
     : 0;
@@ -42,6 +48,11 @@ export const PrestadorCardImproved = ({ prestador, onContact, onViewProfile }: P
   const prevReview = () => {
     setCurrentReviewIndex((prev) => (prev - 1 + mockReviews.length) % mockReviews.length);
   };
+
+  // Safe access to services with proper null checks
+  const servicosOferecidos = Array.isArray(prestador.servicos_oferecidos) 
+    ? prestador.servicos_oferecidos 
+    : [];
 
   return (
     <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group relative">
@@ -68,14 +79,14 @@ export const PrestadorCardImproved = ({ prestador, onContact, onViewProfile }: P
             {prestador.foto_url ? (
               <img
                 src={prestador.foto_url}
-                alt={prestador.nome}
+                alt={prestador.nome || 'Prestador'}
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <Avatar className="h-20 w-20">
                   <AvatarFallback className="text-2xl bg-orange-500 text-white">
-                    {prestador.nome.charAt(0).toUpperCase()}
+                    {(prestador.nome || '?').charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
               </div>
@@ -87,7 +98,7 @@ export const PrestadorCardImproved = ({ prestador, onContact, onViewProfile }: P
             <div className="flex items-start justify-between mb-2">
               <div className="flex-1">
                 <h3 className="font-bold text-lg text-gray-900 mb-1 truncate">
-                  {prestador.nome}
+                  {prestador.nome || 'Nome não informado'}
                 </h3>
                 
                 {prestador.endereco_cidade && (
@@ -101,14 +112,14 @@ export const PrestadorCardImproved = ({ prestador, onContact, onViewProfile }: P
 
             {/* Rating and Price */}
             <div className="flex items-center justify-between mb-3">
-              {prestador.nota_media > 0 && !prestador.ocultar_nota && (
+              {prestador.nota_media && prestador.nota_media > 0 && !prestador.ocultar_nota && (
                 <div className="flex items-center">
                   <div className="flex items-center">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star
                         key={star}
                         className={`h-4 w-4 ${
-                          star <= Math.floor(prestador.nota_media)
+                          star <= Math.floor(prestador.nota_media || 0)
                             ? 'text-yellow-400 fill-current'
                             : 'text-gray-300'
                         }`}
@@ -116,7 +127,7 @@ export const PrestadorCardImproved = ({ prestador, onContact, onViewProfile }: P
                     ))}
                   </div>
                   <span className="ml-2 text-sm text-gray-600">
-                    ({prestador.nota_media.toFixed(1)})
+                    ({(prestador.nota_media || 0).toFixed(1)})
                   </span>
                 </div>
               )}
@@ -130,17 +141,17 @@ export const PrestadorCardImproved = ({ prestador, onContact, onViewProfile }: P
             </div>
 
             {/* Services */}
-            {prestador.servicos_oferecidos && prestador.servicos_oferecidos.length > 0 && (
+            {servicosOferecidos.length > 0 && (
               <div className="mb-4">
                 <div className="flex flex-wrap gap-1">
-                  {prestador.servicos_oferecidos.slice(0, 2).map((servico, index) => (
+                  {servicosOferecidos.slice(0, 2).map((servico, index) => (
                     <Badge key={index} variant="secondary" className="text-xs">
                       {servico}
                     </Badge>
                   ))}
-                  {prestador.servicos_oferecidos.length > 2 && (
+                  {servicosOferecidos.length > 2 && (
                     <Badge variant="outline" className="text-xs">
-                      +{prestador.servicos_oferecidos.length - 2} mais
+                      +{servicosOferecidos.length - 2} mais
                     </Badge>
                   )}
                 </div>
