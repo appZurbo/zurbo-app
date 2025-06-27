@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { UserProfile } from './types';
+import { UserProfile, PrestadorCompleto } from './types';
 
 // Function to normalize city names for filtering
 const normalizeCityForFilter = (cityName: string): string => {
