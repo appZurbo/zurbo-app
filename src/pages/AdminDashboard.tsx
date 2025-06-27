@@ -1,15 +1,15 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Database, Plus, Users, CheckCircle, AlertTriangle, MessageCircle, ShoppingBag, Wrench } from 'lucide-react';
+import { ArrowLeft, Users, CheckCircle, AlertTriangle, MessageCircle, ShoppingBag, Wrench } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { createFakeUsers, createFakePrestadores, createFakeAgendamentos, createFakeHistorico } from '@/utils/database/fake-data';
-import { createCompleteTestData } from '@/utils/database/create-complete-test-data';
+import { CreateTestData } from '@/components/admin/CreateTestData';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ const AdminDashboard = () => {
   const [prestadorCount, setPrestadorCount] = useState(0);
   const [pedidoCount, setPedidoCount] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
-  const [creatingTestData, setCreatingTestData] = useState(false);
+  const [conversationCount, setConversationCount] = useState(0);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -31,34 +31,32 @@ const AdminDashboard = () => {
 
   const loadStats = async () => {
     try {
-      const { data: users, error: usersError, count: usersCount } = await supabase
+      // Get user counts
+      const { count: usersCount } = await supabase
         .from('users')
-        .select('*', { count: 'exact', head: false });
-
-      if (usersError) throw usersError;
+        .select('*', { count: 'exact', head: true });
       setUserCount(usersCount || 0);
 
-      const { data: prestadores, error: prestadoresError, count: prestadoresCount } = await supabase
+      const { count: prestadoresCount } = await supabase
         .from('users')
-        .select('*', { count: 'exact', head: false })
+        .select('*', { count: 'exact', head: true })
         .eq('tipo', 'prestador');
-
-      if (prestadoresError) throw prestadoresError;
       setPrestadorCount(prestadoresCount || 0);
 
-      const { data: pedidos, error: pedidosError, count: pedidosCount } = await supabase
+      const { count: pedidosCount } = await supabase
         .from('pedidos')
-        .select('*', { count: 'exact', head: false });
-
-      if (pedidosError) throw pedidosError;
+        .select('*', { count: 'exact', head: true });
       setPedidoCount(pedidosCount || 0);
 
-      const { data: reviews, error: reviewsError, count: reviewsCount } = await supabase
+      const { count: reviewsCount } = await supabase
         .from('avaliacoes')
-        .select('*', { count: 'exact', head: false });
-
-      if (reviewsError) throw reviewsError;
+        .select('*', { count: 'exact', head: true });
       setReviewCount(reviewsCount || 0);
+
+      const { count: conversationsCount } = await supabase
+        .from('chat_conversations')
+        .select('*', { count: 'exact', head: true });
+      setConversationCount(conversationsCount || 0);
 
     } catch (error) {
       console.error('Error loading stats:', error);
@@ -75,56 +73,6 @@ const AdminDashboard = () => {
       loadStats();
     }
   }, [isAdmin]);
-
-  const handleCreateTestData = async () => {
-    setCreatingTestData(true);
-    try {
-      await createFakeUsers();
-      await createFakePrestadores();
-      await createFakeAgendamentos();
-      await createFakeHistorico();
-      toast({
-        title: "Sucesso",
-        description: "Dados de teste básicos criados com sucesso!",
-      });
-      loadStats();
-    } catch (error) {
-      console.error('Error creating test data:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível criar os dados de teste.",
-        variant: "destructive"
-      });
-    } finally {
-      setCreatingTestData(false);
-    }
-  };
-
-  const handleCreateCompleteTestData = async () => {
-    setCreatingTestData(true);
-    try {
-      const success = await createCompleteTestData();
-      if (success) {
-        toast({
-          title: "Sucesso",
-          description: "Dados de teste completos criados com sucesso! Inclui conversas, mensagens, pedidos e agendamentos.",
-        });
-        // Refresh data
-        loadStats();
-      } else {
-        throw new Error('Failed to create test data');
-      }
-    } catch (error) {
-      console.error('Error creating test data:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível criar os dados de teste.",
-        variant: "destructive"
-      });
-    } finally {
-      setCreatingTestData(false);
-    }
-  };
 
   return (
     <div>
@@ -152,47 +100,9 @@ const AdminDashboard = () => {
           </div>
 
           {/* Test Data Section */}
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Database className="h-5 w-5 text-blue-500" />
-                Dados de Teste
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Button
-                  onClick={handleCreateTestData}
-                  disabled={creatingTestData}
-                  className="flex items-center gap-2"
-                >
-                  {creatingTestData ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                  ) : (
-                    <Plus className="h-4 w-4" />
-                  )}
-                  Criar Dados Básicos
-                </Button>
-                
-                <Button
-                  onClick={handleCreateCompleteTestData}
-                  disabled={creatingTestData}
-                  className="flex items-center gap-2 bg-green-500 hover:bg-green-600"
-                >
-                  {creatingTestData ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                  ) : (
-                    <Database className="h-4 w-4" />
-                  )}
-                  Criar Sistema Completo de Teste
-                </Button>
-              </div>
-              <p className="text-sm text-gray-600 mt-2">
-                O sistema completo inclui: conversas em tempo real, mensagens, pedidos, agendamentos, 
-                contas premium e dados para teste de moderação.
-              </p>
-            </CardContent>
-          </Card>
+          <div className="mb-6">
+            <CreateTestData />
+          </div>
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
@@ -225,6 +135,19 @@ const AdminDashboard = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
+                  <MessageCircle className="h-5 w-5 text-blue-500" />
+                  Conversas
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-bold">{conversationCount}</p>
+                <p className="text-sm text-gray-500">Total de conversas iniciadas</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
                   <ShoppingBag className="h-5 w-5 text-blue-500" />
                   Pedidos
                 </CardTitle>
@@ -234,7 +157,10 @@ const AdminDashboard = () => {
                 <p className="text-sm text-gray-500">Total de pedidos realizados</p>
               </CardContent>
             </Card>
+          </div>
 
+          {/* Additional Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -247,28 +173,67 @@ const AdminDashboard = () => {
                 <p className="text-sm text-gray-500">Total de avaliações recebidas</p>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-red-500" />
+                  Status do Sistema
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Banco de Dados</span>
+                    <span className="text-green-600 text-sm font-medium">✅ Online</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Chat em Tempo Real</span>
+                    <span className="text-green-600 text-sm font-medium">✅ Ativo</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Dados de Teste</span>
+                    <span className={`text-sm font-medium ${conversationCount > 0 ? 'text-green-600' : 'text-yellow-600'}`}>
+                      {conversationCount > 0 ? '✅ Disponível' : '⚠️ Executar Criação'}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Alerts and Notices */}
+          {/* Quick Actions */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-red-500" />
-                Alertas e Notificações
-              </CardTitle>
+              <CardTitle>Ações Rápidas</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="list-disc pl-5">
-                <li>
-                  <span className="font-semibold">Aviso:</span> Monitorar a fila de denúncias de usuários.
-                </li>
-                <li>
-                  <span className="font-semibold">Alerta:</span> Verificar a integridade dos dados dos usuários.
-                </li>
-                <li>
-                  <span className="font-semibold">Aviso:</span> O sistema está em constante atualização.
-                </li>
-              </ul>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Button
+                  onClick={() => navigate('/conversas')}
+                  variant="outline"
+                  className="justify-start"
+                >
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  Ver Conversas
+                </Button>
+                <Button
+                  onClick={() => navigate('/prestadores')}
+                  variant="outline"
+                  className="justify-start"
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Ver Prestadores
+                </Button>
+                <Button
+                  onClick={() => window.location.reload()}
+                  variant="outline"
+                  className="justify-start"
+                >
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Atualizar Stats
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
