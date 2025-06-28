@@ -64,13 +64,6 @@ export const UnifiedHeader = () => {
 
   const isPremium = profile?.premium || false;
 
-  const getPremiumLabel = () => {
-    if (!isPremium) return null;
-    if (isPrestador) return "PRO - Prestador";
-    if (isAdmin) return "PRO - Admin";
-    return "PRO - Cliente";
-  };
-
   const renderNavigationButtons = () => {
     if (isMobile) return null; // Navigation handled by dock on mobile
 
@@ -160,23 +153,23 @@ export const UnifiedHeader = () => {
           </div>
           <DropdownMenuSeparator />
           
-          <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
+          <DropdownMenuItem onClick={() => navigate(isPrestador ? '/prestador-settings' : '/configuracoes')}>
             <Settings className="mr-2 h-4 w-4" />
             Perfil
           </DropdownMenuItem>
 
+          <DropdownMenuItem onClick={() => navigate('/pedidos')}>
+            <Clock className="mr-2 h-4 w-4" />
+            Pedidos
+          </DropdownMenuItem>
+          
+          <DropdownMenuItem onClick={() => navigate('/favoritos')}>
+            <Heart className="mr-2 h-4 w-4" />
+            Favoritos
+          </DropdownMenuItem>
+
           {isPrestador ? (
             <>
-              <DropdownMenuItem onClick={() => navigate('/pedidos')}>
-                <Clock className="mr-2 h-4 w-4" />
-                Pedidos
-              </DropdownMenuItem>
-              
-              <DropdownMenuItem onClick={() => navigate('/favoritos')}>
-                <Heart className="mr-2 h-4 w-4" />
-                Favoritos
-              </DropdownMenuItem>
-              
               <DropdownMenuItem onClick={() => navigate('/agenda-prestador')}>
                 <Calendar className="mr-2 h-4 w-4" />
                 Agenda
@@ -189,16 +182,6 @@ export const UnifiedHeader = () => {
             </>
           ) : (
             <>
-              <DropdownMenuItem onClick={() => navigate('/pedidos')}>
-                <Clock className="mr-2 h-4 w-4" />
-                Pedidos
-              </DropdownMenuItem>
-              
-              <DropdownMenuItem onClick={() => navigate('/favoritos')}>
-                <Heart className="mr-2 h-4 w-4" />
-                Favoritos
-              </DropdownMenuItem>
-              
               <DropdownMenuItem onClick={() => navigate('/central-ajuda')}>
                 <HelpCircle className="mr-2 h-4 w-4" />
                 Central de Ajuda

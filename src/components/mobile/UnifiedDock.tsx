@@ -37,9 +37,8 @@ export const UnifiedDock = () => {
     {
       icon: Calendar,
       label: 'Agenda',
-      path: profile?.tipo === 'prestador' ? '/agenda-prestador' : '/pedidos',
+      path: isPrestador ? '/agenda-prestador' : '/pedidos',
       isActive: isActive('/agenda-prestador') || isActive('/pedidos') || isActive('/agenda'),
-      highlight: profile?.tipo === 'prestador',
       requiresAuth: true
     },
     {
@@ -54,7 +53,7 @@ export const UnifiedDock = () => {
       icon: User,
       label: 'Perfil',
       path: isAuthenticated 
-        ? '/configuracoes'
+        ? (isPrestador ? '/prestador-settings' : '/configuracoes')
         : '/auth',
       isActive: isActive('/configuracoes') || isActive('/prestador-settings') || isActive('/settings') || isActive('/auth'),
       showAlways: true
@@ -65,64 +64,32 @@ export const UnifiedDock = () => {
     item.showAlways || (item.requiresAuth && isAuthenticated)
   );
 
-  const getDockHeight = () => {
-    if (isMobile) return 'h-20'; // Mais alto em mobile para melhor usabilidade
-    if (isTablet) return 'h-18'; // Ligeiramente menor em tablet
-    return 'h-16';
-  };
-
-  const getButtonSize = (): "dock" => {
-    return 'dock'; // Always use 'dock' size for unified dock
-  };
-
-  const getDockContainerClass = () => {
-    if (isTablet) {
-      // Para tablet, centraliza os ícones mesmo em modo paisagem
-      return `flex justify-center items-center ${getDockHeight()} px-4 py-1`;
-    }
-    return `grid grid-cols-${visibleItems.length} h-full px-2 py-1 gap-1`;
-  };
-
-  const getItemContainerClass = () => {
-    if (isTablet) {
-      return "flex items-center gap-4"; // Centralizado no tablet
-    }
-    return ""; // Grid padrão para mobile
-  };
-
   return (
-    <div className={`fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200/80 shadow-lg z-50 ${getDockHeight()} safe-area-padding-bottom`}>
-      <div className={getDockContainerClass()}>
-        <div className={getItemContainerClass()}>
+    <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200/80 shadow-lg z-50 h-20 safe-area-padding-bottom">
+      <div className={`flex justify-center items-center h-full px-4 py-1 ${isTablet ? 'max-w-md mx-auto' : ''}`}>
+        <div className={`flex ${isTablet ? 'gap-8' : 'justify-between w-full max-w-sm'}`}>
           {visibleItems.map((item, index) => {
             const IconComponent = item.icon;
-            const isAgendaDestaque = item.highlight && profile?.tipo === 'prestador';
             
             return (
               <Button
                 key={index}
                 variant="ghost"
-                size={getButtonSize()}
+                size="dock"
                 className={`
-                  relative transition-all duration-200 rounded-lg
+                  relative transition-all duration-200 rounded-lg flex-col
                   ${item.isActive 
                     ? 'bg-orange-100 text-orange-600 border border-orange-200 shadow-sm' 
-                    : isAgendaDestaque 
-                      ? 'text-orange-500 hover:text-orange-600 hover:bg-orange-50' 
-                      : 'text-gray-600 hover:text-orange-600 hover:bg-orange-50'
+                    : 'text-gray-600 hover:text-orange-600 hover:bg-orange-50'
                   }
-                  ${isMobile ? 'min-h-16' : 'min-h-14'}
-                  ${isTablet ? 'flex-col w-16 h-16' : ''}
+                  min-h-16 w-16
                 `}
                 onClick={() => navigate(item.path)}
               >
                 <div className="flex flex-col items-center justify-center w-full h-full">
                   <div className="relative">
                     <IconComponent 
-                      className={`
-                        ${isMobile ? 'h-6 w-6' : 'h-5 w-5'} 
-                        ${item.isActive ? 'text-orange-600' : isAgendaDestaque ? 'text-orange-500' : ''}
-                      `} 
+                      className={`h-6 w-6 ${item.isActive ? 'text-orange-600' : ''}`} 
                     />
                     {item.badge && (
                       <Badge 
@@ -133,11 +100,7 @@ export const UnifiedDock = () => {
                     )}
                   </div>
                   <span 
-                    className={`
-                      mt-1 font-medium leading-none
-                      ${isMobile ? 'text-xs' : 'text-xs'} 
-                      ${item.isActive ? 'text-orange-600' : isAgendaDestaque ? 'text-orange-500' : ''}
-                    `}
+                    className={`mt-1 font-medium leading-none text-xs ${item.isActive ? 'text-orange-600' : ''}`}
                   >
                     {item.label}
                   </span>
