@@ -1,3 +1,4 @@
+
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,18 +10,16 @@ import SecuritySettings from '@/components/settings/SecuritySettings';
 import GerenciadorBairros from '@/components/bairros/GerenciadorBairros';
 import { useMobile } from '@/hooks/useMobile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
+import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
+
 const Settings = () => {
   const navigate = useNavigate();
-  const {
-    profile,
-    isPrestador,
-    loading
-  } = useAuth();
+  const { profile, isPrestador, loading } = useAuth();
   const isMobile = useMobile();
+
   if (loading) {
-    return <div>
-        <UnifiedHeader />
+    return (
+      <UnifiedLayout>
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-orange-500 rounded-xl flex items-center justify-center animate-pulse">
@@ -29,11 +28,13 @@ const Settings = () => {
             <p className="text-gray-600">Carregando configurações...</p>
           </div>
         </div>
-      </div>;
+      </UnifiedLayout>
+    );
   }
+
   if (!profile) {
-    return <div>
-        <UnifiedHeader />
+    return (
+      <UnifiedLayout>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="w-full max-w-md">
             <CardContent className="p-6 text-center">
@@ -47,10 +48,12 @@ const Settings = () => {
             </CardContent>
           </Card>
         </div>
-      </div>;
+      </UnifiedLayout>
+    );
   }
-  return <div>
-      <UnifiedHeader />
+
+  return (
+    <UnifiedLayout>
       <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
         <div className={`${isMobile ? 'px-4 py-4' : 'max-w-4xl mx-auto p-6'}`}>
           {/* Header centralizado */}
@@ -68,13 +71,17 @@ const Settings = () => {
               Configurações
             </h1>
             <p className="text-gray-600 flex items-center justify-center gap-2">
-              {isPrestador ? <>
+              {isPrestador ? (
+                <>
                   <Wrench className="h-4 w-4" />
                   Painel do Prestador
-                </> : <>
+                </>
+              ) : (
+                <>
                   <User className="h-4 w-4" />
                   Configurações do Cliente
-                </>}
+                </>
+              )}
             </p>
           </div>
 
@@ -86,10 +93,12 @@ const Settings = () => {
                   <User className="h-4 w-4" />
                   {isMobile ? 'Perfil' : 'Meu Perfil'}
                 </TabsTrigger>
-                {isPrestador && <TabsTrigger value="bairros" className="flex items-center gap-2 data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600">
+                {isPrestador && (
+                  <TabsTrigger value="bairros" className="flex items-center gap-2 data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600">
                     <SettingsIcon className="h-4 w-4" />
                     {isMobile ? 'Bairros' : 'Área de Atendimento'}
-                  </TabsTrigger>}
+                  </TabsTrigger>
+                )}
                 <TabsTrigger value="security" className="flex items-center gap-0.5 data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600">
                   <Shield className="h-4 w-4" />
                   {isMobile ? 'Segurança' : 'Privacidade & Segurança'}
@@ -110,7 +119,8 @@ const Settings = () => {
                 </Card>
               </TabsContent>
               
-              {isPrestador && <TabsContent value="bairros" className="space-y-6">
+              {isPrestador && (
+                <TabsContent value="bairros" className="space-y-6">
                   <Card className="shadow-sm">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
@@ -122,7 +132,8 @@ const Settings = () => {
                       <GerenciadorBairros />
                     </CardContent>
                   </Card>
-                </TabsContent>}
+                </TabsContent>
+              )}
               
               <TabsContent value="security" className="space-y-6">
                 <Card className="shadow-sm">
@@ -141,6 +152,8 @@ const Settings = () => {
           </div>
         </div>
       </div>
-    </div>;
+    </UnifiedLayout>
+  );
 };
+
 export default Settings;

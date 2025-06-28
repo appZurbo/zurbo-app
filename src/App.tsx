@@ -27,6 +27,7 @@ import NotFound from "@/pages/NotFound";
 import SobreNos from "@/pages/SobreNos";
 import TrabalheConosco from "@/pages/TrabalheConosco";
 import { Toaster } from '@/components/ui/toaster';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 const router = createBrowserRouter([
   {
@@ -137,10 +138,10 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <>
+    <ErrorBoundary>
       <RouterProvider router={router} />
       <Toaster />
-    </>
+    </ErrorBoundary>
   );
 }
 

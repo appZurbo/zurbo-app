@@ -44,12 +44,16 @@ export const useAuth = () => {
 
     const initializeAuth = async () => {
       try {
-        // Verificar sessão existente primeiro
+        // Get initial session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
           console.error('Error getting session:', sessionError);
-          setError('Erro ao verificar sessão');
+          if (mounted) {
+            setError('Erro ao verificar sessão');
+            setLoading(false);
+          }
+          return;
         }
         
         if (mounted) {
@@ -64,7 +68,7 @@ export const useAuth = () => {
           setLoading(false);
         }
 
-        // Configurar listener de mudanças de autenticação
+        // Set up auth state listener
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, session) => {
             if (!mounted) return;
@@ -75,25 +79,18 @@ export const useAuth = () => {
             setUser(currentUser);
             
             if (currentUser && event === 'SIGNED_IN') {
-              // Usar setTimeout para evitar loops infinitos
-              setTimeout(async () => {
-                if (mounted) {
-                  await loadProfile(currentUser.id);
-                }
-              }, 100);
+              // Load profile for signed in user
+              await loadProfile(currentUser.id);
             } else if (event === 'SIGNED_OUT') {
               setProfile(null);
               setError(null);
             }
             
-            if (!loading) {
-              setLoading(false);
-            }
+            setLoading(false);
           }
         );
 
         return () => {
-          mounted = false;
           subscription.unsubscribe();
         };
       } catch (error) {
@@ -146,16 +143,14 @@ export const useAuth = () => {
     }
   };
 
-  // Enhanced admin check - include specific admin emails
+  // Enhanced admin check
   const isAdminUser = () => {
     if (!user || !profile) return false;
     
-    // Check if user has admin type in profile
     if (profile.tipo === 'admin' || profile.tipo === 'moderator') {
       return true;
     }
     
-    // Check specific admin emails
     const adminEmails = ['contato@zurbo.com.br', 'admin@zurbo.com.br'];
     return adminEmails.includes(user.email || '');
   };
