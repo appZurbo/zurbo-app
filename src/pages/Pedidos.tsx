@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMobile } from '@/hooks/useMobile';
-import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
+import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { AppointmentSystem } from '@/components/appointments/AppointmentSystem';
 
 const Pedidos = () => {
@@ -16,8 +16,7 @@ const Pedidos = () => {
 
   if (loading) {
     return (
-      <div>
-        <UnifiedHeader />
+      <UnifiedLayout>
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-orange-500 rounded-xl flex items-center justify-center animate-pulse">
@@ -26,14 +25,13 @@ const Pedidos = () => {
             <p className="text-gray-600">Carregando pedidos...</p>
           </div>
         </div>
-      </div>
+      </UnifiedLayout>
     );
   }
 
   if (!profile) {
     return (
-      <div>
-        <UnifiedHeader />
+      <UnifiedLayout>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="w-full max-w-md">
             <CardContent className="p-6 text-center">
@@ -47,14 +45,13 @@ const Pedidos = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </UnifiedLayout>
     );
   }
 
   return (
-    <div>
-      <UnifiedHeader />
-      <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
+    <UnifiedLayout>
+      <div className="min-h-screen bg-gray-50">
         <div className={`${isMobile ? 'px-4 py-4' : 'max-w-6xl mx-auto p-6'}`}>
           {/* Header */}
           <div className="flex items-center gap-3 mb-6">
@@ -83,7 +80,7 @@ const Pedidos = () => {
           <AppointmentSystem />
         </div>
       </div>
-    </div>
+    </UnifiedLayout>
   );
 };
 

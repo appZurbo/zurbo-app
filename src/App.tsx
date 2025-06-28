@@ -26,7 +26,6 @@ import InformacoesPage from "@/pages/InformacoesPage";
 import NotFound from "@/pages/NotFound";
 import SobreNos from "@/pages/SobreNos";
 import TrabalheConosco from "@/pages/TrabalheConosco";
-import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from '@/components/ui/toaster';
 
 const router = createBrowserRouter([
@@ -71,6 +70,10 @@ const router = createBrowserRouter([
     element: <Conversas />,
   },
   {
+    path: "/mensagens",
+    element: <Conversas />,
+  },
+  {
     path: "/ads",
     element: <AdsPage />,
   },
@@ -84,6 +87,10 @@ const router = createBrowserRouter([
   },
   {
     path: "/agenda",
+    element: <AgendaPrestador />,
+  },
+  {
+    path: "/agenda-prestador",
     element: <AgendaPrestador />,
   },
   {
@@ -130,10 +137,10 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <AuthProvider>
+    <>
       <RouterProvider router={router} />
       <Toaster />
-    </AuthProvider>
+    </>
   );
 }
 

@@ -1,7 +1,7 @@
 
 import React, { ReactNode } from 'react';
 import { UnifiedHeader } from './UnifiedHeader';
-import { UnifiedDock } from '../mobile/UnifiedDock';
+import { ZurboDock } from '../mobile/ZurboDock';
 import { useMobile, useTablet } from '@/hooks/useMobile';
 
 interface UnifiedLayoutProps {
@@ -33,7 +33,7 @@ export const UnifiedLayout = ({
         {children}
       </main>
 
-      {showBottomDock && <UnifiedDock />}
+      {showBottomDock && <ZurboDock />}
     </div>
   );
 };
