@@ -66,7 +66,7 @@ export const UnifiedHeader = () => {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -153,126 +153,146 @@ export const UnifiedHeader = () => {
                       )}
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56 bg-white shadow-lg border z-[70] border-gray-200" align="end" forceMount>
-                    <div className="flex items-center justify-start gap-2 p-2">
-                      <div className="flex flex-col space-y-1 leading-none">
-                        <p className="font-medium text-gray-900">{profile?.nome}</p>
-                        <p className="w-[200px] truncate text-sm text-gray-600">
-                          {profile?.email}
-                        </p>
-                        {isAdmin && (
-                          <Badge className="w-fit bg-red-100 text-red-800 border-red-200">
-                            <Shield className="h-3 w-3 mr-1 text-red-800" />
-                            Admin Verificado
-                          </Badge>
-                        )}
+                  <DropdownMenuContent 
+                    className="w-64 bg-white shadow-xl border border-gray-200 rounded-lg z-[100]" 
+                    align="end" 
+                    forceMount
+                    sideOffset={8}
+                  >
+                    {/* User Info Header */}
+                    <div className="flex items-center gap-3 p-4 border-b border-gray-100">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={profile?.foto_url} alt={profile?.nome} />
+                        <AvatarFallback className="bg-orange-100 text-orange-600">
+                          {profile?.nome?.charAt(0)?.toUpperCase() || '?'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-gray-900 truncate">{profile?.nome}</p>
+                        <p className="text-sm text-gray-500 truncate">{profile?.email}</p>
                         {isPremium && (
-                          <Badge className="w-fit bg-gradient-to-r from-yellow-400 to-yellow-600 text-white border-0 shadow-lg" style={{
-                            boxShadow: '0 0 10px rgba(251, 191, 36, 0.3)'
-                          }}>
-                            <Crown className="h-3 w-3 mr-1 text-white" />
+                          <Badge className="mt-1 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white border-0 text-xs">
+                            <Crown className="h-3 w-3 mr-1" />
                             {getPremiumLabel()}
                           </Badge>
                         )}
                       </div>
                     </div>
-                    <DropdownMenuSeparator className="bg-gray-200" />
                     
-                    {/* Provider Menu Items */}
+                    {/* Provider Service Toggle */}
                     {isPrestador && (
                       <>
-                        <div className="px-3 py-2">
-                          <div className="flex items-center space-x-2">
-                            <Switch id="em-servico" checked={emServico} onCheckedChange={handleServiceToggle} />
-                            <Label htmlFor="em-servico" className="text-sm text-gray-700">
-                              Em Serviço
-                            </Label>
+                        <div className="px-4 py-3 border-b border-gray-100">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className={`w-2 h-2 rounded-full ${emServico ? 'bg-green-500' : 'bg-gray-400'}`} />
+                              <Label htmlFor="em-servico" className="text-sm font-medium text-gray-700">
+                                Em Serviço
+                              </Label>
+                            </div>
+                            <Switch 
+                              id="em-servico" 
+                              checked={emServico} 
+                              onCheckedChange={handleServiceToggle}
+                              className="data-[state=checked]:bg-orange-500"
+                            />
                           </div>
                         </div>
-                        <DropdownMenuSeparator className="bg-gray-200" />
-                        <DropdownMenuItem onClick={() => navigate('/prestador-settings')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
-                          <Wrench className="mr-2 h-4 w-4 text-gray-600" />
+                      </>
+                    )}
+
+                    {/* Provider Menu Items */}
+                    {isPrestador && (
+                      <div className="py-2">
+                        <DropdownMenuItem onClick={() => navigate('/prestador-settings')} className="px-4 py-2 text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                          <Wrench className="mr-3 h-4 w-4 text-gray-500" />
                           <span>Configurações do Prestador</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/agenda')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
-                          <Calendar className="mr-2 h-4 w-4 text-gray-600" />
+                        <DropdownMenuItem onClick={() => navigate('/agenda')} className="px-4 py-2 text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                          <Calendar className="mr-3 h-4 w-4 text-gray-500" />
                           <span>Agenda</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/prestador-dashboard')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
-                          <BarChart3 className="mr-2 h-4 w-4 text-gray-600" />
-                          <span>Dashboard</span>
+                        <DropdownMenuItem onClick={() => navigate('/prestador-dashboard')} className="px-4 py-2 text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                          <BarChart3 className="mr-3 h-4 w-4 text-gray-500" />
+                          <span>Painel do Prestador</span>
                         </DropdownMenuItem>
-                      </>
+                        <DropdownMenuItem onClick={() => navigate('/pedidos')} className="px-4 py-2 text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                          <ShoppingBag className="mr-3 h-4 w-4 text-gray-500" />
+                          <span>Pedidos</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate(isPremium ? '/premium-dashboard' : '/planos')} className="px-4 py-2 text-yellow-600 hover:bg-yellow-50 focus:bg-yellow-50">
+                          <Crown className="mr-3 h-4 w-4 text-yellow-600" />
+                          <span>{isPremium ? 'Dashboard PRO' : 'Tornar-se Premium'}</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="my-2 bg-gray-100" />
+                        <DropdownMenuItem onClick={handleLogout} className="px-4 py-2 text-red-600 hover:bg-red-50 focus:bg-red-50">
+                          <LogOut className="mr-3 h-4 w-4 text-red-600" />
+                          <span>Sair</span>
+                        </DropdownMenuItem>
+                      </div>
                     )}
 
                     {/* Client Menu Items */}
                     {!isPrestador && !isAdmin && (
-                      <>
-                        <DropdownMenuItem onClick={() => navigate('/configuracoes')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
-                          <User className="mr-2 h-4 w-4 text-gray-600" />
+                      <div className="py-2">
+                        <DropdownMenuItem onClick={() => navigate('/configuracoes')} className="px-4 py-2 text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                          <User className="mr-3 h-4 w-4 text-gray-500" />
                           <span>Meu Perfil</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/configuracoes')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
-                          <Settings className="mr-2 h-4 w-4 text-gray-600" />
-                          <span>Configurações</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/favoritos')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
-                          <Heart className="mr-2 h-4 w-4 text-gray-600" />
+                        <DropdownMenuItem onClick={() => navigate('/favoritos')} className="px-4 py-2 text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                          <Heart className="mr-3 h-4 w-4 text-gray-500" />
                           <span>Favoritos</span>
                         </DropdownMenuItem>
-                      </>
+                        <DropdownMenuItem onClick={() => navigate('/pedidos')} className="px-4 py-2 text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                          <ShoppingBag className="mr-3 h-4 w-4 text-gray-500" />
+                          <span>Meus Pedidos</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/conversas')} className="px-4 py-2 text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                          <MessageCircle className="mr-3 h-4 w-4 text-gray-500" />
+                          <span>Conversas</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/enderecos')} className="px-4 py-2 text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                          <MapPin className="mr-3 h-4 w-4 text-gray-500" />
+                          <span>Endereços</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/notificacoes')} className="px-4 py-2 text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                          <Bell className="mr-3 h-4 w-4 text-gray-500" />
+                          <span>Notificações</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate(isPremium ? '/premium-dashboard' : '/planos')} className="px-4 py-2 text-yellow-600 hover:bg-yellow-50 focus:bg-yellow-50">
+                          <Crown className="mr-3 h-4 w-4 text-yellow-600" />
+                          <span>{isPremium ? 'Dashboard PRO' : 'Tornar-se Premium'}</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="my-2 bg-gray-100" />
+                        <DropdownMenuItem onClick={handleLogout} className="px-4 py-2 text-red-600 hover:bg-red-50 focus:bg-red-50">
+                          <LogOut className="mr-3 h-4 w-4 text-red-600" />
+                          <span>Sair</span>
+                        </DropdownMenuItem>
+                      </div>
                     )}
 
                     {/* Admin Menu Items */}
                     {isAdmin && (
-                      <>
-                        <DropdownMenuItem onClick={() => navigate('/configuracoes')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
-                          <Settings className="mr-2 h-4 w-4 text-gray-600" />
+                      <div className="py-2">
+                        <DropdownMenuItem onClick={() => navigate('/configuracoes')} className="px-4 py-2 text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                          <Settings className="mr-3 h-4 w-4 text-gray-500" />
                           <span>Configurações de Perfil</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/admin/relatorios')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
-                          <BarChart3 className="mr-2 h-4 w-4 text-gray-600" />
+                        <DropdownMenuItem onClick={() => navigate('/admin/relatorios')} className="px-4 py-2 text-blue-600 hover:bg-blue-50 focus:bg-blue-50">
+                          <BarChart3 className="mr-3 h-4 w-4 text-blue-600" />
                           <span>Admin Dashboard</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/admin/moderacao')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
-                          <Shield className="mr-2 h-4 w-4 text-gray-600" />
+                        <DropdownMenuItem onClick={() => navigate('/admin/moderacao')} className="px-4 py-2 text-blue-600 hover:bg-blue-50 focus:bg-blue-50">
+                          <Shield className="mr-3 h-4 w-4 text-blue-600" />
                           <span>Painel de Moderação</span>
                         </DropdownMenuItem>
-                      </>
+                        <DropdownMenuSeparator className="my-2 bg-gray-100" />
+                        <DropdownMenuItem onClick={handleLogout} className="px-4 py-2 text-red-600 hover:bg-red-50 focus:bg-red-50">
+                          <LogOut className="mr-3 h-4 w-4 text-red-600" />
+                          <span>Sair</span>
+                        </DropdownMenuItem>
+                      </div>
                     )}
-
-                    {/* Common Menu Items for All Users */}
-                    <DropdownMenuItem onClick={() => navigate('/pedidos')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
-                      <ShoppingBag className="mr-2 h-4 w-4 text-gray-600" />
-                      <span>Meus Pedidos</span>
-                    </DropdownMenuItem>
-
-                    <DropdownMenuItem onClick={() => navigate('/conversas')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
-                      <MessageCircle className="mr-2 h-4 w-4 text-gray-600" />
-                      <span>Conversas</span>
-                    </DropdownMenuItem>
-
-                    <DropdownMenuItem onClick={() => navigate('/enderecos')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
-                      <MapPin className="mr-2 h-4 w-4 text-gray-600" />
-                      <span>Endereços</span>
-                    </DropdownMenuItem>
-
-                    <DropdownMenuItem onClick={() => navigate('/notificacoes')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
-                      <Bell className="mr-2 h-4 w-4 text-gray-600" />
-                      <span>Notificações</span>
-                    </DropdownMenuItem>
-
-                    {/* PRO Menu Item */}
-                    <DropdownMenuItem onClick={() => navigate(isPremium ? '/premium-dashboard' : '/planos')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
-                      <Crown className="mr-2 h-4 w-4 text-yellow-600" />
-                      <span>{isPremium ? 'Dashboard PRO' : 'Tornar-se PRO'}</span>
-                    </DropdownMenuItem>
-
-                    <DropdownMenuSeparator className="bg-gray-200" />
-                    <DropdownMenuItem onClick={handleLogout} className="text-red-600 hover:bg-red-50 focus:bg-red-50">
-                      <LogOut className="mr-2 h-4 w-4 text-red-600" />
-                      <span>Sair</span>
-                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
