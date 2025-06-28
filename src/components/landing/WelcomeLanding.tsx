@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 
 interface WelcomeLandingProps {
-  onEnter: () => void;
+  onEnter?: () => void;
 }
 
 export const WelcomeLanding = ({ onEnter }: WelcomeLandingProps) => {
@@ -23,12 +23,20 @@ export const WelcomeLanding = ({ onEnter }: WelcomeLandingProps) => {
     setAnimationStarted(true);
     // Aguardar animação de 0,8 segundos completar antes de chamar onEnter
     setTimeout(() => {
-      onEnter();
+      if (onEnter) {
+        onEnter();
+      } else {
+        // Se não há callback, ocultar a tela de boas-vindas
+        const welcomeScreen = document.querySelector('.welcome-screen');
+        if (welcomeScreen) {
+          welcomeScreen.remove();
+        }
+      }
     }, 800);
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700 flex items-center justify-center overflow-hidden">
+    <div className="welcome-screen fixed inset-0 z-50 bg-gradient-to-br from-orange-500 via-orange-600 to-orange-700 flex items-center justify-center overflow-hidden">
       {/* Texto principal com efeito de zoom através da letra Z */}
       <div className="relative text-center">
         <div className={`transition-all duration-[800ms] ease-in-out ${
