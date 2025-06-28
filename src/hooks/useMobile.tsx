@@ -9,9 +9,13 @@ export const useMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
 
+    // Check immediately
     checkIfMobile();
+    
+    // Add event listener
     window.addEventListener('resize', checkIfMobile);
-
+    
+    // Cleanup
     return () => window.removeEventListener('resize', checkIfMobile);
   }, []);
 
@@ -28,9 +32,13 @@ export const useTablet = () => {
       setIsTablet(width >= 768 && width < 1024);
     };
 
+    // Check immediately
     checkIfTablet();
+    
+    // Add event listener
     window.addEventListener('resize', checkIfTablet);
-
+    
+    // Cleanup
     return () => window.removeEventListener('resize', checkIfTablet);
   }, []);
 
@@ -46,9 +54,13 @@ export const useMobileOrTablet = () => {
       setIsMobileOrTablet(window.innerWidth < 1024);
     };
 
+    // Check immediately
     checkIfMobileOrTablet();
+    
+    // Add event listener
     window.addEventListener('resize', checkIfMobileOrTablet);
-
+    
+    // Cleanup
     return () => window.removeEventListener('resize', checkIfMobileOrTablet);
   }, []);
 
@@ -71,9 +83,13 @@ export const useBreakpoint = () => {
       }
     };
 
+    // Check immediately
     checkBreakpoint();
+    
+    // Add event listener
     window.addEventListener('resize', checkBreakpoint);
-
+    
+    // Cleanup
     return () => window.removeEventListener('resize', checkBreakpoint);
   }, []);
 

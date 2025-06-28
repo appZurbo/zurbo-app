@@ -65,10 +65,10 @@ export const UnifiedHeader = () => {
   const isPremium = profile?.premium || false;
 
   const renderNavigationButtons = () => {
-    if (isMobile) return null; // Navigation handled by dock on mobile
+    if (isMobile || isTablet) return null; // Navigation handled by dock on mobile/tablet
 
     return (
-      <nav className="hidden md:flex items-center space-x-6">
+      <nav className="hidden lg:flex items-center space-x-6">
         <Button
           variant="ghost"
           onClick={() => navigate('/')}
@@ -153,9 +153,9 @@ export const UnifiedHeader = () => {
           </div>
           <DropdownMenuSeparator />
           
-          <DropdownMenuItem onClick={() => navigate(isPrestador ? '/prestador-settings' : '/configuracoes')}>
+          <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
             <Settings className="mr-2 h-4 w-4" />
-            Perfil
+            Configurações
           </DropdownMenuItem>
 
           <DropdownMenuItem onClick={() => navigate('/pedidos')}>
@@ -230,14 +230,14 @@ export const UnifiedHeader = () => {
             </span>
           </Link>
 
-          {/* Desktop/Tablet Navigation */}
+          {/* Desktop Navigation */}
           {renderNavigationButtons()}
 
           {/* Right Actions */}
           <div className="flex items-center space-x-2">
-            {/* Service Toggle for Prestadores (Desktop/Tablet only) */}
-            {isPrestador && !isMobile && (
-              <div className="hidden sm:flex items-center space-x-2">
+            {/* Service Toggle for Prestadores (Desktop only) */}
+            {isPrestador && !isMobile && !isTablet && (
+              <div className="hidden lg:flex items-center space-x-2">
                 <Switch
                   id="service-toggle"
                   checked={emServico}
@@ -261,15 +261,13 @@ export const UnifiedHeader = () => {
                 className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
               >
                 <Crown className="h-5 w-5" />
-                {!isMobile && <span className="ml-1">PRO</span>}
+                {!isMobile && !isTablet && <span className="ml-1">PRO</span>}
               </Button>
             )}
 
             {/* User Menu or Auth Buttons */}
             {isAuthenticated ? (
-              <div className="hidden lg:block">
-                {renderUserDropdown()}
-              </div>
+              renderUserDropdown()
             ) : (
               <div className="flex items-center space-x-2">
                 <Button

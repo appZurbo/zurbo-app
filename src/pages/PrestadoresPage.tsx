@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,7 @@ import { PremiumHighlightSection } from '@/components/prestadores/PremiumHighlig
 import { PrestadorMiniProfileModal } from '@/components/prestadores/PrestadorMiniProfileModal';
 import { ContactModal } from '@/components/contact/ContactModal';
 import { EmergencyButton } from '@/components/emergency/EmergencyButton';
-import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
+import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { getPrestadores } from '@/utils/database/prestadores';
 import { getServicos } from '@/utils/database/servicos';
 import { UserProfile } from '@/utils/database/types';
@@ -122,10 +123,8 @@ const PrestadoresPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <UnifiedHeader />
-      
-      <div className={`${isMobile ? 'px-4 py-4 pb-20' : 'max-w-7xl mx-auto p-6'}`}>
+    <UnifiedLayout>
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
           <Button 
@@ -260,7 +259,7 @@ const PrestadoresPage = () => {
           />
         </>
       )}
-    </div>
+    </UnifiedLayout>
   );
 };
 
