@@ -47,7 +47,7 @@ export const useNotifications = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [profile?.id]); // Only depend on profile.id to prevent unnecessary re-subscriptions
+  }, [profile?.id]);
 
   const loadNotifications = async () => {
     if (!profile) return;

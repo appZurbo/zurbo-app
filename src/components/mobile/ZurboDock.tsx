@@ -15,8 +15,8 @@ export const ZurboDock = () => {
   const isMobile = useMobile();
   const isTablet = useTablet();
   
-  // Only use notifications hook if user is authenticated to prevent errors
-  const { hasNewMessages } = isAuthenticated ? useNotifications() : { hasNewMessages: false };
+  // Always call the hook - it will handle authentication internally
+  const { hasNewMessages } = useNotifications();
   
   // Show only on mobile and tablet
   if (!isMobile && !isTablet) return null;
@@ -50,7 +50,7 @@ export const ZurboDock = () => {
       label: 'Conversas',
       path: '/conversas',
       isActive: isActive('/conversas'),
-      badge: hasNewMessages,
+      badge: isAuthenticated && hasNewMessages,
       requiresAuth: true
     },
     {
@@ -78,7 +78,7 @@ export const ZurboDock = () => {
             <Button
               key={index}
               variant="ghost"
-              size="dock"
+              size="sm"
               className={`
                 relative transition-all duration-200 rounded-xl flex-col min-h-16 w-16
                 ${item.isActive 
