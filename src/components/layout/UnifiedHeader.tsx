@@ -153,16 +153,16 @@ export const UnifiedHeader = () => {
                       )}
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56 bg-white shadow-lg border z-50" align="end" forceMount>
+                  <DropdownMenuContent className="w-56 bg-white shadow-lg border z-[60] border-gray-200" align="end" forceMount>
                     <div className="flex items-center justify-start gap-2 p-2">
                       <div className="flex flex-col space-y-1 leading-none">
-                        <p className="font-medium">{profile?.nome}</p>
-                        <p className="w-[200px] truncate text-sm text-muted-foreground">
+                        <p className="font-medium text-gray-900">{profile?.nome}</p>
+                        <p className="w-[200px] truncate text-sm text-gray-600">
                           {profile?.email}
                         </p>
                         {isAdmin && (
                           <Badge className="w-fit bg-red-100 text-red-800 border-red-200">
-                            <Shield className="h-3 w-3 mr-1" />
+                            <Shield className="h-3 w-3 mr-1 text-red-800" />
                             Admin Verificado
                           </Badge>
                         )}
@@ -170,13 +170,13 @@ export const UnifiedHeader = () => {
                           <Badge className="w-fit bg-gradient-to-r from-yellow-400 to-yellow-600 text-white border-0 shadow-lg" style={{
                             boxShadow: '0 0 10px rgba(251, 191, 36, 0.3)'
                           }}>
-                            <Crown className="h-3 w-3 mr-1" />
+                            <Crown className="h-3 w-3 mr-1 text-white" />
                             {getPremiumLabel()}
                           </Badge>
                         )}
                       </div>
                     </div>
-                    <DropdownMenuSeparator />
+                    <DropdownMenuSeparator className="bg-gray-200" />
                     
                     {/* Provider Menu Items */}
                     {isPrestador && (
@@ -184,23 +184,23 @@ export const UnifiedHeader = () => {
                         <div className="px-3 py-2">
                           <div className="flex items-center space-x-2">
                             <Switch id="em-servico" checked={emServico} onCheckedChange={handleServiceToggle} />
-                            <Label htmlFor="em-servico" className="text-sm">
+                            <Label htmlFor="em-servico" className="text-sm text-gray-700">
                               Em Serviço
                             </Label>
                           </div>
                         </div>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => navigate('/prestador-settings')}>
-                          <Wrench className="mr-2 h-4 w-4" />
-                          Configurações do Prestador
+                        <DropdownMenuSeparator className="bg-gray-200" />
+                        <DropdownMenuItem onClick={() => navigate('/prestador-settings')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                          <Wrench className="mr-2 h-4 w-4 text-gray-600" />
+                          <span>Configurações do Prestador</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/agenda')}>
-                          <Calendar className="mr-2 h-4 w-4" />
-                          Agenda
+                        <DropdownMenuItem onClick={() => navigate('/agenda')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                          <Calendar className="mr-2 h-4 w-4 text-gray-600" />
+                          <span>Agenda</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/dashboard')}>
-                          <BarChart3 className="mr-2 h-4 w-4" />
-                          Dashboard
+                        <DropdownMenuItem onClick={() => navigate('/dashboard')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                          <BarChart3 className="mr-2 h-4 w-4 text-gray-600" />
+                          <span>Dashboard</span>
                         </DropdownMenuItem>
                       </>
                     )}
@@ -208,17 +208,17 @@ export const UnifiedHeader = () => {
                     {/* Client Menu Items */}
                     {!isPrestador && !isAdmin && (
                       <>
-                        <DropdownMenuItem onClick={() => navigate('/perfil')}>
-                          <User className="mr-2 h-4 w-4" />
-                          Meu Perfil
+                        <DropdownMenuItem onClick={() => navigate('/perfil')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                          <User className="mr-2 h-4 w-4 text-gray-600" />
+                          <span>Meu Perfil</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
-                          <Settings className="mr-2 h-4 w-4" />
-                          Configurações
+                        <DropdownMenuItem onClick={() => navigate('/configuracoes')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                          <Settings className="mr-2 h-4 w-4 text-gray-600" />
+                          <span>Configurações</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/favoritos')}>
-                          <Heart className="mr-2 h-4 w-4" />
-                          Favoritos
+                        <DropdownMenuItem onClick={() => navigate('/favoritos')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                          <Heart className="mr-2 h-4 w-4 text-gray-600" />
+                          <span>Favoritos</span>
                         </DropdownMenuItem>
                       </>
                     )}
@@ -226,47 +226,47 @@ export const UnifiedHeader = () => {
                     {/* Admin Menu Items */}
                     {isAdmin && (
                       <>
-                        <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
-                          <Settings className="mr-2 h-4 w-4" />
-                          Configurações de Perfil
+                        <DropdownMenuItem onClick={() => navigate('/configuracoes')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                          <Settings className="mr-2 h-4 w-4 text-gray-600" />
+                          <span>Configurações de Perfil</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/admin/relatorios')}>
-                          <BarChart3 className="mr-2 h-4 w-4" />
-                          Admin Dashboard
+                        <DropdownMenuItem onClick={() => navigate('/admin/relatorios')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                          <BarChart3 className="mr-2 h-4 w-4 text-gray-600" />
+                          <span>Admin Dashboard</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/admin/moderacao')}>
-                          <Shield className="mr-2 h-4 w-4" />
-                          Painel de Moderação
+                        <DropdownMenuItem onClick={() => navigate('/admin/moderacao')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                          <Shield className="mr-2 h-4 w-4 text-gray-600" />
+                          <span>Painel de Moderação</span>
                         </DropdownMenuItem>
                       </>
                     )}
 
                     {/* Common Menu Items for All Users */}
-                    <DropdownMenuItem onClick={() => navigate('/pedidos')}>
-                      <ShoppingBag className="mr-2 h-4 w-4" />
-                      Meus Pedidos
+                    <DropdownMenuItem onClick={() => navigate('/pedidos')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                      <ShoppingBag className="mr-2 h-4 w-4 text-gray-600" />
+                      <span>Meus Pedidos</span>
                     </DropdownMenuItem>
 
-                    <DropdownMenuItem onClick={() => navigate('/conversas')}>
-                      <MessageCircle className="mr-2 h-4 w-4" />
-                      Conversas
+                    <DropdownMenuItem onClick={() => navigate('/conversas')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                      <MessageCircle className="mr-2 h-4 w-4 text-gray-600" />
+                      <span>Conversas</span>
                     </DropdownMenuItem>
 
-                    <DropdownMenuItem onClick={() => navigate('/endereco')}>
-                      <MapPin className="mr-2 h-4 w-4" />
-                      Endereços
+                    <DropdownMenuItem onClick={() => navigate('/endereco')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                      <MapPin className="mr-2 h-4 w-4 text-gray-600" />
+                      <span>Endereços</span>
                     </DropdownMenuItem>
 
                     {/* PRO Menu Item */}
-                    <DropdownMenuItem onClick={() => navigate(isPremium ? '/premium-dashboard' : '/planos')}>
-                      <Crown className="mr-2 h-4 w-4" />
-                      {isPremium ? 'Dashboard PRO' : 'Tornar-se PRO'}
+                    <DropdownMenuItem onClick={() => navigate(isPremium ? '/premium-dashboard' : '/planos')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                      <Crown className="mr-2 h-4 w-4 text-yellow-600" />
+                      <span>{isPremium ? 'Dashboard PRO' : 'Tornar-se PRO'}</span>
                     </DropdownMenuItem>
 
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Sair
+                    <DropdownMenuSeparator className="bg-gray-200" />
+                    <DropdownMenuItem onClick={handleLogout} className="text-red-600 hover:bg-red-50 focus:bg-red-50">
+                      <LogOut className="mr-2 h-4 w-4 text-red-600" />
+                      <span>Sair</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
