@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 // Comprehensive test data creation function
@@ -36,6 +35,15 @@ export const createUnifiedTestData = async () => {
       console.log('Note: Could not delete existing fake users:', deleteError.message);
     }
 
+    // Generate proper UUIDs for auth_id
+    const generateFakeAuthId = () => {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    };
+
     // Step 3: Create comprehensive fake users (both clients and providers)
     const fakeUsers = [
       // Prestadores
@@ -52,7 +60,7 @@ export const createUnifiedTestData = async () => {
         nota_media: 4.9,
         premium: true,
         foto_url: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop&crop=face',
-        auth_id: `fake-joao-${Date.now()}`,
+        auth_id: generateFakeAuthId(),
         servicos: ['Eletricista'],
         em_servico: true,
         descricao_servico: 'Instalações elétricas residenciais e comerciais com garantia'
@@ -70,7 +78,7 @@ export const createUnifiedTestData = async () => {
         nota_media: 4.8,
         premium: false,
         foto_url: 'https://images.unsplash.com/photo-1494790108755-2616c00e4d8b?w=200&h=200&fit=crop&crop=face',
-        auth_id: `fake-maria-${Date.now()}`,
+        auth_id: generateFakeAuthId(),
         servicos: ['Faxina'],
         em_servico: true,
         descricao_servico: 'Limpeza residencial e comercial com produtos ecológicos'
@@ -88,7 +96,7 @@ export const createUnifiedTestData = async () => {
         nota_media: 4.7,
         premium: true,
         foto_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face',
-        auth_id: `fake-carlos-${Date.now()}`,
+        auth_id: generateFakeAuthId(),
         servicos: ['Encanador'],
         em_servico: true,
         descricao_servico: 'Encanamento e hidráulica com atendimento 24h'
@@ -106,7 +114,7 @@ export const createUnifiedTestData = async () => {
         nota_media: 4.6,
         premium: false,
         foto_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face',
-        auth_id: `fake-ana-${Date.now()}`,
+        auth_id: generateFakeAuthId(),
         servicos: ['Pintor'],
         em_servico: true,
         descricao_servico: 'Pinturas residenciais e comerciais com acabamento profissional'
@@ -124,7 +132,7 @@ export const createUnifiedTestData = async () => {
         nota_media: 4.5,
         premium: true,
         foto_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
-        auth_id: `fake-roberto-${Date.now()}`,
+        auth_id: generateFakeAuthId(),
         servicos: ['Jardinagem'],
         em_servico: true,
         descricao_servico: 'Jardinagem e paisagismo para residências e empresas'
@@ -141,7 +149,7 @@ export const createUnifiedTestData = async () => {
         cpf: '901.234.567-89',
         premium: false,
         foto_url: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&h=200&fit=crop&crop=face',
-        auth_id: `fake-pedro-${Date.now()}`
+        auth_id: generateFakeAuthId()
       },
       {
         nome: 'Julia Ferreira Santos',
@@ -154,7 +162,7 @@ export const createUnifiedTestData = async () => {
         cpf: '012.345.678-90',
         premium: true,
         foto_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face',
-        auth_id: `fake-julia-${Date.now()}`
+        auth_id: generateFakeAuthId()
       },
       {
         nome: 'Marcos Antonio Souza',
@@ -167,7 +175,7 @@ export const createUnifiedTestData = async () => {
         cpf: '123.987.654-32',
         premium: false,
         foto_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face',
-        auth_id: `fake-marcos-${Date.now()}`
+        auth_id: generateFakeAuthId()
       }
     ];
 
@@ -281,7 +289,7 @@ export const createUnifiedTestData = async () => {
       const prestador = prestadores[i % prestadores.length];
       const servicoNome = prestador.servicos?.[0] || 'Serviço Geral';
 
-      const conversationId = `conv-${Date.now()}-${i}`;
+      const conversationId = crypto.randomUUID();
       const status = ['aguardando_preco', 'preco_definido', 'aceito', 'rejeitado', 'bloqueado'][i % 5];
       const preco = status !== 'aguardando_preco' ? Math.floor(Math.random() * 300) + 50 : null;
 

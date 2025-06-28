@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -77,16 +76,16 @@ const Relatorios = () => {
   const handleKpiClick = (type: string) => {
     switch (type) {
       case 'users':
-        navigate('/admin/users');
+        navigate('/settings'); // Página de configurações onde há informações de usuários
         break;
       case 'providers':
-        navigate('/prestadores');
+        navigate('/prestadores'); // Página existente de prestadores
         break;
       case 'orders':
-        navigate('/pedidos');
+        navigate('/conversas'); // Página existente de conversas/pedidos
         break;
       case 'revenue':
-        navigate('/admin/financial');
+        navigate('/admin'); // Volta para o dashboard admin
         break;
       default:
         break;
