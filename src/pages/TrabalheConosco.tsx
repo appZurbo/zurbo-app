@@ -3,10 +3,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Users, MapPin, Clock, Star, Wrench, ArrowRight, Smartphone, Calendar, CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import DesktopHeader from '@/components/layout/DesktopHeader';
+import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { ModernFooter } from '@/components/layout/ModernFooter';
+
 const TrabalheConosco = () => {
   const navigate = useNavigate();
+  
   const beneficios = [{
     icon: Users,
     titulo: "Clientes Qualificados",
@@ -32,6 +34,7 @@ const TrabalheConosco = () => {
     titulo: "Agenda Inteligente",
     descricao: "Organize seus agendamentos facilmente"
   }];
+  
   const comoFunciona = [{
     numero: "01",
     titulo: "Cadastre-se",
@@ -53,9 +56,12 @@ const TrabalheConosco = () => {
     titulo: "Receba",
     descricao: "Seja avaliado e receba seu pagamento"
   }];
+  
   const servicos = ["Limpeza", "Jardinagem", "Pintura", "Elétrica", "Encanamento", "Construção", "Beleza", "Informática", "Educação", "Saúde", "Transporte", "Eventos"];
-  return <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white">
-      <DesktopHeader />
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white">
+      <UnifiedHeader />
       
       {/* Hero Section */}
       <section className="py-20 px-4">
@@ -69,7 +75,9 @@ const TrabalheConosco = () => {
             </h1>
           </div>
           
-          <p className="md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto text-xl font-normal">Conecte-se com milhares de clientes em Sinop e região. Cresça seu faturamento com a primeira plataforma feita para serviços</p>
+          <p className="md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto text-xl font-normal">
+            Conecte-se com milhares de clientes em Sinop e região. Cresça seu faturamento com a primeira plataforma feita para serviços
+          </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" onClick={() => navigate('/auth')} className="bg-orange-500 hover:bg-orange-600 text-lg px-8 py-6">
@@ -87,7 +95,8 @@ const TrabalheConosco = () => {
           <h2 className="text-3xl font-bold text-center mb-12">Por que escolher o Zurbo?</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {beneficios.map((beneficio, index) => <Card key={index} className="hover:shadow-lg transition-shadow">
+            {beneficios.map((beneficio, index) => (
+              <Card key={index} className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6 text-center">
                   <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <beneficio.icon className="h-6 w-6 text-orange-600" />
@@ -95,7 +104,8 @@ const TrabalheConosco = () => {
                   <h3 className="text-xl font-semibold mb-2">{beneficio.titulo}</h3>
                   <p className="text-gray-600">{beneficio.descricao}</p>
                 </CardContent>
-              </Card>)}
+              </Card>
+            ))}
           </div>
         </div>
       </section>
@@ -106,13 +116,15 @@ const TrabalheConosco = () => {
           <h2 className="text-3xl font-bold text-center mb-12">Como funciona?</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-            {comoFunciona.map((passo, index) => <div key={index} className="text-center">
+            {comoFunciona.map((passo, index) => (
+              <div key={index} className="text-center">
                 <div className="w-16 h-16 bg-orange-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
                   {passo.numero}
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{passo.titulo}</h3>
                 <p className="text-gray-600 text-sm">{passo.descricao}</p>
-              </div>)}
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -123,9 +135,11 @@ const TrabalheConosco = () => {
           <h2 className="text-3xl font-bold text-center mb-12">Muitos Serviços Disponíveis</h2>
           
           <div className="flex flex-wrap justify-center gap-3">
-            {servicos.map((servico, index) => <Badge key={index} variant="secondary" className="text-sm py-2 px-4">
+            {servicos.map((servico, index) => (
+              <Badge key={index} variant="secondary" className="text-sm py-2 px-4">
                 {servico}
-              </Badge>)}
+              </Badge>
+            ))}
           </div>
         </div>
       </section>
@@ -147,6 +161,8 @@ const TrabalheConosco = () => {
       </section>
 
       <ModernFooter />
-    </div>;
+    </div>
+  );
 };
+
 export default TrabalheConosco;

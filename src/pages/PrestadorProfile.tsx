@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ImprovedHeader } from '@/components/layout/ImprovedHeader';
+import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { ModernFooter } from '@/components/layout/ModernFooter';
 import { getUserProfile, getAvaliacoes, getPortfolioFotos } from '@/utils/database';
 import { CommentsList } from '@/components/profile/CommentsList';
@@ -118,7 +117,7 @@ export default function PrestadorProfile() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <ImprovedHeader />
+        <UnifiedHeader />
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center animate-pulse">
@@ -134,7 +133,7 @@ export default function PrestadorProfile() {
   if (!prestador) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <ImprovedHeader />
+        <UnifiedHeader />
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -151,7 +150,7 @@ export default function PrestadorProfile() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <ImprovedHeader />
+      <UnifiedHeader />
       
       {/* Hero Section */}
       <div className="bg-white border-b">
