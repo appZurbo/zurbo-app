@@ -9,14 +9,18 @@ import AuthPage from "@/pages/AuthPage";
 import PrestadoresPage from "@/pages/PrestadoresPage";
 import AdminDashboard from "@/pages/AdminDashboard";
 import Relatorios from "@/pages/admin/Relatorios";
+import Moderacao from "@/pages/admin/Moderacao";
 import Conversas from "@/pages/Conversas";
 import Settings from "@/pages/Settings";
 import AdsPage from "@/pages/AdsPage";
 import PrestadorDashboard from "@/pages/PrestadorDashboard";
 import AgendaPrestador from "@/pages/AgendaPrestador";
+import PrestadorSettings from "@/pages/PrestadorSettings";
 import Pedidos from "@/pages/Pedidos";
 import Planos from "@/pages/Planos";
 import PremiumOverview from "@/pages/PremiumOverview";
+import FavoritosPage from "@/pages/FavoritosPage";
+import NotificacoesPage from "@/pages/NotificacoesPage";
 import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from '@/components/ui/toaster';
 
@@ -50,6 +54,10 @@ const router = createBrowserRouter([
     element: <Relatorios />,
   },
   {
+    path: "/admin/moderacao",
+    element: <Moderacao />,
+  },
+  {
     path: "/conversas",
     element: <Conversas />,
   },
@@ -62,7 +70,11 @@ const router = createBrowserRouter([
     element: <PrestadorDashboard />,
   },
   {
-    path: "/agenda-prestador",
+    path: "/prestador-settings",
+    element: <PrestadorSettings />,
+  },
+  {
+    path: "/agenda",
     element: <AgendaPrestador />,
   },
   {
@@ -76,6 +88,22 @@ const router = createBrowserRouter([
   {
     path: "/premium-overview",
     element: <PremiumOverview />,
+  },
+  {
+    path: "/premium-dashboard",
+    element: <PremiumOverview />,
+  },
+  {
+    path: "/favoritos",
+    element: <FavoritosPage />,
+  },
+  {
+    path: "/notificacoes",
+    element: <NotificacoesPage />,
+  },
+  {
+    path: "/enderecos",
+    element: <Settings />, // Redirect to settings for address management
   },
 ]);
 

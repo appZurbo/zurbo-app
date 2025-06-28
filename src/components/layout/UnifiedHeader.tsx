@@ -153,7 +153,7 @@ export const UnifiedHeader = () => {
                       )}
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56 bg-white shadow-lg border z-[60] border-gray-200" align="end" forceMount>
+                  <DropdownMenuContent className="w-56 bg-white shadow-lg border z-[70] border-gray-200" align="end" forceMount>
                     <div className="flex items-center justify-start gap-2 p-2">
                       <div className="flex flex-col space-y-1 leading-none">
                         <p className="font-medium text-gray-900">{profile?.nome}</p>
@@ -198,7 +198,7 @@ export const UnifiedHeader = () => {
                           <Calendar className="mr-2 h-4 w-4 text-gray-600" />
                           <span>Agenda</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/dashboard')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                        <DropdownMenuItem onClick={() => navigate('/prestador-dashboard')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
                           <BarChart3 className="mr-2 h-4 w-4 text-gray-600" />
                           <span>Dashboard</span>
                         </DropdownMenuItem>
@@ -208,7 +208,7 @@ export const UnifiedHeader = () => {
                     {/* Client Menu Items */}
                     {!isPrestador && !isAdmin && (
                       <>
-                        <DropdownMenuItem onClick={() => navigate('/perfil')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                        <DropdownMenuItem onClick={() => navigate('/configuracoes')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
                           <User className="mr-2 h-4 w-4 text-gray-600" />
                           <span>Meu Perfil</span>
                         </DropdownMenuItem>
@@ -252,9 +252,14 @@ export const UnifiedHeader = () => {
                       <span>Conversas</span>
                     </DropdownMenuItem>
 
-                    <DropdownMenuItem onClick={() => navigate('/endereco')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                    <DropdownMenuItem onClick={() => navigate('/enderecos')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
                       <MapPin className="mr-2 h-4 w-4 text-gray-600" />
                       <span>Endereços</span>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem onClick={() => navigate('/notificacoes')} className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50">
+                      <Bell className="mr-2 h-4 w-4 text-gray-600" />
+                      <span>Notificações</span>
                     </DropdownMenuItem>
 
                     {/* PRO Menu Item */}
