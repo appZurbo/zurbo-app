@@ -2,9 +2,7 @@
 import { Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/dropdown-menu';
 import { useNotifications } from '@/hooks/useNotifications';
-import { NotificationPanel } from './NotificationPanel';
 import { useNavigate } from 'react-router-dom';
 
 export const NotificationBell = () => {
