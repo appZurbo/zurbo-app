@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import HeroDemo from '@/components/ui/hero-demo';
@@ -18,6 +17,7 @@ import { useAuth } from '@/hooks/useAuth';
 import PartnersSection from '@/components/sections/PartnersSection';
 import { Button } from '@/components/ui/button';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { PageWithDock } from '@/components/layout/PageWithDock';
 
 const Index = () => {
   const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
@@ -128,10 +128,9 @@ const Index = () => {
   };
 
   return (
-    <ErrorBoundary>
-      <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white">
-        <UnifiedHeader />
-
+    <PageWithDock>
+      <UnifiedHeader />
+      <div className="min-h-screen bg-gradient-to-br from-orange-50/30 to-white">
         <HeroDemo />
         
         <div className="max-w-7xl mx-auto px-[30px] py-[15px]">
@@ -258,7 +257,7 @@ const Index = () => {
           </ErrorBoundary>
         )}
       </div>
-    </ErrorBoundary>
+    </PageWithDock>
   );
 };
 
