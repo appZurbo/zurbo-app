@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { checkUserProfile, createUserProfile, type UserProfile } from '@/utils/database';
 import type { User } from '@supabase/supabase-js';
@@ -10,7 +10,7 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadProfile = useCallback(async (authId: string) => {
+  const loadProfile = async (authId: string) => {
     try {
       console.log('Loading profile for auth ID:', authId);
       let profileData = await checkUserProfile(authId);
@@ -37,19 +37,25 @@ export const useAuth = () => {
       setProfile(null);
       setError('Erro ao carregar perfil do usuário');
     }
-  }, []);
+  };
 
   useEffect(() => {
     let mounted = true;
 
     const initializeAuth = async () => {
       try {
-        // Verificar sessão existente primeiro
+        console.log('Initializing auth...');
+        
+        // Get current session first
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
           console.error('Error getting session:', sessionError);
-          setError('Erro ao verificar sessão');
+          if (mounted) {
+            setError('Erro ao verificar sessão');
+            setLoading(false);
+          }
+          return;
         }
         
         if (mounted) {
@@ -64,7 +70,7 @@ export const useAuth = () => {
           setLoading(false);
         }
 
-        // Configurar listener de mudanças de autenticação
+        // Set up auth state listener
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, session) => {
             if (!mounted) return;
@@ -75,25 +81,17 @@ export const useAuth = () => {
             setUser(currentUser);
             
             if (currentUser && event === 'SIGNED_IN') {
-              // Usar setTimeout para evitar loops infinitos
-              setTimeout(async () => {
-                if (mounted) {
-                  await loadProfile(currentUser.id);
-                }
-              }, 100);
+              await loadProfile(currentUser.id);
             } else if (event === 'SIGNED_OUT') {
               setProfile(null);
               setError(null);
             }
             
-            if (!loading) {
-              setLoading(false);
-            }
+            setLoading(false);
           }
         );
 
         return () => {
-          mounted = false;
           subscription.unsubscribe();
         };
       } catch (error) {
@@ -105,12 +103,13 @@ export const useAuth = () => {
       }
     };
 
-    initializeAuth();
+    const cleanup = initializeAuth();
 
     return () => {
       mounted = false;
+      cleanup?.then(cleanupFn => cleanupFn?.());
     };
-  }, [loadProfile]);
+  }, []); // Empty dependency array to run only once
 
   const logout = async () => {
     setLoading(true);

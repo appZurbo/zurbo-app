@@ -16,19 +16,20 @@ export interface Notification {
 export const useNotifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
-  const { profile } = useAuth();
+  const { profile, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    if (!profile) {
+    if (!isAuthenticated || !profile) {
       setNotifications([]);
       return;
     }
 
+    console.log('Setting up notifications for user:', profile.id);
     loadNotifications();
     
     // Set up real-time subscription for new notifications
     const channel = supabase
-      .channel('notifications-changes')
+      .channel(`notifications-${profile.id}`)
       .on(
         'postgres_changes',
         {
@@ -38,6 +39,7 @@ export const useNotifications = () => {
           filter: `user_id=eq.${profile.id}`
         },
         (payload) => {
+          console.log('New notification received:', payload);
           const newNotification = payload.new as Notification;
           setNotifications(prev => [newNotification, ...prev]);
         }
@@ -45,15 +47,17 @@ export const useNotifications = () => {
       .subscribe();
 
     return () => {
+      console.log('Cleaning up notifications channel');
       supabase.removeChannel(channel);
     };
-  }, [profile?.id]);
+  }, [profile?.id, isAuthenticated]);
 
   const loadNotifications = async () => {
-    if (!profile) return;
+    if (!profile || !isAuthenticated) return;
     
     setLoading(true);
     try {
+      console.log('Loading notifications for user:', profile.id);
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
@@ -61,7 +65,10 @@ export const useNotifications = () => {
         .order('created_at', { ascending: false })
         .limit(20);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading notifications:', error);
+        throw error;
+      }
       
       const typedNotifications: Notification[] = (data || []).map(item => ({
         ...item,
@@ -69,6 +76,7 @@ export const useNotifications = () => {
       }));
       
       setNotifications(typedNotifications);
+      console.log('Loaded notifications:', typedNotifications.length);
     } catch (error) {
       console.error('Error loading notifications:', error);
     } finally {
@@ -77,6 +85,8 @@ export const useNotifications = () => {
   };
 
   const markAsRead = async (notificationId: string) => {
+    if (!isAuthenticated) return;
+
     try {
       const { error } = await supabase
         .from('notifications')
@@ -96,7 +106,7 @@ export const useNotifications = () => {
   };
 
   const markAllAsRead = async () => {
-    if (!profile) return;
+    if (!profile || !isAuthenticated) return;
 
     try {
       const { error } = await supabase
@@ -116,6 +126,8 @@ export const useNotifications = () => {
   };
 
   const createNotification = async (notification: Omit<Notification, 'id' | 'created_at'>) => {
+    if (!isAuthenticated) return;
+
     try {
       const { error } = await supabase
         .from('notifications')

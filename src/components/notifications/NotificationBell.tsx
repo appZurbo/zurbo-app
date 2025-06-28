@@ -16,8 +16,7 @@ export const NotificationBell = () => {
   return (
     <Button 
       variant="ghost" 
-      size="sm" 
-      className="relative hover:bg-orange-50"
+      className="relative hover:bg-orange-50 h-10 w-10 p-2"
       onClick={handleNotificationClick}
     >
       <Bell className="h-5 w-5 text-gray-600" />

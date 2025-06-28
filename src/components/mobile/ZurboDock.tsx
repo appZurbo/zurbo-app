@@ -15,7 +15,7 @@ export const ZurboDock = () => {
   const isMobile = useMobile();
   const isTablet = useTablet();
   
-  // Always call the hook - it will handle authentication internally
+  // Always call the hook - it handles authentication internally
   const { hasNewMessages } = useNotifications();
   
   // Show only on mobile and tablet
