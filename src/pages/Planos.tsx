@@ -31,7 +31,7 @@ const Planos = () => {
   const isMobile = useMobile();
   const { toast } = useToast();
   const [billingCycle, setBillingCycle] = useState('monthly');
-  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [userType, setUserType] = useState<'cliente' | 'prestador'>(isPrestador ? 'prestador' : 'cliente');
 
   const isPremium = profile?.premium || false;
 
@@ -54,12 +54,12 @@ const Planos = () => {
           'Anúncios limitados'
         ],
         popular: false,
-        current: !isPremium
+        current: !isPremium && !isPrestador
       },
       {
         id: 'cliente-pro',
         name: 'PRO',
-        price: { monthly: 19.90, yearly: 199.90 },
+        price: { monthly: 9.90, yearly: 99.90 },
         description: 'Para clientes que querem o melhor',
         features: [
           'Tudo do plano Básico',
@@ -112,33 +112,13 @@ const Planos = () => {
         limitations: [],
         popular: true,
         current: isPremium && isPrestador
-      },
-      {
-        id: 'prestador-premium',
-        name: 'Premium',
-        price: { monthly: 79.90, yearly: 799.90 },
-        description: 'Para prestadores de elite',
-        features: [
-          'Tudo do plano PRO',
-          'Selo Premium Elite',
-          'Prioridade máxima',
-          'Gerente de conta dedicado',
-          'Marketing personalizado',
-          'Análises avançadas',
-          'API para integração'
-        ],
-        limitations: [],
-        popular: false,
-        current: false
       }
     ]
   };
 
-  const currentPlans = isPrestador ? plans.prestador : plans.cliente;
+  const currentPlans = plans[userType];
 
-  const handleSelectPlan = (planId) => {
-    setSelectedPlan(planId);
-    
+  const handleSelectPlan = (planId: string) => {
     if (planId.includes('basico')) {
       toast({
         title: "Plano Básico",
@@ -153,7 +133,6 @@ const Planos = () => {
       description: "Em breve você será redirecionado para finalizar sua assinatura PRO.",
     });
     
-    // Here would integrate with actual payment system
     setTimeout(() => {
       toast({
         title: "Pagamento simulado",
@@ -163,7 +142,7 @@ const Planos = () => {
     }, 2000);
   };
 
-  const PlanCard = ({ plan }) => {
+  const PlanCard = ({ plan }: { plan: any }) => {
     const isCurrentPlan = plan.current;
     const price = billingCycle === 'yearly' ? plan.price.yearly : plan.price.monthly;
     const savingPercent = billingCycle === 'yearly' ? Math.round((1 - plan.price.yearly / (plan.price.monthly * 12)) * 100) : 0;
@@ -235,7 +214,7 @@ const Planos = () => {
               Recursos inclusos
             </h4>
             <ul className="space-y-2">
-              {plan.features.map((feature, index) => (
+              {plan.features.map((feature: string, index: number) => (
                 <li key={index} className="flex items-start">
                   <Check className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
                   <span className="text-sm">{feature}</span>
@@ -251,7 +230,7 @@ const Planos = () => {
                 Limitações
               </h4>
               <ul className="space-y-2">
-                {plan.limitations.map((limitation, index) => (
+                {plan.limitations.map((limitation: string, index: number) => (
                   <li key={index} className="flex items-start">
                     <X className="h-4 w-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" />
                     <span className="text-sm text-gray-600">{limitation}</span>
@@ -313,11 +292,30 @@ const Planos = () => {
               Planos PRO
             </h1>
             <p className={`text-gray-600 mb-8 max-w-2xl mx-auto ${isMobile ? 'text-base' : 'text-xl'}`}>
-              {isPrestador 
-                ? 'Destaque-se como prestador profissional e aumente seus ganhos'
-                : 'Tenha acesso completo à plataforma com recursos premium'
-              }
+              Escolha o plano ideal para suas necessidades
             </p>
+
+            {/* User Type Selection */}
+            <div className="flex justify-center mb-8">
+              <div className="bg-gray-100 p-1 rounded-lg flex">
+                <Button
+                  variant={userType === 'cliente' ? 'default' : 'ghost'}
+                  onClick={() => setUserType('cliente')}
+                  className={userType === 'cliente' ? 'bg-orange-500 hover:bg-orange-600' : ''}
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Cliente
+                </Button>
+                <Button
+                  variant={userType === 'prestador' ? 'default' : 'ghost'}
+                  onClick={() => setUserType('prestador')}
+                  className={userType === 'prestador' ? 'bg-orange-500 hover:bg-orange-600' : ''}
+                >
+                  <Shield className="h-4 w-4 mr-2" />
+                  Prestador
+                </Button>
+              </div>
+            </div>
 
             {/* Billing Toggle */}
             <div className="flex items-center justify-center gap-4 mb-8">
@@ -342,7 +340,7 @@ const Planos = () => {
           </div>
 
           {/* Plans Grid */}
-          <div className={`grid gap-8 mb-12 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
+          <div className={`grid gap-8 mb-12 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
             {currentPlans.map((plan) => (
               <PlanCard key={plan.id} plan={plan} />
             ))}

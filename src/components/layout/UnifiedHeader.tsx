@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { User, Settings, LogOut, Bell, Home, Users, Crown, MessageCircle, Calendar, BarChart3, Shield, ShoppingBag, Wrench, Newspaper } from 'lucide-react';
+import { User, Settings, LogOut, Bell, Home, Users, Crown, MessageCircle, Calendar, BarChart3, Shield, ShoppingBag, Wrench, Newspaper, Heart, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
@@ -194,23 +194,33 @@ export const UnifiedHeader = () => {
                           <Wrench className="mr-2 h-4 w-4" />
                           Configurações do Prestador
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/agenda-prestador')}>
+                        <DropdownMenuItem onClick={() => navigate('/agenda')}>
                           <Calendar className="mr-2 h-4 w-4" />
                           Agenda
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/prestador-dashboard')}>
+                        <DropdownMenuItem onClick={() => navigate('/dashboard')}>
                           <BarChart3 className="mr-2 h-4 w-4" />
-                          Painel do Prestador
+                          Dashboard
                         </DropdownMenuItem>
                       </>
                     )}
 
                     {/* Client Menu Items */}
                     {!isPrestador && !isAdmin && (
-                      <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
-                        <User className="mr-2 h-4 w-4" />
-                        Configurações de Perfil
-                      </DropdownMenuItem>
+                      <>
+                        <DropdownMenuItem onClick={() => navigate('/perfil')}>
+                          <User className="mr-2 h-4 w-4" />
+                          Meu Perfil
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
+                          <Settings className="mr-2 h-4 w-4" />
+                          Configurações
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/favoritos')}>
+                          <Heart className="mr-2 h-4 w-4" />
+                          Favoritos
+                        </DropdownMenuItem>
+                      </>
                     )}
 
                     {/* Admin Menu Items */}
@@ -234,13 +244,23 @@ export const UnifiedHeader = () => {
                     {/* Common Menu Items for All Users */}
                     <DropdownMenuItem onClick={() => navigate('/pedidos')}>
                       <ShoppingBag className="mr-2 h-4 w-4" />
-                      Pedidos
+                      Meus Pedidos
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem onClick={() => navigate('/conversas')}>
+                      <MessageCircle className="mr-2 h-4 w-4" />
+                      Conversas
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem onClick={() => navigate('/endereco')}>
+                      <MapPin className="mr-2 h-4 w-4" />
+                      Endereços
                     </DropdownMenuItem>
 
                     {/* PRO Menu Item */}
-                    <DropdownMenuItem onClick={() => navigate(isPremium ? '/premium-overview' : '/planos')}>
+                    <DropdownMenuItem onClick={() => navigate(isPremium ? '/premium-dashboard' : '/planos')}>
                       <Crown className="mr-2 h-4 w-4" />
-                      {isPremium ? 'Visão Geral PRO' : 'Tornar-se PRO'}
+                      {isPremium ? 'Dashboard PRO' : 'Tornar-se PRO'}
                     </DropdownMenuItem>
 
                     <DropdownMenuSeparator />

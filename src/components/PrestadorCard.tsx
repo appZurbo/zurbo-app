@@ -44,7 +44,6 @@ const PrestadorCard = ({
   distance 
 }: PrestadorCardProps) => {
   const [showChat, setShowChat] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
 
   const handleContactClick = () => {
     setShowChat(true);
@@ -80,9 +79,9 @@ const PrestadorCard = ({
             {/* Avatar with Premium Border */}
             <div className="relative flex-shrink-0">
               <div className={`${isPremium ? 'p-1 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full' : ''}`}>
-                <Avatar className={`${compact ? 'h-12 w-12' : 'h-16 w-16'} ${isPremium ? 'border-2 border-white' : ''}`}>
+                <Avatar className={`${compact ? 'h-16 w-16' : 'h-20 w-20'} ${isPremium ? 'border-2 border-white' : ''}`}>
                   <AvatarImage src={prestador.foto_url} alt={prestador.nome} />
-                  <AvatarFallback className="bg-orange-100 text-orange-600 font-semibold">
+                  <AvatarFallback className="bg-orange-100 text-orange-600 font-semibold text-lg">
                     {prestador.nome.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
@@ -99,7 +98,7 @@ const PrestadorCard = ({
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className={`font-semibold text-gray-900 truncate ${compact ? 'text-base' : 'text-lg'}`}>
+                    <h3 className={`font-semibold text-gray-900 truncate ${compact ? 'text-lg' : 'text-xl'}`}>
                       {prestador.nome}
                     </h3>
                     
@@ -115,7 +114,7 @@ const PrestadorCard = ({
                   </div>
 
                   {/* Rating */}
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-3">
                     <div className="flex items-center gap-1">
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                       <span className="font-medium text-sm">
@@ -134,7 +133,7 @@ const PrestadorCard = ({
 
                   {/* Location */}
                   {(prestador.endereco_cidade || prestador.endereco_bairro) && (
-                    <div className="flex items-center gap-1 text-gray-600 mb-2">
+                    <div className="flex items-center gap-1 text-gray-600 mb-3">
                       <MapPin className="h-3 w-3" />
                       <span className="text-sm truncate">
                         {prestador.endereco_bairro && `${prestador.endereco_bairro}, `}
@@ -149,18 +148,15 @@ const PrestadorCard = ({
                   )}
 
                   {/* Service Description */}
-                  {!compact && prestador.descricao_servico && (
-                    <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+                  {prestador.descricao_servico && (
+                    <p className="text-sm text-gray-600 line-clamp-2 mb-4 leading-relaxed">
                       {prestador.descricao_servico}
                     </p>
                   )}
                 </div>
 
                 {/* Favorite Button */}
-                <BotaoFavorito 
-                  prestadorId={prestador.id}
-                  className="ml-2"
-                />
+                <BotaoFavorito prestadorId={prestador.id} />
               </div>
 
               {/* Action Buttons */}
