@@ -78,9 +78,8 @@ export const ZurboDock = () => {
             <Button
               key={index}
               variant="ghost"
-              size="sm"
               className={`
-                relative transition-all duration-200 rounded-xl flex-col min-h-16 w-16
+                relative transition-all duration-200 rounded-xl flex-col min-h-16 w-16 p-2
                 ${item.isActive 
                   ? 'bg-orange-100 text-orange-600 border border-orange-200 shadow-sm' 
                   : 'text-gray-600 hover:text-orange-600 hover:bg-orange-50'
