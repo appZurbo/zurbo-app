@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,7 +11,6 @@ import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useEnhancedChat } from '@/hooks/useEnhancedChat';
 import { ConversationList } from '@/components/chat/ConversationList';
 import { ChatInterface } from '@/components/chat/ChatInterface';
-import { PageWithDock } from '@/components/layout/PageWithDock';
 
 const Conversas = () => {
   const navigate = useNavigate();
@@ -51,7 +51,7 @@ const Conversas = () => {
 
   if (authLoading) {
     return (
-      <PageWithDock>
+      <div>
         <UnifiedHeader />
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="text-center">
@@ -61,13 +61,13 @@ const Conversas = () => {
             <p className="text-gray-600">Carregando conversas...</p>
           </div>
         </div>
-      </PageWithDock>
+      </div>
     );
   }
 
   if (!profile) {
     return (
-      <PageWithDock>
+      <div>
         <UnifiedHeader />
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="w-full max-w-md">
@@ -82,14 +82,14 @@ const Conversas = () => {
             </CardContent>
           </Card>
         </div>
-      </PageWithDock>
+      </div>
     );
   }
 
   return (
-    <PageWithDock>
+    <div>
       <UnifiedHeader />
-      <div className="min-h-screen bg-gray-50">
+      <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
         <div className={`${isMobile ? 'px-4 py-4' : 'max-w-6xl mx-auto p-6'}`}>
           
           {/* Mobile: Show chat interface when conversation is selected */}
@@ -225,7 +225,7 @@ const Conversas = () => {
           )}
         </div>
       </div>
-    </PageWithDock>
+    </div>
   );
 };
 

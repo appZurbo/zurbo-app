@@ -686,28 +686,28 @@ export type Database = {
       }
       notifications: {
         Row: {
-          content: string
           created_at: string | null
           id: string
-          is_read: boolean | null
+          message: string
+          read: boolean | null
           title: string
           type: string | null
           user_id: string | null
         }
         Insert: {
-          content: string
           created_at?: string | null
           id?: string
-          is_read?: boolean | null
+          message: string
+          read?: boolean | null
           title: string
           type?: string | null
           user_id?: string | null
         }
         Update: {
-          content?: string
           created_at?: string | null
           id?: string
-          is_read?: boolean | null
+          message?: string
+          read?: boolean | null
           title?: string
           type?: string | null
           user_id?: string | null

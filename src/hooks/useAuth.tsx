@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { checkUserProfile, createUserProfile, type UserProfile } from '@/utils/database';
 import type { User } from '@supabase/supabase-js';
@@ -9,16 +9,13 @@ export const useAuth = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const mounted = useRef(true);
 
-  const loadProfile = async (authId: string) => {
-    if (!mounted.current) return;
-    
+  const loadProfile = useCallback(async (authId: string) => {
     try {
       console.log('Loading profile for auth ID:', authId);
       let profileData = await checkUserProfile(authId);
       
-      if (!profileData && mounted.current) {
+      if (!profileData) {
         console.log('Profile not found, creating new profile...');
         const { data: { user: authUser } } = await supabase.auth.getUser();
         if (authUser && authUser.user_metadata) {
@@ -33,40 +30,29 @@ export const useAuth = () => {
         }
       }
 
-      if (mounted.current) {
-        setProfile(profileData);
-        setError(null);
-      }
+      setProfile(profileData);
+      setError(null);
     } catch (error) {
       console.error('Error loading profile:', error);
-      if (mounted.current) {
-        setProfile(null);
-        setError('Erro ao carregar perfil do usuário');
-      }
+      setProfile(null);
+      setError('Erro ao carregar perfil do usuário');
     }
-  };
+  }, []);
 
   useEffect(() => {
-    mounted.current = true;
+    let mounted = true;
 
     const initializeAuth = async () => {
-      if (!mounted.current) return;
-      
       try {
-        console.log('Initializing auth...');
-        
+        // Verificar sessão existente primeiro
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
           console.error('Error getting session:', sessionError);
-          if (mounted.current) {
-            setError('Erro ao verificar sessão');
-            setLoading(false);
-          }
-          return;
+          setError('Erro ao verificar sessão');
         }
         
-        if (mounted.current) {
+        if (mounted) {
           const currentUser = session?.user ?? null;
           setUser(currentUser);
           
@@ -77,9 +63,42 @@ export const useAuth = () => {
           }
           setLoading(false);
         }
+
+        // Configurar listener de mudanças de autenticação
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (event, session) => {
+            if (!mounted) return;
+            
+            console.log('Auth state changed:', event, session?.user?.id);
+            
+            const currentUser = session?.user ?? null;
+            setUser(currentUser);
+            
+            if (currentUser && event === 'SIGNED_IN') {
+              // Usar setTimeout para evitar loops infinitos
+              setTimeout(async () => {
+                if (mounted) {
+                  await loadProfile(currentUser.id);
+                }
+              }, 100);
+            } else if (event === 'SIGNED_OUT') {
+              setProfile(null);
+              setError(null);
+            }
+            
+            if (!loading) {
+              setLoading(false);
+            }
+          }
+        );
+
+        return () => {
+          mounted = false;
+          subscription.unsubscribe();
+        };
       } catch (error) {
         console.error('Error initializing auth:', error);
-        if (mounted.current) {
+        if (mounted) {
           setError('Erro ao inicializar autenticação');
           setLoading(false);
         }
@@ -88,37 +107,12 @@ export const useAuth = () => {
 
     initializeAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (!mounted.current) return;
-        
-        console.log('Auth state changed:', event, session?.user?.id);
-        
-        const currentUser = session?.user ?? null;
-        setUser(currentUser);
-        
-        if (currentUser && event === 'SIGNED_IN') {
-          await loadProfile(currentUser.id);
-        } else if (event === 'SIGNED_OUT') {
-          setProfile(null);
-          setError(null);
-        }
-        
-        if (mounted.current) {
-          setLoading(false);
-        }
-      }
-    );
-
     return () => {
-      mounted.current = false;
-      subscription.unsubscribe();
+      mounted = false;
     };
-  }, []);
+  }, [loadProfile]);
 
   const logout = async () => {
-    if (!mounted.current) return;
-    
     setLoading(true);
     try {
       const { error } = await supabase.auth.signOut();
@@ -134,33 +128,34 @@ export const useAuth = () => {
       console.error('Logout error:', error);
       setError('Erro inesperado ao fazer logout');
     } finally {
-      if (mounted.current) {
-        setLoading(false);
-      }
+      setLoading(false);
     }
   };
 
   const updateLocalProfile = (updates: Partial<UserProfile>) => {
-    if (profile && mounted.current) {
+    if (profile) {
       setProfile({ ...profile, ...updates });
     }
   };
 
   const refreshProfile = async () => {
-    if (user && mounted.current) {
+    if (user) {
       setLoading(true);
       await loadProfile(user.id);
       setLoading(false);
     }
   };
 
+  // Enhanced admin check - include specific admin emails
   const isAdminUser = () => {
     if (!user || !profile) return false;
     
+    // Check if user has admin type in profile
     if (profile.tipo === 'admin' || profile.tipo === 'moderator') {
       return true;
     }
     
+    // Check specific admin emails
     const adminEmails = ['contato@zurbo.com.br', 'admin@zurbo.com.br'];
     return adminEmails.includes(user.email || '');
   };

@@ -155,20 +155,7 @@
   .glass-dock {
     @apply bg-white/95 backdrop-blur-md border-t border-gray-200/80;
   }
-
-  /* ZurboDock specific spacing */
-  .zurbo-dock-spacing {
-    @apply pb-24;
-  }
-  
-  @screen lg {
-    .zurbo-dock-spacing {
-      @apply pb-4;
-    }
-  }
 }
-
-/* ... keep existing code (all animations and other styles) */
 
 /* Scroll Animations */
 @keyframes fadeInUp {
