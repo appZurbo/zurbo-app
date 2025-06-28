@@ -1,12 +1,12 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
-import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
+import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { NotificationPanel } from '@/components/notifications/NotificationPanel';
 
 const NotificacoesPage = () => {
@@ -16,8 +16,7 @@ const NotificacoesPage = () => {
 
   if (!profile) {
     return (
-      <div>
-        <UnifiedHeader />
+      <UnifiedLayout>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="w-full max-w-md">
             <CardContent className="p-6 text-center">
@@ -31,14 +30,13 @@ const NotificacoesPage = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </UnifiedLayout>
     );
   }
 
   return (
-    <div>
-      <UnifiedHeader />
-      <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
+    <UnifiedLayout>
+      <div className="min-h-screen bg-gray-50">
         <div className={`${isMobile ? 'px-4 py-4' : 'max-w-4xl mx-auto p-6'}`}>
           {/* Header */}
           <div className="flex items-center gap-4 mb-6">
@@ -72,7 +70,7 @@ const NotificacoesPage = () => {
           <NotificationPanel />
         </div>
       </div>
-    </div>
+    </UnifiedLayout>
   );
 };
 

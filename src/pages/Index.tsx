@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
+import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import HeroDemo from '@/components/ui/hero-demo';
 import ServiceCategories from '@/components/ServiceCategories';
 import { ModernFilters } from '@/components/filters/ModernFilters';
@@ -17,7 +17,7 @@ import { Loader2, Users, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import PartnersSection from '@/components/sections/PartnersSection';
 import { Button } from '@/components/ui/button';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 const Index = () => {
   const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
@@ -129,135 +129,135 @@ const Index = () => {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white">
-        <UnifiedHeader />
-
-        <HeroDemo />
-        
-        <div className="max-w-7xl mx-auto px-[30px] py-[15px]">
-          <ErrorBoundary>
-            <ServiceCategories onCategorySelect={handleCategorySelect} />
-          </ErrorBoundary>
+      <UnifiedLayout>
+        <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white">
+          <HeroDemo />
           
-          <div className="mt-12">
+          <div className="max-w-7xl mx-auto px-[30px] py-[15px]">
             <ErrorBoundary>
-              <ModernFilters onFiltersChange={handleFiltersChange} servicos={[]} />
+              <ServiceCategories onCategorySelect={handleCategorySelect} />
             </ErrorBoundary>
-          </div>
+            
+            <div className="mt-12">
+              <ErrorBoundary>
+                <ModernFilters onFiltersChange={handleFiltersChange} servicos={[]} />
+              </ErrorBoundary>
+            </div>
 
-          <div className="mt-12">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900">
-                  Prestadores Disponíveis
-                </h2>
-                <p className="text-gray-600 mt-2">
-                  Encontre o profissional ideal para suas necessidades
-                </p>
+            <div className="mt-12">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900">
+                    Prestadores Disponíveis
+                  </h2>
+                  <p className="text-gray-600 mt-2">
+                    Encontre o profissional ideal para suas necessidades
+                  </p>
+                </div>
+
+                {isAuthenticated && (
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="show-favorites"
+                      checked={showFavoritesOnly}
+                      onCheckedChange={setShowFavoritesOnly}
+                    />
+                    <Label htmlFor="show-favorites">Mostrar apenas favoritos</Label>
+                  </div>
+                )}
               </div>
 
-              {isAuthenticated && (
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="show-favorites"
-                    checked={showFavoritesOnly}
-                    onCheckedChange={setShowFavoritesOnly}
-                  />
-                  <Label htmlFor="show-favorites">Mostrar apenas favoritos</Label>
+              {loading ? (
+                <div className="flex justify-center items-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
+                  <span className="ml-2 text-gray-600">Carregando prestadores...</span>
+                </div>
+              ) : error ? (
+                <Card>
+                  <CardContent className="p-12 text-center">
+                    <AlertCircle className="h-16 w-16 mx-auto mb-4 text-red-400" />
+                    <h3 className="text-xl font-semibold mb-2 text-red-600">Erro ao Carregar</h3>
+                    <p className="text-gray-600 mb-4">{error}</p>
+                    <Button onClick={handleRetry} variant="outline">
+                      Tentar Novamente
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : prestadores.length === 0 ? (
+                <Card>
+                  <CardContent className="p-12 text-center">
+                    <Users className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                    <h3 className="text-xl font-semibold mb-2">
+                      {showFavoritesOnly ? 'Nenhum favorito encontrado' : 'Nenhum prestador encontrado'}
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      {showFavoritesOnly 
+                        ? 'Você ainda não favoritou nenhum prestador.'
+                        : 'Não encontramos prestadores que correspondam aos seus filtros.'
+                      }
+                    </p>
+                    <div className="space-y-2">
+                      <Button onClick={() => {
+                        if (showFavoritesOnly) {
+                          setShowFavoritesOnly(false);
+                        } else {
+                          setFilters({
+                            cidade: '',
+                            servico: '',
+                            precoMin: undefined,
+                            precoMax: undefined,
+                            notaMin: undefined
+                          });
+                        }
+                      }}>
+                        {showFavoritesOnly ? 'Ver Todos Prestadores' : 'Limpar Filtros'}
+                      </Button>
+                      {!showFavoritesOnly && (
+                        <p className="text-sm text-gray-500 mt-2">
+                          💡 Dica: Vá para <strong>/admin/relatorios</strong> e clique em "Criar Sistema Completo" para adicionar dados de teste
+                        </p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {prestadores.map(prestador => (
+                    <ErrorBoundary key={prestador.id}>
+                      <PrestadorCardImproved
+                        prestador={prestador}
+                        onContact={handleContact}
+                        onViewProfile={handleViewProfile}
+                      />
+                    </ErrorBoundary>
+                  ))}
                 </div>
               )}
             </div>
-
-            {loading ? (
-              <div className="flex justify-center items-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
-                <span className="ml-2 text-gray-600">Carregando prestadores...</span>
-              </div>
-            ) : error ? (
-              <Card>
-                <CardContent className="p-12 text-center">
-                  <AlertCircle className="h-16 w-16 mx-auto mb-4 text-red-400" />
-                  <h3 className="text-xl font-semibold mb-2 text-red-600">Erro ao Carregar</h3>
-                  <p className="text-gray-600 mb-4">{error}</p>
-                  <Button onClick={handleRetry} variant="outline">
-                    Tentar Novamente
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : prestadores.length === 0 ? (
-              <Card>
-                <CardContent className="p-12 text-center">
-                  <Users className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                  <h3 className="text-xl font-semibold mb-2">
-                    {showFavoritesOnly ? 'Nenhum favorito encontrado' : 'Nenhum prestador encontrado'}
-                  </h3>
-                  <p className="text-gray-600 mb-4">
-                    {showFavoritesOnly 
-                      ? 'Você ainda não favoritou nenhum prestador.'
-                      : 'Não encontramos prestadores que correspondam aos seus filtros.'
-                    }
-                  </p>
-                  <div className="space-y-2">
-                    <Button onClick={() => {
-                      if (showFavoritesOnly) {
-                        setShowFavoritesOnly(false);
-                      } else {
-                        setFilters({
-                          cidade: '',
-                          servico: '',
-                          precoMin: undefined,
-                          precoMax: undefined,
-                          notaMin: undefined
-                        });
-                      }
-                    }}>
-                      {showFavoritesOnly ? 'Ver Todos Prestadores' : 'Limpar Filtros'}
-                    </Button>
-                    {!showFavoritesOnly && (
-                      <p className="text-sm text-gray-500 mt-2">
-                        💡 Dica: Vá para <strong>/admin/relatorios</strong> e clique em "Criar Sistema Completo" para adicionar dados de teste
-                      </p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {prestadores.map(prestador => (
-                  <ErrorBoundary key={prestador.id}>
-                    <PrestadorCardImproved
-                      prestador={prestador}
-                      onContact={handleContact}
-                      onViewProfile={handleViewProfile}
-                    />
-                  </ErrorBoundary>
-                ))}
-              </div>
-            )}
           </div>
-        </div>
 
-        <ErrorBoundary>
-          <PartnersSection />
-        </ErrorBoundary>
-
-        {selectedPrestador && (
           <ErrorBoundary>
-            <PrestadorMiniProfileModal
-              prestador={selectedPrestador}
-              isOpen={showProfileModal}
-              onClose={() => setShowProfileModal(false)}
-              onContact={handleContact}
-            />
-
-            <ContactModal
-              prestador={selectedPrestador}
-              open={showContactModal}
-              onOpenChange={setShowContactModal}
-            />
+            <PartnersSection />
           </ErrorBoundary>
-        )}
-      </div>
+
+          {selectedPrestador && (
+            <ErrorBoundary>
+              <PrestadorMiniProfileModal
+                prestador={selectedPrestador}
+                isOpen={showProfileModal}
+                onClose={() => setShowProfileModal(false)}
+                onContact={handleContact}
+              />
+
+              <ContactModal
+                prestador={selectedPrestador}
+                open={showContactModal}
+                onOpenChange={setShowContactModal}
+              />
+            </ErrorBoundary>
+          )}
+        </div>
+      </UnifiedLayout>
     </ErrorBoundary>
   );
 };

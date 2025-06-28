@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -7,7 +6,7 @@ import { ArrowLeft, Search, MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
-import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
+import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { useEnhancedChat } from '@/hooks/useEnhancedChat';
 import { ConversationList } from '@/components/chat/ConversationList';
 import { ChatInterface } from '@/components/chat/ChatInterface';
@@ -51,8 +50,7 @@ const Conversas = () => {
 
   if (authLoading) {
     return (
-      <div>
-        <UnifiedHeader />
+      <UnifiedLayout>
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-orange-500 rounded-xl flex items-center justify-center animate-pulse">
@@ -61,14 +59,13 @@ const Conversas = () => {
             <p className="text-gray-600">Carregando conversas...</p>
           </div>
         </div>
-      </div>
+      </UnifiedLayout>
     );
   }
 
   if (!profile) {
     return (
-      <div>
-        <UnifiedHeader />
+      <UnifiedLayout>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="w-full max-w-md">
             <CardContent className="p-6 text-center">
@@ -82,14 +79,13 @@ const Conversas = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </UnifiedLayout>
     );
   }
 
   return (
-    <div>
-      <UnifiedHeader />
-      <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
+    <UnifiedLayout>
+      <div className="min-h-screen bg-gray-50">
         <div className={`${isMobile ? 'px-4 py-4' : 'max-w-6xl mx-auto p-6'}`}>
           
           {/* Mobile: Show chat interface when conversation is selected */}
@@ -225,7 +221,7 @@ const Conversas = () => {
           )}
         </div>
       </div>
-    </div>
+    </UnifiedLayout>
   );
 };
 
