@@ -7,9 +7,9 @@ export interface Notification {
   id: string;
   user_id: string;
   title: string;
-  message: string;
+  content: string;
   type: 'new_client' | 'new_review' | 'new_message' | 'system_update' | 'payment' | 'schedule_change';
-  read: boolean;
+  is_read: boolean;
   created_at: string;
 }
 
@@ -59,12 +59,7 @@ export const useNotifications = () => {
 
       if (error) throw error;
       
-      const typedNotifications: Notification[] = (data || []).map(item => ({
-        ...item,
-        type: item.type as Notification['type']
-      }));
-      
-      setNotifications(typedNotifications);
+      setNotifications(data || []);
     } catch (error) {
       console.error('Error loading notifications:', error);
     } finally {
@@ -76,14 +71,14 @@ export const useNotifications = () => {
     try {
       const { error } = await supabase
         .from('notifications')
-        .update({ read: true })
+        .update({ is_read: true })
         .eq('id', notificationId);
 
       if (error) throw error;
 
       setNotifications(prev =>
         prev.map(notif =>
-          notif.id === notificationId ? { ...notif, read: true } : notif
+          notif.id === notificationId ? { ...notif, is_read: true } : notif
         )
       );
     } catch (error) {
@@ -97,14 +92,14 @@ export const useNotifications = () => {
     try {
       const { error } = await supabase
         .from('notifications')
-        .update({ read: true })
+        .update({ is_read: true })
         .eq('user_id', profile.id)
-        .eq('read', false);
+        .eq('is_read', false);
 
       if (error) throw error;
 
       setNotifications(prev =>
-        prev.map(notif => ({ ...notif, read: true }))
+        prev.map(notif => ({ ...notif, is_read: true }))
       );
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
@@ -115,7 +110,13 @@ export const useNotifications = () => {
     try {
       const { error } = await supabase
         .from('notifications')
-        .insert([notification]);
+        .insert([{
+          user_id: notification.user_id,
+          title: notification.title,
+          content: notification.content,
+          type: notification.type,
+          is_read: notification.is_read
+        }]);
 
       if (error) throw error;
     } catch (error) {
@@ -123,16 +124,16 @@ export const useNotifications = () => {
     }
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter(n => !n.is_read).length;
   const recentNotifications = notifications.slice(0, 5);
-  const hasNewMessages = unreadCount > 0; // Add this property
+  const hasNewMessages = unreadCount > 0;
 
   return {
     notifications,
     recentNotifications,
     loading,
     unreadCount,
-    hasNewMessages, // Include this in the return object
+    hasNewMessages,
     markAsRead,
     markAllAsRead,
     loadNotifications,

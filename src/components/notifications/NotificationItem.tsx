@@ -9,9 +9,9 @@ interface Notification {
   id: string;
   user_id: string;
   title: string;
-  message: string;
+  content: string;
   type: 'new_client' | 'new_review' | 'new_message' | 'system_update' | 'payment' | 'schedule_change';
-  read: boolean;
+  is_read: boolean;
   created_at: string;
 }
 
@@ -43,7 +43,7 @@ export const NotificationItem = ({ notification }: NotificationItemProps) => {
   };
 
   const handleClick = () => {
-    if (!notification.read) {
+    if (!notification.is_read) {
       markAsRead(notification.id);
     }
 
@@ -86,7 +86,7 @@ export const NotificationItem = ({ notification }: NotificationItemProps) => {
   return (
     <div
       className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
-        !notification.read ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+        !notification.is_read ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
       }`}
       onClick={handleClick}
     >
@@ -94,15 +94,15 @@ export const NotificationItem = ({ notification }: NotificationItemProps) => {
         <div className="mt-1">{getIcon()}</div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-1">
-            <p className={`text-sm font-medium ${!notification.read ? 'text-gray-900' : 'text-gray-700'}`}>
+            <p className={`text-sm font-medium ${!notification.is_read ? 'text-gray-900' : 'text-gray-700'}`}>
               {notification.title}
             </p>
             <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
               {getTypeLabel()}
             </span>
           </div>
-          <p className={`text-sm mt-1 ${!notification.read ? 'text-gray-700' : 'text-gray-500'}`}>
-            {notification.message}
+          <p className={`text-sm mt-1 ${!notification.is_read ? 'text-gray-700' : 'text-gray-500'}`}>
+            {notification.content}
           </p>
           <p className="text-xs text-gray-400 mt-2">
             {formatDistanceToNow(new Date(notification.created_at), {
@@ -111,7 +111,7 @@ export const NotificationItem = ({ notification }: NotificationItemProps) => {
             })}
           </p>
         </div>
-        {!notification.read && (
+        {!notification.is_read && (
           <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
         )}
       </div>
