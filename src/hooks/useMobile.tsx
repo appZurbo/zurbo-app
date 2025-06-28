@@ -25,7 +25,7 @@ export const useTablet = () => {
   useEffect(() => {
     const checkIfTablet = () => {
       const width = window.innerWidth;
-      setIsTablet(width >= 768 && width <= 1024);
+      setIsTablet(width >= 768 && width < 1024);
     };
 
     checkIfTablet();
@@ -43,7 +43,7 @@ export const useMobileOrTablet = () => {
 
   useEffect(() => {
     const checkIfMobileOrTablet = () => {
-      setIsMobileOrTablet(window.innerWidth <= 1024);
+      setIsMobileOrTablet(window.innerWidth < 1024);
     };
 
     checkIfMobileOrTablet();
@@ -53,4 +53,29 @@ export const useMobileOrTablet = () => {
   }, []);
 
   return isMobileOrTablet;
+};
+
+// Hook for responsive breakpoints
+export const useBreakpoint = () => {
+  const [breakpoint, setBreakpoint] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
+
+  useEffect(() => {
+    const checkBreakpoint = () => {
+      const width = window.innerWidth;
+      if (width < 768) {
+        setBreakpoint('mobile');
+      } else if (width < 1024) {
+        setBreakpoint('tablet');
+      } else {
+        setBreakpoint('desktop');
+      }
+    };
+
+    checkBreakpoint();
+    window.addEventListener('resize', checkBreakpoint);
+
+    return () => window.removeEventListener('resize', checkBreakpoint);
+  }, []);
+
+  return breakpoint;
 };

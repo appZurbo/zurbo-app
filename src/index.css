@@ -96,6 +96,67 @@
   }
 }
 
+/* Responsive Utilities */
+@layer utilities {
+  /* Safe area padding for devices with notch/home indicator */
+  .safe-area-padding-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Mobile-first spacing utilities */
+  .mobile-padding {
+    @apply px-4;
+  }
+  
+  @screen sm {
+    .mobile-padding {
+      @apply px-6;
+    }
+  }
+  
+  @screen lg {
+    .mobile-padding {
+      @apply px-8;
+    }
+  }
+
+  /* Touch-friendly targets */
+  .touch-target {
+    @apply min-h-12 min-w-12;
+  }
+  
+  @screen sm {
+    .touch-target {
+      @apply min-h-10 min-w-10;
+    }
+  }
+
+  /* Responsive text sizing */
+  .responsive-text {
+    @apply text-sm;
+  }
+  
+  @screen sm {
+    .responsive-text {
+      @apply text-base;
+    }
+  }
+
+  /* Dock centering utilities */
+  .dock-center {
+    @apply flex items-center justify-center;
+  }
+
+  /* Backdrop blur utilities */
+  .glass-header {
+    @apply bg-white/95 backdrop-blur-md border-b border-gray-200/80;
+  }
+
+  .glass-dock {
+    @apply bg-white/95 backdrop-blur-md border-t border-gray-200/80;
+  }
+}
+
 /* Scroll Animations */
 @keyframes fadeInUp {
   from {
@@ -259,4 +320,29 @@
 
 .transform-style-3d {
   transform-style: preserve-3d;
+}
+
+/* Grid responsive utilities */
+@layer utilities {
+  .grid-responsive {
+    @apply grid grid-cols-1;
+  }
+  
+  @screen sm {
+    .grid-responsive {
+      @apply grid-cols-2;
+    }
+  }
+  
+  @screen lg {
+    .grid-responsive {
+      @apply grid-cols-3;
+    }
+  }
+  
+  @screen xl {
+    .grid-responsive {
+      @apply grid-cols-4;
+    }
+  }
 }
