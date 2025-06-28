@@ -1,12 +1,16 @@
 
 import React from 'react';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
-import { WelcomeLanding } from '@/components/landing/WelcomeLanding';
+import { HeroSection } from '@/components/sections/HeroSection';
+import PartnersSection from '@/components/sections/PartnersSection';
 
 const Index = () => {
   return (
     <UnifiedLayout>
-      <WelcomeLanding />
+      <div className="min-h-screen">
+        <HeroSection />
+        <PartnersSection />
+      </div>
     </UnifiedLayout>
   );
 };
