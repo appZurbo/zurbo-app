@@ -20,7 +20,9 @@ import {
   X,
   Crown,
   Calendar,
-  Gauge
+  Gauge,
+  Newspaper,
+  Shield
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
@@ -29,7 +31,7 @@ import { NotificationBell } from './notifications/NotificationBell';
 import { useMobile } from '@/hooks/useMobile';
 
 const Header = () => {
-  const { user, profile, logout, isPrestador } = useAuth();
+  const { user, profile, logout, isPrestador, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -76,6 +78,12 @@ const Header = () => {
               <Link to="/prestadores" className="text-gray-700 hover:text-orange-500 transition-colors">
                 Prestadores
               </Link>
+              {user && (
+                <Link to="/ads" className="text-gray-700 hover:text-orange-500 transition-colors flex items-center gap-2">
+                  <Newspaper className="h-4 w-4" />
+                  Anúncios
+                </Link>
+              )}
               <Link to="/como-funciona" className="text-gray-700 hover:text-orange-500 transition-colors">
                 Como Funciona
               </Link>
@@ -103,12 +111,31 @@ const Header = () => {
                             {profile?.nome?.charAt(0) || user.email?.charAt(0) || '?'}
                           </AvatarFallback>
                         </Avatar>
+                        {isAdmin && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                            <Shield className="h-2 w-2 text-white" />
+                          </div>
+                        )}
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56" align="end" forceMount>
                       <div className="flex items-center justify-start gap-2 p-2">
                         <div className="flex flex-col space-y-1 leading-none">
-                          <p className="font-medium">{profile?.nome || 'Usuário'}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium">{profile?.nome || 'Usuário'}</p>
+                            {profile?.premium && (
+                              <span className="inline-flex items-center gap-1 text-xs text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full">
+                                <Crown className="h-3 w-3" />
+                                PRO
+                              </span>
+                            )}
+                            {isAdmin && (
+                              <span className="inline-flex items-center gap-1 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                                <Shield className="h-3 w-3" />
+                                Admin
+                              </span>
+                            )}
+                          </div>
                           <p className="w-[200px] truncate text-sm text-muted-foreground">
                             {user.email}
                           </p>
@@ -135,7 +162,7 @@ const Header = () => {
                           
                           <DropdownMenuItem onClick={() => navigate('/planos')}>
                             <Crown className="mr-2 h-4 w-4" />
-                            Planos Premium
+                            Planos PRO
                           </DropdownMenuItem>
                         </>
                       )}
@@ -180,6 +207,14 @@ const Header = () => {
                       <Crown className="h-5 w-5" />
                     </Button>
                   )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate('/ads')}
+                    className="text-gray-600 hover:text-orange-500"
+                  >
+                    <Newspaper className="h-5 w-5" />
+                  </Button>
                   <NotificationBell />
                 </>
               ) : (

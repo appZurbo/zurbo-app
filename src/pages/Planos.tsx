@@ -28,12 +28,12 @@ export default function Planos() {
       buttonVariant: 'outline' as const
     },
     {
-      name: 'Premium',
+      name: 'PRO',
       price: 'R$ 9,90/mês',
       description: 'Para quem precisa de mais recursos',
       features: [
         'Prioridade no atendimento',
-        'Chat premium com suporte',
+        'Chat PRO com suporte',
         '7 usos do botão SOS por mês',
         'Histórico completo de serviços',
         'Suporte prioritário via WhatsApp',
@@ -41,7 +41,7 @@ export default function Planos() {
         'Notificações push personalizadas'
       ],
       color: 'blue',
-      buttonText: 'Assinar Premium',
+      buttonText: 'Assinar PRO',
       buttonVariant: 'default' as const,
       popular: true
     }
@@ -64,13 +64,13 @@ export default function Planos() {
       buttonVariant: 'outline' as const
     },
     {
-      name: 'Premium',
+      name: 'PRO',
       price: 'R$ 39,90/mês',
       description: 'Para profissionais que querem se destacar',
       features: [
         'Até 20 fotos no portfólio',
         'Prioridade na exibição dos resultados',
-        'Selo Premium exclusivo',
+        'Selo PRO exclusivo',
         'Destaque em carrosséis especiais',
         'Área de cobertura expandida',
         'Estatísticas avançadas de performance',
@@ -78,7 +78,7 @@ export default function Planos() {
         'Marketing personalizado'
       ],
       color: 'yellow',
-      buttonText: 'Assinar Premium',
+      buttonText: 'Assinar PRO',
       buttonVariant: 'default' as const,
       popular: true
     }
@@ -104,7 +104,7 @@ export default function Planos() {
               <Crown className="h-10 w-10 text-white" />
             </div>
             <h1 className="text-5xl font-bold text-gray-900 mb-4">
-              Planos <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">Premium</span>
+              Planos <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">PRO</span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Escolha o plano ideal para o seu perfil e aproveite todos os benefícios exclusivos
@@ -216,7 +216,7 @@ export default function Planos() {
           <section className="mb-16">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                Benefícios Premium para Clientes
+                Benefícios PRO para Clientes
               </h2>
             </div>
             
@@ -240,7 +240,7 @@ export default function Planos() {
                   <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
                     <Shield className="h-6 w-6 text-green-600" />
                   </div>
-                  <CardTitle className="text-lg">SOS Emergência Premium</CardTitle>
+                  <CardTitle className="text-lg">SOS Emergência PRO</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">
@@ -268,7 +268,7 @@ export default function Planos() {
           <section className="mb-16">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                Benefícios Premium para Prestadores
+                Benefícios PRO para Prestadores
               </h2>
             </div>
             
@@ -306,11 +306,11 @@ export default function Planos() {
                   <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
                     <Crown className="h-6 w-6 text-indigo-600" />
                   </div>
-                  <CardTitle className="text-lg">Selo Premium</CardTitle>
+                  <CardTitle className="text-lg">Selo PRO</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">
-                    Selo exclusivo Premium que aumenta a confiança dos clientes no seu perfil.
+                    Selo exclusivo PRO que aumenta a confiança dos clientes no seu perfil.
                   </p>
                 </CardContent>
               </Card>
@@ -334,7 +334,7 @@ export default function Planos() {
               } text-lg mb-6 max-w-2xl mx-auto`}>
                 {selectedUserType === 'cliente' 
                   ? 'Tenha prioridade no atendimento e acesso a recursos exclusivos.'
-                  : 'Destaque-se da concorrência e aumente seus ganhos com o plano Premium.'
+                  : 'Destaque-se da concorrência e aumente seus ganhos com o plano PRO.'
                 }
               </p>
               

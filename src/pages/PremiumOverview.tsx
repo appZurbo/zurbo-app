@@ -16,13 +16,13 @@ const PremiumOverview = () => {
 
   // Mock data - in real app, this would come from database
   const premiumData = {
-    planType: 'Premium Mensal',
+    planType: 'PRO Mensal',
     expirationDate: '15/02/2024',
     sosUsagesRemaining: 3,
     sosUsagesTotal: 5,
     features: [
       'Prioridade nos resultados de busca',
-      'Badge Premium visível',
+      'Badge PRO visível',
       'Suporte prioritário',
       'Relatórios avançados',
       '5 SOS por mês'
@@ -37,12 +37,12 @@ const PremiumOverview = () => {
           <Card className="w-full max-w-md">
             <CardContent className="p-6 text-center">
               <Crown className="h-12 w-12 mx-auto mb-4 text-orange-500" />
-              <h3 className="text-lg font-semibold mb-2">Acesso Premium Necessário</h3>
+              <h3 className="text-lg font-semibold mb-2">Acesso PRO Necessário</h3>
               <p className="text-gray-600 mb-4">
-                Você precisa ser um usuário Premium para acessar esta página.
+                Você precisa ser um usuário PRO para acessar esta página.
               </p>
               <Button onClick={() => navigate('/planos')} className="w-full bg-orange-500 hover:bg-orange-600">
-                Ver Planos Premium
+                Ver Planos PRO
               </Button>
             </CardContent>
           </Card>
@@ -74,7 +74,7 @@ const PremiumOverview = () => {
                 </div>
                 <div>
                   <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
-                    Meu Plano Premium
+                    Meu Plano PRO
                   </h1>
                   <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
                     Visão geral do seu plano ativo
@@ -161,12 +161,12 @@ const PremiumOverview = () => {
             </CardContent>
           </Card>
 
-          {/* Premium Features */}
+          {/* PRO Features */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-green-500" />
-                Benefícios Premium Ativos
+                Benefícios PRO Ativos
               </CardTitle>
             </CardHeader>
             <CardContent>
