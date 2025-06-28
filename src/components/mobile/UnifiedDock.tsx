@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Home, Search, Calendar, User, MessageCircle } from 'lucide-react';
+import { Home, Search, Calendar, User, MessageCircle, FileText } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile, useTablet } from '@/hooks/useMobile';
@@ -36,9 +36,9 @@ export const UnifiedDock = () => {
     },
     {
       icon: Calendar,
-      label: 'Agenda',
-      path: isPrestador ? '/agenda-prestador' : '/pedidos',
-      isActive: isActive('/agenda-prestador') || isActive('/pedidos') || isActive('/agenda'),
+      label: isPrestador ? 'Agenda' : 'Pedidos',
+      path: isPrestador ? '/agenda' : '/pedidos',
+      isActive: isActive('/agenda') || isActive('/pedidos'),
       requiresAuth: true
     },
     {

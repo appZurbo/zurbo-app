@@ -1,23 +1,41 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Shield, Bell, MapPin, User } from 'lucide-react';
+import { Shield, Bell, MapPin, User, Crown, Palette } from 'lucide-react';
 import { LocationSettings } from '@/components/location/LocationSettings';
 import { ProfileTab } from './ProfileTab';
 import { NotificationTab } from './NotificationTab';
 import { SecurityTabContent } from './SecurityTabContent';
 import { useMobile } from '@/hooks/useMobile';
+import { useAuth } from '@/hooks/useAuth';
+
 export const UserSettings = () => {
   const isMobile = useMobile();
+  const { isPrestador, isAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
-  return <div className={`w-full ${isMobile ? 'px-0' : 'max-w-4xl mx-auto'}`}>
+
+  return (
+    <div className={`w-full ${isMobile ? 'px-0' : 'max-w-4xl mx-auto'}`}>
       <Card className={`${isMobile ? 'border-0 shadow-none bg-transparent' : ''}`}>
         <CardHeader className={`${isMobile ? 'px-0 pb-4' : ''}`}>
-          <CardTitle className={`${isMobile ? 'text-lg' : ''}`}>      Configurações da Conta</CardTitle>
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+              <User className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <CardTitle className={`${isMobile ? 'text-lg' : 'text-2xl'}`}>
+                Configurações da Conta
+              </CardTitle>
+              <p className="text-gray-600 text-sm">
+                Gerencie suas informações pessoais e preferências
+              </p>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className={`${isMobile ? 'px-0 py-0' : ''}`}>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="px-[10px]">
-            <TabsList className={`grid grid-cols-4 w-full ${isMobile ? 'h-12 mb-6' : ''}`}>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className={`grid w-full ${isMobile ? 'grid-cols-4 h-12 mb-6' : 'grid-cols-5 mb-8'}`}>
               <TabsTrigger value="profile" className={`flex items-center gap-1 ${isMobile ? 'text-xs px-2' : 'gap-2'}`}>
                 <User className="h-4 w-4" />
                 <span className={`${isMobile ? 'hidden sm:inline' : ''}`}>Perfil</span>
@@ -34,6 +52,12 @@ export const UserSettings = () => {
                 <Shield className="h-4 w-4" />
                 <span className={`${isMobile ? 'hidden sm:inline' : ''}`}>Segur</span>
               </TabsTrigger>
+              {(isPrestador || isAdmin) && (
+                <TabsTrigger value="preferences" className={`flex items-center gap-1 ${isMobile ? 'text-xs px-2' : 'gap-2'}`}>
+                  <Palette className="h-4 w-4" />
+                  <span className={`${isMobile ? 'hidden sm:inline' : ''}`}>Pref</span>
+                </TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="profile" className="mt-6">
@@ -51,8 +75,63 @@ export const UserSettings = () => {
             <TabsContent value="security" className="mt-6">
               <SecurityTabContent />
             </TabsContent>
+
+            {(isPrestador || isAdmin) && (
+              <TabsContent value="preferences" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Crown className="h-5 w-5 text-yellow-600" />
+                      Preferências Avançadas
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {isPrestador && (
+                      <div className="space-y-4">
+                        <h3 className="font-semibold">Configurações do Prestador</h3>
+                        <div className="grid gap-4">
+                          <div className="p-4 border rounded-lg">
+                            <h4 className="font-medium mb-2">Disponibilidade</h4>
+                            <p className="text-sm text-gray-600">
+                              Configure seus horários de atendimento e dias disponíveis
+                            </p>
+                          </div>
+                          <div className="p-4 border rounded-lg">
+                            <h4 className="font-medium mb-2">Preços Automáticos</h4>
+                            <p className="text-sm text-gray-600">
+                              Defina preços padrão para seus serviços mais comuns
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {isAdmin && (
+                      <div className="space-y-4">
+                        <h3 className="font-semibold">Configurações de Administrador</h3>
+                        <div className="grid gap-4">
+                          <div className="p-4 border rounded-lg">
+                            <h4 className="font-medium mb-2">Moderação Automática</h4>
+                            <p className="text-sm text-gray-600">
+                              Configure filtros automáticos para conteúdo inadequado
+                            </p>
+                          </div>
+                          <div className="p-4 border rounded-lg">
+                            <h4 className="font-medium mb-2">Relatórios Personalizados</h4>
+                            <p className="text-sm text-gray-600">
+                              Defina modelos de relatório personalizados
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
           </Tabs>
         </CardContent>
       </Card>
-    </div>;
+    </div>
+  );
 };

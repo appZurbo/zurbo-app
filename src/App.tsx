@@ -22,15 +22,10 @@ import Planos from "@/pages/Planos";
 import PremiumOverview from "@/pages/PremiumOverview";
 import FavoritosPage from "@/pages/FavoritosPage";
 import NotificacoesPage from "@/pages/NotificacoesPage";
+import InformacoesPage from "@/pages/InformacoesPage";
 import NotFound from "@/pages/NotFound";
 import SobreNos from "@/pages/SobreNos";
-import ComoFunciona from "@/pages/ComoFunciona";
-import CentralAjuda from "@/pages/CentralAjuda";
-import PoliticaPrivacidade from "@/pages/PoliticaPrivacidade";
-import RegrasComunidade from "@/pages/RegrasComunidade";
-import TermosUso from "@/pages/TermosUso";
 import TrabalheConosco from "@/pages/TrabalheConosco";
-import ReportPage from "@/pages/ReportPage";
 import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from '@/components/ui/toaster';
 
@@ -116,40 +111,16 @@ const router = createBrowserRouter([
     element: <NotificacoesPage />,
   },
   {
-    path: "/enderecos",
-    element: <Settings />,
+    path: "/informacoes",
+    element: <InformacoesPage />,
   },
   {
     path: "/sobre-nos",
     element: <SobreNos />,
   },
   {
-    path: "/como-funciona",
-    element: <ComoFunciona />,
-  },
-  {
-    path: "/central-ajuda",
-    element: <CentralAjuda />,
-  },
-  {
-    path: "/politica-privacidade",
-    element: <PoliticaPrivacidade />,
-  },
-  {
-    path: "/regras-comunidade",
-    element: <RegrasComunidade />,
-  },
-  {
-    path: "/termos-uso",
-    element: <TermosUso />,
-  },
-  {
     path: "/trabalhe-conosco",
     element: <TrabalheConosco />,
-  },
-  {
-    path: "/report",
-    element: <ReportPage />,
   },
   {
     path: "*",

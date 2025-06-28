@@ -9,7 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { 
   User, Settings, LogOut, Bell, Home, Users, Crown, MessageCircle, 
   Calendar, BarChart3, Shield, ShoppingBag, Heart, MapPin, HelpCircle,
-  FileText, Clock
+  FileText, Clock, Info
 } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -65,7 +65,7 @@ export const UnifiedHeader = () => {
   const isPremium = profile?.premium || false;
 
   const renderNavigationButtons = () => {
-    if (isMobile || isTablet) return null; // Navigation handled by dock on mobile/tablet
+    if (isMobile || isTablet) return null;
 
     return (
       <nav className="hidden lg:flex items-center space-x-6">
@@ -137,7 +137,12 @@ export const UnifiedHeader = () => {
                 {user?.email}
               </p>
               <Badge variant="secondary" className="w-fit text-xs">
-                {isPrestador ? (
+                {isAdmin ? (
+                  <>
+                    <Shield className="h-3 w-3 mr-1" />
+                    Admin
+                  </>
+                ) : isPrestador ? (
                   <>
                     <Users className="h-3 w-3 mr-1" />
                     Prestador
@@ -158,9 +163,25 @@ export const UnifiedHeader = () => {
             Configurações
           </DropdownMenuItem>
 
-          <DropdownMenuItem onClick={() => navigate('/pedidos')}>
+          {/* Service Toggle for Prestadores - Only in dropdown */}
+          {isPrestador && (
+            <div className="px-2 py-2">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="service-toggle-dropdown"
+                  checked={emServico}
+                  onCheckedChange={handleServiceToggle}
+                />
+                <Label htmlFor="service-toggle-dropdown" className="text-sm">
+                  {emServico ? 'Em serviço' : 'Fora de serviço'}
+                </Label>
+              </div>
+            </div>
+          )}
+
+          <DropdownMenuItem onClick={() => navigate(isPrestador ? '/pedidos' : '/pedidos')}>
             <Clock className="mr-2 h-4 w-4" />
-            Pedidos
+            {isPrestador ? 'Pedidos' : 'Meus Agendamentos'}
           </DropdownMenuItem>
           
           <DropdownMenuItem onClick={() => navigate('/favoritos')}>
@@ -168,9 +189,9 @@ export const UnifiedHeader = () => {
             Favoritos
           </DropdownMenuItem>
 
-          {isPrestador ? (
+          {isPrestador && (
             <>
-              <DropdownMenuItem onClick={() => navigate('/agenda-prestador')}>
+              <DropdownMenuItem onClick={() => navigate('/agenda')}>
                 <Calendar className="mr-2 h-4 w-4" />
                 Agenda
               </DropdownMenuItem>
@@ -180,29 +201,37 @@ export const UnifiedHeader = () => {
                 Painel do Prestador
               </DropdownMenuItem>
             </>
-          ) : (
+          )}
+
+          <DropdownMenuItem onClick={() => navigate('/informacoes')}>
+            <Info className="mr-2 h-4 w-4" />
+            Informações
+          </DropdownMenuItem>
+
+          {!isPremium && (
+            <DropdownMenuItem onClick={() => navigate('/planos')}>
+              <Crown className="mr-2 h-4 w-4" />
+              Torne-se PRO
+            </DropdownMenuItem>
+          )}
+
+          {isAdmin && (
             <>
-              <DropdownMenuItem onClick={() => navigate('/central-ajuda')}>
-                <HelpCircle className="mr-2 h-4 w-4" />
-                Central de Ajuda
-              </DropdownMenuItem>
-              
-              <DropdownMenuItem onClick={() => navigate('/como-funciona')}>
-                <FileText className="mr-2 h-4 w-4" />
-                Como Funciona
-              </DropdownMenuItem>
-              
-              <DropdownMenuItem onClick={() => navigate('/regras-comunidade')}>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate('/admin')}>
                 <Shield className="mr-2 h-4 w-4" />
-                Regras da Comunidade
+                Painel Administrativo
               </DropdownMenuItem>
               
-              {!isPremium && (
-                <DropdownMenuItem onClick={() => navigate('/planos')}>
-                  <Crown className="mr-2 h-4 w-4" />
-                  Torne-se PRO
-                </DropdownMenuItem>
-              )}
+              <DropdownMenuItem onClick={() => navigate('/admin/moderacao')}>
+                <Shield className="mr-2 h-4 w-4" />
+                Moderação de Conteúdo
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem onClick={() => navigate('/admin/relatorios')}>
+                <BarChart3 className="mr-2 h-4 w-4" />
+                Relatórios do Sistema
+              </DropdownMenuItem>
             </>
           )}
           
@@ -235,20 +264,6 @@ export const UnifiedHeader = () => {
 
           {/* Right Actions */}
           <div className="flex items-center space-x-2">
-            {/* Service Toggle for Prestadores (Desktop only) */}
-            {isPrestador && !isMobile && !isTablet && (
-              <div className="hidden lg:flex items-center space-x-2">
-                <Switch
-                  id="service-toggle"
-                  checked={emServico}
-                  onCheckedChange={handleServiceToggle}
-                />
-                <Label htmlFor="service-toggle" className="text-sm">
-                  {emServico ? 'Em serviço' : 'Fora de serviço'}
-                </Label>
-              </div>
-            )}
-
             {/* Notifications */}
             {isAuthenticated && <NotificationBell />}
 
