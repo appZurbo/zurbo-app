@@ -160,7 +160,8 @@ export const createUnifiedTestData = async () => {
     // Clear existing data first
     console.log('🧹 Limpando dados existentes...');
     
-    const tables = [
+    // Define table names as literals to avoid TypeScript errors
+    const tablesToClear = [
       'chat_messages',
       'chat_conversations', 
       'avaliacoes',
@@ -171,10 +172,13 @@ export const createUnifiedTestData = async () => {
       'usuarios_premium',
       'users',
       'servicos'
-    ];
+    ] as const;
 
-    for (const table of tables) {
-      const { error } = await supabase.from(table).delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    for (const table of tablesToClear) {
+      const { error } = await supabase
+        .from(table)
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000');
       if (error && !error.message.includes('permission denied')) {
         console.log(`Tabela ${table} limpa ou não acessível:`, error.message);
       }

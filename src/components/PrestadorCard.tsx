@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ChatModal from './ChatModal';
-import { BotaoFavorito } from './favoritos/BotaoFavorito';
+import BotaoFavorito from './favoritos/BotaoFavorito';
 
 interface PrestadorCardProps {
   prestador: {
@@ -53,6 +53,14 @@ const PrestadorCard = ({
   const isPremium = prestador.premium || false;
   const isVerified = prestador.tipo === 'prestador' && isPremium;
   const isOnline = prestador.em_servico ?? true;
+
+  // Convert prestador data to ChatModal expected format
+  const chatModalPrestador = {
+    id: prestador.id,
+    name: prestador.nome,
+    avatar: prestador.foto_url,
+    isOnline: isOnline
+  };
 
   return (
     <>
@@ -201,7 +209,7 @@ const PrestadorCard = ({
       <ChatModal
         isOpen={showChat}
         onClose={() => setShowChat(false)}
-        prestador={prestador}
+        prestador={chatModalPrestador}
       />
     </>
   );

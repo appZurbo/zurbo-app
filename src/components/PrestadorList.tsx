@@ -12,42 +12,46 @@ interface PrestadorListProps {
   onChat: (id: string) => void;
 }
 
+// Updated mock data to match the expected interface
 const mockPrestadores = [
   {
     id: '1',
-    name: 'Ana Silva',
-    rating: 4.8,
-    reviewCount: 127,
-    distance: '0.8 km',
-    category: 'Limpeza Residencial',
-    price: 'R$ 80/dia',
-    description: 'Profissional experiente em limpeza residencial e comercial. Trabalho com produtos próprios e equipamentos modernos.',
-    responseTime: '~15 min',
-    isOnline: true,
+    nome: 'Ana Silva',
+    nota_media: 4.8,
+    endereco_cidade: 'São Paulo',
+    endereco_bairro: 'Centro',
+    premium: true,
+    tipo: 'prestador',
+    descricao_servico: 'Profissional experiente em limpeza residencial e comercial. Trabalho com produtos próprios e equipamentos modernos.',
+    telefone: '(11) 99999-1234',
+    em_servico: true,
+    foto_url: 'https://images.unsplash.com/photo-1494790108755-2616b332c32d?w=150&h=150&fit=crop&crop=face'
   },
   {
     id: '2',
-    name: 'Carlos Santos',
-    rating: 4.9,
-    reviewCount: 89,
-    distance: '1.2 km',
-    category: 'Eletricista',
-    price: 'R$ 120/hora',
-    description: 'Eletricista profissional com mais de 10 anos de experiência. Atendo emergências 24h.',
-    responseTime: '~30 min',
-    isOnline: false,
+    nome: 'Carlos Santos',
+    nota_media: 4.9,
+    endereco_cidade: 'São Paulo',
+    endereco_bairro: 'Vila Madalena',
+    premium: false,
+    tipo: 'prestador',
+    descricao_servico: 'Eletricista profissional com mais de 10 anos de experiência. Atendo emergências 24h.',
+    telefone: '(11) 88888-5678',
+    em_servico: false,
+    foto_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
   },
   {
     id: '3',
-    name: 'Maria Oliveira',
-    rating: 4.7,
-    reviewCount: 203,
-    distance: '2.1 km',
-    category: 'Cabeleireira',
-    price: 'R$ 60/serviço',
-    description: 'Cabeleireira especializada em cortes modernos e coloração. Atendimento domiciliar disponível.',
-    responseTime: '~45 min',
-    isOnline: true,
+    nome: 'Maria Oliveira',
+    nota_media: 4.7,
+    endereco_cidade: 'São Paulo',
+    endereco_bairro: 'Pinheiros',
+    premium: true,
+    tipo: 'prestador',
+    descricao_servico: 'Cabeleireira especializada em cortes modernos e coloração. Atendimento domiciliar disponível.',
+    telefone: '(11) 77777-9999',
+    em_servico: true,
+    foto_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
   },
 ];
 
@@ -144,9 +148,6 @@ const PrestadorList = ({ category, onViewProfile, onSchedule, onChat }: Prestado
           <PrestadorCard
             key={prestador.id}
             prestador={prestador}
-            onViewProfile={onViewProfile}
-            onSchedule={onSchedule}
-            onChat={onChat}
           />
         ))}
       </div>
