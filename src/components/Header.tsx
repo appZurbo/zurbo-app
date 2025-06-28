@@ -100,6 +100,7 @@ const Header = () => {
                     className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
                   >
                     <Crown className="h-5 w-5" />
+                    <span className="ml-1">PRO</span>
                   </Button>
                   <NotificationBell />
                   <DropdownMenu>

@@ -1,12 +1,15 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
+import { useToast } from '@/hooks/use-toast';
+import { useMobile } from '@/hooks/useMobile';
+import { useAuth } from '@/hooks/useAuth';
 import { 
   Star, 
   MapPin, 
@@ -19,16 +22,62 @@ import {
   Eye,
   ChevronLeft,
   ChevronRight,
-  X
+  X,
+  Plus,
+  Upload,
+  AlertTriangle
 } from 'lucide-react';
-import { useMobile } from '@/hooks/useMobile';
 
 const AdsPage = () => {
   const isMobile = useMobile();
+  const { user, profile } = useAuth();
+  const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAd, setSelectedAd] = useState(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [showCreateAd, setShowCreateAd] = useState(false);
+  const [adForm, setAdForm] = useState({
+    title: '',
+    description: '',
+    price: '',
+    category: '',
+    location: '',
+    images: [],
+    adType: 'normal'
+  });
+
+  // Phone number validation
+  const validateDescription = (text) => {
+    const phonePattern = /(\(?\d{2}\)?\s?9?\d{4}-?\d{4})|(\d{10,11})|(\(?\d{2}\)?\s?\d{4,5}-?\d{4})/;
+    return phonePattern.test(text);
+  };
+
+  const handleDescriptionChange = (e) => {
+    const text = e.target.value;
+    if (validateDescription(text)) {
+      toast({
+        title: "Conteúdo não permitido",
+        description: "Não é permitido incluir números de telefone no anúncio. Use o chat da plataforma para contato.",
+        variant: "destructive"
+      });
+      return;
+    }
+    setAdForm({ ...adForm, description: text });
+  };
+
+  const handleTitleChange = (e) => {
+    const text = e.target.value;
+    if (validateDescription(text)) {
+      toast({
+        title: "Conteúdo não permitido",
+        description: "Não é permitido incluir números de telefone no título. Use o chat da plataforma para contato.",
+        variant: "destructive"
+      });
+      return;
+    }
+    setAdForm({ ...adForm, title: text });
+  };
 
   // Fake ads data with photo carousel
   const fakeAds = [
@@ -134,6 +183,42 @@ const AdsPage = () => {
     }
   };
 
+  const handleCreateAd = () => {
+    if (!adForm.title || !adForm.description || !adForm.price || !adForm.category) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Preencha todos os campos obrigatórios.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Mock payment processing
+    if (adForm.adType === 'premium') {
+      toast({
+        title: "Pagamento necessário",
+        description: "Redirecionando para pagamento do anúncio premium...",
+      });
+      // Here would integrate with payment system
+    } else {
+      toast({
+        title: "Anúncio criado!",
+        description: "Seu anúncio foi publicado e ficará visível por 3 dias.",
+      });
+    }
+    
+    setShowCreateAd(false);
+    setAdForm({
+      title: '',
+      description: '',
+      price: '',
+      category: '',
+      location: '',
+      images: [],
+      adType: 'normal'
+    });
+  };
+
   const AdCard = ({ ad, isSponsored = false }) => (
     <Card 
       className={`relative overflow-hidden hover:shadow-lg transition-shadow cursor-pointer ${
@@ -230,12 +315,26 @@ const AdsPage = () => {
         <div className={`${isMobile ? 'px-4 py-4' : 'max-w-7xl mx-auto p-6'}`}>
           {/* Header */}
           <div className="mb-8">
-            <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-2xl' : 'text-4xl'} mb-2`}>
-              Anúncios PRO
-            </h1>
-            <p className={`text-gray-600 ${isMobile ? 'text-sm' : 'text-lg'}`}>
-              Encontre os melhores prestadores com anúncios destacados
-            </p>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-2xl' : 'text-4xl'} mb-2`}>
+                  Anúncios PRO
+                </h1>
+                <p className={`text-gray-600 ${isMobile ? 'text-sm' : 'text-lg'}`}>
+                  Encontre os melhores prestadores com anúncios destacados
+                </p>
+              </div>
+              
+              {user && (
+                <Button 
+                  onClick={() => setShowCreateAd(true)}
+                  className="bg-orange-500 hover:bg-orange-600"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Criar Anúncio
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Filters */}
@@ -323,6 +422,144 @@ const AdsPage = () => {
           )}
         </div>
       </div>
+
+      {/* Create Ad Modal */}
+      <Dialog open={showCreateAd} onOpenChange={setShowCreateAd}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Criar Novo Anúncio</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Image Upload Area */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Fotos do Anúncio (até 10)</label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                <p className="text-sm text-gray-600">Clique para adicionar fotos ou arraste aqui</p>
+                <p className="text-xs text-gray-500 mt-1">Máximo 10 fotos, formatos: JPG, PNG</p>
+              </div>
+            </div>
+
+            {/* Form Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Título *</label>
+                <Input
+                  value={adForm.title}
+                  onChange={handleTitleChange}
+                  placeholder="Ex: Eletricista Especializado"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Categoria *</label>
+                <Select value={adForm.category} onValueChange={(value) => setAdForm({...adForm, category: value})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione a categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.filter(c => c.id !== 'all').map(category => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Descrição *</label>
+              <Textarea
+                value={adForm.description}
+                onChange={handleDescriptionChange}
+                placeholder="Descreva seus serviços... (não inclua números de telefone)"
+                rows={4}
+              />
+              <div className="flex items-center gap-2 mt-2 text-sm text-amber-600">
+                <AlertTriangle className="h-4 w-4" />
+                <span>Não inclua números de telefone. Use o chat da plataforma.</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Preço *</label>
+                <Input
+                  value={adForm.price}
+                  onChange={(e) => setAdForm({...adForm, price: e.target.value})}
+                  placeholder="Ex: A partir de R$ 50"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Localização</label>
+                <Input
+                  value={adForm.location}
+                  onChange={(e) => setAdForm({...adForm, location: e.target.value})}
+                  placeholder="Bairro, Cidade"
+                />
+              </div>
+            </div>
+
+            {/* Ad Type Selection */}
+            <div>
+              <label className="block text-sm font-medium mb-4">Tipo de Anúncio</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card 
+                  className={`cursor-pointer border-2 ${adForm.adType === 'normal' ? 'border-orange-500 bg-orange-50' : 'border-gray-200'}`}
+                  onClick={() => setAdForm({...adForm, adType: 'normal'})}
+                >
+                  <CardContent className="p-4">
+                    <h3 className="font-medium mb-2">Normal - Gratuito</h3>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>• Visível por 3 dias</li>
+                      <li>• Visibilidade normal</li>
+                      <li>• Suporte padrão</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+                
+                <Card 
+                  className={`cursor-pointer border-2 ${adForm.adType === 'premium' ? 'border-yellow-500 bg-yellow-50' : 'border-gray-200'}`}
+                  onClick={() => setAdForm({...adForm, adType: 'premium'})}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Crown className="h-4 w-4 text-yellow-600" />
+                      <h3 className="font-medium">Premium - R$ 19,90</h3>
+                    </div>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>• Visível por 7 dias</li>
+                      <li>• Prioridade na exibição</li>
+                      <li>• Destaque especial</li>
+                      <li>• Suporte prioritário</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-4">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowCreateAd(false)}
+                className="flex-1"
+              >
+                Cancelar
+              </Button>
+              <Button 
+                onClick={handleCreateAd}
+                className="flex-1 bg-orange-500 hover:bg-orange-600"
+              >
+                {adForm.adType === 'premium' ? 'Pagar e Publicar' : 'Publicar Grátis'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Expanded Ad Modal */}
       <Dialog open={!!selectedAd} onOpenChange={() => setSelectedAd(null)}>

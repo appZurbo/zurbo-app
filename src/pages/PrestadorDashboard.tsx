@@ -1,22 +1,10 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  ArrowLeft, 
-  TrendingUp, 
-  Star, 
-  Calendar, 
-  MapPin, 
-  Camera,
-  Crown,
-  DollarSign,
-  Users,
-  Clock,
-  Eye
-} from 'lucide-react';
+import { ArrowLeft, Calendar, MessageCircle, Star, TrendingUp, Users, Eye, Crown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useMobile } from '@/hooks/useMobile';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 
@@ -24,62 +12,24 @@ const PrestadorDashboard = () => {
   const navigate = useNavigate();
   const { profile, isPrestador, loading } = useAuth();
   const isMobile = useMobile();
-  const [stats, setStats] = useState({
-    totalServicos: 24,
-    valorRecebido: 3250.80,
-    avaliacoes: 18,
-    notaMedia: 4.8
-  });
-
-  // Dados fake para próximos agendamentos
-  const proximosAgendamentos = [
-    {
-      id: '1',
-      servico: 'Instalação Elétrica',
-      data: '2024-01-22',
-      hora: '14:00',
-      cliente: 'Pedro Costa',
-      status: 'confirmado'
-    },
-    {
-      id: '2',
-      servico: 'Reparo Encanamento',
-      data: '2024-01-23',
-      hora: '09:30',
-      cliente: 'Maria Silva',
-      status: 'confirmado'
-    },
-    {
-      id: '3',
-      servico: 'Pintura Quarto',
-      data: '2024-01-24',
-      hora: '15:00',
-      cliente: 'João Santos',
-      status: 'pendente'
-    }
-  ];
-
-  const bairrosAtendidos = [
-    'Vila Madalena', 'Pinheiros', 'Jardins', 'Moema', 'Itaim Bibi'
-  ];
 
   if (loading) {
     return (
       <div>
         <UnifiedHeader />
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center p-4">
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-orange-500 rounded-xl flex items-center justify-center animate-pulse">
               <span className="text-white font-bold text-2xl">Z</span>
             </div>
-            <p className="text-gray-600">Carregando dashboard...</p>
+            <p className="text-gray-600">Carregando painel...</p>
           </div>
         </div>
       </div>
     );
   }
 
-  if (!profile || !isPrestador) {
+  if (!profile) {
     return (
       <div>
         <UnifiedHeader />
@@ -88,7 +38,28 @@ const PrestadorDashboard = () => {
             <CardContent className="p-6 text-center">
               <h3 className="text-lg font-semibold mb-2">Acesso Restrito</h3>
               <p className="text-gray-600 mb-4">
-                Esta página é exclusiva para prestadores de serviços.
+                Você precisa estar logado para acessar o painel.
+              </p>
+              <Button onClick={() => navigate('/auth')} className="w-full">
+                Fazer Login
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isPrestador) {
+    return (
+      <div>
+        <UnifiedHeader />
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <CardContent className="p-6 text-center">
+              <h3 className="text-lg font-semibold mb-2">Acesso Restrito</h3>
+              <p className="text-gray-600 mb-4">
+                Este painel é exclusivo para prestadores de serviços.
               </p>
               <Button onClick={() => navigate('/')} className="w-full">
                 Voltar à Página Inicial
@@ -100,243 +71,163 @@ const PrestadorDashboard = () => {
     );
   }
 
+  // Mock data para o dashboard
+  const stats = {
+    pedidosAtivos: 12,
+    avaliacaoMedia: 4.8,
+    totalGanhos: 2450.00,
+    visualizacoes: 1543
+  };
+
   return (
     <div>
       <UnifiedHeader />
       <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
-        <div className={`${isMobile ? 'px-4 py-4' : 'max-w-7xl mx-auto p-6'}`}>
+        <div className={`${isMobile ? 'px-4 py-4' : 'max-w-6xl mx-auto p-6'}`}>
           {/* Header */}
-          <div className="flex items-center gap-3 mb-6">
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/')}
-              className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}
-            >
+          <div className="flex items-center gap-4 mb-6">
+            <Button variant="ghost" onClick={() => navigate('/')} className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               {!isMobile && 'Voltar'}
             </Button>
+            
             <div className="flex-1">
-              <h1 className={`font-bold text-gray-900 flex items-center gap-2 ${isMobile ? 'text-lg' : 'text-2xl'}`}>
-                <TrendingUp className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`} />
-                Dashboard do Prestador
-              </h1>
-              <p className={`text-gray-600 flex items-center gap-1 ${isMobile ? 'text-sm' : ''}`}>
-                {profile.premium && (
-                  <Crown className="h-4 w-4 text-yellow-500" />
-                )}
-                {profile.premium ? 'Prestador Premium' : 'Prestador Padrão'}
-              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
+                  <span className="text-white font-bold text-xl">P</span>
+                </div>
+                <div>
+                  <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
+                    Painel do Prestador
+                  </h1>
+                  <div className="flex items-center gap-2">
+                    <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
+                      Bem-vindo, {profile.nome}
+                    </p>
+                    {profile.premium && (
+                      <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white">
+                        <Crown className="h-3 w-3 mr-1" />
+                        PRO
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Estatísticas Rápidas */}
+          {/* Estatísticas */}
           <div className={`grid gap-4 mb-6 ${isMobile ? 'grid-cols-2' : 'grid-cols-4'}`}>
             <Card>
               <CardContent className="p-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-orange-500" />
                   <div>
-                    <p className={`text-gray-600 ${isMobile ? 'text-xs' : 'text-sm'}`}>
-                      Serviços Realizados
-                    </p>
-                    <p className={`font-bold text-gray-900 ${isMobile ? 'text-lg' : 'text-2xl'}`}>
-                      {stats.totalServicos}
-                    </p>
+                    <p className="text-sm text-gray-600">Pedidos Ativos</p>
+                    <p className="text-2xl font-bold">{stats.pedidosAtivos}</p>
                   </div>
-                  <Users className="h-8 w-8 text-blue-500" />
                 </div>
               </CardContent>
             </Card>
-
+            
             <Card>
               <CardContent className="p-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Star className="h-5 w-5 text-yellow-500" />
                   <div>
-                    <p className={`text-gray-600 ${isMobile ? 'text-xs' : 'text-sm'}`}>
-                      Valor Recebido
-                    </p>
-                    <p className={`font-bold text-green-600 ${isMobile ? 'text-lg' : 'text-2xl'}`}>
-                      R$ {stats.valorRecebido.toFixed(2)}
-                    </p>
+                    <p className="text-sm text-gray-600">Avaliação</p>
+                    <p className="text-2xl font-bold">{stats.avaliacaoMedia}</p>
                   </div>
-                  <DollarSign className="h-8 w-8 text-green-500" />
                 </div>
               </CardContent>
             </Card>
-
+            
             <Card>
               <CardContent className="p-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-green-500" />
                   <div>
-                    <p className={`text-gray-600 ${isMobile ? 'text-xs' : 'text-sm'}`}>
-                      Nota Média
-                    </p>
-                    <p className={`font-bold text-yellow-600 ${isMobile ? 'text-lg' : 'text-2xl'}`}>
-                      {stats.notaMedia.toFixed(1)}
-                    </p>
+                    <p className="text-sm text-gray-600">Este Mês</p>
+                    <p className="text-lg font-bold">R$ {stats.totalGanhos.toFixed(2)}</p>
                   </div>
-                  <Star className="h-8 w-8 text-yellow-500" />
                 </div>
               </CardContent>
             </Card>
-
+            
             <Card>
               <CardContent className="p-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Eye className="h-5 w-5 text-blue-500" />
                   <div>
-                    <p className={`text-gray-600 ${isMobile ? 'text-xs' : 'text-sm'}`}>
-                      Avaliações
-                    </p>
-                    <p className={`font-bold text-gray-900 ${isMobile ? 'text-lg' : 'text-2xl'}`}>
-                      {stats.avaliacoes}
-                    </p>
+                    <p className="text-sm text-gray-600">Visualizações</p>
+                    <p className="text-2xl font-bold">{stats.visualizacoes}</p>
                   </div>
-                  <Star className="h-8 w-8 text-gray-500" />
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Status Premium */}
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Crown className="h-5 w-5" />
-                Status Premium
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {profile.premium ? (
+          {/* Ações Rápidas */}
+          <div className="grid gap-4 mb-6 md:grid-cols-2 lg:grid-cols-3">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/agenda-prestador')}>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-orange-500" />
+                  Agenda
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">Gerencie seus horários e agendamentos</p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/conversas')}>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageCircle className="h-5 w-5 text-blue-500" />
+                  Conversas
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">Converse com seus clientes</p>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/configuracoes')}>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-purple-500" />
+                  Perfil
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">Edite suas informações e serviços</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Upgrade PRO */}
+          {!profile.premium && (
+            <Card className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white border-0">
+              <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <Badge className="bg-yellow-100 text-yellow-800 mb-2">
-                      ✨ Prestador Premium Ativo
-                    </Badge>
-                    <p className="text-sm text-gray-600">
-                      Acesso a recursos exclusivos e destaque nos resultados
+                    <h3 className="text-xl font-bold mb-2">Upgrade para PRO</h3>
+                    <p className="text-yellow-100 mb-4">
+                      Destaque-se da concorrência e aumente seus ganhos
                     </p>
-                  </div>
-                  <Button onClick={() => navigate('/planos')}>
-                    Gerenciar Plano
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 mb-2">
-                      Upgrade para Premium e tenha acesso a recursos exclusivos!
-                    </p>
-                    <ul className="text-sm text-gray-500 space-y-1">
-                      <li>• Destaque nos resultados de busca</li>
-                      <li>• Mais fotos no portfólio</li>
-                      <li>• Estatísticas avançadas</li>
-                    </ul>
                   </div>
                   <Button 
                     onClick={() => navigate('/planos')}
-                    className="bg-yellow-600 hover:bg-yellow-700"
+                    className="bg-white text-yellow-600 hover:bg-gray-50"
                   >
-                    Ativar Premium
+                    <Crown className="h-4 w-4 mr-2" />
+                    Ver Planos
                   </Button>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Grid de Conteúdo */}
-          <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
-            {/* Próximos Agendamentos com botão Ver Agenda Completa */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-5 w-5" />
-                    Próximos Agendamentos
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => navigate('/agenda-prestador')}
-                    className="flex items-center gap-1"
-                  >
-                    <Eye className="h-4 w-4" />
-                    Ver Agenda Completa
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {proximosAgendamentos.length > 0 ? (
-                  <div className="space-y-3">
-                    {proximosAgendamentos.slice(0, 3).map((agendamento) => (
-                      <div key={agendamento.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-medium text-sm">
-                            {agendamento.servico}
-                          </p>
-                          <p className="text-xs text-gray-600">
-                            {new Date(agendamento.data).toLocaleDateString()} às {agendamento.hora}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            Cliente: {agendamento.cliente}
-                          </p>
-                        </div>
-                        <Badge variant="outline">
-                          {agendamento.status}
-                        </Badge>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-6">
-                    <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-gray-500">Nenhum agendamento próximo</p>
-                  </div>
-                )}
               </CardContent>
             </Card>
-
-            {/* Bairros Atendidos */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5" />
-                  Bairros Atendidos
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {bairrosAtendidos.length > 0 ? (
-                  <div className="space-y-2">
-                    <div className="flex flex-wrap gap-2">
-                      {bairrosAtendidos.slice(0, 6).map((bairro) => (
-                        <Badge key={bairro} variant="secondary">
-                          {bairro}
-                        </Badge>
-                      ))}
-                      {bairrosAtendidos.length > 6 && (
-                        <Badge variant="outline">
-                          +{bairrosAtendidos.length - 6} mais
-                        </Badge>
-                      )}
-                    </div>
-                    <Button 
-                      variant="outline" 
-                      className="w-full mt-3"
-                      onClick={() => navigate('/configuracoes')}
-                    >
-                      Gerenciar Bairros
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="text-center py-6">
-                    <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-gray-500 mb-3">Nenhum bairro configurado</p>
-                    <Button onClick={() => navigate('/configuracoes')}>
-                      Adicionar Bairros
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,503 +1,209 @@
-import { supabase } from '@/integrations/supabase/client';
 
-// Comprehensive test data creation function
-export const createUnifiedTestData = async () => {
-  try {
-    console.log('🚀 Starting comprehensive test data creation...');
+import { v4 as uuidv4 } from 'uuid';
 
-    // Step 1: Create basic services if they don't exist
-    const servicosBase = [
-      { nome: 'Eletricista', icone: 'Zap', cor: '#f59e0b' },
-      { nome: 'Encanador', icone: 'Wrench', cor: '#3b82f6' },
-      { nome: 'Faxina', icone: 'Sparkles', cor: '#10b981' },
-      { nome: 'Pintor', icone: 'Paintbrush', cor: '#8b5cf6' },
-      { nome: 'Jardinagem', icone: 'Flower', cor: '#059669' },
-      { nome: 'Cabeleireiro', icone: 'Scissors', cor: '#ec4899' },
-      { nome: 'Ar Condicionado', icone: 'Wind', cor: '#06b6d4' },
-      { nome: 'Manicure', icone: 'Hand', cor: '#f97316' }
-    ];
+// Generate valid UUIDs for all test data
+const generateValidUUID = () => uuidv4();
 
-    for (const servico of servicosBase) {
-      await supabase
-        .from('servicos')
-        .upsert(servico, { onConflict: 'nome' });
+export const unifiedTestData = {
+  // Users data with proper UUIDs
+  users: [
+    {
+      id: generateValidUUID(),
+      auth_id: generateValidUUID(),
+      nome: "João Silva",
+      email: "joao.silva@email.com",
+      cpf: "123.456.789-00",
+      telefone: "(11) 99999-1234",
+      endereco: "Rua das Flores, 123",
+      cidade: "São Paulo",
+      estado: "SP",
+      cep: "01234-567",
+      tipo: "prestador",
+      servicos: ["Elétrica", "Instalações"],
+      nota_media: 4.8,
+      premium: true,
+      foto_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: generateValidUUID(),
+      auth_id: generateValidUUID(),
+      nome: "Maria Santos",
+      email: "maria.santos@email.com",
+      cpf: "987.654.321-00",
+      telefone: "(11) 88888-5678",
+      endereco: "Av. Principal, 456",
+      cidade: "São Paulo",
+      estado: "SP",
+      cep: "04567-890",
+      tipo: "prestador",
+      servicos: ["Limpeza", "Organização"],
+      nota_media: 4.9,
+      premium: false,
+      foto_url: "https://images.unsplash.com/photo-1494790108755-2616b332c32?w=150&h=150&fit=crop&crop=face",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: generateValidUUID(),
+      auth_id: generateValidUUID(),
+      nome: "Carlos Oliveira",
+      email: "carlos.oliveira@email.com",
+      cpf: "456.789.123-00",
+      telefone: "(11) 77777-9012",
+      endereco: "Rua dos Trabalhadores, 789",
+      cidade: "São Paulo",
+      estado: "SP",
+      cep: "07890-123",
+      tipo: "cliente",
+      servicos: [],
+      nota_media: 0,
+      premium: false,
+      foto_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: generateValidUUID(),
+      auth_id: generateValidUUID(),
+      nome: "Ana Costa",
+      email: "ana.costa@email.com",
+      cpf: "789.123.456-00",
+      telefone: "(11) 66666-3456",
+      endereco: "Praça Central, 321",
+      cidade: "São Paulo",
+      estado: "SP",
+      cep: "01234-567",
+      tipo: "cliente",
+      servicos: [],
+      nota_media: 0,
+      premium: true,
+      foto_url: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     }
+  ],
 
-    console.log('✅ Services created/updated');
-
-    // Step 2: Delete existing fake users to avoid duplicates
-    const { error: deleteError } = await supabase
-      .from('users')
-      .delete()
-      .ilike('email', '%.test@zurbo.com');
-
-    if (deleteError) {
-      console.log('Note: Could not delete existing fake users:', deleteError.message);
+  // Conversations with proper UUIDs
+  conversations: [
+    {
+      id: generateValidUUID(),
+      participantes: [generateValidUUID(), generateValidUUID()],
+      ultimo_acesso: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     }
+  ],
 
-    // Generate proper UUIDs for auth_id
-    const generateFakeAuthId = () => {
-      return crypto.randomUUID();
-    };
-
-    // Step 3: Create comprehensive fake users (both clients and providers)
-    const fakeUsers = [
-      // Prestadores
-      {
-        nome: 'João Silva Santos',
-        email: 'joao.silva.test@zurbo.com',
-        tipo: 'prestador',
-        bio: 'Eletricista experiente com 15 anos no mercado. Especialista em instalações residenciais e comerciais.',
-        endereco_cidade: 'Sinop, Mato Grosso',
-        endereco_bairro: 'Centro',
-        endereco_rua: 'Rua das Palmeiras, 123',
-        endereco_cep: '78550-000',
-        cpf: '123.456.789-01',
-        nota_media: 4.9,
-        premium: true,
-        foto_url: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop&crop=face',
-        auth_id: generateFakeAuthId(),
-        servicos: ['Eletricista'],
-        em_servico: true,
-        descricao_servico: 'Instalações elétricas residenciais e comerciais com garantia'
-      },
-      {
-        nome: 'Maria Santos Oliveira',
-        email: 'maria.santos.test@zurbo.com',
-        tipo: 'prestador',
-        bio: 'Profissional de limpeza há 12 anos. Especialista em limpeza residencial e pós-obra.',
-        endereco_cidade: 'Sinop, Mato Grosso',
-        endereco_bairro: 'Jardim Botânico',
-        endereco_rua: 'Av. das Flores, 456',
-        endereco_cep: '78550-010',
-        cpf: '234.567.890-12',
-        nota_media: 4.8,
-        premium: false,
-        foto_url: 'https://images.unsplash.com/photo-1494790108755-2616c00e4d8b?w=200&h=200&fit=crop&crop=face',
-        auth_id: generateFakeAuthId(),
-        servicos: ['Faxina'],
-        em_servico: true,
-        descricao_servico: 'Limpeza residencial e comercial com produtos ecológicos'
-      },
-      {
-        nome: 'Carlos Eduardo Pereira',
-        email: 'carlos.pereira.test@zurbo.com',
-        tipo: 'prestador',
-        bio: 'Encanador com 18 anos de experiência. Atendo emergências 24h.',
-        endereco_cidade: 'Sinop, Mato Grosso',
-        endereco_bairro: 'Vila Rica',
-        endereco_rua: 'Rua do Comércio, 789',
-        endereco_cep: '78550-020',
-        cpf: '345.678.901-23',
-        nota_media: 4.7,
-        premium: true,
-        foto_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face',
-        auth_id: generateFakeAuthId(),
-        servicos: ['Encanador'],
-        em_servico: true,
-        descricao_servico: 'Encanamento e hidráulica com atendimento 24h'
-      },
-      {
-        nome: 'Ana Paula Santos',
-        email: 'ana.paula.test@zurbo.com',
-        tipo: 'prestador',
-        bio: 'Pintora profissional há 10 anos. Especialista em texturas e acabamentos.',
-        endereco_cidade: 'Sinop, Mato Grosso',
-        endereco_bairro: 'Setor Industrial',
-        endereco_rua: 'Rua da Indústria, 321',
-        endereco_cep: '78550-030',
-        cpf: '456.789.012-34',
-        nota_media: 4.6,
-        premium: false,
-        foto_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face',
-        auth_id: generateFakeAuthId(),
-        servicos: ['Pintor'],
-        em_servico: true,
-        descricao_servico: 'Pinturas residenciais e comerciais com acabamento profissional'
-      },
-      {
-        nome: 'Roberto Costa Lima',
-        email: 'roberto.costa.test@zurbo.com',
-        tipo: 'prestador',
-        bio: 'Jardineiro e paisagista com 14 anos de experiência.',
-        endereco_cidade: 'Sinop, Mato Grosso',
-        endereco_bairro: 'Residencial Florença',
-        endereco_rua: 'Rua das Orquídeas, 654',
-        endereco_cep: '78550-040',
-        cpf: '567.890.123-45',
-        nota_media: 4.5,
-        premium: true,
-        foto_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
-        auth_id: generateFakeAuthId(),
-        servicos: ['Jardinagem'],
-        em_servico: true,
-        descricao_servico: 'Jardinagem e paisagismo para residências e empresas'
-      },
-      // Clientes
-      {
-        nome: 'Pedro Costa Silva',
-        email: 'pedro.costa.test@zurbo.com',
-        tipo: 'cliente',
-        endereco_cidade: 'Sinop, Mato Grosso',
-        endereco_bairro: 'Centro',
-        endereco_rua: 'Rua das Palmeiras, 200',
-        endereco_cep: '78550-005',
-        cpf: '901.234.567-89',
-        premium: false,
-        foto_url: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&h=200&fit=crop&crop=face',
-        auth_id: generateFakeAuthId()
-      },
-      {
-        nome: 'Julia Ferreira Santos',
-        email: 'julia.ferreira.test@zurbo.com',
-        tipo: 'cliente',
-        endereco_cidade: 'Sinop, Mato Grosso',
-        endereco_bairro: 'Jardim Botânico',
-        endereco_rua: 'Av. das Flores, 300',
-        endereco_cep: '78550-015',
-        cpf: '012.345.678-90',
-        premium: true,
-        foto_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=face',
-        auth_id: generateFakeAuthId()
-      },
-      {
-        nome: 'Marcos Antonio Souza',
-        email: 'marcos.souza.test@zurbo.com',
-        tipo: 'cliente',
-        endereco_cidade: 'Sinop, Mato Grosso',
-        endereco_bairro: 'Vila Rica',
-        endereco_rua: 'Rua do Comércio, 400',
-        endereco_cep: '78550-025',
-        cpf: '123.987.654-32',
-        premium: false,
-        foto_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face',
-        auth_id: generateFakeAuthId()
-      }
-    ];
-
-    // Insert users one by one to handle errors gracefully
-    const insertedUsers = [];
-    for (const user of fakeUsers) {
-      const { servicos, ...userData } = user;
-      
-      try {
-        const { data: insertedUser, error: userError } = await supabase
-          .from('users')
-          .insert(userData)
-          .select()
-          .single();
-
-        if (userError) {
-          console.error('Error creating user:', user.nome, userError);
-          continue;
-        }
-
-        insertedUsers.push({ ...insertedUser, servicos });
-        console.log(`✅ Created user: ${insertedUser.nome}`);
-      } catch (error) {
-        console.error('Exception creating user:', user.nome, error);
-        continue;
-      }
+  // Messages with proper UUIDs
+  messages: [
+    {
+      id: generateValidUUID(),
+      conversation_id: generateValidUUID(),
+      sender_id: generateValidUUID(),
+      content: "Olá! Preciso de um orçamento para instalação elétrica.",
+      timestamp: new Date().toISOString(),
+      read: false
+    },
+    {
+      id: generateValidUUID(),
+      conversation_id: generateValidUUID(),
+      sender_id: generateValidUUID(),
+      content: "Claro! Posso ajudar. Quando seria conveniente para você?",
+      timestamp: new Date().toISOString(),
+      read: true
     }
+  ],
 
-    console.log(`✅ Created ${insertedUsers.length} users`);
-
-    // Step 4: Get services and create prestador_servicos relationships
-    const { data: servicos, error: servicosError } = await supabase
-      .from('servicos')
-      .select('*');
-
-    if (servicosError) {
-      console.error('Error fetching services:', servicosError);
-      return { success: false, error: `Error fetching services: ${servicosError.message}` };
+  // Reviews with proper UUIDs
+  reviews: [
+    {
+      id: generateValidUUID(),
+      avaliador_id: generateValidUUID(),
+      avaliado_id: generateValidUUID(),
+      nota: 5,
+      comentario: "Excelente profissional! Muito pontual e competente.",
+      created_at: new Date().toISOString()
+    },
+    {
+      id: generateValidUUID(),
+      avaliador_id: generateValidUUID(),
+      avaliado_id: generateValidUUID(),
+      nota: 4,
+      comentario: "Bom trabalho, recomendo!",
+      created_at: new Date().toISOString()
     }
+  ],
 
-    const servicosMap = new Map();
-    servicos?.forEach(servico => {
-      servicosMap.set(servico.nome, servico.id);
-    });
-
-    for (const user of insertedUsers) {
-      if (user.tipo === 'prestador' && user.servicos) {
-        for (const servicoNome of user.servicos) {
-          const servicoId = servicosMap.get(servicoNome);
-          if (servicoId) {
-            try {
-              await supabase
-                .from('prestador_servicos')
-                .insert({
-                  prestador_id: user.id,
-                  servico_id: servicoId,
-                  preco_min: Math.floor(Math.random() * 100) + 50,
-                  preco_max: Math.floor(Math.random() * 200) + 150
-                });
-            } catch (error) {
-              console.log('Note: Could not create prestador_servicos relationship:', error);
-            }
-          }
-        }
-      }
-
-      // Add premium records
-      if (user.premium) {
-        try {
-          await supabase
-            .from('usuarios_premium')
-            .insert({
-              usuario_id: user.id,
-              ativo: true,
-              desde: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-              expira_em: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-            });
-        } catch (error) {
-          console.log('Note: Could not create premium record:', error);
-        }
-      }
+  // Appointments with proper UUIDs
+  appointments: [
+    {
+      id: generateValidUUID(),
+      cliente_id: generateValidUUID(),
+      prestador_id: generateValidUUID(),
+      servico: "Instalação Elétrica",
+      data_agendamento: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
+      status: "agendado",
+      observacoes: "Instalação de tomadas na cozinha",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    {
+      id: generateValidUUID(),
+      cliente_id: generateValidUUID(),
+      prestador_id: generateValidUUID(),
+      servico: "Limpeza Residencial",
+      data_agendamento: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(), // Day after tomorrow
+      status: "confirmado",
+      observacoes: "Limpeza completa do apartamento",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     }
-
-    console.log('✅ Created prestador services and premium records');
-
-    // Step 5: Create conversations and messages
-    const prestadores = insertedUsers.filter(u => u.tipo === 'prestador');
-    const clientes = insertedUsers.filter(u => u.tipo === 'cliente');
-
-    if (prestadores.length === 0 || clientes.length === 0) {
-      console.log('⚠️ Not enough users to create conversations');
-      return { 
-        success: true, 
-        data: {
-          users: insertedUsers.length,
-          conversations: 0,
-          messages: 0,
-          pedidos: 0,
-          agendamentos: 0,
-          avaliacoes: 0
-        }
-      };
-    }
-
-    const conversationData = [];
-    const messageData = [];
-    const pedidoData = [];
-
-    for (let i = 0; i < 12; i++) {
-      const cliente = clientes[i % clientes.length];
-      const prestador = prestadores[i % prestadores.length];
-      const servicoNome = prestador.servicos?.[0] || 'Serviço Geral';
-
-      const conversationId = crypto.randomUUID();
-      const status = ['aguardando_preco', 'preco_definido', 'aceito', 'rejeitado', 'bloqueado'][i % 5];
-      const preco = status !== 'aguardando_preco' ? Math.floor(Math.random() * 300) + 50 : null;
-
-      conversationData.push({
-        id: conversationId,
-        cliente_id: cliente.id,
-        prestador_id: prestador.id,
-        servico_solicitado: servicoNome,
-        status,
-        preco_proposto: preco,
-        created_at: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
-        updated_at: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString()
-      });
-
-      // Create realistic messages for each conversation
-      const messageTemplates = [
-        { sender: 'cliente', content: `Olá! Tenho interesse no serviço de ${servicoNome}. Poderia me passar um orçamento?` },
-        { sender: 'prestador', content: 'Oi! Claro, posso te ajudar sim. Qual seria exatamente o trabalho a ser feito?' },
-        { sender: 'cliente', content: 'Preciso de um reparo e uma pequena instalação. Quando você poderia vir avaliar?' },
-        { sender: 'prestador', content: 'Posso ir aí amanhã pela manhã para avaliar. Seria por volta das 9h?' },
-        { sender: 'cliente', content: 'Perfeito! Aguardo você então. Qual seria mais ou menos o valor?' },
-        { sender: 'prestador', content: `Para esse tipo de serviço, fica em torno de R$ ${preco || 150}. Mas posso confirmar após ver pessoalmente.` },
-        { sender: 'cliente', content: 'Está bem! Combinado então.' },
-        { sender: 'prestador', content: 'Ótimo! Até amanhã!' }
-      ];
-
-      const messageCount = Math.min(messageTemplates.length, Math.floor(Math.random() * 6) + 3);
-      for (let j = 0; j < messageCount; j++) {
-        const template = messageTemplates[j];
-        const sender = template.sender === 'cliente' ? cliente : prestador;
-        const messageTime = new Date(Date.now() - (messageCount - j) * 60 * 60 * 1000);
-
-        messageData.push({
-          conversation_id: conversationId,
-          sender_id: sender.id,
-          message_type: 'text',
-          content: template.content,
-          created_at: messageTime.toISOString()
-        });
-      }
-
-      // Create pedido if accepted
-      if (status === 'aceito') {
-        const servicoId = servicosMap.get(servicoNome);
-        if (servicoId) {
-          pedidoData.push({
-            cliente_id: cliente.id,
-            prestador_id: prestador.id,
-            servico_id: servicoId,
-            titulo: `${servicoNome} - ${cliente.nome}`,
-            descricao: `Serviço de ${servicoNome} solicitado via chat`,
-            preco_acordado: preco,
-            status: 'aceito',
-            data_solicitacao: new Date(Date.now() - Math.random() * 15 * 24 * 60 * 60 * 1000).toISOString(),
-            endereco_completo: `${cliente.endereco_rua}, ${cliente.endereco_bairro}, ${cliente.endereco_cidade}`
-          });
-        }
-      }
-    }
-
-    // Insert conversations
-    try {
-      const { error: convError } = await supabase
-        .from('chat_conversations')
-        .insert(conversationData);
-
-      if (convError) {
-        console.error('Error creating conversations:', convError);
-        return { success: false, error: `Error creating conversations: ${convError.message}` };
-      }
-
-      console.log(`✅ Created ${conversationData.length} conversations`);
-    } catch (error) {
-      console.error('Exception creating conversations:', error);
-      return { success: false, error: `Exception creating conversations: ${error.message}` };
-    }
-
-    // Insert messages
-    try {
-      const { error: msgError } = await supabase
-        .from('chat_messages')
-        .insert(messageData);
-
-      if (msgError) {
-        console.error('Error creating messages:', msgError);
-        return { success: false, error: `Error creating messages: ${msgError.message}` };
-      }
-
-      console.log(`✅ Created ${messageData.length} messages`);
-    } catch (error) {
-      console.error('Exception creating messages:', error);
-      return { success: false, error: `Exception creating messages: ${error.message}` };
-    }
-
-    // Insert pedidos
-    if (pedidoData.length > 0) {
-      try {
-        const { error: pedidoError } = await supabase
-          .from('pedidos')
-          .insert(pedidoData);
-
-        if (pedidoError) {
-          console.error('Error creating pedidos:', pedidoError);
-          // Don't return error, continue with other data
-        } else {
-          console.log(`✅ Created ${pedidoData.length} pedidos`);
-        }
-      } catch (error) {
-        console.error('Exception creating pedidos:', error);
-        // Don't return error, continue with other data
-      }
-    }
-
-    // Step 6: Create agendamentos
-    const agendamentoData = [];
-    for (let i = 0; i < 8; i++) {
-      const prestador = prestadores[i % prestadores.length];
-      const cliente = clientes[i % clientes.length];
-      const servicoNome = prestador.servicos?.[0] || 'Serviço Geral';
-      const servicoId = servicosMap.get(servicoNome);
-      
-      if (servicoId) {
-        const futureDate = new Date();
-        futureDate.setDate(futureDate.getDate() + Math.floor(Math.random() * 30) + 1);
-
-        agendamentoData.push({
-          prestador_id: prestador.id,
-          solicitante_id: cliente.id,
-          servico_id: servicoId,
-          titulo: `${servicoNome} - ${cliente.nome}`,
-          descricao: `Agendamento de ${servicoNome}`,
-          data_agendada: futureDate.toISOString().split('T')[0],
-          hora_agendada: `${Math.floor(Math.random() * 8) + 8}:00`,
-          endereco: `${cliente.endereco_rua}, ${cliente.endereco_bairro}`,
-          status: ['pendente', 'confirmado', 'em_andamento'][Math.floor(Math.random() * 3)],
-          preco_acordado: Math.floor(Math.random() * 300) + 50,
-          cliente_nome: cliente.nome
-        });
-      }
-    }
-
-    if (agendamentoData.length > 0) {
-      try {
-        const { error: agendError } = await supabase
-          .from('agendamentos')
-          .insert(agendamentoData);
-
-        if (agendError) {
-          console.error('Error creating agendamentos:', agendError);
-          // Don't return error, continue with other data
-        } else {
-          console.log(`✅ Created ${agendamentoData.length} agendamentos`);
-        }
-      } catch (error) {
-        console.error('Exception creating agendamentos:', error);
-        // Don't return error, continue with other data
-      }
-    }
-
-    // Step 7: Create some avaliacoes
-    const avaliacaoData = [];
-    for (let i = 0; i < 15; i++) {
-      const prestador = prestadores[i % prestadores.length];
-      const cliente = clientes[i % clientes.length];
-
-      avaliacaoData.push({
-        avaliador_id: cliente.id,
-        avaliado_id: prestador.id,
-        nota: Math.floor(Math.random() * 2) + 4, // 4 ou 5 estrelas
-        comentario: [
-          'Excelente profissional! Recomendo muito.',
-          'Trabalho de qualidade, muito pontual.',
-          'Superou minhas expectativas.',
-          'Profissional competente e prestativo.',
-          'Ótimo atendimento e resultado final.'
-        ][i % 5],
-        criado_em: new Date(Date.now() - Math.random() * 60 * 24 * 60 * 60 * 1000).toISOString()
-      });
-    }
-
-    try {
-      const { error: avalError } = await supabase
-        .from('avaliacoes')
-        .insert(avaliacaoData);
-
-      if (avalError) {
-        console.error('Error creating avaliacoes:', avalError);
-        // Don't return error, continue
-      } else {
-        console.log(`✅ Created ${avaliacaoData.length} avaliacoes`);
-      }
-    } catch (error) {
-      console.error('Exception creating avaliacoes:', error);
-      // Don't return error, continue
-    }
-
-    console.log('🎉 Comprehensive test data creation completed successfully!');
-    
-    return {
-      success: true,
-      data: {
-        users: insertedUsers.length,
-        conversations: 12,
-        messages: 96,
-        pedidos: 4,
-        agendamentos: 8,
-        avaliacoes: 15
-      }
-    };
-
-  } catch (error) {
-    console.error('❌ Error creating comprehensive test data:', error);
-    return { success: false, error: error.message };
-  }
+  ]
 };
+
+// Helper function to get random UUID from test data
+export const getRandomTestUUID = () => {
+  const allUUIDs = [
+    ...unifiedTestData.users.map(u => u.id),
+    ...unifiedTestData.conversations.map(c => c.id),
+    ...unifiedTestData.messages.map(m => m.id),
+    ...unifiedTestData.reviews.map(r => r.id),
+    ...unifiedTestData.appointments.map(a => a.id)
+  ];
+  return allUUIDs[Math.floor(Math.random() * allUUIDs.length)];
+};
+
+// Generate more test users for demonstration
+export const generateMoreTestUsers = (count: number = 10) => {
+  const newUsers = [];
+  const services = ["Elétrica", "Encanamento", "Limpeza", "Pintura", "Jardinagem", "Marcenaria"];
+  const cities = ["São Paulo", "Rio de Janeiro", "Belo Horizonte", "Brasília", "Salvador"];
+  
+  for (let i = 0; i < count; i++) {
+    newUsers.push({
+      id: generateValidUUID(),
+      auth_id: generateValidUUID(),
+      nome: `Prestador ${i + 1}`,
+      email: `prestador${i + 1}@teste.com`,
+      cpf: `${String(i).padStart(3, '0')}.${String(i).padStart(3, '0')}.${String(i).padStart(3, '0')}-${String(i % 100).padStart(2, '0')}`,
+      telefone: `(11) ${String(90000 + i).padStart(5, '0')}-${String(1000 + i).padStart(4, '0')}`,
+      endereco: `Rua Teste ${i + 1}, ${i * 100}`,
+      cidade: cities[i % cities.length],
+      estado: "SP",
+      cep: `${String(i * 1000).padStart(5, '0')}-${String(i * 10).padStart(3, '0')}`,
+      tipo: "prestador",
+      servicos: [services[i % services.length]],
+      nota_media: 4.0 + (Math.random() * 1.0),
+      premium: Math.random() > 0.5,
+      foto_url: `https://images.unsplash.com/photo-150700321116${i % 10}-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face`,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    });
+  }
+  
+  return newUsers;
+};
+
+export default unifiedTestData;
