@@ -1,128 +1,86 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { 
-  Crown, 
-  Check, 
-  X, 
-  Star, 
-  Zap, 
-  Shield, 
-  TrendingUp,
-  Users,
-  MessageCircle,
-  Calendar,
-  Sparkles,
-  ArrowLeft
-} from 'lucide-react';
+import { Crown, Check, X, Star, Zap, Shield, TrendingUp, Users, MessageCircle, Calendar, Sparkles, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useToast } from '@/hooks/use-toast';
-
 const Planos = () => {
   const navigate = useNavigate();
-  const { profile, isPrestador } = useAuth();
+  const {
+    profile,
+    isPrestador
+  } = useAuth();
   const isMobile = useMobile();
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [billingCycle, setBillingCycle] = useState('monthly');
   const [userType, setUserType] = useState<'cliente' | 'prestador'>(isPrestador ? 'prestador' : 'cliente');
-
   const isPremium = profile?.premium || false;
-
   const plans = {
-    cliente: [
-      {
-        id: 'cliente-basico',
-        name: 'Básico',
-        price: { monthly: 0, yearly: 0 },
-        description: 'Para uso pessoal básico',
-        features: [
-          'Buscar prestadores',
-          'Ver avaliações',
-          'Chat básico',
-          'Suporte por email'
-        ],
-        limitations: [
-          'Máximo 3 conversas por mês',
-          'Sem prioridade no suporte',
-          'Anúncios limitados'
-        ],
-        popular: false,
-        current: !isPremium && !isPrestador
+    cliente: [{
+      id: 'cliente-basico',
+      name: 'Básico',
+      price: {
+        monthly: 0,
+        yearly: 0
       },
-      {
-        id: 'cliente-pro',
-        name: 'PRO',
-        price: { monthly: 9.90, yearly: 99.90 },
-        description: 'Para clientes que querem o melhor',
-        features: [
-          'Tudo do plano Básico',
-          'Conversas ilimitadas',
-          'Suporte prioritário',
-          'Sem anúncios',
-          'Relatórios de gastos',
-          'Desconto em serviços'
-        ],
-        limitations: [],
-        popular: true,
-        current: isPremium && !isPrestador
-      }
-    ],
-    prestador: [
-      {
-        id: 'prestador-basico',
-        name: 'Básico',
-        price: { monthly: 0, yearly: 0 },
-        description: 'Para começar como prestador',
-        features: [
-          'Perfil básico',
-          'Receber pedidos',
-          'Chat básico',
-          '5 fotos no portfólio'
-        ],
-        limitations: [
-          'Máximo 10 pedidos por mês',
-          'Sem destaque nos resultados',
-          'Suporte limitado'
-        ],
-        popular: false,
-        current: !isPremium && isPrestador
+      description: 'Para uso pessoal básico',
+      features: ['Buscar prestadores', 'Ver avaliações', 'Chat básico', 'Suporte por email'],
+      limitations: ['Máximo 3 conversas por mês', 'Sem prioridade no suporte', 'Anúncios limitados'],
+      popular: false,
+      current: !isPremium && !isPrestador
+    }, {
+      id: 'cliente-pro',
+      name: 'PRO',
+      price: {
+        monthly: 9.90,
+        yearly: 99.90
       },
-      {
-        id: 'prestador-pro',
-        name: 'PRO',
-        price: { monthly: 39.90, yearly: 399.90 },
-        description: 'Para prestadores profissionais',
-        features: [
-          'Tudo do plano Básico',
-          'Pedidos ilimitados',
-          'Destaque nos resultados',
-          'Badge PRO verificado',
-          'Portfólio ilimitado',
-          'Estatísticas detalhadas',
-          'Suporte prioritário',
-          'Anúncios patrocinados'
-        ],
-        limitations: [],
-        popular: true,
-        current: isPremium && isPrestador
-      }
-    ]
+      description: 'Para clientes que querem o melhor',
+      features: ['Tudo do plano Básico', 'Conversas ilimitadas', 'Suporte prioritário', 'Sem anúncios', 'Relatórios de gastos', 'Desconto em serviços'],
+      limitations: [],
+      popular: true,
+      current: isPremium && !isPrestador
+    }],
+    prestador: [{
+      id: 'prestador-basico',
+      name: 'Básico',
+      price: {
+        monthly: 0,
+        yearly: 0
+      },
+      description: 'Para começar como prestador',
+      features: ['Perfil básico', 'Receber pedidos', 'Chat básico', '5 fotos no portfólio'],
+      limitations: ['Máximo 10 pedidos por mês', 'Sem destaque nos resultados', 'Suporte limitado'],
+      popular: false,
+      current: !isPremium && isPrestador
+    }, {
+      id: 'prestador-pro',
+      name: 'PRO',
+      price: {
+        monthly: 39.90,
+        yearly: 399.90
+      },
+      description: 'Para prestadores profissionais',
+      features: ['Tudo do plano Básico', 'Pedidos ilimitados', 'Destaque nos resultados', 'Badge PRO verificado', 'Portfólio ilimitado', 'Estatísticas detalhadas', 'Suporte prioritário', 'Anúncios patrocinados'],
+      limitations: [],
+      popular: true,
+      current: isPremium && isPrestador
+    }]
   };
-
   const currentPlans = plans[userType];
-
   const handleSelectPlan = (planId: string) => {
     if (planId.includes('basico')) {
       toast({
         title: "Plano Básico",
-        description: "Você já está no plano básico gratuito!",
+        description: "Você já está no plano básico gratuito!"
       });
       return;
     }
@@ -130,9 +88,8 @@ const Planos = () => {
     // Mock payment process
     toast({
       title: "Redirecionando para pagamento",
-      description: "Em breve você será redirecionado para finalizar sua assinatura PRO.",
+      description: "Em breve você será redirecionado para finalizar sua assinatura PRO."
     });
-    
     setTimeout(() => {
       toast({
         title: "Pagamento simulado",
@@ -141,49 +98,35 @@ const Planos = () => {
       });
     }, 2000);
   };
-
-  const PlanCard = ({ plan }: { plan: any }) => {
+  const PlanCard = ({
+    plan
+  }: {
+    plan: any;
+  }) => {
     const isCurrentPlan = plan.current;
     const price = billingCycle === 'yearly' ? plan.price.yearly : plan.price.monthly;
     const savingPercent = billingCycle === 'yearly' ? Math.round((1 - plan.price.yearly / (plan.price.monthly * 12)) * 100) : 0;
-
-    return (
-      <Card 
-        className={`relative overflow-hidden transition-all duration-300 hover:shadow-xl ${
-          plan.popular 
-            ? 'border-2 border-gradient-to-r from-yellow-400 to-yellow-600 shadow-lg bg-gradient-to-br from-yellow-50 to-amber-50' 
-            : 'border border-gray-200 hover:border-orange-300'
-        } ${
-          isCurrentPlan ? 'ring-2 ring-green-500' : ''
-        }`}
-        style={plan.popular ? {
-          boxShadow: '0 0 30px rgba(251, 191, 36, 0.3)',
-          border: '2px solid #f59e0b'
-        } : {}}
-      >
-        {plan.popular && (
-          <div className="absolute top-0 left-0 right-0">
+    return <Card className={`relative overflow-hidden transition-all duration-300 hover:shadow-xl ${plan.popular ? 'border-2 border-gradient-to-r from-yellow-400 to-yellow-600 shadow-lg bg-gradient-to-br from-yellow-50 to-amber-50' : 'border border-gray-200 hover:border-orange-300'} ${isCurrentPlan ? 'ring-2 ring-green-500' : ''}`} style={plan.popular ? {
+      boxShadow: '0 0 30px rgba(251, 191, 36, 0.3)',
+      border: '2px solid #f59e0b'
+    } : {}}>
+        {plan.popular && <div className="absolute top-0 left-0 right-0">
             <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white text-center py-2 font-medium">
               <Sparkles className="inline h-4 w-4 mr-1" />
               MAIS POPULAR
             </div>
-          </div>
-        )}
+          </div>}
         
-        {isCurrentPlan && (
-          <div className="absolute top-0 right-0">
+        {isCurrentPlan && <div className="absolute top-0 right-0">
             <Badge className="bg-green-500 text-white rounded-none rounded-bl-lg">
               <Check className="h-3 w-3 mr-1" />
               Atual
             </Badge>
-          </div>
-        )}
+          </div>}
 
         <CardHeader className={`text-center ${plan.popular ? 'pt-16' : 'pt-6'}`}>
           <div className="flex items-center justify-center mb-2">
-            {plan.id.includes('pro') && (
-              <Crown className="h-6 w-6 text-yellow-500 mr-2" />
-            )}
+            {plan.id.includes('pro') && <Crown className="h-6 w-6 text-yellow-500 mr-2" />}
             <CardTitle className="text-2xl">{plan.name}</CardTitle>
           </div>
           
@@ -197,11 +140,9 @@ const Planos = () => {
               </span>
             </div>
             
-            {billingCycle === 'yearly' && savingPercent > 0 && (
-              <Badge variant="secondary" className="bg-green-100 text-green-800">
+            {billingCycle === 'yearly' && savingPercent > 0 && <Badge variant="secondary" className="bg-green-100 text-green-800">
                 Economize {savingPercent}%
-              </Badge>
-            )}
+              </Badge>}
           </div>
           
           <p className="text-gray-600 mt-2">{plan.description}</p>
@@ -214,75 +155,45 @@ const Planos = () => {
               Recursos inclusos
             </h4>
             <ul className="space-y-2">
-              {plan.features.map((feature: string, index: number) => (
-                <li key={index} className="flex items-start">
+              {plan.features.map((feature: string, index: number) => <li key={index} className="flex items-start">
                   <Check className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
                   <span className="text-sm">{feature}</span>
-                </li>
-              ))}
+                </li>)}
             </ul>
           </div>
 
-          {plan.limitations.length > 0 && (
-            <div>
+          {plan.limitations.length > 0 && <div>
               <h4 className="font-semibold text-red-700 mb-3 flex items-center">
                 <X className="h-4 w-4 mr-2" />
                 Limitações
               </h4>
               <ul className="space-y-2">
-                {plan.limitations.map((limitation: string, index: number) => (
-                  <li key={index} className="flex items-start">
+                {plan.limitations.map((limitation: string, index: number) => <li key={index} className="flex items-start">
                     <X className="h-4 w-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" />
                     <span className="text-sm text-gray-600">{limitation}</span>
-                  </li>
-                ))}
+                  </li>)}
               </ul>
-            </div>
-          )}
+            </div>}
 
-          <Button
-            onClick={() => handleSelectPlan(plan.id)}
-            disabled={isCurrentPlan}
-            className={`w-full ${
-              plan.popular 
-                ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700' 
-                : 'bg-orange-500 hover:bg-orange-600'
-            } ${isCurrentPlan ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            {isCurrentPlan ? (
-              <>
+          <Button onClick={() => handleSelectPlan(plan.id)} disabled={isCurrentPlan} className={`w-full ${plan.popular ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700' : 'bg-orange-500 hover:bg-orange-600'} ${isCurrentPlan ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            {isCurrentPlan ? <>
                 <Check className="h-4 w-4 mr-2" />
                 Plano Atual
-              </>
-            ) : plan.price.monthly === 0 ? (
-              'Manter Gratuito'
-            ) : (
-              <>
+              </> : plan.price.monthly === 0 ? 'Manter Gratuito' : <>
                 <Crown className="h-4 w-4 mr-2" />
                 Assinar {plan.name}
-              </>
-            )}
+              </>}
           </Button>
         </CardContent>
-      </Card>
-    );
+      </Card>;
   };
-
-  return (
-    <div>
+  return <div>
       <UnifiedHeader />
       <div className={`min-h-screen bg-gradient-to-b from-orange-50 to-white ${isMobile ? 'pb-20' : ''}`}>
         <div className={`${isMobile ? 'px-4 py-6' : 'max-w-7xl mx-auto p-8'}`}>
           {/* Header */}
           <div className="text-center mb-12">
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/')} 
-              className="mb-6"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar
-            </Button>
+            
             
             <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-xl flex items-center justify-center">
               <Crown className="h-8 w-8 text-white" />
@@ -298,19 +209,11 @@ const Planos = () => {
             {/* User Type Selection */}
             <div className="flex justify-center mb-8">
               <div className="bg-gray-100 p-1 rounded-lg flex">
-                <Button
-                  variant={userType === 'cliente' ? 'default' : 'ghost'}
-                  onClick={() => setUserType('cliente')}
-                  className={userType === 'cliente' ? 'bg-orange-500 hover:bg-orange-600' : ''}
-                >
+                <Button variant={userType === 'cliente' ? 'default' : 'ghost'} onClick={() => setUserType('cliente')} className={userType === 'cliente' ? 'bg-orange-500 hover:bg-orange-600' : ''}>
                   <Users className="h-4 w-4 mr-2" />
                   Cliente
                 </Button>
-                <Button
-                  variant={userType === 'prestador' ? 'default' : 'ghost'}
-                  onClick={() => setUserType('prestador')}
-                  className={userType === 'prestador' ? 'bg-orange-500 hover:bg-orange-600' : ''}
-                >
+                <Button variant={userType === 'prestador' ? 'default' : 'ghost'} onClick={() => setUserType('prestador')} className={userType === 'prestador' ? 'bg-orange-500 hover:bg-orange-600' : ''}>
                   <Shield className="h-4 w-4 mr-2" />
                   Prestador
                 </Button>
@@ -322,28 +225,20 @@ const Planos = () => {
               <Label htmlFor="billing-toggle" className={billingCycle === 'monthly' ? 'font-semibold' : ''}>
                 Mensal
               </Label>
-              <Switch
-                id="billing-toggle"
-                checked={billingCycle === 'yearly'}
-                onCheckedChange={(checked) => setBillingCycle(checked ? 'yearly' : 'monthly')}
-              />
+              <Switch id="billing-toggle" checked={billingCycle === 'yearly'} onCheckedChange={checked => setBillingCycle(checked ? 'yearly' : 'monthly')} />
               <Label htmlFor="billing-toggle" className={billingCycle === 'yearly' ? 'font-semibold' : ''}>
                 Anual
               </Label>
-              {billingCycle === 'yearly' && (
-                <Badge variant="secondary" className="bg-green-100 text-green-800 ml-2">
+              {billingCycle === 'yearly' && <Badge variant="secondary" className="bg-green-100 text-green-800 ml-2">
                   <TrendingUp className="h-3 w-3 mr-1" />
                   Economize até 17%
-                </Badge>
-              )}
+                </Badge>}
             </div>
           </div>
 
           {/* Plans Grid */}
           <div className={`grid gap-8 mb-12 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
-            {currentPlans.map((plan) => (
-              <PlanCard key={plan.id} plan={plan} />
-            ))}
+            {currentPlans.map(plan => <PlanCard key={plan.id} plan={plan} />)}
           </div>
 
           {/* Benefits Section */}
@@ -408,8 +303,6 @@ const Planos = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Planos;
