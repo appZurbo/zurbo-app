@@ -7,9 +7,9 @@ export interface Notification {
   id: string;
   user_id: string;
   title: string;
-  message: string;
+  content: string;
   type: 'new_client' | 'new_review' | 'new_message' | 'system_update' | 'payment' | 'schedule_change';
-  read: boolean;
+  is_read: boolean;
   created_at: string;
 }
 
@@ -19,31 +19,35 @@ export const useNotifications = () => {
   const { profile } = useAuth();
 
   useEffect(() => {
-    if (profile) {
-      loadNotifications();
-      // Set up real-time subscription for new notifications
-      const channel = supabase
-        .channel('notifications-changes')
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'notifications',
-            filter: `user_id=eq.${profile.id}`
-          },
-          (payload) => {
-            const newNotification = payload.new as Notification;
-            setNotifications(prev => [newNotification, ...prev]);
-          }
-        )
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
+    if (!profile) {
+      setNotifications([]);
+      return;
     }
-  }, [profile]);
+
+    loadNotifications();
+    
+    // Set up real-time subscription for new notifications
+    const channel = supabase
+      .channel('notifications-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${profile.id}`
+        },
+        (payload) => {
+          const newNotification = payload.new as Notification;
+          setNotifications(prev => [newNotification, ...prev]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [profile?.id]); // Only depend on profile.id to prevent unnecessary re-subscriptions
 
   const loadNotifications = async () => {
     if (!profile) return;
@@ -76,14 +80,14 @@ export const useNotifications = () => {
     try {
       const { error } = await supabase
         .from('notifications')
-        .update({ read: true })
+        .update({ is_read: true })
         .eq('id', notificationId);
 
       if (error) throw error;
 
       setNotifications(prev =>
         prev.map(notif =>
-          notif.id === notificationId ? { ...notif, read: true } : notif
+          notif.id === notificationId ? { ...notif, is_read: true } : notif
         )
       );
     } catch (error) {
@@ -97,14 +101,14 @@ export const useNotifications = () => {
     try {
       const { error } = await supabase
         .from('notifications')
-        .update({ read: true })
+        .update({ is_read: true })
         .eq('user_id', profile.id)
-        .eq('read', false);
+        .eq('is_read', false);
 
       if (error) throw error;
 
       setNotifications(prev =>
-        prev.map(notif => ({ ...notif, read: true }))
+        prev.map(notif => ({ ...notif, is_read: true }))
       );
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
@@ -123,16 +127,16 @@ export const useNotifications = () => {
     }
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter(n => !n.is_read).length;
   const recentNotifications = notifications.slice(0, 5);
-  const hasNewMessages = unreadCount > 0; // Add this property
+  const hasNewMessages = unreadCount > 0;
 
   return {
     notifications,
     recentNotifications,
     loading,
     unreadCount,
-    hasNewMessages, // Include this in the return object
+    hasNewMessages,
     markAsRead,
     markAllAsRead,
     loadNotifications,

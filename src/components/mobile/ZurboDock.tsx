@@ -14,7 +14,9 @@ export const ZurboDock = () => {
   const { profile, isAuthenticated, isPrestador } = useAuth();
   const isMobile = useMobile();
   const isTablet = useTablet();
-  const { hasNewMessages } = useNotifications();
+  
+  // Only use notifications hook if user is authenticated to prevent errors
+  const { hasNewMessages } = isAuthenticated ? useNotifications() : { hasNewMessages: false };
   
   // Show only on mobile and tablet
   if (!isMobile && !isTablet) return null;
