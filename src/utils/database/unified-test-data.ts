@@ -15,12 +15,12 @@ export const unifiedTestData = {
       email: "joao.silva@email.com",
       cpf: "123.456.789-00",
       telefone: "(11) 99999-1234",
-      endereco: "Rua das Flores, 123",
-      cidade: "São Paulo",
-      estado: "SP",
-      cep: "01234-567",
+      endereco_rua: "Rua das Flores",
+      endereco_numero: "123",
+      endereco_bairro: "Centro",
+      endereco_cidade: "São Paulo",
+      endereco_cep: "01234-567",
       tipo: "prestador",
-      servicos: ["Elétrica", "Instalações"],
       nota_media: 4.8,
       premium: true,
       foto_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
@@ -34,12 +34,12 @@ export const unifiedTestData = {
       email: "maria.santos@email.com",
       cpf: "987.654.321-00",
       telefone: "(11) 88888-5678",
-      endereco: "Av. Principal, 456",
-      cidade: "São Paulo",
-      estado: "SP",
-      cep: "04567-890",
+      endereco_rua: "Av. Principal",
+      endereco_numero: "456",
+      endereco_bairro: "Vila Madalena",
+      endereco_cidade: "São Paulo",
+      endereco_cep: "04567-890",
       tipo: "prestador",
-      servicos: ["Limpeza", "Organização"],
       nota_media: 4.9,
       premium: false,
       foto_url: "https://images.unsplash.com/photo-1494790108755-2616b332c32?w=150&h=150&fit=crop&crop=face",
@@ -53,12 +53,12 @@ export const unifiedTestData = {
       email: "carlos.oliveira@email.com",
       cpf: "456.789.123-00",
       telefone: "(11) 77777-9012",
-      endereco: "Rua dos Trabalhadores, 789",
-      cidade: "São Paulo",
-      estado: "SP",
-      cep: "07890-123",
+      endereco_rua: "Rua dos Trabalhadores",
+      endereco_numero: "789",
+      endereco_bairro: "Centro",
+      endereco_cidade: "São Paulo",
+      endereco_cep: "07890-123",
       tipo: "cliente",
-      servicos: [],
       nota_media: 0,
       premium: false,
       foto_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
@@ -72,12 +72,12 @@ export const unifiedTestData = {
       email: "ana.costa@email.com",
       cpf: "789.123.456-00",
       telefone: "(11) 66666-3456",
-      endereco: "Praça Central, 321",
-      cidade: "São Paulo",
-      estado: "SP",
-      cep: "01234-567",
+      endereco_rua: "Praça Central",
+      endereco_numero: "321",
+      endereco_bairro: "Pinheiros",
+      endereco_cidade: "São Paulo",
+      endereco_cep: "01234-567",
       tipo: "cliente",
-      servicos: [],
       nota_media: 0,
       premium: true,
       foto_url: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
@@ -86,80 +86,21 @@ export const unifiedTestData = {
     }
   ],
 
-  // Conversations with proper UUIDs
-  conversations: [
+  // Services data
+  services: [
     {
       id: generateValidUUID(),
-      participantes: [generateValidUUID(), generateValidUUID()],
-      ultimo_acesso: new Date().toISOString(),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }
-  ],
-
-  // Messages with proper UUIDs
-  messages: [
-    {
-      id: generateValidUUID(),
-      conversation_id: generateValidUUID(),
-      sender_id: generateValidUUID(),
-      content: "Olá! Preciso de um orçamento para instalação elétrica.",
-      timestamp: new Date().toISOString(),
-      read: false
+      nome: "Instalação Elétrica",
+      ativo: true,
+      icone: "zap",
+      cor: "#f97316"
     },
     {
       id: generateValidUUID(),
-      conversation_id: generateValidUUID(),
-      sender_id: generateValidUUID(),
-      content: "Claro! Posso ajudar. Quando seria conveniente para você?",
-      timestamp: new Date().toISOString(),
-      read: true
-    }
-  ],
-
-  // Reviews with proper UUIDs
-  reviews: [
-    {
-      id: generateValidUUID(),
-      avaliador_id: generateValidUUID(),
-      avaliado_id: generateValidUUID(),
-      nota: 5,
-      comentario: "Excelente profissional! Muito pontual e competente.",
-      created_at: new Date().toISOString()
-    },
-    {
-      id: generateValidUUID(),
-      avaliador_id: generateValidUUID(),
-      avaliado_id: generateValidUUID(),
-      nota: 4,
-      comentario: "Bom trabalho, recomendo!",
-      created_at: new Date().toISOString()
-    }
-  ],
-
-  // Appointments with proper UUIDs
-  appointments: [
-    {
-      id: generateValidUUID(),
-      cliente_id: generateValidUUID(),
-      prestador_id: generateValidUUID(),
-      servico: "Instalação Elétrica",
-      data_agendamento: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
-      status: "agendado",
-      observacoes: "Instalação de tomadas na cozinha",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: generateValidUUID(),
-      cliente_id: generateValidUUID(),
-      prestador_id: generateValidUUID(),
-      servico: "Limpeza Residencial",
-      data_agendamento: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(), // Day after tomorrow
-      status: "confirmado",
-      observacoes: "Limpeza completa do apartamento",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      nome: "Limpeza Residencial",
+      ativo: true,
+      icone: "sparkles",
+      cor: "#06b6d4"
     }
   ]
 };
@@ -169,6 +110,18 @@ export const createUnifiedTestData = async () => {
   try {
     console.log('🚀 Starting unified test data creation...');
     
+    // Create services first
+    const { data: servicesData, error: servicesError } = await supabase
+      .from('servicos')
+      .insert(unifiedTestData.services)
+      .select();
+
+    if (servicesError) {
+      console.error('Error creating services:', servicesError);
+    } else {
+      console.log('✅ Services created:', servicesData?.length || 0);
+    }
+
     // Create users
     const { data: usersData, error: usersError } = await supabase
       .from('users')
@@ -186,20 +139,27 @@ export const createUnifiedTestData = async () => {
     const userIds = usersData?.map(u => u.id) || [];
     const prestadorIds = usersData?.filter(u => u.tipo === 'prestador').map(u => u.id) || [];
     const clienteIds = usersData?.filter(u => u.tipo === 'cliente').map(u => u.id) || [];
+    const serviceIds = servicesData?.map(s => s.id) || [];
 
     // Create conversations with real user IDs
     const conversationsToInsert = [
       {
         id: generateValidUUID(),
-        participantes: [prestadorIds[0] || generateValidUUID(), clienteIds[0] || generateValidUUID()],
-        ultimo_acesso: new Date().toISOString(),
+        cliente_id: clienteIds[0] || generateValidUUID(),
+        prestador_id: prestadorIds[0] || generateValidUUID(),
+        servico_solicitado: "Instalação Elétrica",
+        status: "aguardando_preco",
+        preco_proposto: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       },
       {
         id: generateValidUUID(),
-        participantes: [prestadorIds[1] || generateValidUUID(), clienteIds[1] || generateValidUUID()],
-        ultimo_acesso: new Date().toISOString(),
+        cliente_id: clienteIds[1] || generateValidUUID(),
+        prestador_id: prestadorIds[1] || generateValidUUID(),
+        servico_solicitado: "Limpeza Residencial",
+        status: "negociando",
+        preco_proposto: 120.00,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       }
@@ -224,24 +184,24 @@ export const createUnifiedTestData = async () => {
         conversation_id: conversationIds[0] || generateValidUUID(),
         sender_id: clienteIds[0] || generateValidUUID(),
         content: "Olá! Preciso de um orçamento para instalação elétrica.",
-        timestamp: new Date().toISOString(),
-        read: false
+        created_at: new Date().toISOString(),
+        message_type: "text"
       },
       {
         id: generateValidUUID(),
         conversation_id: conversationIds[0] || generateValidUUID(),
         sender_id: prestadorIds[0] || generateValidUUID(),
         content: "Claro! Posso ajudar. Quando seria conveniente para você?",
-        timestamp: new Date().toISOString(),
-        read: true
+        created_at: new Date().toISOString(),
+        message_type: "text"
       },
       {
         id: generateValidUUID(),
         conversation_id: conversationIds[1] || generateValidUUID(),
         sender_id: clienteIds[1] || generateValidUUID(),
         content: "Preciso de uma limpeza completa para o fim de semana.",
-        timestamp: new Date().toISOString(),
-        read: false
+        created_at: new Date().toISOString(),
+        message_type: "text"
       }
     ];
 
@@ -264,7 +224,7 @@ export const createUnifiedTestData = async () => {
         avaliado_id: prestadorIds[0] || generateValidUUID(),
         nota: 5,
         comentario: "Excelente profissional! Muito pontual e competente.",
-        created_at: new Date().toISOString()
+        criado_em: new Date().toISOString()
       },
       {
         id: generateValidUUID(),
@@ -272,7 +232,7 @@ export const createUnifiedTestData = async () => {
         avaliado_id: prestadorIds[1] || generateValidUUID(),
         nota: 4,
         comentario: "Bom trabalho, recomendo!",
-        created_at: new Date().toISOString()
+        criado_em: new Date().toISOString()
       }
     ];
 
@@ -287,29 +247,40 @@ export const createUnifiedTestData = async () => {
       console.log('✅ Reviews created:', reviewsData?.length || 0);
     }
 
-    // Create appointments
+    // Create appointments with correct field names
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dayAfterTomorrow = new Date();
+    dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+
     const appointmentsToInsert = [
       {
         id: generateValidUUID(),
-        cliente_id: clienteIds[0] || generateValidUUID(),
+        solicitante_id: clienteIds[0] || generateValidUUID(),
         prestador_id: prestadorIds[0] || generateValidUUID(),
-        servico: "Instalação Elétrica",
-        data_agendamento: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        servico_id: serviceIds[0] || generateValidUUID(),
+        titulo: "Instalação Elétrica",
+        descricao: "Instalação de tomadas na cozinha",
+        data_agendada: tomorrow.toISOString().split('T')[0],
+        hora_agendada: "14:00:00",
         status: "agendado",
-        observacoes: "Instalação de tomadas na cozinha",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        endereco: "Rua das Flores, 123",
+        preco_acordado: 150.00,
+        criado_em: new Date().toISOString()
       },
       {
         id: generateValidUUID(),
-        cliente_id: clienteIds[1] || generateValidUUID(),
+        solicitante_id: clienteIds[1] || generateValidUUID(),
         prestador_id: prestadorIds[1] || generateValidUUID(),
-        servico: "Limpeza Residencial",
-        data_agendamento: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
+        servico_id: serviceIds[1] || generateValidUUID(),
+        titulo: "Limpeza Residencial",
+        descricao: "Limpeza completa do apartamento",
+        data_agendada: dayAfterTomorrow.toISOString().split('T')[0],
+        hora_agendada: "09:00:00",
         status: "confirmado",
-        observacoes: "Limpeza completa do apartamento",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        endereco: "Av. Principal, 456",
+        preco_acordado: 120.00,
+        criado_em: new Date().toISOString()
       }
     ];
 
@@ -324,15 +295,19 @@ export const createUnifiedTestData = async () => {
       console.log('✅ Appointments created:', appointmentsData?.length || 0);
     }
 
-    // Create some pedidos (orders)
+    // Create pedidos with correct field structure
     const pedidosToInsert = [
       {
         id: generateValidUUID(),
         cliente_id: clienteIds[0] || generateValidUUID(),
         prestador_id: prestadorIds[0] || generateValidUUID(),
-        servico: "Instalação Elétrica",
+        servico_id: serviceIds[0] || generateValidUUID(),
+        titulo: "Instalação Elétrica",
         descricao: "Preciso instalar tomadas na cozinha",
         status: "pendente",
+        endereco_completo: "Rua das Flores, 123, Centro, São Paulo",
+        preco_acordado: null,
+        data_solicitacao: new Date().toISOString(),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       },
@@ -340,9 +315,13 @@ export const createUnifiedTestData = async () => {
         id: generateValidUUID(),
         cliente_id: clienteIds[1] || generateValidUUID(),
         prestador_id: prestadorIds[1] || generateValidUUID(),
-        servico: "Limpeza Residencial",
+        servico_id: serviceIds[1] || generateValidUUID(),
+        titulo: "Limpeza Residencial",
         descricao: "Limpeza completa do apartamento",
         status: "aceito",
+        endereco_completo: "Av. Principal, 456, Vila Madalena, São Paulo",
+        preco_acordado: 120.00,
+        data_solicitacao: new Date().toISOString(),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       }
@@ -361,6 +340,7 @@ export const createUnifiedTestData = async () => {
 
     const summary = {
       users: usersData?.length || 0,
+      services: servicesData?.length || 0,
       conversations: conversationsData?.length || 0,
       messages: messagesData?.length || 0,
       pedidos: pedidosData?.length || 0,
@@ -388,10 +368,7 @@ export const createUnifiedTestData = async () => {
 export const getRandomTestUUID = () => {
   const allUUIDs = [
     ...unifiedTestData.users.map(u => u.id),
-    ...unifiedTestData.conversations.map(c => c.id),
-    ...unifiedTestData.messages.map(m => m.id),
-    ...unifiedTestData.reviews.map(r => r.id),
-    ...unifiedTestData.appointments.map(a => a.id)
+    ...unifiedTestData.services.map(s => s.id)
   ];
   return allUUIDs[Math.floor(Math.random() * allUUIDs.length)];
 };
@@ -399,7 +376,6 @@ export const getRandomTestUUID = () => {
 // Generate more test users for demonstration
 export const generateMoreTestUsers = (count: number = 10) => {
   const newUsers = [];
-  const services = ["Elétrica", "Encanamento", "Limpeza", "Pintura", "Jardinagem", "Marcenaria"];
   const cities = ["São Paulo", "Rio de Janeiro", "Belo Horizonte", "Brasília", "Salvador"];
   
   for (let i = 0; i < count; i++) {
@@ -410,12 +386,12 @@ export const generateMoreTestUsers = (count: number = 10) => {
       email: `prestador${i + 1}@teste.com`,
       cpf: `${String(i).padStart(3, '0')}.${String(i).padStart(3, '0')}.${String(i).padStart(3, '0')}-${String(i % 100).padStart(2, '0')}`,
       telefone: `(11) ${String(90000 + i).padStart(5, '0')}-${String(1000 + i).padStart(4, '0')}`,
-      endereco: `Rua Teste ${i + 1}, ${i * 100}`,
-      cidade: cities[i % cities.length],
-      estado: "SP",
-      cep: `${String(i * 1000).padStart(5, '0')}-${String(i * 10).padStart(3, '0')}`,
+      endereco_rua: `Rua Teste ${i + 1}`,
+      endereco_numero: String(i * 100),
+      endereco_bairro: "Centro",
+      endereco_cidade: cities[i % cities.length],
+      endereco_cep: `${String(i * 1000).padStart(5, '0')}-${String(i * 10).padStart(3, '0')}`,
       tipo: "prestador",
-      servicos: [services[i % services.length]],
       nota_media: 4.0 + (Math.random() * 1.0),
       premium: Math.random() > 0.5,
       foto_url: `https://images.unsplash.com/photo-150700321116${i % 10}-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face`,
