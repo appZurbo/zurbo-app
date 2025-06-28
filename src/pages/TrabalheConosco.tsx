@@ -1,137 +1,167 @@
-
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Users, Target, Star, TrendingUp } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle, Users, MapPin, Clock, Star, Wrench, ArrowRight, Smartphone, Calendar, CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
-import { useMobile } from '@/hooks/useMobile';
+import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
+import { ModernFooter } from '@/components/layout/ModernFooter';
 
 const TrabalheConosco = () => {
   const navigate = useNavigate();
-  const isMobile = useMobile();
+  
+  const beneficios = [{
+    icon: Users,
+    titulo: "Clientes Qualificados",
+    descricao: "Conecte-se com clientes que realmente precisam dos seus serviços"
+  }, {
+    icon: MapPin,
+    titulo: "Área de Atuação Flexível",
+    descricao: "Defina os bairros onde você quer trabalhar"
+  }, {
+    icon: Clock,
+    titulo: "Horários Flexíveis",
+    descricao: "Você define quando quer trabalhar"
+  }, {
+    icon: Star,
+    titulo: "Sistema de Avaliações",
+    descricao: "Construa sua reputação com avaliações reais"
+  }, {
+    icon: Smartphone,
+    titulo: "App Mobile Completo",
+    descricao: "Gerencie tudo pelo celular"
+  }, {
+    icon: Calendar,
+    titulo: "Agenda Inteligente",
+    descricao: "Organize seus agendamentos facilmente"
+  }];
+  
+  const comoFunciona = [{
+    numero: "01",
+    titulo: "Cadastre-se",
+    descricao: "Crie seu perfil e adicione seus serviços"
+  }, {
+    numero: "02",
+    titulo: "Receba Pedidos",
+    descricao: "Clientes interessados entram em contato"
+  }, {
+    numero: "03",
+    titulo: "Negocie",
+    descricao: "Converse com o cliente e acerte os detalhes"
+  }, {
+    numero: "04",
+    titulo: "Execute",
+    descricao: "Realize o serviço com qualidade"
+  }, {
+    numero: "05",
+    titulo: "Receba",
+    descricao: "Seja avaliado e receba seu pagamento"
+  }];
+  
+  const servicos = ["Limpeza", "Jardinagem", "Pintura", "Elétrica", "Encanamento", "Construção", "Beleza", "Informática", "Educação", "Saúde", "Transporte", "Eventos"];
 
   return (
-    <UnifiedLayout>
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-8">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/')}
-            className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            {!isMobile && 'Voltar'}
-          </Button>
-          <div>
-            <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
+    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white">
+      <UnifiedHeader />
+      
+      {/* Hero Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-6xl mx-auto text-center">
+          <div className="flex items-center justify-center gap-0 mb-6">
+            <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
+              <span className="text-white font-bold text-2xl">Z</span>
+            </div>
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mx-0 text-center px-[5px]">
               Trabalhe Conosco
             </h1>
-            <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
-              Junte-se à nossa equipe e faça a diferença
-            </p>
+          </div>
+          
+          <p className="md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto text-xl font-normal">
+            Conecte-se com milhares de clientes em Sinop e região. Cresça seu faturamento com a primeira plataforma feita para serviços
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" onClick={() => navigate('/auth')} className="bg-orange-500 hover:bg-orange-600 text-lg px-8 py-6">
+              <Wrench className="mr-2 h-5 w-5" />
+              Cadastrar-se agora como Prestador
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
           </div>
         </div>
+      </section>
 
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
-            <span className="text-white font-bold text-3xl">Z</span>
+      {/* Benefícios */}
+      <section className="px-4 bg-white py-[15px]">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12">Por que escolher o Zurbo?</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {beneficios.map((beneficio, index) => (
+              <Card key={index} className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-6 text-center">
+                  <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <beneficio.icon className="h-6 w-6 text-orange-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">{beneficio.titulo}</h3>
+                  <p className="text-gray-600">{beneficio.descricao}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Construa o futuro dos serviços conosco
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            O ZURBO está crescendo e buscamos pessoas talentosas e apaixonadas por tecnologia e inovação.
-          </p>
         </div>
+      </section>
 
-        {/* Por que trabalhar conosco */}
-        <div className="grid gap-6 mb-12 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardContent className="p-6 text-center">
-              <Users className="h-12 w-12 text-orange-500 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-3">Equipe Incrível</h3>
-              <p className="text-gray-600">
-                Trabalhe com profissionais talentosos e colaborativos.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6 text-center">
-              <Target className="h-12 w-12 text-orange-500 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-3">Propósito</h3>
-              <p className="text-gray-600">
-                Faça parte de uma missão que conecta pessoas e facilita vidas.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6 text-center">
-              <TrendingUp className="h-12 w-12 text-orange-500 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-3">Crescimento</h3>
-              <p className="text-gray-600">
-                Desenvolva suas habilidades em uma empresa em expansão.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6 text-center">
-              <Star className="h-12 w-12 text-orange-500 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-3">Benefícios</h3>
-              <p className="text-gray-600">
-                Pacote completo de benefícios e ambiente flexível.
-              </p>
-            </CardContent>
-          </Card>
+      {/* Como Funciona */}
+      <section className="py-16 px-4">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12">Como funciona?</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+            {comoFunciona.map((passo, index) => (
+              <div key={index} className="text-center">
+                <div className="w-16 h-16 bg-orange-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                  {passo.numero}
+                </div>
+                <h3 className="text-lg font-semibold mb-2">{passo.titulo}</h3>
+                <p className="text-gray-600 text-sm">{passo.descricao}</p>
+              </div>
+            ))}
+          </div>
         </div>
+      </section>
 
-        {/* Vagas em aberto */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Vagas em Aberto</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="border-l-4 border-orange-500 pl-4">
-                <h4 className="font-semibold text-lg">Desenvolvedor Full Stack</h4>
-                <p className="text-gray-600 mb-2">React, Node.js, TypeScript</p>
-                <p className="text-gray-500 text-sm">Remoto • Tempo integral</p>
-              </div>
-              
-              <div className="border-l-4 border-orange-500 pl-4">
-                <h4 className="font-semibold text-lg">Designer UX/UI</h4>
-                <p className="text-gray-600 mb-2">Figma, Prototipagem, Design System</p>
-                <p className="text-gray-500 text-sm">Remoto • Tempo integral</p>
-              </div>
-              
-              <div className="border-l-4 border-orange-500 pl-4">
-                <h4 className="font-semibold text-lg">Analista de Marketing Digital</h4>
-                <p className="text-gray-600 mb-2">SEO, SEM, Analytics, Growth</p>
-                <p className="text-gray-500 text-sm">Híbrido • Tempo integral</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Serviços Disponíveis */}
+      <section className="px-4 bg-white py-[15px]">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12">Muitos Serviços Disponíveis</h2>
+          
+          <div className="flex flex-wrap justify-center gap-3">
+            {servicos.map((servico, index) => (
+              <Badge key={index} variant="secondary" className="text-sm py-2 px-4">
+                {servico}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      </section>
 
-        {/* Call to Action */}
-        <div className="text-center">
-          <h3 className="text-xl font-semibold mb-4">Interessado em fazer parte da equipe?</h3>
-          <p className="text-gray-600 mb-6">
-            Envie seu currículo e portfólio para nós. Vamos adorar conhecer você!
+      {/* CTA Final */}
+      <section className="py-20 px-4 bg-gradient-to-r from-orange-500 to-orange-600">
+        <div className="max-w-4xl mx-auto text-center text-white">
+          <h2 className="text-4xl font-bold mb-6">Pronto para começar?</h2>
+          <p className="text-xl mb-8 opacity-90">
+            Junte-se a centenas de prestadores que já confiam no Zurbo para fazer seus negócios crescerem.
           </p>
-          <Button 
-            className="bg-orange-500 hover:bg-orange-600"
-            onClick={() => window.open('mailto:rh@zurbo.com?subject=Interesse em trabalhar no ZURBO')}
-          >
-            Enviar Currículo
+          
+          <Button size="lg" onClick={() => navigate('/auth')} className="bg-white text-orange-600 hover:bg-gray-50 py-[10px] text-left text-sm px-[11px]">
+            <Wrench className="mr-2 h-5 w-5" />
+            Cadastrar-se agora como Prestador
+            <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
-      </div>
-    </UnifiedLayout>
+      </section>
+
+      <ModernFooter />
+    </div>
   );
 };
 

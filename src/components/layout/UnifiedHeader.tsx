@@ -152,25 +152,6 @@ export const UnifiedHeader = () => {
             </div>
           </div>
           <DropdownMenuSeparator />
-
-          {/* Service Toggle for Prestadores */}
-          {isPrestador && (
-            <>
-              <div className="px-2 py-2">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="service-toggle-dropdown"
-                    checked={emServico}
-                    onCheckedChange={handleServiceToggle}
-                  />
-                  <Label htmlFor="service-toggle-dropdown" className="text-sm">
-                    {emServico ? 'Em serviço' : 'Fora de serviço'}
-                  </Label>
-                </div>
-              </div>
-              <DropdownMenuSeparator />
-            </>
-          )}
           
           <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
             <Settings className="mr-2 h-4 w-4" />
@@ -179,7 +160,7 @@ export const UnifiedHeader = () => {
 
           <DropdownMenuItem onClick={() => navigate('/pedidos')}>
             <Clock className="mr-2 h-4 w-4" />
-            {isPrestador ? 'Meus Pedidos' : 'Meus Agendamentos'}
+            Pedidos
           </DropdownMenuItem>
           
           <DropdownMenuItem onClick={() => navigate('/favoritos')}>
@@ -201,17 +182,17 @@ export const UnifiedHeader = () => {
             </>
           ) : (
             <>
-              <DropdownMenuItem onClick={() => navigate('/informacoes#ajuda')}>
+              <DropdownMenuItem onClick={() => navigate('/central-ajuda')}>
                 <HelpCircle className="mr-2 h-4 w-4" />
                 Central de Ajuda
               </DropdownMenuItem>
               
-              <DropdownMenuItem onClick={() => navigate('/informacoes#como-funciona')}>
+              <DropdownMenuItem onClick={() => navigate('/como-funciona')}>
                 <FileText className="mr-2 h-4 w-4" />
                 Como Funciona
               </DropdownMenuItem>
               
-              <DropdownMenuItem onClick={() => navigate('/informacoes#regras')}>
+              <DropdownMenuItem onClick={() => navigate('/regras-comunidade')}>
                 <Shield className="mr-2 h-4 w-4" />
                 Regras da Comunidade
               </DropdownMenuItem>
@@ -254,6 +235,20 @@ export const UnifiedHeader = () => {
 
           {/* Right Actions */}
           <div className="flex items-center space-x-2">
+            {/* Service Toggle for Prestadores (Desktop only) */}
+            {isPrestador && !isMobile && !isTablet && (
+              <div className="hidden lg:flex items-center space-x-2">
+                <Switch
+                  id="service-toggle"
+                  checked={emServico}
+                  onCheckedChange={handleServiceToggle}
+                />
+                <Label htmlFor="service-toggle" className="text-sm">
+                  {emServico ? 'Em serviço' : 'Fora de serviço'}
+                </Label>
+              </div>
+            )}
+
             {/* Notifications */}
             {isAuthenticated && <NotificationBell />}
 

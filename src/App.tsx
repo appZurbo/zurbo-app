@@ -23,12 +23,16 @@ import PremiumOverview from "@/pages/PremiumOverview";
 import FavoritosPage from "@/pages/FavoritosPage";
 import NotificacoesPage from "@/pages/NotificacoesPage";
 import NotFound from "@/pages/NotFound";
+import SobreNos from "@/pages/SobreNos";
+import ComoFunciona from "@/pages/ComoFunciona";
+import CentralAjuda from "@/pages/CentralAjuda";
+import PoliticaPrivacidade from "@/pages/PoliticaPrivacidade";
+import RegrasComunidade from "@/pages/RegrasComunidade";
+import TermosUso from "@/pages/TermosUso";
 import TrabalheConosco from "@/pages/TrabalheConosco";
 import ReportPage from "@/pages/ReportPage";
-import InformacoesPage from "@/pages/InformacoesPage";
 import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from '@/components/ui/toaster';
-import { Navigate } from 'react-router-dom';
 
 const router = createBrowserRouter([
   {
@@ -88,10 +92,6 @@ const router = createBrowserRouter([
     element: <AgendaPrestador />,
   },
   {
-    path: "/agenda-prestador",
-    element: <AgendaPrestador />,
-  },
-  {
     path: "/pedidos",
     element: <Pedidos />,
   },
@@ -116,46 +116,40 @@ const router = createBrowserRouter([
     element: <NotificacoesPage />,
   },
   {
+    path: "/enderecos",
+    element: <Settings />,
+  },
+  {
+    path: "/sobre-nos",
+    element: <SobreNos />,
+  },
+  {
+    path: "/como-funciona",
+    element: <ComoFunciona />,
+  },
+  {
+    path: "/central-ajuda",
+    element: <CentralAjuda />,
+  },
+  {
+    path: "/politica-privacidade",
+    element: <PoliticaPrivacidade />,
+  },
+  {
+    path: "/regras-comunidade",
+    element: <RegrasComunidade />,
+  },
+  {
+    path: "/termos-uso",
+    element: <TermosUso />,
+  },
+  {
     path: "/trabalhe-conosco",
     element: <TrabalheConosco />,
   },
   {
     path: "/report",
     element: <ReportPage />,
-  },
-  {
-    path: "/informacoes",
-    element: <InformacoesPage />,
-  },
-  // Redirecionamentos para página unificada
-  {
-    path: "/sobre-nos",
-    element: <Navigate to="/informacoes#como-funciona" replace />,
-  },
-  {
-    path: "/como-funciona",
-    element: <Navigate to="/informacoes#como-funciona" replace />,
-  },
-  {
-    path: "/central-ajuda",
-    element: <Navigate to="/informacoes#ajuda" replace />,
-  },
-  {
-    path: "/politica-privacidade",
-    element: <Navigate to="/informacoes#privacidade" replace />,
-  },
-  {
-    path: "/regras-comunidade",
-    element: <Navigate to="/informacoes#regras" replace />,
-  },
-  {
-    path: "/termos-uso",
-    element: <Navigate to="/informacoes#termos" replace />,
-  },
-  // Redirecionamento para endereços (página obsoleta)
-  {
-    path: "/enderecos",
-    element: <Navigate to="/configuracoes" replace />,
   },
   {
     path: "*",
