@@ -1,5 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
+import { supabase } from '@/integrations/supabase/client';
 
 // Generate valid UUIDs for all test data
 const generateValidUUID = () => uuidv4();
@@ -161,6 +162,226 @@ export const unifiedTestData = {
       updated_at: new Date().toISOString()
     }
   ]
+};
+
+// Main function to create unified test data
+export const createUnifiedTestData = async () => {
+  try {
+    console.log('🚀 Starting unified test data creation...');
+    
+    // Create users
+    const { data: usersData, error: usersError } = await supabase
+      .from('users')
+      .insert(unifiedTestData.users)
+      .select();
+
+    if (usersError) {
+      console.error('Error creating users:', usersError);
+      return { success: false, error: usersError.message };
+    }
+
+    console.log('✅ Users created:', usersData?.length || 0);
+
+    // Get actual user IDs for relationships
+    const userIds = usersData?.map(u => u.id) || [];
+    const prestadorIds = usersData?.filter(u => u.tipo === 'prestador').map(u => u.id) || [];
+    const clienteIds = usersData?.filter(u => u.tipo === 'cliente').map(u => u.id) || [];
+
+    // Create conversations with real user IDs
+    const conversationsToInsert = [
+      {
+        id: generateValidUUID(),
+        participantes: [prestadorIds[0] || generateValidUUID(), clienteIds[0] || generateValidUUID()],
+        ultimo_acesso: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: generateValidUUID(),
+        participantes: [prestadorIds[1] || generateValidUUID(), clienteIds[1] || generateValidUUID()],
+        ultimo_acesso: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+    ];
+
+    const { data: conversationsData, error: conversationsError } = await supabase
+      .from('chat_conversations')
+      .insert(conversationsToInsert)
+      .select();
+
+    if (conversationsError) {
+      console.error('Error creating conversations:', conversationsError);
+    } else {
+      console.log('✅ Conversations created:', conversationsData?.length || 0);
+    }
+
+    // Create messages with real conversation and user IDs
+    const conversationIds = conversationsData?.map(c => c.id) || [];
+    const messagesToInsert = [
+      {
+        id: generateValidUUID(),
+        conversation_id: conversationIds[0] || generateValidUUID(),
+        sender_id: clienteIds[0] || generateValidUUID(),
+        content: "Olá! Preciso de um orçamento para instalação elétrica.",
+        timestamp: new Date().toISOString(),
+        read: false
+      },
+      {
+        id: generateValidUUID(),
+        conversation_id: conversationIds[0] || generateValidUUID(),
+        sender_id: prestadorIds[0] || generateValidUUID(),
+        content: "Claro! Posso ajudar. Quando seria conveniente para você?",
+        timestamp: new Date().toISOString(),
+        read: true
+      },
+      {
+        id: generateValidUUID(),
+        conversation_id: conversationIds[1] || generateValidUUID(),
+        sender_id: clienteIds[1] || generateValidUUID(),
+        content: "Preciso de uma limpeza completa para o fim de semana.",
+        timestamp: new Date().toISOString(),
+        read: false
+      }
+    ];
+
+    const { data: messagesData, error: messagesError } = await supabase
+      .from('chat_messages')
+      .insert(messagesToInsert)
+      .select();
+
+    if (messagesError) {
+      console.error('Error creating messages:', messagesError);
+    } else {
+      console.log('✅ Messages created:', messagesData?.length || 0);
+    }
+
+    // Create reviews
+    const reviewsToInsert = [
+      {
+        id: generateValidUUID(),
+        avaliador_id: clienteIds[0] || generateValidUUID(),
+        avaliado_id: prestadorIds[0] || generateValidUUID(),
+        nota: 5,
+        comentario: "Excelente profissional! Muito pontual e competente.",
+        created_at: new Date().toISOString()
+      },
+      {
+        id: generateValidUUID(),
+        avaliador_id: clienteIds[1] || generateValidUUID(),
+        avaliado_id: prestadorIds[1] || generateValidUUID(),
+        nota: 4,
+        comentario: "Bom trabalho, recomendo!",
+        created_at: new Date().toISOString()
+      }
+    ];
+
+    const { data: reviewsData, error: reviewsError } = await supabase
+      .from('avaliacoes')
+      .insert(reviewsToInsert)
+      .select();
+
+    if (reviewsError) {
+      console.error('Error creating reviews:', reviewsError);
+    } else {
+      console.log('✅ Reviews created:', reviewsData?.length || 0);
+    }
+
+    // Create appointments
+    const appointmentsToInsert = [
+      {
+        id: generateValidUUID(),
+        cliente_id: clienteIds[0] || generateValidUUID(),
+        prestador_id: prestadorIds[0] || generateValidUUID(),
+        servico: "Instalação Elétrica",
+        data_agendamento: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        status: "agendado",
+        observacoes: "Instalação de tomadas na cozinha",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: generateValidUUID(),
+        cliente_id: clienteIds[1] || generateValidUUID(),
+        prestador_id: prestadorIds[1] || generateValidUUID(),
+        servico: "Limpeza Residencial",
+        data_agendamento: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
+        status: "confirmado",
+        observacoes: "Limpeza completa do apartamento",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+    ];
+
+    const { data: appointmentsData, error: appointmentsError } = await supabase
+      .from('agendamentos')
+      .insert(appointmentsToInsert)
+      .select();
+
+    if (appointmentsError) {
+      console.error('Error creating appointments:', appointmentsError);
+    } else {
+      console.log('✅ Appointments created:', appointmentsData?.length || 0);
+    }
+
+    // Create some pedidos (orders)
+    const pedidosToInsert = [
+      {
+        id: generateValidUUID(),
+        cliente_id: clienteIds[0] || generateValidUUID(),
+        prestador_id: prestadorIds[0] || generateValidUUID(),
+        servico: "Instalação Elétrica",
+        descricao: "Preciso instalar tomadas na cozinha",
+        status: "pendente",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: generateValidUUID(),
+        cliente_id: clienteIds[1] || generateValidUUID(),
+        prestador_id: prestadorIds[1] || generateValidUUID(),
+        servico: "Limpeza Residencial",
+        descricao: "Limpeza completa do apartamento",
+        status: "aceito",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+    ];
+
+    const { data: pedidosData, error: pedidosError } = await supabase
+      .from('pedidos')
+      .insert(pedidosToInsert)
+      .select();
+
+    if (pedidosError) {
+      console.error('Error creating pedidos:', pedidosError);
+    } else {
+      console.log('✅ Pedidos created:', pedidosData?.length || 0);
+    }
+
+    const summary = {
+      users: usersData?.length || 0,
+      conversations: conversationsData?.length || 0,
+      messages: messagesData?.length || 0,
+      pedidos: pedidosData?.length || 0,
+      agendamentos: appointmentsData?.length || 0,
+      avaliacoes: reviewsData?.length || 0
+    };
+
+    console.log('🎉 Test data creation completed successfully!', summary);
+    
+    return {
+      success: true,
+      data: summary
+    };
+
+  } catch (error) {
+    console.error('❌ Error creating unified test data:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
 };
 
 // Helper function to get random UUID from test data
