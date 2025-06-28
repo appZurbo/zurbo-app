@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Home, Search, Calendar, MessageCircle, User } from 'lucide-react';
@@ -15,7 +15,7 @@ export const ZurboDock = () => {
   const isMobile = useMobile();
   const isTablet = useTablet();
   
-  // Always call the hook - it handles authentication internally
+  // Only call useNotifications if authenticated to avoid unnecessary subscriptions
   const { hasNewMessages } = useNotifications();
   
   // Show only on mobile and tablet
@@ -23,7 +23,7 @@ export const ZurboDock = () => {
 
   const isActive = (path: string) => location.pathname === path;
   
-  const navigationItems = [
+  const navigationItems = useMemo(() => [
     {
       icon: Home,
       label: 'Início',
@@ -62,10 +62,12 @@ export const ZurboDock = () => {
       isActive: isActive('/configuracoes') || isActive('/settings') || isActive('/auth'),
       showAlways: true
     }
-  ];
+  ], [location.pathname, isAuthenticated, isPrestador, hasNewMessages]);
 
-  const visibleItems = navigationItems.filter(item => 
-    item.showAlways || (item.requiresAuth && isAuthenticated)
+  const visibleItems = useMemo(() => 
+    navigationItems.filter(item => 
+      item.showAlways || (item.requiresAuth && isAuthenticated)
+    ), [navigationItems, isAuthenticated]
   );
 
   return (

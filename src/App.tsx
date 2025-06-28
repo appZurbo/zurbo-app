@@ -26,7 +26,6 @@ import InformacoesPage from "@/pages/InformacoesPage";
 import NotFound from "@/pages/NotFound";
 import SobreNos from "@/pages/SobreNos";
 import TrabalheConosco from "@/pages/TrabalheConosco";
-import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from '@/components/ui/toaster';
 
 const router = createBrowserRouter([
@@ -130,10 +129,10 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <AuthProvider>
+    <>
       <RouterProvider router={router} />
       <Toaster />
-    </AuthProvider>
+    </>
   );
 }
 
