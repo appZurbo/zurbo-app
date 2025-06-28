@@ -67,6 +67,32 @@ const Relatorios = () => {
     { name: 'Carlos Mendes', orders: 98, rating: 4.6, revenue: 5800 },
   ];
 
+  const systemHealth = [
+    { metric: 'Uptime', value: '99.9%', status: 'excellent' },
+    { metric: 'Response Time', value: '120ms', status: 'good' },
+    { metric: 'Error Rate', value: '0.1%', status: 'excellent' },
+    { metric: 'Active Sessions', value: '1,234', status: 'good' },
+  ];
+
+  const handleKpiClick = (type: string) => {
+    switch (type) {
+      case 'users':
+        navigate('/admin/users');
+        break;
+      case 'providers':
+        navigate('/prestadores');
+        break;
+      case 'orders':
+        navigate('/pedidos');
+        break;
+      case 'revenue':
+        navigate('/admin/financial');
+        break;
+      default:
+        break;
+    }
+  };
+
   if (!isAdmin) {
     return (
       <div>
@@ -132,60 +158,65 @@ const Relatorios = () => {
             </div>
           </div>
 
-          {/* Test Data Creation Section - MOVED TO TOP */}
-          <div className="mb-8">
-            <CreateTestData />
-          </div>
+          {/* Dashboard Layout - Desktop/Tablet: KPIs left, Test Data right */}
+          <div className={`mb-8 ${isMobile ? '' : 'grid grid-cols-1 lg:grid-cols-3 gap-6'}`}>
+            {/* KPIs Section */}
+            <div className={`${isMobile ? 'mb-6' : 'lg:col-span-2'}`}>
+              <div className="grid grid-cols-2 gap-4">
+                <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => handleKpiClick('users')}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-gray-600">Usuários Total</p>
+                        <p className="text-2xl font-bold">{kpiData.totalUsers.toLocaleString()}</p>
+                      </div>
+                      <Users className="h-8 w-8 text-blue-500" />
+                    </div>
+                  </CardContent>
+                </Card>
 
-          {/* KPIs */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Usuários Total</p>
-                    <p className="text-2xl font-bold">{kpiData.totalUsers.toLocaleString()}</p>
-                  </div>
-                  <Users className="h-8 w-8 text-blue-500" />
-                </div>
-              </CardContent>
-            </Card>
+                <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => handleKpiClick('providers')}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-gray-600">Prestadores</p>
+                        <p className="text-2xl font-bold">{kpiData.totalProviders}</p>
+                      </div>
+                      <Activity className="h-8 w-8 text-orange-500" />
+                    </div>
+                  </CardContent>
+                </Card>
 
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Prestadores</p>
-                    <p className="text-2xl font-bold">{kpiData.totalProviders}</p>
-                  </div>
-                  <Activity className="h-8 w-8 text-orange-500" />
-                </div>
-              </CardContent>
-            </Card>
+                <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => handleKpiClick('orders')}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-gray-600">Pedidos</p>
+                        <p className="text-2xl font-bold">{kpiData.totalOrders.toLocaleString()}</p>
+                      </div>
+                      <Calendar className="h-8 w-8 text-green-500" />
+                    </div>
+                  </CardContent>
+                </Card>
 
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Pedidos</p>
-                    <p className="text-2xl font-bold">{kpiData.totalOrders.toLocaleString()}</p>
-                  </div>
-                  <Calendar className="h-8 w-8 text-green-500" />
-                </div>
-              </CardContent>
-            </Card>
+                <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => handleKpiClick('revenue')}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-gray-600">Receita</p>
+                        <p className="text-2xl font-bold">R$ {kpiData.totalRevenue.toLocaleString()}</p>
+                      </div>
+                      <DollarSign className="h-8 w-8 text-purple-500" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
 
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Receita</p>
-                    <p className="text-2xl font-bold">R$ {kpiData.totalRevenue.toLocaleString()}</p>
-                  </div>
-                  <DollarSign className="h-8 w-8 text-purple-500" />
-                </div>
-              </CardContent>
-            </Card>
+            {/* Test Data Creation Section - Right side for desktop/tablet */}
+            <div className={`${isMobile ? '' : 'lg:col-span-1'}`}>
+              <CreateTestData />
+            </div>
           </div>
 
           <Tabs defaultValue="overview" className="space-y-6">
@@ -203,6 +234,16 @@ const Relatorios = () => {
                     <CardTitle className="flex items-center gap-2">
                       <TrendingUp className="h-5 w-5" />
                       Crescimento de Usuários
+                      <Select value={timeRange} onValueChange={setTimeRange}>
+                        <SelectTrigger className="w-24 ml-auto">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="7">7d</SelectItem>
+                          <SelectItem value="30">30d</SelectItem>
+                          <SelectItem value="90">90d</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -224,6 +265,10 @@ const Relatorios = () => {
                     <CardTitle className="flex items-center gap-2">
                       <PieChart className="h-5 w-5" />
                       Distribuição de Serviços
+                      <Button variant="outline" size="sm" className="ml-auto">
+                        <Download className="h-4 w-4 mr-1" />
+                        Exportar
+                      </Button>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -248,29 +293,63 @@ const Relatorios = () => {
                 </Card>
               </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Top Prestadores</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {topProviders.map((provider, index) => (
-                      <div key={provider.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <span className="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold">
-                            {index + 1}
-                          </span>
-                          <div>
-                            <p className="font-semibold">{provider.name}</p>
-                            <p className="text-sm text-gray-600">{provider.orders} pedidos • ⭐ {provider.rating}</p>
+              {/* Split section - Top Providers and System Health */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Top Prestadores</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {topProviders.map((provider, index) => (
+                        <div key={provider.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <span className="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold">
+                              {index + 1}
+                            </span>
+                            <div>
+                              <p className="font-semibold">{provider.name}</p>
+                              <p className="text-sm text-gray-600">{provider.orders} pedidos • ⭐ {provider.rating}</p>
+                            </div>
                           </div>
+                          <p className="font-bold text-green-600">R$ {provider.revenue.toLocaleString()}</p>
                         </div>
-                        <p className="font-bold text-green-600">R$ {provider.revenue.toLocaleString()}</p>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Status do Sistema</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {systemHealth.map((item, index) => (
+                        <div key={item.metric} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-3 h-3 rounded-full ${
+                              item.status === 'excellent' ? 'bg-green-500' : 
+                              item.status === 'good' ? 'bg-yellow-500' : 'bg-red-500'
+                            }`}></div>
+                            <span className="font-medium">{item.metric}</span>
+                          </div>
+                          <span className="font-bold">{item.value}</span>
+                        </div>
+                      ))}
+                      <div className="mt-4 pt-4 border-t">
+                        <Button 
+                          variant="outline" 
+                          className="w-full"
+                          onClick={() => navigate('/ads')}
+                        >
+                          Ver Anúncios do Sistema
+                        </Button>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
 
             <TabsContent value="users" className="space-y-6">

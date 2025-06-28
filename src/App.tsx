@@ -1,74 +1,90 @@
-import { Suspense, lazy } from 'react';
-import { Toaster } from '@/components/ui/toaster';
-import { TooltipProvider } from '@/components/ui/tooltip';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from '@/contexts/AuthContext';
-import MobileDock from '@/components/mobile/MobileDock';
+import React from 'react';
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
+import Index from "@/pages/Index";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
+import Profile from "@/pages/Profile";
+import Prestadores from "@/pages/Prestadores";
+import AdminDashboard from "@/pages/AdminDashboard";
+import Relatorios from "@/pages/admin/Relatorios";
+import Conversas from "@/pages/Conversas";
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { AuthProvider } from '@/hooks/useAuth';
+import { ToastProvider } from '@/hooks/use-toast';
+import { ThemeProvider } from '@/components/theme-provider';
+import AdsPage from '@/pages/AdsPage';
 
-// Lazy loading das páginas
-const Index = lazy(() => import('@/pages/Index'));
-const Settings = lazy(() => import('@/pages/Settings'));
-const Pedidos = lazy(() => import('@/pages/Pedidos'));
-const Conversas = lazy(() => import('@/pages/Conversas'));
-const AdminRelatorios = lazy(() => import('@/pages/admin/Relatorios'));
-const PrestadoresPage = lazy(() => import('@/pages/PrestadoresPage'));
-const AuthPage = lazy(() => import('@/pages/AuthPage'));
-const TrabalheConosco = lazy(() => import('@/pages/TrabalheConosco'));
-const PrestadorSettings = lazy(() => import('@/pages/PrestadorSettings'));
-const PrestadorDashboard = lazy(() => import('@/pages/PrestadorDashboard'));
-const AgendaPrestador = lazy(() => import('@/pages/AgendaPrestador'));
-const Planos = lazy(() => import('@/pages/Planos'));
-const PremiumOverview = lazy(() => import('@/pages/PremiumOverview'));
-const AdminModeracao = lazy(() => import('@/pages/admin/Moderacao'));
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-      refetchOnWindowFocus: false,
-    },
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Index />,
   },
-});
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
+  },
+  {
+    path: "/profile",
+    element: (
+      <ProtectedRoute>
+        <Profile />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/prestadores",
+    element: (
+      <ProtectedRoute>
+        <Prestadores />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin",
+    element: (
+      <ProtectedRoute requiredAdmin={true}>
+        <AdminDashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/relatorios",
+    element: (
+      <ProtectedRoute requiredAdmin={true}>
+        <Relatorios />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/conversas",
+    element: (
+      <ProtectedRoute>
+        <Conversas />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/ads",
+    element: <AdsPage />,
+  },
+]);
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <BrowserRouter>
-            <div className="min-h-screen bg-background font-sans antialiased">
-              <Suspense fallback={
-                <div className="flex items-center justify-center min-h-screen">
-                  <div className="w-16 h-16 bg-orange-500 rounded-xl flex items-center justify-center animate-pulse">
-                    <span className="text-white font-bold text-2xl">Z</span>
-                  </div>
-                </div>
-              }>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/configuracoes" element={<Settings />} />
-                  <Route path="/pedidos" element={<Pedidos />} />
-                  <Route path="/conversas" element={<Conversas />} />
-                  <Route path="/prestadores" element={<PrestadoresPage />} />
-                  <Route path="/auth" element={<AuthPage />} />
-                  <Route path="/trabalhe-conosco" element={<TrabalheConosco />} />
-                  <Route path="/prestador-settings" element={<PrestadorSettings />} />
-                  <Route path="/prestador-dashboard" element={<PrestadorDashboard />} />
-                  <Route path="/agenda-prestador" element={<AgendaPrestador />} />
-                  <Route path="/planos" element={<Planos />} />
-                  <Route path="/premium-overview" element={<PremiumOverview />} />
-                  <Route path="/admin/relatorios" element={<AdminRelatorios />} />
-                  <Route path="/admin/moderacao" element={<AdminModeracao />} />
-                </Routes>
-              </Suspense>
-              <Toaster />
-              <MobileDock />
-            </div>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <ThemeProvider defaultTheme="system" storageKey="zurbo-theme">
+      <ToastProvider>
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
+      </ToastProvider>
+    </ThemeProvider>
   );
 }
 
