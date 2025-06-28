@@ -12,10 +12,12 @@ import { Pedido } from '@/utils/database/types';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
+type FilterType = 'todos' | 'pendente' | 'aceito' | 'em_andamento' | 'concluido' | 'cancelado';
+
 export const AppointmentSystem: React.FC = () => {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'todos' | 'pendente' | 'aceito' | 'em_andamento' | 'concluido' | 'cancelado'>('todos');
+  const [filter, setFilter] = useState<FilterType>('todos');
   const { profile } = useAuth();
   const isMobile = useMobile();
   const { toast } = useToast();
@@ -100,7 +102,7 @@ export const AppointmentSystem: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Tabs value={filter} onValueChange={(value) => setFilter(value as typeof filter)}>
+          <Tabs value={filter} onValueChange={(value) => setFilter(value as FilterType)}>
             <TabsList className={`grid w-full ${isMobile ? 'grid-cols-3' : 'grid-cols-6'} h-auto p-1`}>
               <TabsTrigger value="todos" className="text-xs py-2 px-3">
                 Todos
