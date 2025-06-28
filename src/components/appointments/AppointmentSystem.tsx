@@ -10,6 +10,7 @@ import { EmptyState } from './EmptyState';
 import { PedidoCard } from './PedidoCard';
 
 type FilterType = 'todos' | 'pendente' | 'aceito' | 'em_andamento' | 'concluido' | 'cancelado';
+type StatusType = 'pendente' | 'aceito' | 'em_andamento' | 'concluido' | 'cancelado';
 
 export const AppointmentSystem: React.FC = () => {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
@@ -41,7 +42,7 @@ export const AppointmentSystem: React.FC = () => {
     }
   };
 
-  const handleStatusUpdate = async (pedidoId: string, newStatus: string) => {
+  const handleStatusUpdate = async (pedidoId: string, newStatus: StatusType) => {
     try {
       await updatePedido(pedidoId, { status: newStatus });
       await loadPedidos();
