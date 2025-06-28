@@ -71,10 +71,9 @@ export const UnifiedDock = () => {
     return 'h-16';
   };
 
-  const getButtonSize = () => {
-    if (isMobile) return 'dock';
-    if (isTablet) return 'dock';
-    return 'dock';
+  // Fix: Return the actual literal type instead of a string
+  const getButtonSize = (): "dock" => {
+    return 'dock'; // Always use 'dock' size for unified dock
   };
 
   return (
