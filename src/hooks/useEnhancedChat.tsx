@@ -10,10 +10,12 @@ export interface ChatConversation {
   prestador_id: string;
   servico_solicitado: string;
   preco_proposto?: number;
-  status: 'aguardando_preco' | 'preco_definido' | 'aceito' | 'rejeitado' | 'bloqueado';
+  status: 'aguardando_preco' | 'preco_definido' | 'aceito' | 'rejeitado' | 'pagamento_retido' | 'em_andamento' | 'concluido' | 'cancelado' | 'bloqueado';
   pedido_id?: string;
   created_at: string;
   updated_at: string;
+  client_message_count?: number;
+  provider_message_count?: number;
   cliente?: { nome: string; foto_url?: string };
   prestador?: { nome: string; foto_url?: string };
   last_message?: string;
@@ -315,41 +317,13 @@ export const useEnhancedChat = () => {
           conversation_id: conversationId,
           sender_id: profile?.id,
           message_type: 'system',
-          content: accept ? 'Preço aceito! Pedido criado.' : 'Preço rejeitado.'
+          content: accept ? 'Preço aceito! Aguardando pagamento.' : 'Preço rejeitado.'
         });
-
-      if (accept) {
-        // Create pedido
-        const conversation = conversations.find(c => c.id === conversationId);
-        if (conversation) {
-          const { data: defaultService } = await supabase
-            .from('servicos')
-            .select('id')
-            .limit(1)
-            .single();
-
-          if (defaultService) {
-            const { error: pedidoError } = await supabase
-              .from('pedidos')
-              .insert({
-                cliente_id: conversation.cliente_id,
-                prestador_id: conversation.prestador_id,
-                servico_id: defaultService.id,
-                titulo: conversation.servico_solicitado,
-                descricao: `Serviço solicitado via chat - ${conversation.servico_solicitado}`,
-                preco_acordado: conversation.preco_proposto,
-                status: 'aceito'
-              });
-
-            if (pedidoError) throw pedidoError;
-          }
-        }
-      }
 
       await loadConversations();
       toast({
         title: "Sucesso",
-        description: accept ? "Preço aceito! Pedido criado." : "Preço rejeitado.",
+        description: accept ? "Preço aceito! Cliente pode pagar agora." : "Preço rejeitado.",
       });
     } catch (error) {
       console.error('Error responding to price:', error);
@@ -359,7 +333,7 @@ export const useEnhancedChat = () => {
         variant: "destructive"
       });
     }
-  }, [profile, conversations, loadConversations, toast]);
+  }, [profile, loadConversations, toast]);
 
   // Report user
   const reportUser = useCallback(async (conversationId: string, reportedUserId: string, issueType: string, description: string) => {

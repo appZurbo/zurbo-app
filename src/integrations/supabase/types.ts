@@ -149,34 +149,40 @@ export type Database = {
       }
       chat_conversations: {
         Row: {
+          client_message_count: number | null
           cliente_id: string | null
           created_at: string | null
           id: string
           pedido_id: string | null
           preco_proposto: number | null
           prestador_id: string | null
+          provider_message_count: number | null
           servico_solicitado: string
           status: string | null
           updated_at: string | null
         }
         Insert: {
+          client_message_count?: number | null
           cliente_id?: string | null
           created_at?: string | null
           id?: string
           pedido_id?: string | null
           preco_proposto?: number | null
           prestador_id?: string | null
+          provider_message_count?: number | null
           servico_solicitado: string
           status?: string | null
           updated_at?: string | null
         }
         Update: {
+          client_message_count?: number | null
           cliente_id?: string | null
           created_at?: string | null
           id?: string
           pedido_id?: string | null
           preco_proposto?: number | null
           prestador_id?: string | null
+          provider_message_count?: number | null
           servico_solicitado?: string
           status?: string | null
           updated_at?: string | null
@@ -503,6 +509,63 @@ export type Database = {
             columns: ["denunciante_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      escrow_payments: {
+        Row: {
+          amount: number
+          auto_release_date: string | null
+          conversation_id: string | null
+          created_at: string | null
+          currency: string | null
+          id: string
+          pedido_id: string | null
+          released_at: string | null
+          status: string | null
+          stripe_payment_intent_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          auto_release_date?: string | null
+          conversation_id?: string | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          pedido_id?: string | null
+          released_at?: string | null
+          status?: string | null
+          stripe_payment_intent_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          auto_release_date?: string | null
+          conversation_id?: string | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          pedido_id?: string | null
+          released_at?: string | null
+          status?: string | null
+          stripe_payment_intent_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "escrow_payments_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "escrow_payments_pedido_id_fkey"
+            columns: ["pedido_id"]
+            isOneToOne: false
+            referencedRelation: "pedidos"
             referencedColumns: ["id"]
           },
         ]
@@ -1007,6 +1070,51 @@ export type Database = {
           {
             foreignKeyName: "system_settings_updated_by_fkey"
             columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          description: string | null
+          escrow_payment_id: string | null
+          id: string
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          description?: string | null
+          escrow_payment_id?: string | null
+          id?: string
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          description?: string | null
+          escrow_payment_id?: string | null
+          id?: string
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_escrow_payment_id_fkey"
+            columns: ["escrow_payment_id"]
+            isOneToOne: false
+            referencedRelation: "escrow_payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
