@@ -26,6 +26,7 @@ import InformacoesPage from "@/pages/InformacoesPage";
 import NotFound from "@/pages/NotFound";
 import SobreNos from "@/pages/SobreNos";
 import TrabalheConosco from "@/pages/TrabalheConosco";
+import TestingDashboard from "@/pages/TestingDashboard";
 import { Toaster } from '@/components/ui/toaster';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
@@ -65,6 +66,10 @@ const router = createBrowserRouter([
   {
     path: "/admin/moderacao",
     element: <Moderacao />,
+  },
+  {
+    path: "/admin/testing",
+    element: <TestingDashboard />,
   },
   {
     path: "/conversas",

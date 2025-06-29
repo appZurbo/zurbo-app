@@ -1,310 +1,247 @@
 
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { 
-  User, Settings, LogOut, Bell, Home, Users, Crown, MessageCircle, 
-  Calendar, BarChart3, Shield, ShoppingBag, Heart, MapPin, HelpCircle,
-  FileText, Clock, Info
-} from 'lucide-react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
+import { Bell, MessageCircle, Settings, User, LogOut, Shield, Calendar, FileText, Crown, Heart, AlertTriangle, Menu, X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { useMobile, useTablet } from '@/hooks/useMobile';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
+import { useMobile } from '@/hooks/useMobile';
 
 export const UnifiedHeader = () => {
+  const { profile, logout, isAdmin, isPrestador } = useAuth();
   const navigate = useNavigate();
-  const {
-    profile,
-    user,
-    isAuthenticated,
-    logout,
-    isAdmin,
-    isPrestador
-  } = useAuth();
   const isMobile = useMobile();
-  const isTablet = useTablet();
-  const { toast } = useToast();
-  const [emServico, setEmServico] = useState(profile?.em_servico ?? true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
     navigate('/');
   };
 
-  const handleServiceToggle = async (checked: boolean) => {
-    if (!profile) return;
-    try {
-      const { error } = await supabase.from('users').update({
-        em_servico: checked
-      } as any).eq('id', profile.id);
-
-      if (error) throw error;
-
-      setEmServico(checked);
-      toast({
-        title: checked ? "Em serviço" : "Fora de serviço",
-        description: checked ? "Você está disponível para novos pedidos" : "Você não receberá novos pedidos"
-      });
-    } catch (error) {
-      console.error('Error updating service status:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível atualizar o status de serviço",
-        variant: "destructive"
-      });
-    }
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    setMobileMenuOpen(false);
   };
 
-  const isPremium = profile?.premium || false;
+  const getSOSLimit = () => profile?.premium ? 7 : 3;
 
-  const renderNavigationButtons = () => {
-    if (isMobile || isTablet) return null;
-
-    return (
-      <nav className="hidden lg:flex items-center space-x-6">
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-gray-700 hover:text-orange-600"
-        >
-          <Home className="h-4 w-4" />
-          Início
+  const UserDropdownMenu = () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-10 w-10 rounded-full p-0">
+          <Avatar className="h-8 w-8">
+            <AvatarImage src={profile?.foto_url} alt={profile?.nome} />
+            <AvatarFallback className="bg-orange-500 text-white">
+              {profile?.nome?.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
         </Button>
-        
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/prestadores')}
-          className="flex items-center gap-2 text-gray-700 hover:text-orange-600"
-        >
-          <Users className="h-4 w-4" />
-          Prestadores
-        </Button>
-        
-        {isAuthenticated && (
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/conversas')}
-            className="flex items-center gap-2 text-gray-700 hover:text-orange-600"
-          >
-            <MessageCircle className="h-4 w-4" />
-            Conversas
-          </Button>
-        )}
-      </nav>
-    );
-  };
-
-  const renderUserDropdown = () => {
-    if (!isAuthenticated) return null;
-
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={profile?.foto_url} alt={profile?.nome} />
-              <AvatarFallback className="bg-orange-100 text-orange-600">
-                {profile?.nome?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || '?'}
-              </AvatarFallback>
-            </Avatar>
-            {isAdmin && (
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                <Shield className="h-2 w-2 text-white" />
-              </div>
-            )}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-64" align="end" forceMount>
-          <div className="flex items-center justify-start gap-2 p-2">
-            <div className="flex flex-col space-y-1 leading-none">
-              <div className="flex items-center gap-2">
-                <p className="font-medium">{profile?.nome || 'Usuário'}</p>
-                {isPremium && (
-                  <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white text-xs">
-                    <Crown className="h-3 w-3 mr-1" />
-                    PRO
-                  </Badge>
-                )}
-              </div>
-              <p className="w-[200px] truncate text-sm text-muted-foreground">
-                {user?.email}
-              </p>
-              <Badge variant="secondary" className="w-fit text-xs">
-                {isAdmin ? (
-                  <>
-                    <Shield className="h-3 w-3 mr-1" />
-                    Admin
-                  </>
-                ) : isPrestador ? (
-                  <>
-                    <Users className="h-3 w-3 mr-1" />
-                    Prestador
-                  </>
-                ) : (
-                  <>
-                    <User className="h-3 w-3 mr-1" />
-                    Cliente
-                  </>
-                )}
-              </Badge>
-            </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <div className="flex items-center justify-start gap-2 p-2">
+          <Avatar className="h-8 w-8">
+            <AvatarImage src={profile?.foto_url} alt={profile?.nome} />
+            <AvatarFallback className="bg-orange-500 text-white">
+              {profile?.nome?.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col space-y-1">
+            <p className="text-sm font-medium leading-none">{profile?.nome}</p>
+            <p className="text-xs leading-none text-muted-foreground">
+              {profile?.email}
+            </p>
           </div>
-          <DropdownMenuSeparator />
-          
-          <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
-            <Settings className="mr-2 h-4 w-4" />
-            Configurações
-          </DropdownMenuItem>
-
-          {/* Service Toggle for Prestadores - Only in dropdown */}
-          {isPrestador && (
-            <div className="px-2 py-2">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="service-toggle-dropdown"
-                  checked={emServico}
-                  onCheckedChange={handleServiceToggle}
-                />
-                <Label htmlFor="service-toggle-dropdown" className="text-sm">
-                  {emServico ? 'Em serviço' : 'Fora de serviço'}
-                </Label>
-              </div>
-            </div>
-          )}
-
-          <DropdownMenuItem onClick={() => navigate(isPrestador ? '/pedidos' : '/pedidos')}>
-            <Clock className="mr-2 h-4 w-4" />
-            {isPrestador ? 'Pedidos' : 'Meus Agendamentos'}
-          </DropdownMenuItem>
-          
-          <DropdownMenuItem onClick={() => navigate('/favoritos')}>
-            <Heart className="mr-2 h-4 w-4" />
-            Favoritos
-          </DropdownMenuItem>
-
-          {isPrestador && (
-            <>
-              <DropdownMenuItem onClick={() => navigate('/agenda')}>
-                <Calendar className="mr-2 h-4 w-4" />
-                Agenda
-              </DropdownMenuItem>
-              
-              <DropdownMenuItem onClick={() => navigate('/prestador-dashboard')}>
-                <BarChart3 className="mr-2 h-4 w-4" />
-                Painel do Prestador
-              </DropdownMenuItem>
-            </>
-          )}
-
-          <DropdownMenuItem onClick={() => navigate('/informacoes')}>
-            <Info className="mr-2 h-4 w-4" />
-            Informações
-          </DropdownMenuItem>
-
-          {!isPremium && (
-            <DropdownMenuItem onClick={() => navigate('/planos')}>
-              <Crown className="mr-2 h-4 w-4" />
-              Torne-se PRO
+        </div>
+        <DropdownMenuSeparator />
+        
+        {/* Client Menu Items */}
+        {profile?.tipo === 'cliente' && (
+          <>
+            <DropdownMenuItem onClick={() => handleNavigation('/conversas')}>
+              <MessageCircle className="mr-2 h-4 w-4" />
+              Minhas Conversas
             </DropdownMenuItem>
-          )}
+            <DropdownMenuItem onClick={() => handleNavigation('/pedidos')}>
+              <FileText className="mr-2 h-4 w-4" />
+              Meus Pedidos
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleNavigation('/favoritos')}>
+              <Heart className="mr-2 h-4 w-4" />
+              Favoritos
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleNavigation('/notificacoes')}>
+              <Bell className="mr-2 h-4 w-4" />
+              Notificações
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => handleNavigation('/planos')}>
+              <Crown className="mr-2 h-4 w-4" />
+              Planos Premium
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-red-600" onClick={() => handleNavigation('/emergency')}>
+              <AlertTriangle className="mr-2 h-4 w-4" />
+              SOS ({getSOSLimit()} restantes)
+            </DropdownMenuItem>
+          </>
+        )}
 
-          {isAdmin && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate('/admin')}>
-                <Shield className="mr-2 h-4 w-4" />
-                Painel Administrativo
-              </DropdownMenuItem>
-              
-              <DropdownMenuItem onClick={() => navigate('/admin/moderacao')}>
-                <Shield className="mr-2 h-4 w-4" />
-                Moderação de Conteúdo
-              </DropdownMenuItem>
-              
-              <DropdownMenuItem onClick={() => navigate('/admin/relatorios')}>
-                <BarChart3 className="mr-2 h-4 w-4" />
-                Relatórios do Sistema
-              </DropdownMenuItem>
-            </>
-          )}
-          
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Sair
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  };
+        {/* Provider Menu Items */}
+        {isPrestador && (
+          <>
+            <DropdownMenuItem onClick={() => handleNavigation('/prestador-dashboard')}>
+              <User className="mr-2 h-4 w-4" />
+              Dashboard
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleNavigation('/conversas')}>
+              <MessageCircle className="mr-2 h-4 w-4" />
+              Conversas
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleNavigation('/agenda-prestador')}>
+              <Calendar className="mr-2 h-4 w-4" />
+              Minha Agenda
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleNavigation('/pedidos')}>
+              <FileText className="mr-2 h-4 w-4" />
+              Pedidos
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => handleNavigation('/premium-overview')}>
+              <Crown className="mr-2 h-4 w-4" />
+              {profile?.premium ? 'Premium Ativo' : 'Upgrade Premium'}
+              {profile?.premium && <Badge variant="secondary" className="ml-2">Pro</Badge>}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleNavigation('/prestador-settings')}>
+              <Settings className="mr-2 h-4 w-4" />
+              Configurações
+            </DropdownMenuItem>
+          </>
+        )}
+
+        {/* Admin Menu Items */}
+        {isAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => handleNavigation('/admin')}>
+              <Shield className="mr-2 h-4 w-4" />
+              Painel Admin
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleNavigation('/admin/relatorios')}>
+              <FileText className="mr-2 h-4 w-4" />
+              Relatórios
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleNavigation('/admin/moderacao')}>
+              <Shield className="mr-2 h-4 w-4" />
+              Moderação
+            </DropdownMenuItem>
+          </>
+        )}
+
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => handleNavigation('/configuracoes')}>
+          <Settings className="mr-2 h-4 w-4" />
+          Configurações
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout}>
+          <LogOut className="mr-2 h-4 w-4" />
+          Sair
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 
   return (
-    <header className="bg-white/95 backdrop-blur-md border-b border-gray-200/80 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center">
-            <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mr-3">
-              <span className="text-white font-bold text-lg">Z</span>
-            </div>
-            <span className={`font-bold text-gray-900 ${isMobile ? 'text-lg' : 'text-xl'}`}>
-              Zurbo
-            </span>
-          </Link>
+    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+      <div className="container flex h-16 items-center justify-between px-4">
+        {/* Logo */}
+        <Link to="/" className="flex items-center space-x-2">
+          <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-lg">Z</span>
+          </div>
+          <span className="font-bold text-xl text-gray-900">Zurbo</span>
+        </Link>
 
-          {/* Desktop Navigation */}
-          {renderNavigationButtons()}
-
-          {/* Right Actions */}
-          <div className="flex items-center space-x-2">
-            {/* Notifications */}
-            {isAuthenticated && <NotificationBell />}
-
-            {/* PRO Button */}
-            {!isPremium && (
-              <Button
-                variant="ghost"
-                size={isMobile ? "icon" : "sm"}
-                onClick={() => navigate('/planos')}
-                className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
-              >
-                <Crown className="h-5 w-5" />
-                {!isMobile && !isTablet && <span className="ml-1">PRO</span>}
-              </Button>
+        {/* Desktop Navigation */}
+        {!isMobile && (
+          <nav className="flex items-center space-x-6">
+            <Link to="/" className="text-sm font-medium text-gray-700 hover:text-orange-600 transition-colors">
+              Início
+            </Link>
+            <Link to="/prestadores" className="text-sm font-medium text-gray-700 hover:text-orange-600 transition-colors">
+              Prestadores
+            </Link>
+            {profile && (
+              <Link to="/conversas" className="text-sm font-medium text-gray-700 hover:text-orange-600 transition-colors">
+                Conversas
+              </Link>
             )}
+          </nav>
+        )}
 
-            {/* User Menu or Auth Buttons */}
-            {isAuthenticated ? (
-              renderUserDropdown()
-            ) : (
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant="ghost"
-                  size={isMobile ? "sm" : "default"}
-                  onClick={() => navigate('/auth')}
-                  className="text-gray-700 hover:text-orange-600"
-                >
-                  Entrar
-                </Button>
-                <Button
-                  size={isMobile ? "sm" : "default"}
-                  onClick={() => navigate('/auth')}
-                  className="bg-orange-500 hover:bg-orange-600 text-white"
-                >
-                  Cadastrar
-                </Button>
-              </div>
+        {/* Right Side */}
+        <div className="flex items-center space-x-4">
+          {profile ? (
+            <>
+              <NotificationBell />
+              <UserDropdownMenu />
+            </>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <Button variant="ghost" onClick={() => navigate('/auth')}>
+                Entrar
+              </Button>
+              <Button onClick={() => navigate('/auth')}>
+                Cadastrar
+              </Button>
+            </div>
+          )}
+
+          {/* Mobile Menu Button */}
+          {isMobile && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden"
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {isMobile && mobileMenuOpen && (
+        <div className="md:hidden border-t bg-white">
+          <div className="container py-4 space-y-2">
+            <Link 
+              to="/" 
+              className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Início
+            </Link>
+            <Link 
+              to="/prestadores" 
+              className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Prestadores
+            </Link>
+            {profile && (
+              <Link 
+                to="/conversas" 
+                className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Conversas
+              </Link>
             )}
           </div>
         </div>
-      </div>
+      )}
     </header>
   );
 };
