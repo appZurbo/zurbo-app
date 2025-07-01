@@ -22,6 +22,7 @@ interface Agendamento {
   endereco?: string;
   status: string;
   cliente_nome?: string;
+  preco_acordado?: number;
 }
 
 const AgendaPrestador = () => {
@@ -165,69 +166,109 @@ const AgendaPrestador = () => {
                   </div>
                 </CardContent>
               </Card>
-            ) : agendamentos.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <Calendar className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                  <h3 className="text-xl font-semibold mb-2">Agenda vazia</h3>
-                  <p className="text-gray-600 mb-4">
-                    Você ainda não possui compromissos agendados.
-                  </p>
-                  <NovoCompromissoModal />
-                </CardContent>
-              </Card>
             ) : (
-              <div className="space-y-4">
-                {agendamentos.map((agendamento) => (
-                  <Card key={agendamento.id} className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-3">
-                            <h3 className="font-semibold text-lg">{agendamento.titulo}</h3>
-                            <Badge className={getStatusColor(agendamento.status)}>
-                              {getStatusText(agendamento.status)}
-                            </Badge>
-                          </div>
-                          
-                          <div className="space-y-2 text-sm text-gray-600">
-                            <div className="flex items-center gap-2">
-                              <Calendar className="h-4 w-4" />
-                              <span>
-                                {format(new Date(agendamento.data_agendada), 'dd \'de\' MMMM \'de\' yyyy', { locale: ptBR })}
-                              </span>
-                            </div>
-                            
-                            <div className="flex items-center gap-2">
-                              <Clock className="h-4 w-4" />
-                              <span>{agendamento.hora_agendada}</span>
-                            </div>
-                            
-                            {agendamento.endereco && (
-                              <div className="flex items-center gap-2">
-                                <MapPin className="h-4 w-4" />
-                                <span>{agendamento.endereco}</span>
-                              </div>
-                            )}
-                            
-                            {agendamento.cliente_nome && (
-                              <div className="flex items-center gap-2">
-                                <User className="h-4 w-4" />
-                                <span>{agendamento.cliente_nome}</span>
-                              </div>
-                            )}
-                          </div>
-                          
-                          {agendamento.descricao && (
-                            <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                              <p className="text-sm text-gray-700">{agendamento.descricao}</p>
-                            </div>
-                          )}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Calendar View */}
+                <div className="lg:col-span-1">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Calendar className="h-5 w-5 text-orange-500" />
+                        Calendário
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {/* Simple calendar placeholder - you can integrate a calendar library */}
+                      <div className="text-center p-8 bg-orange-50 rounded-lg">
+                        <Calendar className="h-12 w-12 mx-auto mb-4 text-orange-500" />
+                        <p className="text-sm text-gray-600">
+                          {format(new Date(), 'MMMM \'de\' yyyy', { locale: ptBR })}
+                        </p>
+                        <div className="mt-4">
+                          <p className="text-xs text-gray-500">
+                            {agendamentos.length} compromissos este mês
+                          </p>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
-                ))}
+                </div>
+
+                {/* Appointments List */}
+                <div className="lg:col-span-2">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center justify-between">
+                        <span>Próximos Compromissos</span>
+                        <NovoCompromissoModal />
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {agendamentos.length === 0 ? (
+                        <div className="text-center py-8">
+                          <Calendar className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                          <h3 className="text-xl font-semibold mb-2">Agenda vazia</h3>
+                          <p className="text-gray-600 mb-4">
+                            Você ainda não possui compromissos agendados.
+                          </p>
+                          <NovoCompromissoModal />
+                        </div>
+                      ) : (
+                        <div className="space-y-4 max-h-96 overflow-y-auto">
+                          {agendamentos.map((agendamento) => (
+                            <div key={agendamento.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-3 mb-2">
+                                    <h3 className="font-semibold">{agendamento.titulo}</h3>
+                                    <Badge className={getStatusColor(agendamento.status)}>
+                                      {getStatusText(agendamento.status)}
+                                    </Badge>
+                                  </div>
+                                  
+                                  <div className="space-y-1 text-sm text-gray-600">
+                                    <div className="flex items-center gap-2">
+                                      <Calendar className="h-3 w-3" />
+                                      <span>
+                                        {format(new Date(agendamento.data_agendada), 'dd \'de\' MMMM', { locale: ptBR })}
+                                      </span>
+                                      <Clock className="h-3 w-3 ml-2" />
+                                      <span>{agendamento.hora_agendada}</span>
+                                    </div>
+                                    
+                                    {agendamento.cliente_nome && (
+                                      <div className="flex items-center gap-2">
+                                        <User className="h-3 w-3" />
+                                        <span>{agendamento.cliente_nome}</span>
+                                      </div>
+                                    )}
+
+                                    {agendamento.preco_acordado && (
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-green-600 font-medium">
+                                          R$ {agendamento.preco_acordado.toFixed(2)}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  
+                                  {agendamento.descricao && (
+                                    <div className="mt-2 p-2 bg-gray-100 rounded text-xs text-gray-700">
+                                      {agendamento.descricao.length > 100 
+                                        ? `${agendamento.descricao.substring(0, 100)}...`
+                                        : agendamento.descricao
+                                      }
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             )}
           </div>

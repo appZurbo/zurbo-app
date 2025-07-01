@@ -14,22 +14,29 @@ const PremiumOverview = () => {
   const { profile } = useAuth();
   const isMobile = useMobile();
 
-  // Mock data - in real app, this would come from database
+  // Premium data based on user profile
   const premiumData = {
-    planType: 'PRO Mensal',
-    expirationDate: '15/02/2024',
-    sosUsagesRemaining: 3,
-    sosUsagesTotal: 5,
-    features: [
+    planType: profile?.tipo === 'prestador' ? 'PRO Prestador' : 'PRO Cliente',
+    expirationDate: 'Eterno', // Since it's permanent from migration
+    sosUsagesRemaining: profile?.tipo === 'prestador' ? 7 : (profile?.premium ? 7 : 3),
+    sosUsagesTotal: profile?.tipo === 'prestador' ? 7 : (profile?.premium ? 7 : 3),
+    features: profile?.tipo === 'prestador' ? [
       'Prioridade nos resultados de busca',
-      'Badge PRO visível',
+      'Badge PRO visível no perfil',
+      'Suporte prioritário 24/7',
+      'Relatórios avançados de performance',
+      'Agenda premium com recursos extras',
+      '7 SOS por mês'
+    ] : [
+      'Acesso prioritário a prestadores',
+      'Badge Premium visível',
       'Suporte prioritário',
-      'Relatórios avançados',
-      '5 SOS por mês'
+      'Histórico expandido de pedidos',
+      '7 SOS por mês'
     ]
   };
 
-  if (!profile || profile.plano_premium !== 'ativo') {
+  if (!profile || !profile.premium) {
     return (
       <div>
         <UnifiedHeader />

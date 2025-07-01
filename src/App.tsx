@@ -97,10 +97,6 @@ const router = createBrowserRouter([
     element: <PrestadorSettings />,
   },
   {
-    path: "/agenda",
-    element: <AgendaPrestador />,
-  },
-  {
     path: "/agenda-prestador",
     element: <AgendaPrestador />,
   },

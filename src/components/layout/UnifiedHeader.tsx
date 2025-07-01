@@ -57,54 +57,51 @@ export const UnifiedHeader = () => {
         
         {/* Client Menu Items */}
         {profile?.tipo === 'cliente' && <>
+            <DropdownMenuItem onClick={() => handleNavigation('/configuracoes')}>
+              <Settings className="mr-2 h-4 w-4 text-blue-500" />
+              Configurações de Perfil
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleNavigation('/conversas')}>
-              <MessageCircle className="mr-2 h-4 w-4" />
+              <MessageCircle className="mr-2 h-4 w-4 text-green-500" />
               Minhas Conversas
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleNavigation('/pedidos')}>
-              <FileText className="mr-2 h-4 w-4" />
+              <FileText className="mr-2 h-4 w-4 text-purple-500" />
               Meus Pedidos
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleNavigation('/favoritos')}>
-              <Heart className="mr-2 h-4 w-4" />
+              <Heart className="mr-2 h-4 w-4 text-red-500" />
               Favoritos
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleNavigation('/notificacoes')}>
-              <Bell className="mr-2 h-4 w-4" />
-              Notificações
-            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => handleNavigation('/planos')}>
-              <Crown className="mr-2 h-4 w-4" />
-              Planos Premium
-            </DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600" onClick={() => handleNavigation('/emergency')}>
-              <AlertTriangle className="mr-2 h-4 w-4" />
-              SOS ({getSOSLimit()} restantes)
+            <DropdownMenuItem onClick={() => handleNavigation(profile?.premium ? '/premium-overview' : '/planos')}>
+              <Crown className="mr-2 h-4 w-4 text-yellow-500" />
+              {profile?.premium ? 'Premium Ativo' : 'Upgrade Premium'}
+              {profile?.premium && <Badge variant="secondary" className="ml-2">Pro</Badge>}
             </DropdownMenuItem>
           </>}
 
         {/* Provider Menu Items */}
         {isPrestador && <>
             <DropdownMenuItem onClick={() => handleNavigation('/prestador-dashboard')}>
-              <User className="mr-2 h-4 w-4" />
-              Dashboard
+              <User className="mr-2 h-4 w-4 text-blue-500" />
+              Painel do Prestador
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleNavigation('/conversas')}>
-              <MessageCircle className="mr-2 h-4 w-4" />
+              <MessageCircle className="mr-2 h-4 w-4 text-green-500" />
               Conversas
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleNavigation('/agenda-prestador')}>
-              <Calendar className="mr-2 h-4 w-4" />
-              Minha Agenda
+              <Calendar className="mr-2 h-4 w-4 text-purple-500" />
+              Agenda
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleNavigation('/pedidos')}>
-              <FileText className="mr-2 h-4 w-4" />
+              <FileText className="mr-2 h-4 w-4 text-orange-500" />
               Pedidos
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => handleNavigation('/premium-overview')}>
-              <Crown className="mr-2 h-4 w-4" />
+            <DropdownMenuItem onClick={() => handleNavigation(profile?.premium ? '/premium-overview' : '/planos')}>
+              <Crown className="mr-2 h-4 w-4 text-yellow-500" />
               {profile?.premium ? 'Premium Ativo' : 'Upgrade Premium'}
               {profile?.premium && <Badge variant="secondary" className="ml-2">Pro</Badge>}
             </DropdownMenuItem>
@@ -128,11 +125,11 @@ export const UnifiedHeader = () => {
             </DropdownMenuItem>
           </>}
 
-        <DropdownMenuSeparator />
+        {!isPrestador && <><DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => handleNavigation('/configuracoes')}>
           <Settings className="mr-2 h-4 w-4" />
           Configurações
-        </DropdownMenuItem>
+        </DropdownMenuItem></>}
         <DropdownMenuItem onClick={handleLogout}>
           <LogOut className="mr-2 h-4 w-4" />
           Sair

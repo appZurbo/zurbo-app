@@ -3,10 +3,14 @@ import { Home, Search, MessageCircle, User, Calendar } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
+import { useNotifications } from '@/hooks/useNotifications';
+import { useRealtimeChat } from '@/hooks/useRealtimeChat';
 
 const MobileDock = () => {
   const location = useLocation();
   const { isAuthenticated, profile } = useAuth();
+  const { unreadCount: notificationCount } = useNotifications();
+  const { unreadCount: chatCount } = useRealtimeChat();
   const isActive = (path: string) => location.pathname === path;
   
   const isPrestador = profile?.tipo === 'prestador';
@@ -38,7 +42,7 @@ const MobileDock = () => {
       icon: User,
       label: 'Perfil',
       path: isAuthenticated 
-        ? (isPrestador ? '/prestador-settings' : '/configuracoes') 
+        ? (isPrestador ? '/configuracoes' : '/configuracoes') 
         : '/auth'
     }
   ];
@@ -63,9 +67,9 @@ const MobileDock = () => {
             >
               <div className="relative">
                 <IconComponent className="h-5 w-5" />
-                {item.label === 'Conversas' && (
-                  <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 text-xs">
-                    2
+                {item.label === 'Conversas' && chatCount > 0 && (
+                  <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 text-xs bg-red-500">
+                    {chatCount > 99 ? '99+' : chatCount}
                   </Badge>
                 )}
               </div>
