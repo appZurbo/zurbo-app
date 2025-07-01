@@ -51,7 +51,14 @@ const UserManagement = () => {
         .order('criado_em', { ascending: false });
 
       if (error) throw error;
-      setUsers(data || []);
+      
+      // Properly type the data to match our UserData interface
+      const typedUsers: UserData[] = (data || []).map(user => ({
+        ...user,
+        tipo: user.tipo as 'cliente' | 'prestador' | 'admin' | 'moderator'
+      }));
+      
+      setUsers(typedUsers);
     } catch (error) {
       console.error('Error loading users:', error);
       toast({
