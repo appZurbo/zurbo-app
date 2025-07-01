@@ -32,11 +32,17 @@ interface AuthContextType {
   session: Session | null;
   profile: Profile | null;
   loading: boolean;
+  error: string | null;
+  isAuthenticated: boolean;
+  isPrestador: boolean;
+  isCliente: boolean;
   isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string, userData: Partial<Profile>) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  logout: () => Promise<void>;
   updateLocalProfile: (updates: Partial<Profile>) => void;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -44,11 +50,17 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   profile: null,
   loading: true,
+  error: null,
+  isAuthenticated: false,
+  isPrestador: false,
+  isCliente: false,
   isAdmin: false,
   signIn: async () => ({ error: null }),
   signUp: async () => ({ error: null }),
   signOut: async () => {},
+  logout: async () => {},
   updateLocalProfile: () => {},
+  refreshProfile: async () => {},
 });
 
 export const useAuth = () => {
@@ -64,6 +76,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const loadProfile = async (userId: string) => {
     try {
@@ -75,13 +88,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) {
         console.error('Error loading profile:', error);
+        setError(error.message);
         return null;
       }
 
-      return data;
-    } catch (error) {
+      // Ensure tipo is properly typed
+      const profileData = {
+        ...data,
+        tipo: data.tipo as 'cliente' | 'prestador' | 'admin' | 'moderator'
+      };
+
+      return profileData;
+    } catch (error: any) {
       console.error('Error loading profile:', error);
+      setError(error.message);
       return null;
+    }
+  };
+
+  const refreshProfile = async () => {
+    if (user) {
+      const userProfile = await loadProfile(user.id);
+      if (userProfile) {
+        setProfile(userProfile);
+      }
     }
   };
 
@@ -98,6 +128,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Update session and user state
         setSession(session);
         setUser(session?.user ?? null);
+        setError(null);
 
         // Load profile if user is authenticated
         if (session?.user) {
@@ -105,7 +136,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setTimeout(async () => {
             if (isMounted) {
               const userProfile = await loadProfile(session.user.id);
-              if (isMounted) {
+              if (isMounted && userProfile) {
                 setProfile(userProfile);
               }
             }
@@ -127,6 +158,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         
         if (error) {
           console.error('Error getting session:', error);
+          setError(error.message);
           return;
         }
 
@@ -137,12 +169,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         if (session?.user) {
           const userProfile = await loadProfile(session.user.id);
-          if (isMounted) {
+          if (isMounted && userProfile) {
             setProfile(userProfile);
           }
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error initializing auth:', error);
+        setError(error.message);
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -160,18 +193,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
+      setError(null);
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       return { error };
     } catch (error) {
+      setError('Erro ao fazer login');
       return { error };
     }
   };
 
   const signUp = async (email: string, password: string, userData: Partial<Profile>) => {
     try {
+      setError(null);
       const redirectUrl = `${window.location.origin}/`;
       
       const { data, error } = await supabase.auth.signUp({
@@ -200,22 +236,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         if (profileError) {
           console.error('Error creating profile:', profileError);
+          setError(profileError.message);
           return { error: profileError };
         }
       }
 
       return { error: null };
-    } catch (error) {
+    } catch (error: any) {
+      setError('Erro ao criar conta');
       return { error };
     }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setSession(null);
-    setProfile(null);
+    try {
+      setError(null);
+      await supabase.auth.signOut();
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+    } catch (error: any) {
+      setError('Erro ao sair');
+      console.error('Error signing out:', error);
+    }
   };
+
+  const logout = signOut; // Alias for signOut
 
   const updateLocalProfile = (updates: Partial<Profile>) => {
     if (profile) {
@@ -223,6 +269,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Computed properties
+  const isAuthenticated = !!user;
+  const isPrestador = profile?.tipo === 'prestador';
+  const isCliente = profile?.tipo === 'cliente';
   const isAdmin = profile?.tipo === 'admin' || profile?.tipo === 'moderator';
 
   const value = {
@@ -230,11 +280,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     session,
     profile,
     loading,
+    error,
+    isAuthenticated,
+    isPrestador,
+    isCliente,
     isAdmin,
     signIn,
     signUp,
     signOut,
+    logout,
     updateLocalProfile,
+    refreshProfile,
   };
 
   return (
