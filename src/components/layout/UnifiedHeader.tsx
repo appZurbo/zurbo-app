@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -9,27 +8,26 @@ import { Bell, MessageCircle, Settings, User, LogOut, Shield, Calendar, FileText
 import { useAuth } from '@/hooks/useAuth';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { useMobile } from '@/hooks/useMobile';
-
 export const UnifiedHeader = () => {
-  const { profile, logout, isAdmin, isPrestador } = useAuth();
+  const {
+    profile,
+    logout,
+    isAdmin,
+    isPrestador
+  } = useAuth();
   const navigate = useNavigate();
   const isMobile = useMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   const handleLogout = async () => {
     await logout();
     navigate('/');
   };
-
   const handleNavigation = (path: string) => {
     navigate(path);
     setMobileMenuOpen(false);
   };
-
   const getSOSLimit = () => profile?.premium ? 7 : 3;
-
-  const UserDropdownMenu = () => (
-    <DropdownMenu>
+  const UserDropdownMenu = () => <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-10 w-10 rounded-full p-0">
           <Avatar className="h-8 w-8">
@@ -58,8 +56,7 @@ export const UnifiedHeader = () => {
         <DropdownMenuSeparator />
         
         {/* Client Menu Items */}
-        {profile?.tipo === 'cliente' && (
-          <>
+        {profile?.tipo === 'cliente' && <>
             <DropdownMenuItem onClick={() => handleNavigation('/conversas')}>
               <MessageCircle className="mr-2 h-4 w-4" />
               Minhas Conversas
@@ -85,12 +82,10 @@ export const UnifiedHeader = () => {
               <AlertTriangle className="mr-2 h-4 w-4" />
               SOS ({getSOSLimit()} restantes)
             </DropdownMenuItem>
-          </>
-        )}
+          </>}
 
         {/* Provider Menu Items */}
-        {isPrestador && (
-          <>
+        {isPrestador && <>
             <DropdownMenuItem onClick={() => handleNavigation('/prestador-dashboard')}>
               <User className="mr-2 h-4 w-4" />
               Dashboard
@@ -113,16 +108,11 @@ export const UnifiedHeader = () => {
               {profile?.premium ? 'Premium Ativo' : 'Upgrade Premium'}
               {profile?.premium && <Badge variant="secondary" className="ml-2">Pro</Badge>}
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleNavigation('/prestador-settings')}>
-              <Settings className="mr-2 h-4 w-4" />
-              Configurações
-            </DropdownMenuItem>
-          </>
-        )}
+            
+          </>}
 
         {/* Admin Menu Items */}
-        {isAdmin && (
-          <>
+        {isAdmin && <>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => handleNavigation('/admin')}>
               <Shield className="mr-2 h-4 w-4" />
@@ -136,8 +126,7 @@ export const UnifiedHeader = () => {
               <Shield className="mr-2 h-4 w-4" />
               Moderação
             </DropdownMenuItem>
-          </>
-        )}
+          </>}
 
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => handleNavigation('/configuracoes')}>
@@ -149,11 +138,8 @@ export const UnifiedHeader = () => {
           Sair
         </DropdownMenuItem>
       </DropdownMenuContent>
-    </DropdownMenu>
-  );
-
-  return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+    </DropdownMenu>;
+  return <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="container flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-2">
@@ -164,84 +150,52 @@ export const UnifiedHeader = () => {
         </Link>
 
         {/* Desktop Navigation */}
-        {!isMobile && (
-          <nav className="flex items-center space-x-6">
+        {!isMobile && <nav className="flex items-center space-x-6">
             <Link to="/" className="text-sm font-medium text-gray-700 hover:text-orange-600 transition-colors">
               Início
             </Link>
             <Link to="/prestadores" className="text-sm font-medium text-gray-700 hover:text-orange-600 transition-colors">
               Prestadores
             </Link>
-            {profile && (
-              <Link to="/conversas" className="text-sm font-medium text-gray-700 hover:text-orange-600 transition-colors">
+            {profile && <Link to="/conversas" className="text-sm font-medium text-gray-700 hover:text-orange-600 transition-colors">
                 Conversas
-              </Link>
-            )}
-          </nav>
-        )}
+              </Link>}
+          </nav>}
 
         {/* Right Side */}
         <div className="flex items-center space-x-4">
-          {profile ? (
-            <>
+          {profile ? <>
               <NotificationBell />
               <UserDropdownMenu />
-            </>
-          ) : (
-            <div className="flex items-center space-x-2">
+            </> : <div className="flex items-center space-x-2">
               <Button variant="ghost" onClick={() => navigate('/auth')}>
                 Entrar
               </Button>
               <Button onClick={() => navigate('/auth')}>
                 Cadastrar
               </Button>
-            </div>
-          )}
+            </div>}
 
           {/* Mobile Menu Button */}
-          {isMobile && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden"
-            >
+          {isMobile && <Button variant="ghost" size="sm" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden">
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
-          )}
+            </Button>}
         </div>
       </div>
 
       {/* Mobile Menu */}
-      {isMobile && mobileMenuOpen && (
-        <div className="md:hidden border-t bg-white">
+      {isMobile && mobileMenuOpen && <div className="md:hidden border-t bg-white">
           <div className="container py-4 space-y-2">
-            <Link 
-              to="/" 
-              className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md"
-              onClick={() => setMobileMenuOpen(false)}
-            >
+            <Link to="/" className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md" onClick={() => setMobileMenuOpen(false)}>
               Início
             </Link>
-            <Link 
-              to="/prestadores" 
-              className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md"
-              onClick={() => setMobileMenuOpen(false)}
-            >
+            <Link to="/prestadores" className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md" onClick={() => setMobileMenuOpen(false)}>
               Prestadores
             </Link>
-            {profile && (
-              <Link 
-                to="/conversas" 
-                className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md"
-                onClick={() => setMobileMenuOpen(false)}
-              >
+            {profile && <Link to="/conversas" className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-orange-600 hover:bg-gray-50 rounded-md" onClick={() => setMobileMenuOpen(false)}>
                 Conversas
-              </Link>
-            )}
+              </Link>}
           </div>
-        </div>
-      )}
-    </header>
-  );
+        </div>}
+    </header>;
 };
