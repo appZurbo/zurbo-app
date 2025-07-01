@@ -27,6 +27,7 @@ import NotFound from "@/pages/NotFound";
 import SobreNos from "@/pages/SobreNos";
 import TrabalheConosco from "@/pages/TrabalheConosco";
 import TestingDashboard from "@/pages/TestingDashboard";
+import UserManagement from "@/pages/admin/UserManagement";
 import { Toaster } from '@/components/ui/toaster';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
@@ -72,6 +73,10 @@ const router = createBrowserRouter([
     element: <TestingDashboard />,
   },
   {
+    path: "/admin/usuarios",
+    element: <UserManagement />,
+  },
+  {
     path: "/conversas",
     element: <Conversas />,
   },
@@ -109,10 +114,6 @@ const router = createBrowserRouter([
   },
   {
     path: "/premium-overview",
-    element: <PremiumOverview />,
-  },
-  {
-    path: "/premium-dashboard",
     element: <PremiumOverview />,
   },
   {

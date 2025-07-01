@@ -14,7 +14,7 @@ import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 
 const Settings = () => {
   const navigate = useNavigate();
-  const { profile, isPrestador, loading } = useAuth();
+  const { profile, isPrestador, isAuthenticated, loading } = useAuth();
   const isMobile = useMobile();
 
   if (loading) {
@@ -32,7 +32,7 @@ const Settings = () => {
     );
   }
 
-  if (!profile) {
+  if (!isAuthenticated || !profile) {
     return (
       <UnifiedLayout>
         <div className="min-h-screen flex items-center justify-center p-4">
@@ -106,14 +106,14 @@ const Settings = () => {
               </TabsList>
               
               <TabsContent value="profile" className="space-y-6">
-                <Card className="shadow-sm px-0">
-                  <CardHeader className="py-[10px] my-0 mx-0 px-[34px]">
-                    <CardTitle className="flex items-center gap-2 text-sm text-center">
+                <Card className="shadow-sm">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="flex items-center gap-2 text-lg">
                       <User className="h-5 w-5 text-orange-500" />
                       Informações Pessoais
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="px-0">
+                  <CardContent>
                     {isPrestador ? <PrestadorSettings /> : <UserSettings />}
                   </CardContent>
                 </Card>

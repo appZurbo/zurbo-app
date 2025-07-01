@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Users, CheckCircle, AlertTriangle, MessageCircle, ShoppingBag, Wrench } from 'lucide-react';
+import { ArrowLeft, Users, CheckCircle, AlertTriangle, MessageCircle, ShoppingBag, Wrench, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
@@ -229,7 +229,15 @@ const AdminDashboard = () => {
               <CardTitle>Ações Rápidas</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <Button
+                  onClick={() => navigate('/admin/usuarios')}
+                  variant="outline"
+                  className="justify-start"
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Gerenciar Usuários
+                </Button>
                 <Button
                   onClick={() => navigate('/conversas')}
                   variant="outline"
@@ -243,7 +251,7 @@ const AdminDashboard = () => {
                   variant="outline"
                   className="justify-start"
                 >
-                  <Users className="h-4 w-4 mr-2" />
+                  <Wrench className="h-4 w-4 mr-2" />
                   Ver Prestadores
                 </Button>
                 <Button

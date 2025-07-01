@@ -19,7 +19,8 @@ import {
   ChevronDown,
   Shield,
   Wrench,
-  Heart
+  Heart,
+  Users
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -136,14 +137,14 @@ export const UserSubmenu = () => {
               Painel Administrativo
             </DropdownMenuItem>
             
+            <DropdownMenuItem onClick={() => navigate('/admin/usuarios')}>
+              <Users className="h-4 w-4 mr-2" />
+              Gerenciar Usuários
+            </DropdownMenuItem>
+            
             <DropdownMenuItem onClick={() => navigate('/admin/moderacao')}>
               <Shield className="h-4 w-4 mr-2" />
               Moderação de Conteúdo
-            </DropdownMenuItem>
-            
-            <DropdownMenuItem onClick={() => navigate('/admin/sistema')}>
-              <Settings className="h-4 w-4 mr-2" />
-              Configurações do Sistema
             </DropdownMenuItem>
           </>
         )}
