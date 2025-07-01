@@ -1,102 +1,150 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { checkUserProfile, createUserProfile, type UserProfile } from '@/utils/database';
-import type { User } from '@supabase/supabase-js';
+
+interface Profile {
+  id: string;
+  nome: string;
+  email: string;
+  tipo: 'cliente' | 'prestador' | 'admin' | 'moderator';
+  foto_url?: string;
+  bio?: string;
+  descricao_servico?: string;
+  endereco_cidade?: string;
+  endereco_bairro?: string;
+  endereco_rua?: string;
+  endereco_numero?: string;
+  endereco_cep?: string;
+  cpf?: string;
+  premium?: boolean;
+  nota_media?: number;
+  em_servico?: boolean;
+  latitude?: number;
+  longitude?: number;
+  auth_id?: string;
+  updated_at?: string;
+  criado_em?: string;
+}
+
+interface AuthContextType {
+  user: User | null;
+  session: Session | null;
+  profile: Profile | null;
+  loading: boolean;
+  isAdmin: boolean;
+  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, userData: Partial<Profile>) => Promise<{ error: any }>;
+  signOut: () => Promise<void>;
+  updateLocalProfile: (updates: Partial<Profile>) => void;
+}
+
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  session: null,
+  profile: null,
+  loading: true,
+  isAdmin: false,
+  signIn: async () => ({ error: null }),
+  signUp: async () => ({ error: null }),
+  signOut: async () => {},
+  updateLocalProfile: () => {},
+});
 
 export const useAuth = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
-  const loadProfile = useCallback(async (authId: string) => {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const loadProfile = async (userId: string) => {
     try {
-      console.log('Loading profile for auth ID:', authId);
-      let profileData = await checkUserProfile(authId);
-      
-      if (!profileData) {
-        console.log('Profile not found, creating new profile...');
-        const { data: { user: authUser } } = await supabase.auth.getUser();
-        if (authUser && authUser.user_metadata) {
-          const metadata = authUser.user_metadata;
-          profileData = await createUserProfile(authId, authUser.email || '', {
-            nome: metadata.nome || authUser.email?.split('@')[0] || 'Usuário',
-            tipo: metadata.tipo || 'cliente',
-            cpf: metadata.cpf || null
-          });
-        } else {
-          profileData = await createUserProfile(authId, authUser?.email || '', {});
-        }
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('auth_id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error loading profile:', error);
+        return null;
       }
 
-      setProfile(profileData);
-      setError(null);
+      return data;
     } catch (error) {
       console.error('Error loading profile:', error);
-      setProfile(null);
-      setError('Erro ao carregar perfil do usuário');
+      return null;
     }
-  }, []);
+  };
 
   useEffect(() => {
-    let mounted = true;
+    let isMounted = true;
 
-    const initializeAuth = async () => {
-      try {
-        // Get initial session
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.id);
         
-        if (sessionError) {
-          console.error('Error getting session:', sessionError);
-          if (mounted) {
-            setError('Erro ao verificar sessão');
-            setLoading(false);
-          }
-          return;
+        if (!isMounted) return;
+
+        // Update session and user state
+        setSession(session);
+        setUser(session?.user ?? null);
+
+        // Load profile if user is authenticated
+        if (session?.user) {
+          // Defer profile loading to avoid blocking auth state changes
+          setTimeout(async () => {
+            if (isMounted) {
+              const userProfile = await loadProfile(session.user.id);
+              if (isMounted) {
+                setProfile(userProfile);
+              }
+            }
+          }, 0);
+        } else {
+          setProfile(null);
         }
-        
-        if (mounted) {
-          const currentUser = session?.user ?? null;
-          setUser(currentUser);
-          
-          if (currentUser) {
-            await loadProfile(currentUser.id);
-          } else {
-            setProfile(null);
-          }
+
+        if (isMounted) {
           setLoading(false);
         }
+      }
+    );
 
-        // Set up auth state listener
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(
-          async (event, session) => {
-            if (!mounted) return;
-            
-            console.log('Auth state changed:', event, session?.user?.id);
-            
-            const currentUser = session?.user ?? null;
-            setUser(currentUser);
-            
-            if (currentUser && event === 'SIGNED_IN') {
-              // Load profile for signed in user
-              await loadProfile(currentUser.id);
-            } else if (event === 'SIGNED_OUT') {
-              setProfile(null);
-              setError(null);
-            }
-            
-            setLoading(false);
+    // THEN check for existing session
+    const initializeAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error getting session:', error);
+          return;
+        }
+
+        if (!isMounted) return;
+
+        setSession(session);
+        setUser(session?.user ?? null);
+
+        if (session?.user) {
+          const userProfile = await loadProfile(session.user.id);
+          if (isMounted) {
+            setProfile(userProfile);
           }
-        );
-
-        return () => {
-          subscription.unsubscribe();
-        };
+        }
       } catch (error) {
         console.error('Error initializing auth:', error);
-        if (mounted) {
-          setError('Erro ao inicializar autenticação');
+      } finally {
+        if (isMounted) {
           setLoading(false);
         }
       }
@@ -105,67 +153,93 @@ export const useAuth = () => {
     initializeAuth();
 
     return () => {
-      mounted = false;
+      isMounted = false;
+      subscription.unsubscribe();
     };
-  }, [loadProfile]);
+  }, []);
 
-  const logout = async () => {
-    setLoading(true);
+  const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Error logging out:', error);
-        setError('Erro ao fazer logout');
-      } else {
-        setUser(null);
-        setProfile(null);
-        setError(null);
-      }
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      return { error };
     } catch (error) {
-      console.error('Logout error:', error);
-      setError('Erro inesperado ao fazer logout');
-    } finally {
-      setLoading(false);
+      return { error };
     }
   };
 
-  const updateLocalProfile = (updates: Partial<UserProfile>) => {
+  const signUp = async (email: string, password: string, userData: Partial<Profile>) => {
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+        },
+      });
+
+      if (error) return { error };
+
+      // Create user profile if signup was successful
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('users')
+          .insert({
+            auth_id: data.user.id,
+            email: email,
+            nome: userData.nome || '',
+            tipo: userData.tipo || 'cliente',
+            bio: userData.bio || '',
+            endereco_cidade: userData.endereco_cidade || '',
+            endereco_bairro: userData.endereco_bairro || '',
+          });
+
+        if (profileError) {
+          console.error('Error creating profile:', profileError);
+          return { error: profileError };
+        }
+      }
+
+      return { error: null };
+    } catch (error) {
+      return { error };
+    }
+  };
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setSession(null);
+    setProfile(null);
+  };
+
+  const updateLocalProfile = (updates: Partial<Profile>) => {
     if (profile) {
       setProfile({ ...profile, ...updates });
     }
   };
 
-  const refreshProfile = async () => {
-    if (user) {
-      setLoading(true);
-      await loadProfile(user.id);
-      setLoading(false);
-    }
-  };
+  const isAdmin = profile?.tipo === 'admin' || profile?.tipo === 'moderator';
 
-  // Enhanced admin check
-  const isAdminUser = () => {
-    if (!user || !profile) return false;
-    
-    if (profile.tipo === 'admin' || profile.tipo === 'moderator') {
-      return true;
-    }
-    
-    const adminEmails = ['contato@zurbo.com.br', 'admin@zurbo.com.br'];
-    return adminEmails.includes(user.email || '');
-  };
-
-  return {
+  const value = {
     user,
+    session,
     profile,
     loading,
-    error,
-    isAuthenticated: !!user,
-    isPrestador: profile?.tipo === 'prestador',
-    isCliente: profile?.tipo === 'cliente',
-    isAdmin: isAdminUser(),
-    logout,
+    isAdmin,
+    signIn,
+    signUp,
+    signOut,
     updateLocalProfile,
-    refreshProfile
   };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 };

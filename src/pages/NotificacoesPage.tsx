@@ -66,8 +66,10 @@ const NotificacoesPage = () => {
             </div>
           </div>
 
-          {/* Painel de Notificações */}
-          <NotificationPanel />
+          {/* Notifications Panel */}
+          <div className="flex justify-center">
+            <NotificationPanel />
+          </div>
         </div>
       </div>
     </UnifiedLayout>
