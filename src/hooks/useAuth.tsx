@@ -18,6 +18,7 @@ interface Profile {
   endereco_cep?: string;
   cpf?: string;
   premium?: boolean;
+  plano_premium?: string;
   nota_media?: number;
   em_servico?: boolean;
   latitude?: number;
@@ -93,7 +94,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       // Ensure tipo is properly typed
-      const profileData = {
+      const profileData: Profile = {
         ...data,
         tipo: data.tipo as 'cliente' | 'prestador' | 'admin' | 'moderator'
       };

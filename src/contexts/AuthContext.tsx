@@ -18,6 +18,7 @@ interface Profile {
   endereco_cep?: string;
   cpf?: string;
   premium?: boolean;
+  plano_premium?: string;
   nota_media?: number;
   em_servico?: boolean;
   latitude?: number;
