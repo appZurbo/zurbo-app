@@ -38,6 +38,9 @@ interface AuthContextType {
   isPrestador: boolean;
   isCliente: boolean;
   isAdmin: boolean;
+  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, userData: Partial<Profile>) => Promise<{ error: any }>;
+  signOut: () => Promise<void>;
   logout: () => Promise<void>;
   updateLocalProfile: (updates: Partial<Profile>) => void;
   refreshProfile: () => Promise<void>;
@@ -52,23 +55,8 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const auth = useAuth();
 
-  const contextValue: AuthContextType = {
-    user: auth.user,
-    session: auth.session,
-    profile: auth.profile,
-    loading: auth.loading,
-    error: auth.error,
-    isAuthenticated: auth.isAuthenticated,
-    isPrestador: auth.isPrestador,
-    isCliente: auth.isCliente,
-    isAdmin: auth.isAdmin,
-    logout: auth.logout,
-    updateLocalProfile: auth.updateLocalProfile,
-    refreshProfile: auth.refreshProfile,
-  };
-
   return (
-    <AuthContext.Provider value={contextValue}>
+    <AuthContext.Provider value={auth}>
       {children}
     </AuthContext.Provider>
   );
