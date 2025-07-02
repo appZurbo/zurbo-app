@@ -1,45 +1,37 @@
 
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { AuthModal } from './AuthModal';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 import { 
   User, 
   Settings, 
   LogOut, 
-  Bell,
-  Wrench,
-  Search,
-  Menu,
-  X,
   Crown,
   Calendar,
-  Gauge,
-  Newspaper,
-  Shield
+  MessageSquare,
+  Heart,
+  Bell,
+  FileText,
+  Info
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { useNavigate, Link } from 'react-router-dom';
-import AuthModal from './AuthModal';
-import { NotificationBell } from './notifications/NotificationBell';
-import { useMobile } from '@/hooks/useMobile';
+import { Badge } from '@/components/ui/badge';
 
-const Header = () => {
-  const { user, profile, logout, isPrestador, isAdmin } = useAuth();
+export const Header = () => {
   const navigate = useNavigate();
+  const { user, logout, isPremium, isProvider } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const isMobile = useMobile();
 
-  const handleLogin = (userData: any) => {
-    console.log('Login realizado:', userData);
-    setShowAuthModal(false);
+  const handleAuthClick = () => {
+    setShowAuthModal(true);
   };
 
   const handleLogout = async () => {
@@ -47,216 +39,133 @@ const Header = () => {
     navigate('/');
   };
 
-  const handleProfileClick = () => {
-    navigate('/perfil');
-  };
-
-  const handleSettingsClick = () => {
-    if (isPrestador) {
-      navigate('/prestador-settings');
-    } else {
-      navigate('/configuracoes');
-    }
-  };
-
   return (
-    <>
-      <header className="bg-white shadow-sm border-b sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <Link to="/" className="flex items-center">
-              <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-xl">Z</span>
+    <header className="bg-white shadow-sm border-b">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <div className="flex items-center">
+            <button
+              onClick={() => navigate('/')}
+              className="flex items-center space-x-2"
+            >
+              <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">Z</span>
               </div>
-              <span className="ml-2 text-xl font-bold gradient-bg bg-clip-text text-transparent">
-                ZURBO
-              </span>
-            </Link>
+              <span className="text-xl font-bold text-gray-900">Zurbo</span>
+            </button>
+          </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-8">
-              <Link to="/" className="text-gray-700 hover:text-orange-500 transition-colors">
-                Início
-              </Link>
-              <Link to="/prestadores" className="text-gray-700 hover:text-orange-500 transition-colors">
-                Prestadores
-              </Link>
-              {user && (
-                <Link to="/ads" className="text-gray-700 hover:text-orange-500 transition-colors flex items-center gap-2">
-                  <Newspaper className="h-4 w-4" />
-                  Anúncios
-                </Link>
-              )}
-              <Link to="/como-funciona" className="text-gray-700 hover:text-orange-500 transition-colors">
-                Como Funciona
-              </Link>
-            </nav>
+          <div className="flex items-center space-x-4">
+            {!user && (
+              <>
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate('/informacoes')}
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  <Info className="h-4 w-4 mr-2" />
+                  Informações
+                </Button>
+                <Button variant="outline" onClick={handleAuthClick}>
+                  Entrar
+                </Button>
+                <Button onClick={handleAuthClick} className="bg-orange-500 hover:bg-orange-600">
+                  Cadastrar
+                </Button>
+              </>
+            )}
 
-            {/* Desktop Actions */}
-            <div className="hidden lg:flex items-center space-x-4">
-              {user ? (
-                <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => navigate('/planos')}
-                    className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
-                  >
-                    <Crown className="h-5 w-5" />
-                    <span className="ml-1">PRO</span>
-                  </Button>
-                  <NotificationBell />
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage src={profile?.foto_url} alt={profile?.nome} />
-                          <AvatarFallback>
-                            {profile?.nome?.charAt(0) || user.email?.charAt(0) || '?'}
-                          </AvatarFallback>
-                        </Avatar>
-                        {isAdmin && (
-                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                            <Shield className="h-2 w-2 text-white" />
-                          </div>
-                        )}
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56" align="end" forceMount>
-                      <div className="flex items-center justify-start gap-2 p-2">
-                        <div className="flex flex-col space-y-1 leading-none">
-                          <div className="flex items-center gap-2">
-                            <p className="font-medium">{profile?.nome || 'Usuário'}</p>
-                            {profile?.premium && (
-                              <span className="inline-flex items-center gap-1 text-xs text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full">
-                                <Crown className="h-3 w-3" />
-                                PRO
-                              </span>
-                            )}
-                            {isAdmin && (
-                              <span className="inline-flex items-center gap-1 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
-                                <Shield className="h-3 w-3" />
-                                Admin
-                              </span>
-                            )}
-                          </div>
-                          <p className="w-[200px] truncate text-sm text-muted-foreground">
-                            {user.email}
-                          </p>
-                          {isPrestador && (
-                            <span className="inline-flex items-center gap-1 text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded-full">
-                              <Wrench className="h-3 w-3" />
-                              Prestador
-                            </span>
-                          )}
+            {user && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <div className="flex items-center space-x-2">
+                      {user.foto_url ? (
+                        <img 
+                          src={user.foto_url} 
+                          alt={user.nome}
+                          className="h-8 w-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center">
+                          <User className="h-4 w-4 text-white" />
                         </div>
-                      </div>
-                      <DropdownMenuSeparator />
-                      {isPrestador && (
-                        <>
-                          <DropdownMenuItem onClick={() => navigate('/prestador-dashboard')}>
-                            <Gauge className="mr-2 h-4 w-4 text-blue-500" />
-                            Painel do Prestador
-                          </DropdownMenuItem>
-                          
-                          <DropdownMenuItem onClick={() => navigate('/prestador-settings')}>
-                            <Settings className="mr-2 h-4 w-4 text-gray-500" />
-                            Configurações do Prestador
-                          </DropdownMenuItem>
-                          
-                          <DropdownMenuItem onClick={() => navigate('/agenda-prestador')}>
-                            <Calendar className="mr-2 h-4 w-4 text-purple-500" />
-                            Agenda Profissional
-                          </DropdownMenuItem>
-                          
-                          <DropdownMenuItem onClick={() => navigate('/planos')}>
-                            <Crown className="mr-2 h-4 w-4 text-yellow-500" />
-                            Planos PRO
-                          </DropdownMenuItem>
-                        </>
                       )}
-                      <DropdownMenuItem onClick={handleSettingsClick}>
-                        <Settings className="mr-2 h-4 w-4 text-gray-500" />
-                        {isPrestador ? 'Configurações do Prestador' : 'Configurações'}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleLogout}>
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Sair
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <Button variant="ghost" onClick={() => setShowAuthModal(true)}>
-                    Entrar
+                      {isPremium && (
+                        <Crown className="h-4 w-4 text-yellow-500" />
+                      )}
+                    </div>
                   </Button>
-                  <Button 
-                    onClick={() => setShowAuthModal(true)}
-                    className="gradient-bg"
-                  >
-                    Cadastrar
-                  </Button>
-                </div>
-              )}
-            </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <div className="flex items-center justify-start gap-2 p-2">
+                    <div className="flex flex-col space-y-1 leading-none">
+                      <p className="font-medium">{user.nome}</p>
+                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                      {isPremium && (
+                        <Badge variant="secondary" className="text-xs w-fit">
+                          <Crown className="h-3 w-3 mr-1" />
+                          Premium
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  
+                  <DropdownMenuItem onClick={() => navigate('/settings')}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Configurações</span>
+                  </DropdownMenuItem>
 
-            {/* Mobile/Tablet Actions */}
-            <div className="flex lg:hidden items-center space-x-2">
-              {user ? (
-                <>
-                  {!profile?.premium && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => navigate('/planos')}
-                      className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
-                    >
-                      <Crown className="h-5 w-5" />
-                    </Button>
+                  {isProvider && (
+                    <>
+                      <DropdownMenuItem onClick={() => navigate('/agenda')}>
+                        <Calendar className="mr-2 h-4 w-4" />
+                        <span>Agenda</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/prestador-settings')}>
+                        <Settings className="mr-2 h-4 w-4 text-blue-600" />
+                        <span>Config. Prestador</span>
+                      </DropdownMenuItem>
+                    </>
                   )}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => navigate('/ads')}
-                    className="text-gray-600 hover:text-orange-500"
-                  >
-                    <Newspaper className="h-5 w-5" />
-                  </Button>
-                  <NotificationBell />
-                </>
-              ) : (
-                <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => navigate('/planos')}
-                    className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
-                  >
-                    <Crown className="h-5 w-5" />
-                  </Button>
-                  <Button 
-                    onClick={() => setShowAuthModal(true)}
-                    className="gradient-bg text-sm px-3 py-2"
-                  >
-                    Entrar
-                  </Button>
-                </>
-              )}
-            </div>
+
+                  <DropdownMenuItem onClick={() => navigate('/conversas')}>
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    <span>Conversas</span>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem onClick={() => navigate('/favoritos')}>
+                    <Heart className="mr-2 h-4 w-4" />
+                    <span>Favoritos</span>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem onClick={() => navigate('/notificacoes')}>
+                    <Bell className="mr-2 h-4 w-4" />
+                    <span>Notificações</span>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem onClick={() => navigate('/informacoes')}>
+                    <Info className="mr-2 h-4 w-4" />
+                    <span>Informações</span>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sair</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
-      </header>
+      </div>
 
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
-        onLogin={handleLogin}
       />
-    </>
+    </header>
   );
 };
-
-export default Header;

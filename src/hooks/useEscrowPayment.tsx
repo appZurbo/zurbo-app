@@ -8,12 +8,17 @@ export interface EscrowPayment {
   conversation_id?: string;
   pedido_id?: string;
   stripe_payment_intent_id?: string;
+  stripe_account_id?: string;
   amount: number;
   currency: string;
-  status: 'pending' | 'held' | 'released' | 'refunded';
+  zurbo_fee: number;
+  status: 'pending' | 'authorized' | 'captured' | 'refunded' | 'disputed' | 'failed';
   created_at: string;
-  released_at?: string;
+  authorized_at?: string;
+  captured_at?: string;
   auto_release_date?: string;
+  dispute_reason?: string;
+  dispute_images?: string[];
 }
 
 export const useEscrowPayment = () => {
@@ -27,6 +32,8 @@ export const useEscrowPayment = () => {
   ) => {
     setLoading(true);
     try {
+      const zurboFee = amount * 0.05;
+      
       // Criar pagamento escrow no Supabase
       const { data, error } = await supabase
         .from('escrow_payments')
@@ -34,6 +41,7 @@ export const useEscrowPayment = () => {
           conversation_id: conversationId,
           amount,
           currency,
+          zurbo_fee: zurboFee,
           status: 'pending',
           auto_release_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 dias
         })
@@ -78,7 +86,7 @@ export const useEscrowPayment = () => {
   const releasePayment = useCallback(async (escrowPaymentId: string) => {
     setLoading(true);
     try {
-      const { error } = await supabase.functions.invoke('release-escrow-payment', {
+      const { error } = await supabase.functions.invoke('capture-escrow-payment', {
         body: { escrowPaymentId }
       });
 
@@ -93,6 +101,40 @@ export const useEscrowPayment = () => {
       toast({
         title: "Erro",
         description: "Não foi possível liberar o pagamento.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
+  const createDispute = useCallback(async (
+    escrowPaymentId: string, 
+    reason: string, 
+    images?: string[]
+  ) => {
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('escrow_payments')
+        .update({
+          status: 'disputed',
+          dispute_reason: reason,
+          dispute_images: images || []
+        })
+        .eq('id', escrowPaymentId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Disputa Criada",
+        description: "Sua disputa foi registrada e será analisada.",
+      });
+    } catch (error) {
+      console.error('Error creating dispute:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível criar a disputa.",
         variant: "destructive"
       });
     } finally {
@@ -122,6 +164,7 @@ export const useEscrowPayment = () => {
     loading,
     createEscrowPayment,
     releasePayment,
+    createDispute,
     getEscrowPayments
   };
 };

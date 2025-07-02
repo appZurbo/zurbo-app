@@ -14,120 +14,113 @@ serve(async (req) => {
   }
 
   try {
-    const { escrowPaymentId, amount, currency = 'brl' } = await req.json();
-
-    // Criar cliente Supabase com service role para bypass RLS
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       { auth: { persistSession: false } }
     );
 
-    // Buscar detalhes do pagamento escrow
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+      apiVersion: "2023-10-16",
+    });
+
+    const { escrowPaymentId, amount, currency } = await req.json();
+
+    // Buscar dados do pagamento escrow
     const { data: escrowPayment, error: escrowError } = await supabaseClient
       .from('escrow_payments')
       .select(`
         *,
-        chat_conversations!inner(
+        chat_conversations:conversation_id (
           cliente_id,
           prestador_id,
-          servico_solicitado,
-          cliente:users!chat_conversations_cliente_id_fkey(nome, email),
-          prestador:users!chat_conversations_prestador_id_fkey(nome, email)
+          users:prestador_id (
+            email,
+            stripe_accounts (
+              stripe_account_id
+            )
+          )
         )
       `)
       .eq('id', escrowPaymentId)
       .single();
 
     if (escrowError || !escrowPayment) {
-      throw new Error('Pagamento escrow não encontrado');
+      throw new Error('Escrow payment not found');
     }
 
-    // Inicializar Stripe
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-      apiVersion: "2023-10-16",
+    // Criar Payment Intent com captura manual
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency,
+      capture_method: 'manual', // Captura manual para escrow
+      automatic_payment_methods: {
+        enabled: true,
+      },
+      transfer_data: escrowPayment.chat_conversations?.users?.stripe_accounts?.[0] ? {
+        destination: escrowPayment.chat_conversations.users.stripe_accounts[0].stripe_account_id,
+        amount: Math.floor(amount * 0.95), // 95% para o prestador (5% fee Zurbo)
+      } : undefined,
+      metadata: {
+        escrow_payment_id: escrowPaymentId,
+        type: 'escrow_service_payment'
+      }
     });
 
-    const conversation = escrowPayment.chat_conversations;
-    const clientEmail = conversation.cliente?.email;
-
-    if (!clientEmail) {
-      throw new Error('Email do cliente não encontrado');
-    }
-
-    // Verificar se já existe customer no Stripe
-    const customers = await stripe.customers.list({ 
-      email: clientEmail,
-      limit: 1 
-    });
-    
-    let customerId;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
-    }
-
-    // Criar sessão de checkout do Stripe para pagamento com retenção
+    // Criar Checkout Session
     const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      customer_email: customerId ? undefined : clientEmail,
+      payment_intent_data: {
+        setup_future_usage: 'off_session',
+      },
       line_items: [
         {
           price_data: {
-            currency: currency,
+            currency,
             product_data: {
-              name: `Serviço: ${conversation.servico_solicitado}`,
-              description: `Prestador: ${conversation.prestador?.nome}`
+              name: 'Pagamento de Serviço - ZURBO',
+              description: 'Pagamento seguro retido até a conclusão do serviço',
             },
-            unit_amount: amount, // Já vem em centavos
+            unit_amount: amount,
           },
           quantity: 1,
         },
       ],
-      mode: "payment",
-      payment_intent_data: {
-        // Configurar para retenção - o dinheiro fica retido até liberação manual
-        capture_method: 'manual',
-        metadata: {
-          escrow_payment_id: escrowPaymentId,
-          conversation_id: conversation.id,
-          type: 'escrow'
-        }
-      },
-      success_url: `${req.headers.get("origin")}/conversas?payment=success&escrow_id=${escrowPaymentId}`,
-      cancel_url: `${req.headers.get("origin")}/conversas?payment=canceled`,
+      mode: 'payment',
+      success_url: `${req.headers.get("origin")}/conversas?payment=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.headers.get("origin")}/conversas?payment=cancelled`,
       metadata: {
         escrow_payment_id: escrowPaymentId,
-        conversation_id: conversation.id
       }
     });
 
-    // Atualizar escrow payment com payment intent ID
+    // Atualizar o pagamento escrow com os IDs do Stripe
     await supabaseClient
       .from('escrow_payments')
-      .update({ 
-        stripe_payment_intent_id: session.payment_intent,
+      .update({
+        stripe_payment_intent_id: paymentIntent.id,
         status: 'pending'
       })
       .eq('id', escrowPaymentId);
 
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
+        payment_intent_id: paymentIntent.id,
         checkout_url: session.url,
-        payment_intent_id: session.payment_intent 
+        client_secret: paymentIntent.client_secret
       }),
-      { 
+      {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200 
+        status: 200,
       }
     );
 
   } catch (error) {
-    console.error('Error creating escrow payment:', error);
+    console.error("Error creating escrow payment:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
+      {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500 
+        status: 500,
       }
     );
   }
