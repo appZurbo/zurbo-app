@@ -1,24 +1,16 @@
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, Users, Target, Heart, Lightbulb } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMobile } from '@/hooks/useMobile';
-
 const SobreNos = () => {
   const navigate = useNavigate();
   const isMobile = useMobile();
-
-  return (
-    <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
+  return <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
       <div className={`${isMobile ? 'px-4 py-4' : 'max-w-4xl mx-auto p-6'}`}>
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/')}
-            className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}
-          >
+          <Button variant="ghost" onClick={() => navigate('/')} className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             {!isMobile && 'Voltar'}
           </Button>
@@ -86,21 +78,13 @@ const SobreNos = () => {
               Nossa História
             </h3>
             <div className="prose prose-gray max-w-none">
-              <p className="text-gray-700 mb-4">
-                O ZURBO foi criado em 2024 com o objetivo de simplificar a busca por profissionais qualificados. 
-                Percebemos que tanto clientes quanto prestadores de serviços enfrentavam dificuldades para se conectar 
-                de forma eficiente e segura.
-              </p>
+              <p className="text-gray-700 mb-4">O ZURBO foi criado em 2025 com o objetivo de simplificar a busca por profissionais qualificados. Percebemos que tanto clientes quanto prestadores de serviços enfrentavam dificuldades para se conectar de forma eficiente e segura.</p>
               <p className="text-gray-700 mb-4">
                 Nossa plataforma foi desenvolvida pensando na experiência do usuário, oferecendo ferramentas 
                 intuitivas para busca, contratação e avaliação de serviços. Priorizamos a segurança e a qualidade 
                 em todas as interações.
               </p>
-              <p className="text-gray-700">
-                Hoje, o ZURBO conecta milhares de clientes a prestadores de serviços qualificados em diversas 
-                categorias, desde limpeza e reparos até beleza e jardinagem. Continuamos crescendo e inovando 
-                para atender melhor às necessidades de nossa comunidade.
-              </p>
+              <p className="text-gray-700 text-base font-normal">Hoje, o zurbo conecta milhares de clientes a prestadores de serviços qualificados em diversas categorias, desde limpeza, cuidados e reparos até beleza e jardinagem. Continuamos crescendo e inovando para atender melhor às necessidades de nossa comunidade.</p>
             </div>
           </CardContent>
         </Card>
@@ -108,24 +92,16 @@ const SobreNos = () => {
         {/* Call to Action */}
         <div className="text-center">
           <h3 className="text-xl font-semibold mb-4">Faça parte da nossa comunidade</h3>
-          <div className="flex gap-4 justify-center">
-            <Button 
-              onClick={() => navigate('/auth')}
-              className="bg-orange-500 hover:bg-orange-600"
-            >
+          <div className="flex gap-1 justify-center">
+            <Button onClick={() => navigate('/auth')} className="bg-orange-500 hover:bg-orange-600">
               Cadastre-se como Cliente
             </Button>
-            <Button 
-              variant="outline"
-              onClick={() => navigate('/auth')}
-            >
+            <Button variant="outline" onClick={() => navigate('/auth')}>
               Seja um Prestador
             </Button>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default SobreNos;
