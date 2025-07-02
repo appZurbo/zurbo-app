@@ -28,7 +28,7 @@ export const useUsageLimits = () => {
         .from('usage_limits' as any)
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       const now = new Date();
       
@@ -133,7 +133,7 @@ export const useUsageLimits = () => {
         .from('usage_limits' as any)
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       const now = new Date();
       const lastRequest = limits?.last_request_at ? new Date(limits.last_request_at) : new Date(0);
@@ -168,7 +168,7 @@ export const useUsageLimits = () => {
         .from('usage_limits' as any)
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (limits && limits.active_requests > 0) {
         await supabase

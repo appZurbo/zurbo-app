@@ -27,12 +27,12 @@ import { Badge } from '@/components/ui/badge';
 
 export const Header = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, profile, logout } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  // Mock premium and provider status from user data
-  const isPremium = user?.premium || false;
-  const isProvider = user?.tipo === 'prestador';
+  // Get premium and provider status from profile
+  const isPremium = profile?.premium || false;
+  const isProvider = profile?.tipo === 'prestador';
 
   const handleAuthClick = () => {
     setShowAuthModal(true);
@@ -84,10 +84,10 @@ export const Header = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <div className="flex items-center space-x-2">
-                      {user.foto_url ? (
+                      {profile?.foto_url ? (
                         <img 
-                          src={user.foto_url} 
-                          alt={user.nome || 'User'}
+                          src={profile.foto_url} 
+                          alt={profile.nome || 'User'}
                           className="h-8 w-8 rounded-full object-cover"
                         />
                       ) : (
@@ -104,8 +104,8 @@ export const Header = () => {
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">{user.nome || 'Usuário'}</p>
-                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                      <p className="font-medium">{profile?.nome || 'Usuário'}</p>
+                      <p className="text-xs text-muted-foreground">{profile?.email}</p>
                       {isPremium && (
                         <Badge variant="secondary" className="text-xs w-fit">
                           <Crown className="h-3 w-3 mr-1" />

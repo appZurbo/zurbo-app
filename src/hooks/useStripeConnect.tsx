@@ -57,14 +57,14 @@ export const useStripeConnect = () => {
         .from('stripe_accounts' as any)
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
-        if (error.code === 'PGRST116') return null; // No data found
-        throw error;
+        console.error('Error fetching Stripe account:', error);
+        return null;
       }
 
-      return data as StripeAccount;
+      return data as StripeAccount | null;
     } catch (error) {
       console.error('Error fetching Stripe account:', error);
       return null;
