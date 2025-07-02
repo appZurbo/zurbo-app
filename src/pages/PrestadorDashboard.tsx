@@ -1,4 +1,3 @@
-
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,15 +6,16 @@ import { ArrowLeft, Calendar, MessageCircle, Star, TrendingUp, Users, Eye, Crown
 import { useNavigate } from 'react-router-dom';
 import { useMobile } from '@/hooks/useMobile';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
-
 const PrestadorDashboard = () => {
   const navigate = useNavigate();
-  const { profile, isPrestador, loading } = useAuth();
+  const {
+    profile,
+    isPrestador,
+    loading
+  } = useAuth();
   const isMobile = useMobile();
-
   if (loading) {
-    return (
-      <div>
+    return <div>
         <UnifiedHeader />
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="text-center">
@@ -25,13 +25,10 @@ const PrestadorDashboard = () => {
             <p className="text-gray-600">Carregando painel...</p>
           </div>
         </div>
-      </div>
-    );
+      </div>;
   }
-
   if (!profile) {
-    return (
-      <div>
+    return <div>
         <UnifiedHeader />
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="w-full max-w-md">
@@ -46,13 +43,10 @@ const PrestadorDashboard = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
-    );
+      </div>;
   }
-
   if (!isPrestador) {
-    return (
-      <div>
+    return <div>
         <UnifiedHeader />
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="w-full max-w-md">
@@ -67,8 +61,7 @@ const PrestadorDashboard = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
-    );
+      </div>;
   }
 
   // Mock data para o dashboard
@@ -78,18 +71,13 @@ const PrestadorDashboard = () => {
     totalGanhos: 2450.00,
     visualizacoes: 1543
   };
-
-  return (
-    <div>
+  return <div>
       <UnifiedHeader />
       <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
         <div className={`${isMobile ? 'px-4 py-4' : 'max-w-6xl mx-auto p-6'}`}>
           {/* Header */}
           <div className="flex items-center gap-4 mb-6">
-            <Button variant="ghost" onClick={() => navigate('/')} className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              {!isMobile && 'Voltar'}
-            </Button>
+            
             
             <div className="flex-1">
               <div className="flex items-center gap-3">
@@ -104,12 +92,10 @@ const PrestadorDashboard = () => {
                     <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
                       Bem-vindo, {profile.nome}
                     </p>
-                    {profile.premium && (
-                      <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white">
+                    {profile.premium && <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white">
                         <Crown className="h-3 w-3 mr-1" />
                         PRO
-                      </Badge>
-                    )}
+                      </Badge>}
                   </div>
                 </div>
               </div>
@@ -207,8 +193,7 @@ const PrestadorDashboard = () => {
           </div>
 
           {/* Upgrade PRO */}
-          {!profile.premium && (
-            <Card className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white border-0">
+          {!profile.premium && <Card className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white border-0">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
@@ -217,21 +202,15 @@ const PrestadorDashboard = () => {
                       Destaque-se da concorrência e aumente seus ganhos
                     </p>
                   </div>
-                  <Button 
-                    onClick={() => navigate('/planos')}
-                    className="bg-white text-yellow-600 hover:bg-gray-50"
-                  >
+                  <Button onClick={() => navigate('/planos')} className="bg-white text-yellow-600 hover:bg-gray-50">
                     <Crown className="h-4 w-4 mr-2" />
                     Ver Planos
                   </Button>
                 </div>
               </CardContent>
-            </Card>
-          )}
+            </Card>}
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default PrestadorDashboard;
