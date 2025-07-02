@@ -52,7 +52,11 @@ const Header = () => {
   };
 
   const handleSettingsClick = () => {
-    navigate('/configuracoes');
+    if (isPrestador) {
+      navigate('/prestador-settings');
+    } else {
+      navigate('/configuracoes');
+    }
   };
 
   return (
@@ -152,23 +156,28 @@ const Header = () => {
                       {isPrestador && (
                         <>
                           <DropdownMenuItem onClick={() => navigate('/prestador-dashboard')}>
-                            <Gauge className="mr-2 h-4 w-4" />
+                            <Gauge className="mr-2 h-4 w-4 text-blue-500" />
                             Painel do Prestador
                           </DropdownMenuItem>
                           
+                          <DropdownMenuItem onClick={() => navigate('/prestador-settings')}>
+                            <Settings className="mr-2 h-4 w-4 text-gray-500" />
+                            Configurações do Prestador
+                          </DropdownMenuItem>
+                          
                           <DropdownMenuItem onClick={() => navigate('/agenda-prestador')}>
-                            <Calendar className="mr-2 h-4 w-4" />
+                            <Calendar className="mr-2 h-4 w-4 text-purple-500" />
                             Agenda Profissional
                           </DropdownMenuItem>
                           
                           <DropdownMenuItem onClick={() => navigate('/planos')}>
-                            <Crown className="mr-2 h-4 w-4" />
+                            <Crown className="mr-2 h-4 w-4 text-yellow-500" />
                             Planos PRO
                           </DropdownMenuItem>
                         </>
                       )}
                       <DropdownMenuItem onClick={handleSettingsClick}>
-                        <Settings className="mr-2 h-4 w-4" />
+                        <Settings className="mr-2 h-4 w-4 text-gray-500" />
                         {isPrestador ? 'Configurações do Prestador' : 'Configurações'}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />

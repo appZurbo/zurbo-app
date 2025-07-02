@@ -15,7 +15,7 @@ import Settings from "@/pages/Settings";
 import AdsPage from "@/pages/AdsPage";
 import PrestadorDashboard from "@/pages/PrestadorDashboard";
 import AgendaPrestador from "@/pages/AgendaPrestador";
-import PrestadorSettings from "@/pages/PrestadorSettings";
+import PrestadorSettingsImproved from "@/pages/PrestadorSettingsImproved";
 import PrestadorProfile from "@/pages/PrestadorProfile";
 import Pedidos from "@/pages/Pedidos";
 import Planos from "@/pages/Planos";
@@ -94,7 +94,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/prestador-settings",
-    element: <PrestadorSettings />,
+    element: <PrestadorSettingsImproved />,
   },
   {
     path: "/agenda-prestador",

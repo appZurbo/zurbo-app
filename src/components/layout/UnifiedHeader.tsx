@@ -1,13 +1,15 @@
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { Bell, MessageCircle, Settings, User, LogOut, Shield, Calendar, FileText, Crown, Heart, AlertTriangle, Menu, X } from 'lucide-react';
+import { Bell, MessageCircle, Settings, User, LogOut, Shield, Calendar, FileText, Crown, Heart, AlertTriangle, Menu, X, Gauge, Wrench } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { useMobile } from '@/hooks/useMobile';
+
 export const UnifiedHeader = () => {
   const {
     profile,
@@ -18,15 +20,19 @@ export const UnifiedHeader = () => {
   const navigate = useNavigate();
   const isMobile = useMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
   const handleLogout = async () => {
     await logout();
     navigate('/');
   };
+  
   const handleNavigation = (path: string) => {
     navigate(path);
     setMobileMenuOpen(false);
   };
+  
   const getSOSLimit = () => profile?.premium ? 7 : 3;
+  
   const UserDropdownMenu = () => <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-10 w-10 rounded-full p-0">
@@ -84,8 +90,12 @@ export const UnifiedHeader = () => {
         {/* Provider Menu Items */}
         {isPrestador && <>
             <DropdownMenuItem onClick={() => handleNavigation('/prestador-dashboard')}>
-              <User className="mr-2 h-4 w-4 text-blue-500" />
+              <Gauge className="mr-2 h-4 w-4 text-blue-500" />
               Painel do Prestador
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleNavigation('/prestador-settings')}>
+              <Settings className="mr-2 h-4 w-4 text-gray-500" />
+              Configurações do Prestador
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleNavigation('/conversas')}>
               <MessageCircle className="mr-2 h-4 w-4 text-green-500" />
@@ -112,15 +122,15 @@ export const UnifiedHeader = () => {
         {isAdmin && <>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => handleNavigation('/admin')}>
-              <Shield className="mr-2 h-4 w-4" />
+              <Shield className="mr-2 h-4 w-4 text-red-500" />
               Painel Admin
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleNavigation('/admin/relatorios')}>
-              <FileText className="mr-2 h-4 w-4" />
+              <FileText className="mr-2 h-4 w-4 text-blue-500" />
               Relatórios
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleNavigation('/admin/moderacao')}>
-              <Shield className="mr-2 h-4 w-4" />
+              <Shield className="mr-2 h-4 w-4 text-amber-500" />
               Moderação
             </DropdownMenuItem>
           </>}
@@ -133,6 +143,7 @@ export const UnifiedHeader = () => {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>;
+  
   return <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="container flex h-16 items-center justify-between px-4">
         {/* Logo */}
