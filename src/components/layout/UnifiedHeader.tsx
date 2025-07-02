@@ -126,10 +126,7 @@ export const UnifiedHeader = () => {
           </>}
 
         {!isPrestador && <><DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => handleNavigation('/configuracoes')}>
-          <Settings className="mr-2 h-4 w-4" />
-          Configurações
-        </DropdownMenuItem></>}
+        </>}
         <DropdownMenuItem onClick={handleLogout}>
           <LogOut className="mr-2 h-4 w-4" />
           Sair
