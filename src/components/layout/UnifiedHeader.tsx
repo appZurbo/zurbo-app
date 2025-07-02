@@ -174,9 +174,7 @@ export const UnifiedHeader = () => {
             </div>}
 
           {/* Mobile Menu Button */}
-          {isMobile && <Button variant="ghost" size="sm" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden">
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>}
+          {isMobile}
         </div>
       </div>
 
