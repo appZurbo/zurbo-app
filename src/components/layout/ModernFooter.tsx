@@ -1,11 +1,8 @@
-
 import { Link } from 'react-router-dom';
 import { Separator } from '@/components/ui/separator';
 import { Heart, Mail, Phone, MapPin } from 'lucide-react';
-
 export const ModernFooter = () => {
-  return (
-    <footer className="bg-gray-900 text-white">
+  return <footer className="bg-gray-900 text-white">
       <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Section */}
@@ -86,14 +83,11 @@ export const ModernFooter = () => {
         <Separator className="my-8 bg-gray-700" />
 
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="text-sm text-gray-400">
-            © 2024 Zurbo. Todos os direitos reservados.
-          </div>
+          <div className="text-sm text-gray-400">© 2025 Zurbo. Todos os direitos reservados.</div>
           <div className="text-sm text-gray-400">
             Versão 1.0 - Sinop, MT
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
