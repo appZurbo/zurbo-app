@@ -11,7 +11,7 @@ export interface EscrowPayment {
   stripe_account_id?: string;
   amount: number;
   currency: string;
-  zurbo_fee: number;
+  zurbo_fee?: number;
   status: 'pending' | 'authorized' | 'captured' | 'refunded' | 'disputed' | 'failed';
   created_at: string;
   authorized_at?: string;
@@ -34,9 +34,9 @@ export const useEscrowPayment = () => {
     try {
       const zurboFee = amount * 0.05;
       
-      // Criar pagamento escrow no Supabase
+      // Criar pagamento escrow no Supabase usando raw query
       const { data, error } = await supabase
-        .from('escrow_payments')
+        .from('escrow_payments' as any)
         .insert({
           conversation_id: conversationId,
           amount,
@@ -63,7 +63,7 @@ export const useEscrowPayment = () => {
 
       // Atualizar com payment_intent_id do Stripe
       const { error: updateError } = await supabase
-        .from('escrow_payments')
+        .from('escrow_payments' as any)
         .update({ stripe_payment_intent_id: stripeData.payment_intent_id })
         .eq('id', data.id);
 
@@ -116,7 +116,7 @@ export const useEscrowPayment = () => {
     setLoading(true);
     try {
       const { error } = await supabase
-        .from('escrow_payments')
+        .from('escrow_payments' as any)
         .update({
           status: 'disputed',
           dispute_reason: reason,
@@ -144,7 +144,7 @@ export const useEscrowPayment = () => {
 
   const getEscrowPayments = useCallback(async (conversationId?: string) => {
     try {
-      let query = supabase.from('escrow_payments').select('*');
+      let query = supabase.from('escrow_payments' as any).select('*');
       
       if (conversationId) {
         query = query.eq('conversation_id', conversationId);
@@ -153,7 +153,14 @@ export const useEscrowPayment = () => {
       const { data, error } = await query.order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as EscrowPayment[];
+      
+      // Add zurbo_fee to data if missing (for backward compatibility)
+      const processedData = (data || []).map((payment: any) => ({
+        ...payment,
+        zurbo_fee: payment.zurbo_fee || (payment.amount * 0.05)
+      }));
+
+      return processedData as EscrowPayment[];
     } catch (error) {
       console.error('Error fetching escrow payments:', error);
       return [];
