@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,22 +6,15 @@ import { ArrowLeft, Shield, FileText, Users, HelpCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useMobile } from '@/hooks/useMobile';
-
 const InformacoesPage = () => {
   const navigate = useNavigate();
   const isMobile = useMobile();
-
-  return (
-    <div>
+  return <div>
       <UnifiedHeader />
       <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
         <div className={`${isMobile ? 'px-4 py-4' : 'max-w-4xl mx-auto p-6'}`}>
           <div className="flex items-center gap-4 mb-6">
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/')}
-              className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}
-            >
+            <Button variant="ghost" onClick={() => navigate('/')} className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               {!isMobile && 'Voltar'}
             </Button>
@@ -78,7 +70,7 @@ const InformacoesPage = () => {
                         
                         <section>
                           <h3 className="text-lg font-semibold mb-2">2. Qualidade dos Serviços</h3>
-                          <p>Prestadores devem fornecer serviços de qualidade conforme acordado. Clientes devem fornecer informações precisas sobre suas necessidades.</p>
+                          <p>Prestadores devem fornecer serviços de qualidade conforme acordado. Clientes devem fornecer informações precisas sobre suas necessidades. Podemos intermediar a situação em casos necessários.</p>
                         </section>
                         
                         <section>
@@ -165,7 +157,7 @@ const InformacoesPage = () => {
                               <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold text-sm">1</div>
                               <div>
                                 <h4 className="font-semibold">Busque Prestadores</h4>
-                                <p className="text-gray-600">Use nossa busca para encontrar prestadores na sua região</p>
+                                <p className="text-gray-600">Use nossa busca para encontrar prestadores na sua região ou por tipo de serviço</p>
                               </div>
                             </div>
                             <div className="flex items-start gap-3">
@@ -220,8 +212,6 @@ const InformacoesPage = () => {
           </Card>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default InformacoesPage;
