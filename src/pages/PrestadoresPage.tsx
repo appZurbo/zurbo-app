@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,12 +16,15 @@ import { UserProfile } from '@/utils/database/types';
 import { useToast } from '@/hooks/use-toast';
 import { useMobile } from '@/hooks/useMobile';
 import { useAuth } from '@/hooks/useAuth';
-
 const PrestadoresPage = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const isMobile = useMobile();
-  const { isAuthenticated } = useAuth();
+  const {
+    isAuthenticated
+  } = useAuth();
   const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
   const [servicos, setServicos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,17 +42,13 @@ const PrestadoresPage = () => {
     notaMin: 0,
     apenasPremium: false
   });
-
   const ITEMS_PER_PAGE = 5;
-
   useEffect(() => {
     loadInitialData();
   }, []);
-
   useEffect(() => {
     loadPrestadores(true);
   }, [filters]);
-
   const loadInitialData = async () => {
     try {
       const servicosData = await getServicos();
@@ -59,7 +57,6 @@ const PrestadoresPage = () => {
       console.error('Error loading initial data:', error);
     }
   };
-
   const loadPrestadores = async (reset = false) => {
     if (reset) {
       setLoading(true);
@@ -69,7 +66,6 @@ const PrestadoresPage = () => {
     } else {
       setLoadingMore(true);
     }
-
     try {
       const page = reset ? 1 : currentPage + 1;
       const result = await getPrestadores({
@@ -77,15 +73,12 @@ const PrestadoresPage = () => {
         limit: ITEMS_PER_PAGE,
         page
       });
-
       if (reset) {
         setPrestadores(result.prestadores);
       } else {
         setPrestadores(prev => [...prev, ...result.prestadores]);
       }
-
       setHasMore(result.hasMore);
-
       if (!reset) {
         setCurrentPage(prev => prev + 1);
       }
@@ -101,40 +94,27 @@ const PrestadoresPage = () => {
       setLoadingMore(false);
     }
   };
-
   const handleLoadMore = () => {
     if (!loadingMore && hasMore) {
       loadPrestadores(false);
     }
   };
-
   const handleContact = (prestador: UserProfile) => {
     setSelectedPrestador(prestador);
     setShowContactModal(true);
   };
-
   const handleViewProfile = (prestador: UserProfile) => {
     setSelectedPrestador(prestador);
     setShowProfileModal(true);
   };
-
   const handleFiltersChange = (newFilters: any) => {
     setFilters(newFilters);
   };
-
-  return (
-    <UnifiedLayout>
-      <div className="max-w-7xl mx-auto">
+  return <UnifiedLayout>
+      <div className="max-w-7xl mx-[16px]">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/')}
-            className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            {!isMobile && 'Voltar'}
-          </Button>
+        <div className="flex items-center gap-4 mb-6 my-0 py-[13px]">
+          
           
           <div className="flex-1">
             <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
@@ -147,11 +127,9 @@ const PrestadoresPage = () => {
         </div>
 
         {/* Emergency SOS Button */}
-        {isAuthenticated && (
-          <div className="mb-8">
+        {isAuthenticated && <div className="mb-8">
             <EmergencyButton />
-          </div>
-        )}
+          </div>}
 
         {/* Filtros */}
         <div className="mb-8">
@@ -159,10 +137,7 @@ const PrestadoresPage = () => {
         </div>
 
         {/* Premium/Highlight Section */}
-        <PremiumHighlightSection
-          onContact={handleContact}
-          onViewProfile={handleViewProfile}
-        />
+        <PremiumHighlightSection onContact={handleContact} onViewProfile={handleViewProfile} />
 
         {/* Lista Normal de Prestadores */}
         <div className="mb-8">
@@ -170,13 +145,10 @@ const PrestadoresPage = () => {
             Todos os Prestadores
           </h2>
           
-          {loading ? (
-            <div className="flex justify-center items-center py-12">
+          {loading ? <div className="flex justify-center items-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
               <span className="ml-2 text-gray-600">Carregando prestadores...</span>
-            </div>
-          ) : prestadores.length === 0 ? (
-            <Card>
+            </div> : prestadores.length === 0 ? <Card>
               <CardContent className="p-12 text-center">
                 <Users className="h-16 w-16 mx-auto mb-4 text-gray-400" />
                 <h3 className="text-xl font-semibold mb-2">Nenhum prestador encontrado</h3>
@@ -184,83 +156,47 @@ const PrestadoresPage = () => {
                   Não encontramos prestadores que correspondam aos seus filtros.
                 </p>
                 <Button onClick={() => setFilters({
-                  cidade: 'Sinop, Mato Grosso',
-                  servicos: [],
-                  precoMin: 0,
-                  precoMax: 500,
-                  notaMin: 0,
-                  apenasPremium: false
-                })}>
+              cidade: 'Sinop, Mato Grosso',
+              servicos: [],
+              precoMin: 0,
+              precoMax: 500,
+              notaMin: 0,
+              apenasPremium: false
+            })}>
                   Limpar Filtros
                 </Button>
               </CardContent>
-            </Card>
-          ) : (
-            <>
+            </Card> : <>
               <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
-                {prestadores.map(prestador => (
-                  <PrestadorCardImproved
-                    key={prestador.id}
-                    prestador={prestador}
-                    onContact={handleContact}
-                    onViewProfile={handleViewProfile}
-                  />
-                ))}
+                {prestadores.map(prestador => <PrestadorCardImproved key={prestador.id} prestador={prestador} onContact={handleContact} onViewProfile={handleViewProfile} />)}
               </div>
 
               {/* Load More Button */}
-              {(hasMore || loadingMore) && (
-                <div className="flex justify-center mt-8">
-                  <Button
-                    onClick={handleLoadMore}
-                    disabled={loadingMore}
-                    variant="outline"
-                    size="lg"
-                  >
-                    {loadingMore ? (
-                      <>
+              {(hasMore || loadingMore) && <div className="flex justify-center mt-8">
+                  <Button onClick={handleLoadMore} disabled={loadingMore} variant="outline" size="lg">
+                    {loadingMore ? <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                         Carregando...
-                      </>
-                    ) : (
-                      'Carregar mais prestadores'
-                    )}
+                      </> : 'Carregar mais prestadores'}
                   </Button>
-                </div>
-              )}
+                </div>}
 
               {/* End of results message */}
-              {!hasMore && !loadingMore && prestadores.length > 0 && (
-                <div className="text-center py-8">
+              {!hasMore && !loadingMore && prestadores.length > 0 && <div className="text-center py-8">
                   <p className="text-gray-600">
                     Não há mais prestadores disponíveis para os filtros selecionados.
                   </p>
-                </div>
-              )}
-            </>
-          )}
+                </div>}
+            </>}
         </div>
       </div>
 
       {/* Modals */}
-      {selectedPrestador && (
-        <>
-          <PrestadorMiniProfileModal
-            prestador={selectedPrestador}
-            isOpen={showProfileModal}
-            onClose={() => setShowProfileModal(false)}
-            onContact={handleContact}
-          />
+      {selectedPrestador && <>
+          <PrestadorMiniProfileModal prestador={selectedPrestador} isOpen={showProfileModal} onClose={() => setShowProfileModal(false)} onContact={handleContact} />
 
-          <ContactModal
-            prestador={selectedPrestador}
-            open={showContactModal}
-            onOpenChange={setShowContactModal}
-          />
-        </>
-      )}
-    </UnifiedLayout>
-  );
+          <ContactModal prestador={selectedPrestador} open={showContactModal} onOpenChange={setShowContactModal} />
+        </>}
+    </UnifiedLayout>;
 };
-
 export default PrestadoresPage;
