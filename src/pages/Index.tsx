@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import HeroDemo from '@/components/ui/hero-demo';
 import ServiceCategories from '@/components/ServiceCategories';
@@ -36,6 +37,7 @@ const Index = () => {
   });
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadPrestadores();
@@ -117,10 +119,7 @@ const Index = () => {
 
   const handleCategorySelect = (categoryId: string) => {
     console.log('📂 Category selected:', categoryId);
-    setFilters(prev => ({
-      ...prev,
-      servico: categoryId
-    }));
+    navigate(`/prestadores?servico=${categoryId}`);
   };
 
   const handleRetry = () => {

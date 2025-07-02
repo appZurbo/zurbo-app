@@ -7,10 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { NovoCompromissoModal } from '@/components/agenda/NovoCompromissoModal';
 import { useMobile } from '@/hooks/useMobile';
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, Calendar, Clock, MapPin, User } from 'lucide-react';
-import { format } from 'date-fns';
+import { ArrowLeft, Calendar as CalendarIcon, Clock, MapPin, User, Copy, MessageCircle, Plus } from 'lucide-react';
+import { format, startOfMonth, endOfMonth, isSameDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Calendar } from '@/components/ui/calendar';
 interface Agendamento {
   id: string;
   titulo: string;
@@ -21,30 +23,32 @@ interface Agendamento {
   status: string;
   cliente_nome?: string;
   preco_acordado?: number;
+  tipo_origem?: 'manual' | 'sistema';
 }
 const AgendaPrestador = () => {
   const navigate = useNavigate();
-  const {
-    profile,
-    loading: authLoading
-  } = useAuth();
+  const { profile, loading: authLoading } = useAuth();
   const isMobile = useMobile();
+  const { toast } = useToast();
   const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  
   useEffect(() => {
     if (profile) {
       loadAgendamentos();
     }
   }, [profile]);
+  
   const loadAgendamentos = async () => {
     if (!profile) return;
     try {
-      const {
-        data,
-        error
-      } = await supabase.from('agendamentos').select('*').eq('prestador_id', profile.id).order('data_agendada', {
-        ascending: true
-      });
+      const { data, error } = await supabase
+        .from('agendamentos')
+        .select('*')
+        .eq('prestador_id', profile.id)
+        .order('data_agendada', { ascending: true });
+      
       if (error) throw error;
       setAgendamentos(data || []);
     } catch (error) {
@@ -52,6 +56,27 @@ const AgendaPrestador = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const copyAddress = async (address: string) => {
+    try {
+      await navigator.clipboard.writeText(address);
+      toast({
+        title: "Endereço copiado!",
+        description: "O endereço foi copiado para sua área de transferência."
+      });
+    } catch (error) {
+      console.error('Failed to copy address:', error);
+    }
+  };
+
+  const handleMessageClient = (agendamento: Agendamento) => {
+    // Navigate to conversation with client
+    navigate('/conversas');
+  };
+
+  const getDaysWithAppointments = () => {
+    return agendamentos.map(apt => new Date(apt.data_agendada));
   };
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -137,105 +162,192 @@ const AgendaPrestador = () => {
 
           {/* Agenda Content */}
           <div className="grid gap-6">
-            {loading ? <Card>
+            {loading ? (
+              <Card>
                 <CardContent className="p-6">
                   <div className="text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
                     <p className="text-sm text-gray-600 mt-2">Carregando agenda...</p>
                   </div>
                 </CardContent>
-              </Card> : <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Calendar View */}
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Enhanced Calendar View */}
                 <div className="lg:col-span-1">
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        <Calendar className="h-5 w-5 text-orange-500" />
+                        <CalendarIcon className="h-5 w-5 text-orange-500" />
                         Calendário
                       </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                      {/* Simple calendar placeholder - you can integrate a calendar library */}
-                      <div className="text-center p-8 bg-orange-50 rounded-lg">
-                        <Calendar className="h-12 w-12 mx-auto mb-4 text-orange-500" />
+                    <CardContent className="p-3">
+                      <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={setSelectedDate}
+                        locale={ptBR}
+                        className="rounded-md border"
+                        modifiers={{
+                          hasAppointment: getDaysWithAppointments(),
+                        }}
+                        modifiersStyles={{
+                          hasAppointment: {
+                            backgroundColor: 'hsl(var(--primary))',
+                            color: 'white',
+                            fontWeight: 'bold'
+                          }
+                        }}
+                      />
+                      <div className="mt-4 text-center">
                         <p className="text-sm text-gray-600">
-                          {format(new Date(), 'MMMM \'de\' yyyy', {
-                        locale: ptBR
-                      })}
+                          {format(selectedDate || new Date(), 'MMMM \'de\' yyyy', { locale: ptBR })}
                         </p>
-                        <div className="mt-4">
-                          <p className="text-xs text-gray-500">
-                            {agendamentos.length} compromissos este mês
-                          </p>
+                        <div className="mt-2 flex items-center justify-center gap-4 text-xs">
+                          <div className="flex items-center gap-1">
+                            <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                            <span>Com agendamentos</span>
+                          </div>
+                          <span className="text-gray-500">
+                            {agendamentos.length} total
+                          </span>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
                 </div>
 
-                {/* Appointments List */}
+                {/* Enhanced Appointments List */}
                 <div className="lg:col-span-2">
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center justify-between">
                         <span>Próximos Compromissos</span>
-                        <NovoCompromissoModal />
+                        <Button
+                          onClick={() => {}}
+                          size="sm"
+                          className="bg-orange-500 hover:bg-orange-600"
+                        >
+                          <Plus className="h-4 w-4 mr-1" />
+                          Adicionar Manual
+                        </Button>
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      {agendamentos.length === 0 ? <div className="text-center py-8">
-                          <Calendar className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                      {agendamentos.length === 0 ? (
+                        <div className="text-center py-8">
+                          <CalendarIcon className="h-16 w-16 mx-auto mb-4 text-gray-400" />
                           <h3 className="text-xl font-semibold mb-2">Agenda vazia</h3>
                           <p className="text-gray-600 mb-4">
                             Você ainda não possui compromissos agendados.
                           </p>
                           <NovoCompromissoModal />
-                        </div> : <div className="space-y-4 max-h-96 overflow-y-auto">
-                          {agendamentos.map(agendamento => <div key={agendamento.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                              <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-3 mb-2">
-                                    <h3 className="font-semibold">{agendamento.titulo}</h3>
-                                    <Badge className={getStatusColor(agendamento.status)}>
-                                      {getStatusText(agendamento.status)}
-                                    </Badge>
-                                  </div>
-                                  
-                                  <div className="space-y-1 text-sm text-gray-600">
-                                    <div className="flex items-center gap-2">
-                                      <Calendar className="h-3 w-3" />
-                                      <span>
-                                        {format(new Date(agendamento.data_agendada), 'dd \'de\' MMMM', {
-                                  locale: ptBR
-                                })}
-                                      </span>
-                                      <Clock className="h-3 w-3 ml-2" />
-                                      <span>{agendamento.hora_agendada}</span>
+                        </div>
+                      ) : (
+                        <div className="space-y-4 max-h-96 overflow-y-auto">
+                          {agendamentos.map(agendamento => (
+                            <Card key={agendamento.id} className="border-l-4 border-l-orange-500">
+                              <CardContent className="p-4">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-3 mb-3">
+                                      <h3 className="font-semibold text-lg">{agendamento.titulo}</h3>
+                                      <Badge className={getStatusColor(agendamento.status)}>
+                                        {getStatusText(agendamento.status)}
+                                      </Badge>
+                                      {agendamento.tipo_origem === 'sistema' && (
+                                        <Badge variant="outline" className="text-xs">
+                                          Sistema
+                                        </Badge>
+                                      )}
                                     </div>
                                     
-                                    {agendamento.cliente_nome && <div className="flex items-center gap-2">
-                                        <User className="h-3 w-3" />
-                                        <span>{agendamento.cliente_nome}</span>
-                                      </div>}
-
-                                    {agendamento.preco_acordado && <div className="flex items-center gap-2">
-                                        <span className="text-green-600 font-medium">
-                                          R$ {agendamento.preco_acordado.toFixed(2)}
+                                    <div className="space-y-2 text-sm text-gray-600 mb-3">
+                                      <div className="flex items-center gap-2">
+                                        <CalendarIcon className="h-4 w-4 text-orange-500" />
+                                        <span className="font-medium">
+                                          {format(new Date(agendamento.data_agendada), 'dd \'de\' MMMM \'de\' yyyy', { locale: ptBR })}
                                         </span>
-                                      </div>}
+                                        <Clock className="h-4 w-4 text-blue-500 ml-2" />
+                                        <span className="font-medium">{agendamento.hora_agendada}</span>
+                                      </div>
+                                      
+                                      {agendamento.cliente_nome && (
+                                        <div className="flex items-center gap-2">
+                                          <User className="h-4 w-4 text-green-500" />
+                                          <span className="font-medium">{agendamento.cliente_nome}</span>
+                                        </div>
+                                      )}
+
+                                      {agendamento.endereco && (
+                                        <div className="flex items-center gap-2">
+                                          <MapPin className="h-4 w-4 text-purple-500" />
+                                          <span className="flex-1">{agendamento.endereco}</span>
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() => copyAddress(agendamento.endereco!)}
+                                            className="ml-2 h-6 px-2"
+                                          >
+                                            <Copy className="h-3 w-3" />
+                                          </Button>
+                                        </div>
+                                      )}
+
+                                      {agendamento.preco_acordado && (
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-green-600 font-bold text-base">
+                                            R$ {agendamento.preco_acordado.toFixed(2)}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+                                    
+                                    {agendamento.descricao && (
+                                      <div className="mt-3 p-3 bg-gray-50 rounded-md">
+                                        <p className="text-sm text-gray-700">
+                                          {agendamento.descricao}
+                                        </p>
+                                      </div>
+                                    )}
+
+                                    {/* Action Buttons */}
+                                    <div className="flex gap-2 mt-4">
+                                      {agendamento.cliente_nome && (
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() => handleMessageClient(agendamento)}
+                                          className="flex items-center gap-1"
+                                        >
+                                          <MessageCircle className="h-3 w-3" />
+                                          Mensagem
+                                        </Button>
+                                      )}
+                                      
+                                      {agendamento.tipo_origem === 'manual' && (
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          className="text-gray-600"
+                                        >
+                                          Editar
+                                        </Button>
+                                      )}
+                                    </div>
                                   </div>
-                                  
-                                  {agendamento.descricao && <div className="mt-2 p-2 bg-gray-100 rounded text-xs text-gray-700">
-                                      {agendamento.descricao.length > 100 ? `${agendamento.descricao.substring(0, 100)}...` : agendamento.descricao}
-                                    </div>}
                                 </div>
-                              </div>
-                            </div>)}
-                        </div>}
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 </div>
-              </div>}
+              </div>
+            )}
           </div>
         </div>
       </div>

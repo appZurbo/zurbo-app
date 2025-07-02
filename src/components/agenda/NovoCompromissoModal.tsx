@@ -75,7 +75,10 @@ export const NovoCompromissoModal = () => {
   };
   return <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        
+        <Button className="bg-orange-500 hover:bg-orange-600">
+          <Plus className="h-4 w-4 mr-2" />
+          Novo Compromisso
+        </Button>
       </DialogTrigger>
       
       <DialogContent className="sm:max-w-md">
