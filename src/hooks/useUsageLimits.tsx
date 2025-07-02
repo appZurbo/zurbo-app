@@ -24,11 +24,16 @@ export const useUsageLimits = () => {
 
     try {
       // Use raw query for now since usage_limits is not in types yet
-      const { data: limits } = await supabase
+      const { data: limits, error } = await supabase
         .from('usage_limits' as any)
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching usage limits:', error);
+        return true; // Fail-safe: allow if we can't check
+      }
 
       const now = new Date();
       
@@ -129,11 +134,16 @@ export const useUsageLimits = () => {
     if (!user?.id) return;
 
     try {
-      const { data: limits } = await supabase
+      const { data: limits, error } = await supabase
         .from('usage_limits' as any)
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching usage limits for recording:', error);
+        return;
+      }
 
       const now = new Date();
       const lastRequest = limits?.last_request_at ? new Date(limits.last_request_at) : new Date(0);
@@ -164,11 +174,16 @@ export const useUsageLimits = () => {
     if (!user?.id) return;
 
     try {
-      const { data: limits } = await supabase
+      const { data: limits, error } = await supabase
         .from('usage_limits' as any)
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching usage limits for release:', error);
+        return;
+      }
 
       if (limits && limits.active_requests > 0) {
         await supabase

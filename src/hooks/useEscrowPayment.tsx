@@ -34,9 +34,9 @@ export const useEscrowPayment = () => {
     try {
       const zurboFee = amount * 0.05;
       
-      // Criar pagamento escrow no Supabase usando raw query
+      // Criar pagamento escrow no Supabase
       const { data, error } = await supabase
-        .from('escrow_payments' as any)
+        .from('escrow_payments')
         .insert({
           conversation_id: conversationId,
           amount,
@@ -63,7 +63,7 @@ export const useEscrowPayment = () => {
 
       // Atualizar com payment_intent_id do Stripe
       const { error: updateError } = await supabase
-        .from('escrow_payments' as any)
+        .from('escrow_payments')
         .update({ stripe_payment_intent_id: stripeData.payment_intent_id })
         .eq('id', data.id);
 
@@ -116,7 +116,7 @@ export const useEscrowPayment = () => {
     setLoading(true);
     try {
       const { error } = await supabase
-        .from('escrow_payments' as any)
+        .from('escrow_payments')
         .update({
           status: 'disputed',
           dispute_reason: reason,
@@ -144,7 +144,7 @@ export const useEscrowPayment = () => {
 
   const getEscrowPayments = useCallback(async (conversationId?: string) => {
     try {
-      let query = supabase.from('escrow_payments' as any).select('*');
+      let query = supabase.from('escrow_payments').select('*');
       
       if (conversationId) {
         query = query.eq('conversation_id', conversationId);
