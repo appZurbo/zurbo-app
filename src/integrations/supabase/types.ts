@@ -1041,6 +1041,47 @@ export type Database = {
           },
         ]
       }
+      stripe_accounts: {
+        Row: {
+          account_type: string
+          charges_enabled: boolean
+          created_at: string
+          details_submitted: boolean
+          id: string
+          stripe_account_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_type?: string
+          charges_enabled?: boolean
+          created_at?: string
+          details_submitted?: boolean
+          id?: string
+          stripe_account_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_type?: string
+          charges_enabled?: boolean
+          created_at?: string
+          details_submitted?: boolean
+          id?: string
+          stripe_account_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stripe_accounts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       system_settings: {
         Row: {
           description: string | null
@@ -1114,6 +1155,50 @@ export type Database = {
           },
           {
             foreignKeyName: "transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      usage_limits: {
+        Row: {
+          active_requests: number
+          blocked_until: string | null
+          created_at: string
+          id: string
+          last_request_at: string | null
+          service_requests_day: number
+          service_requests_hour: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active_requests?: number
+          blocked_until?: string | null
+          created_at?: string
+          id?: string
+          last_request_at?: string | null
+          service_requests_day?: number
+          service_requests_hour?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active_requests?: number
+          blocked_until?: string | null
+          created_at?: string
+          id?: string
+          last_request_at?: string | null
+          service_requests_day?: number
+          service_requests_hour?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usage_limits_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"

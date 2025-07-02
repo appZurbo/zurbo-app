@@ -52,9 +52,8 @@ export const useStripeConnect = () => {
     if (!user?.id) return null;
 
     try {
-      // Use raw query for now since stripe_accounts is not in types yet
       const { data, error } = await supabase
-        .from('stripe_accounts' as any)
+        .from('stripe_accounts')
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle();

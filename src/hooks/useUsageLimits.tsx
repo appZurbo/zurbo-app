@@ -23,9 +23,8 @@ export const useUsageLimits = () => {
     if (!user?.id) return false;
 
     try {
-      // Use raw query for now since usage_limits is not in types yet
       const { data: limits, error } = await supabase
-        .from('usage_limits' as any)
+        .from('usage_limits')
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
@@ -57,7 +56,7 @@ export const useUsageLimits = () => {
           // Bloquear por 6 horas
           const blockUntil = new Date(now.getTime() + 6 * 60 * 60 * 1000);
           await supabase
-            .from('usage_limits' as any)
+            .from('usage_limits')
             .upsert({
               user_id: user.id,
               blocked_until: blockUntil.toISOString(),
@@ -82,7 +81,7 @@ export const useUsageLimits = () => {
           // Bloquear por 24 horas
           const blockUntil = new Date(now.getTime() + 24 * 60 * 60 * 1000);
           await supabase
-            .from('usage_limits' as any)
+            .from('usage_limits')
             .upsert({
               user_id: user.id,
               blocked_until: blockUntil.toISOString(),
@@ -135,7 +134,7 @@ export const useUsageLimits = () => {
 
     try {
       const { data: limits, error } = await supabase
-        .from('usage_limits' as any)
+        .from('usage_limits')
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
@@ -156,7 +155,7 @@ export const useUsageLimits = () => {
       const newDayCount = daysSince >= 1 ? 1 : (limits?.service_requests_day || 0) + 1;
 
       await supabase
-        .from('usage_limits' as any)
+        .from('usage_limits')
         .upsert({
           user_id: user.id,
           service_requests_hour: newHourCount,
@@ -175,7 +174,7 @@ export const useUsageLimits = () => {
 
     try {
       const { data: limits, error } = await supabase
-        .from('usage_limits' as any)
+        .from('usage_limits')
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
@@ -187,7 +186,7 @@ export const useUsageLimits = () => {
 
       if (limits && limits.active_requests > 0) {
         await supabase
-          .from('usage_limits' as any)
+          .from('usage_limits')
           .update({
             active_requests: limits.active_requests - 1
           })
