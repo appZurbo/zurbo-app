@@ -41,7 +41,7 @@ export const ModernFooter = () => {
 
           {/* Legal */}
           <div className="space-y-4">
-            <h4 className="font-semibold text-lg">Legal</h4>
+            
             <div className="space-y-2">
               <Link to="/termos-uso" className="block text-gray-400 hover:text-white text-sm transition-colors">
                 Termos de Uso
