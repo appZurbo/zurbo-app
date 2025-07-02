@@ -32,9 +32,7 @@ export const ModernFooter = () => {
               <Link to="/trabalhe-conosco" className="block text-gray-400 hover:text-white text-sm transition-colors">
                 Trabalhe Conosco
               </Link>
-              <Link to="/planos" className="block text-gray-400 hover:text-white text-sm transition-colors">
-                Planos Premium
-              </Link>
+              
               <Link to="/central-ajuda" className="block text-gray-400 hover:text-white text-sm transition-colors">
                 Central de Ajuda
               </Link>
