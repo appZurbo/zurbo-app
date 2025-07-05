@@ -24,7 +24,7 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({
   const [loading, setLoading] = useState(false);
   const { createEscrowPayment } = useEscrowPayment();
 
-  const zurboFee = totalPrice * 0.05;
+  const zurboFee = totalPrice * 0.08; // Taxa alterada de 5% para 8%
   const netAmount = totalPrice - zurboFee;
 
   const handlePayment = async () => {
@@ -71,7 +71,7 @@ export const PaymentCard: React.FC<PaymentCardProps> = ({
             <span>R$ {totalPrice.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-sm text-gray-600">
-            <span>Taxa Zurbo (5%):</span>
+            <span>Taxa Zurbo (8%):</span>
             <span>- R$ {zurboFee.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-sm text-gray-600">

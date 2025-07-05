@@ -59,7 +59,7 @@ serve(async (req) => {
       },
       transfer_data: escrowPayment.chat_conversations?.users?.stripe_accounts?.[0] ? {
         destination: escrowPayment.chat_conversations.users.stripe_accounts[0].stripe_account_id,
-        amount: Math.floor(amount * 0.95), // 95% para o prestador (5% fee Zurbo)
+        amount: Math.floor(amount * 0.92), // 92% para o prestador (taxa Zurbo 8%)
       } : undefined,
       metadata: {
         escrow_payment_id: escrowPaymentId,

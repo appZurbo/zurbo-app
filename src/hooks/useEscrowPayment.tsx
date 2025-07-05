@@ -32,7 +32,7 @@ export const useEscrowPayment = () => {
   ) => {
     setLoading(true);
     try {
-      const zurboFee = amount * 0.05;
+      const zurboFee = amount * 0.08; // Taxa alterada de 5% para 8%
       
       // Criar pagamento escrow no Supabase
       const { data, error } = await supabase
@@ -157,7 +157,7 @@ export const useEscrowPayment = () => {
       // Add zurbo_fee to data if missing (for backward compatibility)
       const processedData = (data || []).map((payment: any) => ({
         ...payment,
-        zurbo_fee: payment.zurbo_fee || (payment.amount * 0.05)
+        zurbo_fee: payment.zurbo_fee || (payment.amount * 0.08) // Taxa alterada de 5% para 8%
       }));
 
       return processedData as EscrowPayment[];
