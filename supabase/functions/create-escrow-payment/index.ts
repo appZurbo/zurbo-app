@@ -49,7 +49,7 @@ serve(async (req) => {
       throw new Error('Escrow payment not found');
     }
 
-    // Criar Payment Intent com captura manual
+    // Criar Payment Intent com captura manual (para escrow)
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
@@ -67,32 +67,6 @@ serve(async (req) => {
       }
     });
 
-    // Criar Checkout Session
-    const session = await stripe.checkout.sessions.create({
-      payment_intent_data: {
-        setup_future_usage: 'off_session',
-      },
-      line_items: [
-        {
-          price_data: {
-            currency,
-            product_data: {
-              name: 'Pagamento de Serviço - ZURBO',
-              description: 'Pagamento seguro retido até a conclusão do serviço',
-            },
-            unit_amount: amount,
-          },
-          quantity: 1,
-        },
-      ],
-      mode: 'payment',
-      success_url: `${req.headers.get("origin")}/conversas?payment=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin")}/conversas?payment=cancelled`,
-      metadata: {
-        escrow_payment_id: escrowPaymentId,
-      }
-    });
-
     // Atualizar o pagamento escrow com os IDs do Stripe
     await supabaseClient
       .from('escrow_payments')
@@ -105,7 +79,6 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         payment_intent_id: paymentIntent.id,
-        checkout_url: session.url,
         client_secret: paymentIntent.client_secret
       }),
       {

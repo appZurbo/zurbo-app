@@ -69,7 +69,11 @@ export const useEscrowPayment = () => {
 
       if (updateError) throw updateError;
 
-      return { ...data, checkout_url: stripeData.checkout_url };
+      return { 
+        ...data, 
+        client_secret: stripeData.client_secret,
+        payment_intent_id: stripeData.payment_intent_id
+      };
     } catch (error) {
       console.error('Error creating escrow payment:', error);
       toast({
