@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { DollarSign, Check, X, CreditCard } from 'lucide-react';
 import { ChatConversation } from '@/hooks/useEnhancedChat';
-import { useEscrowPayment } from '@/hooks/useEscrowPayment';
+import { PaymentCard } from '@/components/payments/PaymentCard';
 
 interface PaymentButtonsProps {
   conversation: ChatConversation;
@@ -24,7 +24,7 @@ export const PaymentButtons: React.FC<PaymentButtonsProps> = ({
 }) => {
   const [priceInput, setPriceInput] = useState('');
   const [showPriceInput, setShowPriceInput] = useState(false);
-  const { createEscrowPayment, loading } = useEscrowPayment();
+  const [showPayment, setShowPayment] = useState(false);
 
   const isClient = conversation.cliente_id === currentUserId;
   const isProvider = conversation.prestador_id === currentUserId;
@@ -38,18 +38,9 @@ export const PaymentButtons: React.FC<PaymentButtonsProps> = ({
     }
   };
 
-  const handlePayment = async () => {
-    if (conversation.preco_proposto) {
-      const result = await createEscrowPayment(
-        conversation.id,
-        conversation.preco_proposto,
-        'BRL'
-      );
-      
-      if (result?.checkout_url) {
-        window.location.href = result.checkout_url;
-      }
-    }
+  const handlePaymentSuccess = () => {
+    setShowPayment(false);
+    // The payment success will be handled by the real-time updates
   };
 
   // Botão para definir preço (apenas cliente)
@@ -137,6 +128,20 @@ export const PaymentButtons: React.FC<PaymentButtonsProps> = ({
 
   // Botão para pagar (apenas cliente após prestador aceitar)
   if (isClient && conversation.status === 'aceito' && conversation.preco_proposto) {
+    if (showPayment) {
+      return (
+        <div className="mt-4">
+          <PaymentCard
+            serviceName={conversation.servico_solicitado}
+            providerName="Prestador" // You might want to pass the actual provider name
+            totalPrice={conversation.preco_proposto}
+            conversationId={conversation.id}
+            onPaymentSuccess={handlePaymentSuccess}
+          />
+        </div>
+      );
+    }
+
     return (
       <Card className="mt-4">
         <CardContent className="p-4">
@@ -145,12 +150,11 @@ export const PaymentButtons: React.FC<PaymentButtonsProps> = ({
               Serviço Aceito - R$ {conversation.preco_proposto.toFixed(2)}
             </h4>
             <Button 
-              onClick={handlePayment}
-              disabled={loading}
+              onClick={() => setShowPayment(true)}
               className="w-full"
             >
               <CreditCard className="h-4 w-4 mr-2" />
-              {loading ? 'Processando...' : 'Pagar Agora'}
+              Pagar Agora
             </Button>
           </div>
         </CardContent>
