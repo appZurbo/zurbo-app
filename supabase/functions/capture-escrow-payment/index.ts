@@ -14,69 +14,82 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { persistSession: false } }
-    );
+    const { escrowPaymentId } = await req.json();
+    
+    if (!escrowPaymentId) {
+      throw new Error("Missing escrow payment ID");
+    }
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2023-10-16",
     });
 
-    const { escrowPaymentId } = await req.json();
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
 
-    // Buscar dados do pagamento escrow
-    const { data: escrowPayment, error: escrowError } = await supabaseClient
+    // Get escrow payment details
+    const { data: escrowPayment, error: escrowError } = await supabase
       .from('escrow_payments')
-      .select('*')
+      .select(`
+        *,
+        conversation:chat_conversations(
+          prestador:users!prestador_id(stripe_account_id)
+        )
+      `)
       .eq('id', escrowPaymentId)
       .single();
 
-    if (escrowError || !escrowPayment || !escrowPayment.stripe_payment_intent_id) {
-      throw new Error('Escrow payment not found or invalid');
+    if (escrowError || !escrowPayment) {
+      throw new Error("Escrow payment not found");
     }
 
     if (escrowPayment.status !== 'authorized') {
-      throw new Error('Payment not authorized for capture');
+      throw new Error("Payment not authorized for capture");
     }
 
-    // Capturar o Payment Intent
-    const capturedPayment = await stripe.paymentIntents.capture(
-      escrowPayment.stripe_payment_intent_id
-    );
+    const providerAccountId = escrowPayment.conversation.prestador.stripe_account_id;
+    if (!providerAccountId) {
+      throw new Error("Provider Stripe account not configured");
+    }
 
-    // Atualizar status no banco
-    await supabaseClient
+    // Calculate transfer amount (total - zurbo fee)
+    const transferAmount = Math.round((escrowPayment.amount - escrowPayment.zurbo_fee) * 100);
+
+    // Create transfer to provider
+    const transfer = await stripe.transfers.create({
+      amount: transferAmount,
+      currency: escrowPayment.currency.toLowerCase(),
+      destination: providerAccountId,
+      description: `Payment release for escrow ${escrowPaymentId}`,
+    });
+
+    // Update escrow payment status
+    const { error: updateError } = await supabase
       .from('escrow_payments')
       .update({
         status: 'captured',
-        captured_at: new Date().toISOString()
+        captured_at: new Date().toISOString(),
       })
       .eq('id', escrowPaymentId);
 
-    // Criar registro de transação
-    await supabaseClient
-      .from('transactions')
-      .insert({
-        escrow_payment_id: escrowPaymentId,
-        amount: escrowPayment.amount,
-        type: 'escrow_capture',
-        description: 'Liberação de pagamento escrow'
-      });
+    if (updateError) {
+      console.error("Error updating escrow payment:", updateError);
+    }
 
     return new Response(
       JSON.stringify({
         success: true,
-        payment_intent_id: capturedPayment.id,
-        status: capturedPayment.status
+        transfer_id: transfer.id,
+        amount_transferred: transferAmount / 100,
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       }
     );
-
   } catch (error) {
     console.error("Error capturing escrow payment:", error);
     return new Response(

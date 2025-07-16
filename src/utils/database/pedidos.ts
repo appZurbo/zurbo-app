@@ -49,7 +49,10 @@ export const createPedido = async (pedidoData: Partial<Pedido>): Promise<Pedido 
         titulo: pedidoData.titulo,
         descricao: pedidoData.descricao,
         preco_acordado: pedidoData.preco_acordado,
-        endereco_completo: pedidoData.endereco_completo
+        endereco_completo: pedidoData.endereco_completo,
+        status_pagamento: 'pendente',
+        cliente_confirmou: false,
+        prestador_confirmou: false
       }])
       .select()
       .single();
@@ -87,5 +90,26 @@ export const updatePedido = async (pedidoId: string, updates: Partial<Pedido>): 
   } catch (error) {
     console.error('Error updating pedido:', error);
     return null;
+  }
+};
+
+export const confirmService = async (pedidoId: string, userType: 'cliente' | 'prestador'): Promise<boolean> => {
+  try {
+    const field = userType === 'cliente' ? 'cliente_confirmou' : 'prestador_confirmou';
+    
+    const { error } = await supabase
+      .from('pedidos')
+      .update({ [field]: true })
+      .eq('id', pedidoId);
+
+    if (error) {
+      console.error('Error confirming service:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error confirming service:', error);
+    return false;
   }
 };

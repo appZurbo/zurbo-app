@@ -1,166 +1,169 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CreditCard, Shield, AlertCircle, ArrowLeft } from 'lucide-react';
-import { useEscrowPayment } from '@/hooks/useEscrowPayment';
-import { StripePaymentForm } from './StripePaymentForm';
+import { CreditCard, Shield, Clock } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || 'pk_test_...');
 
 interface PaymentCardProps {
   serviceName: string;
   providerName: string;
   totalPrice: number;
   conversationId: string;
-  onPaymentSuccess?: () => void;
+  onPaymentSuccess: () => void;
 }
 
-export const PaymentCard: React.FC<PaymentCardProps> = ({
+const PaymentForm: React.FC<PaymentCardProps> = ({
   serviceName,
   providerName,
   totalPrice,
   conversationId,
   onPaymentSuccess
 }) => {
+  const stripe = useStripe();
+  const elements = useElements();
   const [loading, setLoading] = useState(false);
-  const [showPaymentForm, setShowPaymentForm] = useState(false);
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const { createEscrowPayment } = useEscrowPayment();
+  const { toast } = useToast();
 
-  const zurboFee = totalPrice * 0.08; // Taxa alterada de 5% para 8%
-  const netAmount = totalPrice - zurboFee;
+  const zurboFee = totalPrice * 0.08;
+  const providerAmount = totalPrice - zurboFee;
 
-  const handleInitiatePayment = async () => {
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!stripe || !elements) return;
+
     setLoading(true);
+
     try {
-      const result = await createEscrowPayment(conversationId, totalPrice, 'BRL');
-      
-      if (result?.client_secret) {
-        setClientSecret(result.client_secret);
-        setShowPaymentForm(true);
-      } else {
-        console.error('No client secret received');
+      // Create escrow payment
+      const { data, error } = await supabase.functions.invoke('create-escrow-payment', {
+        body: {
+          conversationId,
+          amount: totalPrice,
+          currency: 'BRL'
+        }
+      });
+
+      if (error) throw error;
+
+      const cardElement = elements.getElement(CardElement);
+      if (!cardElement) throw new Error('Card element not found');
+
+      // Confirm payment
+      const { error: confirmError } = await stripe.confirmCardPayment(data.client_secret, {
+        payment_method: {
+          card: cardElement,
+        }
+      });
+
+      if (confirmError) {
+        throw new Error(confirmError.message);
       }
+
+      toast({
+        title: "Pagamento Realizado!",
+        description: "O pagamento foi processado e está em retenção até a conclusão do serviço.",
+      });
+
+      onPaymentSuccess();
     } catch (error) {
-      console.error('Payment initiation error:', error);
+      console.error('Payment error:', error);
+      toast({
+        title: "Erro no Pagamento",
+        description: error instanceof Error ? error.message : "Ocorreu um erro ao processar o pagamento.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
-  };
-
-  const handlePaymentSuccess = () => {
-    setShowPaymentForm(false);
-    setClientSecret(null);
-    onPaymentSuccess?.();
-  };
-
-  const handlePaymentError = (error: string) => {
-    console.error('Payment error:', error);
-    // Manter o formulário aberto para retry
-  };
-
-  const handleBackToSummary = () => {
-    setShowPaymentForm(false);
-    setClientSecret(null);
   };
 
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          {showPaymentForm && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={handleBackToSummary}
-              className="mr-2 p-1"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          )}
-          <CreditCard className="h-5 w-5" />
-          {showPaymentForm ? 'Finalizar Pagamento' : 'Pagamento Seguro'}
+          <Shield className="h-5 w-5 text-green-600" />
+          Pagamento Seguro
         </CardTitle>
       </CardHeader>
-      
       <CardContent className="space-y-4">
-        {!showPaymentForm ? (
-          <>
-            {/* Resumo do Serviço */}
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="font-medium">Serviço:</span>
-                <span>{serviceName}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-medium">Prestador:</span>
-                <span>{providerName}</span>
-              </div>
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <span>Serviço:</span>
+            <span className="font-medium">{serviceName}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Prestador:</span>
+            <span className="font-medium">{providerName}</span>
+          </div>
+          <Separator />
+          <div className="flex justify-between">
+            <span>Valor do Serviço:</span>
+            <span>R$ {providerAmount.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between text-sm text-gray-600">
+            <span>Taxa da Plataforma (8%):</span>
+            <span>R$ {zurboFee.toFixed(2)}</span>
+          </div>
+          <Separator />
+          <div className="flex justify-between font-bold">
+            <span>Total a Pagar:</span>
+            <span>R$ {totalPrice.toFixed(2)}</span>
+          </div>
+        </div>
+
+        <div className="bg-blue-50 p-3 rounded-lg">
+          <div className="flex items-start gap-2">
+            <Clock className="h-4 w-4 text-blue-600 mt-0.5" />
+            <div className="text-sm text-blue-800">
+              <p className="font-medium">Pagamento em Retenção</p>
+              <p>O valor será liberado ao prestador após a confirmação do serviço por ambas as partes.</p>
             </div>
+          </div>
+        </div>
 
-            <Separator />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="p-3 border rounded-lg">
+            <CardElement
+              options={{
+                style: {
+                  base: {
+                    fontSize: '16px',
+                    color: '#424770',
+                    '::placeholder': {
+                      color: '#aab7c4',
+                    },
+                  },
+                },
+              }}
+            />
+          </div>
 
-            {/* Breakdown de Preços */}
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span>Valor do Serviço:</span>
-                <span>R$ {totalPrice.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-sm text-gray-600">
-                <span>Taxa Zurbo (8%):</span>
-                <span>- R$ {zurboFee.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-sm text-gray-600">
-                <span>Valor para o Prestador:</span>
-                <span>R$ {netAmount.toFixed(2)}</span>
-              </div>
-              <Separator />
-              <div className="flex justify-between font-bold">
-                <span>Total a Pagar:</span>
-                <span>R$ {totalPrice.toFixed(2)}</span>
-              </div>
-            </div>
-
-            {/* Informação de Proteção */}
-            <div className="bg-blue-50 p-3 rounded-lg">
-              <div className="flex items-start gap-2">
-                <Shield className="h-4 w-4 text-blue-600 mt-0.5" />
-                <div className="text-sm text-blue-800">
-                  <p className="font-medium">Pagamento Protegido</p>
-                  <p>Seu pagamento é mantido em segurança e liberado apenas quando o serviço for concluído.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Botão para Iniciar Pagamento */}
-            <Button 
-              onClick={handleInitiatePayment}
-              disabled={loading}
-              className="w-full"
-              size="lg"
-            >
-              {loading ? 'Preparando...' : 'Continuar para Pagamento'}
-            </Button>
-
-            <div className="flex items-center gap-2 text-xs text-gray-500 justify-center">
-              <AlertCircle className="h-3 w-3" />
-              <span>Processado via Stripe - Seus dados estão seguros</span>
-            </div>
-          </>
-        ) : (
-          <>
-            {/* Formulário de Pagamento Stripe */}
-            {clientSecret && (
-              <StripePaymentForm
-                clientSecret={clientSecret}
-                amount={totalPrice * 100} // Converter para centavos
-                onSuccess={handlePaymentSuccess}
-                onError={handlePaymentError}
-              />
-            )}
-          </>
-        )}
+          <Button 
+            type="submit" 
+            className="w-full" 
+            disabled={!stripe || loading}
+          >
+            <CreditCard className="h-4 w-4 mr-2" />
+            {loading ? 'Processando...' : `Pagar R$ ${totalPrice.toFixed(2)}`}
+          </Button>
+        </form>
       </CardContent>
     </Card>
+  );
+};
+
+export const PaymentCard: React.FC<PaymentCardProps> = (props) => {
+  return (
+    <Elements stripe={stripePromise}>
+      <PaymentForm {...props} />
+    </Elements>
   );
 };

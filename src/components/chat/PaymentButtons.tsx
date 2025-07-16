@@ -1,26 +1,22 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { DollarSign, Check, X, CreditCard } from 'lucide-react';
-import { ChatConversation } from '@/hooks/useEnhancedChat';
+import { Check, CreditCard, X } from 'lucide-react';
 import { PaymentCard } from '@/components/payments/PaymentCard';
+import { ChatConversation } from '@/utils/database/types';
 
 interface PaymentButtonsProps {
   conversation: ChatConversation;
   currentUserId: string;
-  canSetPrice: boolean;
-  onSetPrice: (price: number) => void;
-  onRespondToPrice: (accept: boolean) => void;
+  onSendMessage: (message: string, type?: string, metadata?: any) => Promise<void>;
+  onUpdate?: () => void;
 }
 
 export const PaymentButtons: React.FC<PaymentButtonsProps> = ({
   conversation,
   currentUserId,
-  canSetPrice,
-  onSetPrice,
-  onRespondToPrice
+  onSendMessage,
+  onUpdate
 }) => {
   const [priceInput, setPriceInput] = useState('');
   const [showPriceInput, setShowPriceInput] = useState(false);
@@ -29,95 +25,72 @@ export const PaymentButtons: React.FC<PaymentButtonsProps> = ({
   const isClient = conversation.cliente_id === currentUserId;
   const isProvider = conversation.prestador_id === currentUserId;
 
-  const handleSetPrice = () => {
+  const handlePriceSubmit = async () => {
     const price = parseFloat(priceInput);
     if (price > 0) {
-      onSetPrice(price);
-      setShowPriceInput(false);
+      await onSendMessage(`💰 Proposta de preço: R$ ${price.toFixed(2)}`, 'price_proposal', { preco_proposto: price });
       setPriceInput('');
+      setShowPriceInput(false);
     }
   };
 
   const handlePaymentSuccess = () => {
     setShowPayment(false);
-    // The payment success will be handled by the real-time updates
+    onUpdate?.();
   };
 
-  // Botão para definir preço (apenas cliente)
-  if (isClient && conversation.status === 'aguardando_preco' && canSetPrice) {
-    if (showPriceInput) {
-      return (
-        <Card className="mt-4">
-          <CardContent className="p-4">
-            <div className="space-y-3">
-              <h4 className="font-semibold">Definir Preço do Serviço</h4>
-              <div className="flex gap-2">
-                <div className="flex-1 relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
-                  <Input
-                    type="number"
-                    placeholder="0,00"
-                    value={priceInput}
-                    onChange={(e) => setPriceInput(e.target.value)}
-                    className="pl-8"
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
-                <Button onClick={handleSetPrice} disabled={!priceInput}>
-                  <Check className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" onClick={() => setShowPriceInput(false)}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      );
-    }
-
+  // Campo para inserir preço (apenas cliente)
+  if (isClient && conversation.status === 'aguardando_preco') {
     return (
       <Card className="mt-4">
         <CardContent className="p-4">
-          <Button 
-            onClick={() => setShowPriceInput(true)} 
-            className="w-full"
-            variant="outline"
-          >
-            <DollarSign className="h-4 w-4 mr-2" />
-            Definir Preço
-          </Button>
+          {showPriceInput ? (
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                placeholder="Digite o preço"
+                className="flex-1 p-2 border rounded"
+                value={priceInput}
+                onChange={(e) => setPriceInput(e.target.value)}
+              />
+              <Button size="sm" onClick={handlePriceSubmit}>
+                Enviar
+              </Button>
+            </div>
+          ) : (
+            <Button size="sm" onClick={() => setShowPriceInput(true)}>
+              Propor Preço
+            </Button>
+          )}
         </CardContent>
       </Card>
     );
   }
 
-  // Botões para aceitar/rejeitar preço (apenas prestador)
-  if (isProvider && conversation.status === 'preco_definido') {
+  // Botão para aceitar preço (apenas prestador)
+  if (isProvider && conversation.status === 'aguardando_preco' && conversation.preco_proposto) {
     return (
       <Card className="mt-4">
         <CardContent className="p-4">
-          <div className="space-y-3">
-            <h4 className="font-semibold">
-              Preço proposto: R$ {conversation.preco_proposto?.toFixed(2)}
-            </h4>
+          <div className="flex items-center justify-between">
+            <span className="text-sm">
+              Cliente propôs: R$ {conversation.preco_proposto.toFixed(2)}
+            </span>
             <div className="flex gap-2">
               <Button 
-                onClick={() => onRespondToPrice(true)} 
-                className="flex-1"
-                variant="default"
+                size="sm" 
+                variant="outline"
+                onClick={() => onSendMessage('❌ Preço recusado. Vamos negociar?', 'price_declined')}
               >
-                <Check className="h-4 w-4 mr-2" />
-                Aceitar
+                <X className="h-4 w-4 mr-1" />
+                Recusar
               </Button>
               <Button 
-                onClick={() => onRespondToPrice(false)} 
-                className="flex-1"
-                variant="outline"
+                size="sm"
+                onClick={() => onSendMessage('✅ Preço aceito! Aguardando pagamento.', 'price_accepted')}
               >
-                <X className="h-4 w-4 mr-2" />
-                Rejeitar
+                <Check className="h-4 w-4 mr-1" />
+                Aceitar
               </Button>
             </div>
           </div>
@@ -133,7 +106,7 @@ export const PaymentButtons: React.FC<PaymentButtonsProps> = ({
         <div className="mt-4">
           <PaymentCard
             serviceName={conversation.servico_solicitado}
-            providerName="Prestador" // You might want to pass the actual provider name
+            providerName="Prestador"
             totalPrice={conversation.preco_proposto}
             conversationId={conversation.id}
             onPaymentSuccess={handlePaymentSuccess}
@@ -145,8 +118,8 @@ export const PaymentButtons: React.FC<PaymentButtonsProps> = ({
     return (
       <Card className="mt-4">
         <CardContent className="p-4">
-          <div className="space-y-3">
-            <h4 className="font-semibold">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-medium text-green-700">
               Serviço Aceito - R$ {conversation.preco_proposto.toFixed(2)}
             </h4>
             <Button 
@@ -156,32 +129,6 @@ export const PaymentButtons: React.FC<PaymentButtonsProps> = ({
               <CreditCard className="h-4 w-4 mr-2" />
               Pagar Agora
             </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Status do pagamento/serviço
-  if (['pagamento_retido', 'em_andamento', 'concluido'].includes(conversation.status)) {
-    const statusText = {
-      'pagamento_retido': 'Pagamento retido - Aguardando início do serviço',
-      'em_andamento': 'Serviço em andamento',
-      'concluido': 'Serviço concluído'
-    };
-
-    return (
-      <Card className="mt-4">
-        <CardContent className="p-4">
-          <div className="text-center">
-            <p className="font-semibold text-green-600">
-              {statusText[conversation.status as keyof typeof statusText]}
-            </p>
-            {conversation.preco_proposto && (
-              <p className="text-sm text-gray-600 mt-1">
-                Valor: R$ {conversation.preco_proposto.toFixed(2)}
-              </p>
-            )}
           </div>
         </CardContent>
       </Card>

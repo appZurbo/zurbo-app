@@ -91,6 +91,9 @@ export interface Pedido {
   descricao?: string;
   preco_acordado?: number;
   status: 'pendente' | 'aceito' | 'em_andamento' | 'concluido' | 'cancelado';
+  status_pagamento?: 'pendente' | 'pago_em_escrow' | 'liberado' | 'cancelado';
+  cliente_confirmou?: boolean;
+  prestador_confirmou?: boolean;
   data_solicitacao: string;
   data_conclusao?: string;
   endereco_completo?: string;
