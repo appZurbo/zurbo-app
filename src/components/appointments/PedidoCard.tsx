@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
@@ -43,19 +44,21 @@ export const PedidoCard: React.FC<PedidoCardProps> = ({ pedido, currentUser, onU
   return (
     <Card className="w-full">
       <CardHeader className="pb-3">
-        <div className="flex items-start">
-          <Avatar className="mr-4">
-            <AvatarImage src={pedido.servico?.icone} />
-            <AvatarFallback>{pedido.servico?.nome?.substring(0, 2)}</AvatarFallback>
-          </Avatar>
-          <div className="space-y-1">
-            <h4 className="text-sm font-semibold">{pedido.titulo}</h4>
-            <p className="text-xs text-gray-500">
-              Solicitado em: {formatarData(pedido.data_solicitacao)}
-            </p>
-            {getStatusBadge(pedido.status)}
+        <div className="flex items-start justify-between">
+          <div className="flex items-start">
+            <Avatar className="mr-4">
+              <AvatarImage src={pedido.servico?.icone} />
+              <AvatarFallback>{pedido.servico?.nome?.substring(0, 2)}</AvatarFallback>
+            </Avatar>
+            <div className="space-y-1">
+              <h4 className="text-sm font-semibold">{pedido.titulo}</h4>
+              <p className="text-xs text-gray-500">
+                Solicitado em: {formatarData(pedido.data_solicitacao)}
+              </p>
+              {getStatusBadge(pedido.status)}
+            </div>
           </div>
-          <DropdownMenu className="ml-auto">
+          <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
                 <span className="sr-only">Abrir menu</span>

@@ -3,16 +3,15 @@ import React, { useEffect, useRef } from 'react';
 import { MessageList } from './MessageList';
 import { MessageInput } from './MessageInput';
 import { PaymentButtons } from './PaymentButtons';
-import { ChatMessage, ChatConversation, ImageUploadInfo } from '@/hooks/useEnhancedChat';
 import { CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 
 interface ChatInterfaceProps {
-  conversation: ChatConversation;
-  messages: ChatMessage[];
-  imageUploadInfo: ImageUploadInfo;
+  conversation: any;
+  messages: any[];
+  imageUploadInfo: any;
   onSendMessage: (content: string) => void;
   onUploadImage: (file: File) => void;
   onSetPrice: (price: number) => void;
@@ -78,6 +77,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   };
 
+  const handleSendMessageWithType = async (message: string, type?: string, metadata?: any) => {
+    // For now, just call the basic onSendMessage
+    onSendMessage(message);
+  };
+
   return (
     <div className="flex flex-col h-full">
       {/* Header do Chat */}
@@ -117,9 +121,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           <PaymentButtons
             conversation={conversation}
             currentUserId={profile.id}
-            canSetPrice={canSetPrice}
-            onSetPrice={onSetPrice}
-            onRespondToPrice={onRespondToPrice}
+            onSendMessage={handleSendMessageWithType}
           />
 
           {/* Input de Mensagem */}

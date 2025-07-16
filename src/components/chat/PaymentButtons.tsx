@@ -1,12 +1,12 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Check, CreditCard, X } from 'lucide-react';
 import { PaymentCard } from '@/components/payments/PaymentCard';
-import { ChatConversation } from '@/utils/database/types';
 
 interface PaymentButtonsProps {
-  conversation: ChatConversation;
+  conversation: any; // Using any for now since ChatConversation is not available
   currentUserId: string;
   onSendMessage: (message: string, type?: string, metadata?: any) => Promise<void>;
   onUpdate?: () => void;

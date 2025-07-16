@@ -93,9 +93,8 @@ export const AppointmentSystem: React.FC = () => {
             <PedidoCard
               key={pedido.id}
               pedido={pedido}
-              isPrestador={isPrestador}
-              profileId={profile?.id}
-              onStatusUpdate={handleStatusUpdate}
+              currentUser={profile}
+              onUpdate={loadPedidos}
             />
           ))
         )}
