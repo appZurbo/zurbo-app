@@ -8,12 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { UserCheck, UserX, Crown, Shield, User } from 'lucide-react';
 
-interface UserRoleManagerProps {
-  userId: string;
-  currentRole: string;
-  userName: string;
-  onRoleUpdate: () => void;
-}
+import { UserRoleManagerProps } from '@/types';
 
 export const UserRoleManager = ({ userId, currentRole, userName, onRoleUpdate }: UserRoleManagerProps) => {
   const [newRole, setNewRole] = useState(currentRole);

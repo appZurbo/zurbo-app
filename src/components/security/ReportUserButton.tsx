@@ -17,12 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { securityLogger } from '@/utils/securityLogger';
-
-interface ReportUserButtonProps {
-  reportedUserId: string;
-  reportedUserName: string;
-  variant?: 'button' | 'icon';
-}
+import { ReportUserButtonProps } from '@/types';
 
 const ReportUserButton = ({ reportedUserId, reportedUserName, variant = 'button' }: ReportUserButtonProps) => {
   const [open, setOpen] = useState(false);

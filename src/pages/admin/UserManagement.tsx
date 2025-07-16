@@ -12,18 +12,7 @@ import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { UserRoleManager } from '@/components/admin/UserRoleManager';
-
-interface UserData {
-  id: string;
-  nome: string;
-  email: string;
-  tipo: 'cliente' | 'prestador' | 'admin' | 'moderator';
-  premium: boolean;
-  criado_em: string;
-  descricao_servico?: string;
-  nota_media?: number;
-  endereco_cidade?: string;
-}
+import { UserData } from '@/types';
 
 const UserManagement = () => {
   const navigate = useNavigate();
@@ -54,8 +43,15 @@ const UserManagement = () => {
       
       // Properly type the data to match our UserData interface
       const typedUsers: UserData[] = (data || []).map(user => ({
-        ...user,
-        tipo: user.tipo as 'cliente' | 'prestador' | 'admin' | 'moderator'
+        id: user.id,
+        nome: user.nome,
+        email: user.email,
+        tipo: user.tipo as 'cliente' | 'prestador' | 'admin' | 'moderator',
+        premium: user.premium || false,
+        criado_em: user.criado_em,
+        endereco_cidade: user.endereco_cidade,
+        descricao_servico: user.descricao_servico,
+        nota_media: user.nota_media
       }));
       
       setUsers(typedUsers);

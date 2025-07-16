@@ -2,36 +2,12 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import type { User, Session } from '@supabase/supabase-js';
-
-interface Profile {
-  id: string;
-  nome: string;
-  email: string;
-  tipo: 'cliente' | 'prestador' | 'admin' | 'moderator';
-  foto_url?: string;
-  bio?: string;
-  descricao_servico?: string;
-  endereco_cidade?: string;
-  endereco_bairro?: string;
-  endereco_rua?: string;
-  endereco_numero?: string;
-  endereco_cep?: string;
-  cpf?: string;
-  premium?: boolean;
-  plano_premium?: string;
-  nota_media?: number;
-  em_servico?: boolean;
-  latitude?: number;
-  longitude?: number;
-  auth_id?: string;
-  updated_at?: string;
-  criado_em?: string;
-}
+import type { UserProfile } from '@/types';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  profile: Profile | null;
+  profile: UserProfile | null;
   loading: boolean;
   error: string | null;
   isAuthenticated: boolean;
@@ -39,10 +15,10 @@ interface AuthContextType {
   isCliente: boolean;
   isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string, userData: Partial<Profile>) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, userData: Partial<UserProfile>) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   logout: () => Promise<void>;
-  updateLocalProfile: (updates: Partial<Profile>) => void;
+  updateLocalProfile: (updates: Partial<UserProfile>) => void;
   refreshProfile: () => Promise<void>;
 }
 

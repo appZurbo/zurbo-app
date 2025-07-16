@@ -8,17 +8,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MapPin, User, Mail, FileText, Camera } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { UserProfile } from '@/types';
 
-interface UserProfile {
-  id: string;
-  nome: string;
-  email: string;
-  cpf: string;
-  endereco_cidade: string;
-  tipo: string;
-  foto_url: string;
-  bio: string;
-}
+// Using centralized UserProfile type from @/types
 
 const ProfilePage = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -44,8 +36,14 @@ const ProfilePage = () => {
 
       if (error) throw error;
       
-      setProfile(data);
-      setFormData(data);
+      // Ensure tipo is properly typed
+      const profileData: UserProfile = {
+        ...data,
+        tipo: data.tipo as 'cliente' | 'prestador' | 'admin' | 'moderator'
+      };
+      
+      setProfile(profileData);
+      setFormData(profileData);
     } catch (error: any) {
       toast({
         title: "Erro ao carregar perfil",

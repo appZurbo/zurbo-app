@@ -3,33 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from './useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-
-export interface ChatConversation {
-  id: string;
-  cliente_id: string;
-  prestador_id: string;
-  servico_solicitado: string;
-  preco_proposto?: number;
-  status: 'aguardando_preco' | 'preco_definido' | 'aceito' | 'rejeitado' | 'pagamento_retido' | 'em_andamento' | 'concluido' | 'cancelado' | 'bloqueado';
-  pedido_id?: string;
-  created_at: string;
-  updated_at: string;
-  client_message_count?: number;
-  provider_message_count?: number;
-  cliente?: { nome: string; foto_url?: string };
-  prestador?: { nome: string; foto_url?: string };
-  last_message?: string;
-}
-
-export interface ChatMessage {
-  id: string;
-  conversation_id: string;
-  sender_id: string;
-  message_type: 'text' | 'image' | 'system';
-  content?: string;
-  image_url?: string;
-  created_at: string;
-}
+import { ChatConversation, ChatMessage } from '@/types';
 
 export interface ImageUploadInfo {
   remaining: number;

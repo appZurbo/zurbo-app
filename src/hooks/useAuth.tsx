@@ -2,36 +2,12 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-
-interface Profile {
-  id: string;
-  nome: string;
-  email: string;
-  tipo: 'cliente' | 'prestador' | 'admin' | 'moderator';
-  foto_url?: string;
-  bio?: string;
-  descricao_servico?: string;
-  endereco_cidade?: string;
-  endereco_bairro?: string;
-  endereco_rua?: string;
-  endereco_numero?: string;
-  endereco_cep?: string;
-  cpf?: string;
-  premium?: boolean;
-  plano_premium?: string;
-  nota_media?: number;
-  em_servico?: boolean;
-  latitude?: number;
-  longitude?: number;
-  auth_id?: string;
-  updated_at?: string;
-  criado_em?: string;
-}
+import { UserProfile } from '@/types';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  profile: Profile | null;
+  profile: UserProfile | null;
   loading: boolean;
   error: string | null;
   isAuthenticated: boolean;
@@ -39,10 +15,10 @@ interface AuthContextType {
   isCliente: boolean;
   isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string, userData: Partial<Profile>) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, userData: Partial<UserProfile>) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   logout: () => Promise<void>;
-  updateLocalProfile: (updates: Partial<Profile>) => void;
+  updateLocalProfile: (updates: Partial<UserProfile>) => void;
   refreshProfile: () => Promise<void>;
 }
 
@@ -75,7 +51,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -94,8 +70,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       // Ensure tipo is properly typed
-      const profileData: Profile = {
+      const profileData: UserProfile = {
         ...data,
+        auth_id: data.auth_id || userId,
+        criado_em: data.criado_em || new Date().toISOString(),
         tipo: data.tipo as 'cliente' | 'prestador' | 'admin' | 'moderator'
       };
 
@@ -206,7 +184,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const signUp = async (email: string, password: string, userData: Partial<Profile>) => {
+  const signUp = async (email: string, password: string, userData: Partial<UserProfile>) => {
     try {
       setError(null);
       const redirectUrl = `${window.location.origin}/`;
@@ -264,7 +242,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = signOut; // Alias for signOut
 
-  const updateLocalProfile = (updates: Partial<Profile>) => {
+  const updateLocalProfile = (updates: Partial<UserProfile>) => {
     if (profile) {
       setProfile({ ...profile, ...updates });
     }

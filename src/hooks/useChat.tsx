@@ -2,34 +2,23 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from './useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { Message } from '@/types';
 
-export interface Chat {
+// Chat interface with simplified user info for this hook
+interface ChatWithUsers {
   id: string;
   cliente_id: string;
   prestador_id: string;
-  created_at: string;
   last_message?: string;
-  cliente?: {
-    nome: string;
-    foto_url?: string;
-  };
-  prestador?: {
-    nome: string;
-    foto_url?: string;
-  };
-}
-
-export interface Message {
-  id: string;
-  chat_id: string;
-  sender_id: string;
-  content: string;
   created_at: string;
+  updated_at: string;
+  cliente?: { nome: string; foto_url?: string };
+  prestador?: { nome: string; foto_url?: string };
 }
 
 export const useChat = () => {
-  const [chats, setChats] = useState<Chat[]>([]);
-  const [currentChat, setCurrentChat] = useState<Chat | null>(null);
+  const [chats, setChats] = useState<ChatWithUsers[]>([]);
+  const [currentChat, setCurrentChat] = useState<ChatWithUsers | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const { profile } = useAuth();
@@ -123,7 +112,7 @@ export const useChat = () => {
     }
   };
 
-  const sendMessage = async (chat: Chat, content: string) => {
+  const sendMessage = async (chat: ChatWithUsers, content: string) => {
     if (!profile || !content.trim()) {
       console.log('Cannot send message - missing profile or content');
       return;
