@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,7 +11,6 @@ import {
   Activity, 
   Mail, 
   Ban, 
-  AlertTriangle,
   Star,
   Calendar,
   MapPin
@@ -23,7 +21,7 @@ import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useMobile } from '@/hooks/useMobile';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Profile } from '@/types';
+import { UserProfile } from '@/types';
 
 const UserManagement = () => {
   const navigate = useNavigate();
@@ -31,26 +29,26 @@ const UserManagement = () => {
   const isMobile = useMobile();
   const { toast } = useToast();
   
-  const [usuarios, setUsuarios] = useState<Profile[]>([]);
-  const [prestadores, setPrestadores] = useState<Profile[]>([]);
+  const [usuarios, setUsuarios] = useState<UserProfile[]>([]);
+  const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
-  const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
 
   const loadUsers = async () => {
     try {
       const { data: allUsers, error } = await supabase
         .from('users')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('criado_em', { ascending: false });
 
       if (error) throw error;
 
       const users = allUsers?.filter(user => user.tipo !== 'prestador') || [];
       const providers = allUsers?.filter(user => user.tipo === 'prestador') || [];
 
-      setUsuarios(users);
-      setPrestadores(providers);
+      setUsuarios(users as UserProfile[] || []);
+      setPrestadores(providers as UserProfile[] || []);
     } catch (error: any) {
       console.error('Erro ao carregar usuários:', error);
       toast({
@@ -73,7 +71,7 @@ const UserManagement = () => {
     try {
       const { error } = await supabase
         .from('users')
-        .update({ ativo: false })
+        .update({ em_servico: false } as any)
         .eq('id', userId);
 
       if (error) throw error;
@@ -97,7 +95,7 @@ const UserManagement = () => {
     try {
       const { error } = await supabase
         .from('users')
-        .update({ ativo: true })
+        .update({ em_servico: true } as any)
         .eq('id', userId);
 
       if (error) throw error;
@@ -127,7 +125,7 @@ const UserManagement = () => {
     user.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const UserCard = ({ user, isPrestador = false }: { user: Profile; isPrestador?: boolean }) => (
+  const UserCard = ({ user, isPrestador = false }: { user: UserProfile; isPrestador?: boolean }) => (
     <Card className="mb-4">
       <CardContent className="p-4">
         <div className="flex items-start justify-between">
@@ -147,8 +145,11 @@ const UserManagement = () => {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <h3 className="font-semibold">{user.nome}</h3>
-                <Badge variant={user.ativo ? "default" : "destructive"}>
-                  {user.ativo ? "Ativo" : "Banido"}
+                <Badge 
+                  variant={user.em_servico ? "default" : "destructive"}
+                  className={user.em_servico ? "text-green-600" : "text-red-600"}
+                >
+                  {user.em_servico ? 'Ativo' : 'Inativo'}
                 </Badge>
                 {isPrestador && (
                   <Badge variant="secondary" className="bg-orange-100 text-orange-800">
@@ -161,6 +162,11 @@ const UserManagement = () => {
               
               {isPrestador && (
                 <div className="space-y-1 text-sm text-gray-600">
+                  <p><strong>Tipo:</strong> {user.tipo}</p>
+                  <p><strong>Premium:</strong> {user.premium ? 'Sim' : 'Não'}</p>
+                  <p><strong>Cidade:</strong> {user.endereco_cidade || 'Não informado'}</p>
+                  <p><strong>Cadastrado em:</strong> {new Date(user.criado_em).toLocaleDateString()}</p>
+                  
                   {user.nota_media && (
                     <div className="flex items-center gap-1">
                       <Star className="h-4 w-4 text-yellow-500" />
@@ -175,18 +181,19 @@ const UserManagement = () => {
                     </div>
                   )}
                   
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    <span>Cadastrado em {new Date(user.created_at).toLocaleDateString()}</span>
-                  </div>
+                  <p><strong>Serviços:</strong> {user.descricao_servico || 'Não informado'}</p>
+                  <p><strong>Cadastrado em:</strong> {new Date(user.criado_em).toLocaleDateString()}</p>
                 </div>
               )}
               
               {!isPrestador && (
                 <div className="text-sm text-gray-600">
+                  <p><strong>Tipo:</strong> {user.tipo}</p>
+                  <p><strong>Premium:</strong> {user.premium ? 'Sim' : 'Não'}</p>
+                  <p><strong>Cidade:</strong> {user.endereco_cidade || 'Não informado'}</p>
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
-                    <span>Cadastrado em {new Date(user.created_at).toLocaleDateString()}</span>
+                    <span>Cadastrado em {new Date(user.criado_em).toLocaleDateString()}</span>
                   </div>
                 </div>
               )}
@@ -203,7 +210,7 @@ const UserManagement = () => {
               Contatar
             </Button>
             
-            {user.ativo ? (
+            {user.em_servico ? (
               <Button
                 size="sm"
                 variant="destructive"
@@ -349,7 +356,7 @@ const UserManagement = () => {
         </div>
       </div>
 
-      {/* Modal de contato de usuário */}
+      {/* Contact Modal */}
       {selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <Card className="max-w-md w-full mx-4">

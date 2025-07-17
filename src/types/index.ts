@@ -37,13 +37,17 @@ export interface UserProfile {
     expira_em: string;
   }[];
   criado_em: string;
+  created_at?: string; // Alternative field name for compatibility
   updated_at?: string;
   servicos_oferecidos?: string[];
   em_servico?: boolean;
   descricao_servico?: string;
   prestador_servicos?: PrestadorServico[];
   avaliacoes?: Avaliacao[];
+  portfolio_fotos?: string | PortfolioFoto[]; // Can be JSON string or array
   stripe_account_id?: string;
+  ativo?: boolean; // For admin management
+  categoria_servico?: string; // Service category
 }
 
 /**

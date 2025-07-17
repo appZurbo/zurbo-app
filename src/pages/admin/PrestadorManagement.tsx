@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -22,7 +21,13 @@ import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useMobile } from '@/hooks/useMobile';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Profile } from '@/types';
+import { UserProfile } from '@/types';
+
+interface Filters {
+  search: string;
+  status: 'all' | 'active' | 'inactive';
+  category: string;
+}
 
 const PrestadorManagement = () => {
   const navigate = useNavigate();
@@ -30,22 +35,28 @@ const PrestadorManagement = () => {
   const isMobile = useMobile();
   const { toast } = useToast();
   
-  const [prestadores, setPrestadores] = useState<Profile[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
+  const [filteredPrestadores, setFilteredPrestadores] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedPrestador, setSelectedPrestador] = useState<Profile | null>(null);
+  const [selectedPrestador, setSelectedPrestador] = useState<UserProfile | null>(null);
+  const [filters, setFilters] = useState<Filters>({
+    search: '',
+    status: 'all',
+    category: ''
+  });
 
   const loadPrestadores = async () => {
     try {
-      const { data: providers, error } = await supabase
+      const { data, error } = await supabase
         .from('users')
         .select('*')
         .eq('tipo', 'prestador')
-        .order('created_at', { ascending: false });
+        .order('criado_em', { ascending: false });
 
       if (error) throw error;
 
-      setPrestadores(providers || []);
+      setPrestadores(data as UserProfile[] || []);
+      setFilteredPrestadores(data as UserProfile[] || []);
     } catch (error: any) {
       console.error('Erro ao carregar prestadores:', error);
       toast({
@@ -64,61 +75,57 @@ const PrestadorManagement = () => {
     }
   }, [isAdmin]);
 
-  const handleBanPrestador = async (userId: string) => {
+  const toggleUserStatus = async (id: string, isActive: boolean | undefined) => {
     try {
-      const { error } = await supabase
-        .from('users')
-        .update({ ativo: false })
-        .eq('id', userId);
+      if (isActive) {
+        const { error } = await supabase
+          .from('users')
+          .update({ em_servico: false } as any)
+          .eq('id', id);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      toast({
-        title: "Prestador banido",
-        description: "O prestador foi banido com sucesso."
-      });
+        toast({
+          title: "Prestador suspenso",
+          description: "O prestador foi suspenso com sucesso."
+        });
+      } else {
+        const { error } = await supabase
+          .from('users')
+          .update({ em_servico: true } as any)
+          .eq('id', id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Prestador ativado",
+          description: "O prestador foi ativado com sucesso."
+        });
+      }
       
       loadPrestadores();
     } catch (error: any) {
       toast({
         title: "Erro",
-        description: "Não foi possível banir o prestador.",
+        description: "Não foi possível alterar o status do prestador.",
         variant: "destructive"
       });
     }
   };
 
-  const handleUnbanPrestador = async (userId: string) => {
+  const getPortfolioPhotosCount = (prestador: UserProfile) => {
+    if (!prestador.portfolio_fotos) return 0;
     try {
-      const { error } = await supabase
-        .from('users')
-        .update({ ativo: true })
-        .eq('id', userId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Prestador reativado",
-        description: "O prestador foi reativado com sucesso."
-      });
-      
-      loadPrestadores();
-    } catch (error: any) {
-      toast({
-        title: "Erro",
-        description: "Não foi possível reativar o prestador.",
-        variant: "destructive"
-      });
+      const photos = typeof prestador.portfolio_fotos === 'string' 
+        ? JSON.parse(prestador.portfolio_fotos)
+        : prestador.portfolio_fotos;
+      return Array.isArray(photos) ? photos.length : 0;
+    } catch {
+      return 0;
     }
   };
 
-  const filteredPrestadores = prestadores.filter(user =>
-    user.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.categoria_servico?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const PrestadorCard = ({ prestador }: { prestador: Profile }) => (
+  const PrestadorCard = ({ prestador }: { prestador: UserProfile }) => (
     <Card className="mb-4">
       <CardContent className="p-4">
         <div className="flex items-start justify-between">
@@ -138,8 +145,11 @@ const PrestadorManagement = () => {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <h3 className="font-semibold text-lg">{prestador.nome}</h3>
-                <Badge variant={prestador.ativo ? "default" : "destructive"}>
-                  {prestador.ativo ? "Ativo" : "Banido"}
+                <Badge 
+                  variant={prestador.em_servico ? "default" : "destructive"}
+                  className={prestador.em_servico ? "text-green-600" : "text-red-600"}
+                >
+                  {prestador.em_servico ? 'Ativo' : 'Inativo'}
                 </Badge>
                 <Badge variant="secondary" className="bg-orange-100 text-orange-800">
                   <Wrench className="h-3 w-3 mr-1" />
@@ -149,38 +159,58 @@ const PrestadorManagement = () => {
               
               <p className="text-sm text-gray-600 mb-2">{prestador.email}</p>
               
-              {prestador.categoria_servico && (
-                <p className="text-sm font-medium text-orange-600 mb-2">
-                  {prestador.categoria_servico}
-                </p>
-              )}
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600">
-                {prestador.nota_media && (
+              <div className="space-y-1 text-sm text-gray-600">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <p><strong>Categoria:</strong> {prestador.descricao_servico || 'Não informado'}</p>
+                  <p><strong>Descrição:</strong> {prestador.bio || 'Não informado'}</p>
+                  <p><strong>Status:</strong> {prestador.em_servico ? 'Ativo' : 'Inativo'}</p>
+                  
+                  {prestador.nota_media && (
+                    <div className="flex items-center gap-1">
+                      <Star className="h-4 w-4 text-yellow-500" />
+                      <span>{prestador.nota_media.toFixed(1)} de avaliação</span>
+                    </div>
+                  )}
+                  
+                  {prestador.endereco_cidade && (
+                    <div className="flex items-center gap-1">
+                      <MapPin className="h-4 w-4" />
+                      <span>{prestador.endereco_cidade}</span>
+                    </div>
+                  )}
+                  
                   <div className="flex items-center gap-1">
-                    <Star className="h-4 w-4 text-yellow-500" />
-                    <span>{prestador.nota_media.toFixed(1)} de avaliação</span>
+                    <Calendar className="h-4 w-4" />
+                    <span>Desde {new Date(prestador.criado_em).toLocaleDateString()}</span>
                   </div>
-                )}
-                
-                {prestador.endereco_cidade && (
+
                   <div className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4" />
-                    <span>{prestador.endereco_cidade}</span>
+                    <Camera className="h-4 w-4" />
+                    <span>{getPortfolioPhotosCount(prestador)} fotos</span>
                   </div>
-                )}
-                
-                <div className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4" />
-                  <span>Desde {new Date(prestador.created_at).toLocaleDateString()}</span>
                 </div>
 
                 {prestador.portfolio_fotos && (
-                  <div className="flex items-center gap-1">
-                    <Camera className="h-4 w-4" />
-                    <span>
-                      {JSON.parse(prestador.portfolio_fotos).length || 0} fotos
-                    </span>
+                  <div className="mt-3">
+                    <p className="text-sm font-medium mb-2">Portfólio:</p>
+                    <div className="grid grid-cols-4 gap-2">
+                      {(() => {
+                        try {
+                          const fotos = typeof prestador.portfolio_fotos === 'string' ? 
+                            JSON.parse(prestador.portfolio_fotos) : prestador.portfolio_fotos;
+                          return fotos.slice(0, 4).map((foto: any, index: number) => (
+                            <img 
+                              key={index}
+                              src={foto.url} 
+                              alt={`Portfólio ${index + 1}`}
+                              className="w-16 h-16 object-cover rounded border"
+                            />
+                          ));
+                        } catch {
+                          return null;
+                        }
+                      })()}
+                    </div>
                   </div>
                 )}
               </div>
@@ -203,23 +233,23 @@ const PrestadorManagement = () => {
               Contatar
             </Button>
             
-            {prestador.ativo ? (
+            {prestador.em_servico ? (
               <Button
                 size="sm"
                 variant="destructive"
-                onClick={() => handleBanPrestador(prestador.id)}
+                onClick={() => toggleUserStatus(prestador.id, prestador.em_servico)}
               >
                 <Ban className="h-4 w-4 mr-1" />
-                Banir
+                Suspender
               </Button>
             ) : (
               <Button
                 size="sm"
                 variant="default"
-                onClick={() => handleUnbanPrestador(prestador.id)}
+                onClick={() => toggleUserStatus(prestador.id, prestador.em_servico)}
               >
                 <Activity className="h-4 w-4 mr-1" />
-                Reativar
+                Ativar
               </Button>
             )}
           </div>
@@ -249,6 +279,26 @@ const PrestadorManagement = () => {
     );
   }
 
+  // Filter logic
+  useEffect(() => {
+    let filtered = prestadores
+      .filter(prestador => 
+        prestador.nome?.toLowerCase().includes(filters.search.toLowerCase()) ||
+        prestador.email?.toLowerCase().includes(filters.search.toLowerCase()) ||
+        prestador.descricao_servico?.toLowerCase().includes(filters.search.toLowerCase())
+      )
+      .filter(prestador => 
+        filters.category === '' || 
+        prestador.descricao_servico?.toLowerCase().includes(filters.category.toLowerCase())
+      )
+      .filter(prestador => 
+        filters.status === 'all' || 
+        (filters.status === 'active' ? prestador.em_servico : !prestador.em_servico)
+      );
+
+    setFilteredPrestadores(filtered);
+  }, [prestadores, filters]);
+
   return (
     <div>
       <UnifiedHeader />
@@ -274,17 +324,33 @@ const PrestadorManagement = () => {
             </div>
           </div>
 
-          {/* Search */}
+          {/* Search and Filters */}
           <Card className="mb-6">
             <CardContent className="p-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    placeholder="Pesquisar por nome, email..."
+                    value={filters.search}
+                    onChange={(e) => setFilters({...filters, search: e.target.value})}
+                    className="pl-10"
+                  />
+                </div>
                 <Input
-                  placeholder="Pesquisar por nome, email ou categoria..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  placeholder="Filtrar por categoria..."
+                  value={filters.category}
+                  onChange={(e) => setFilters({...filters, category: e.target.value})}
                 />
+                <select 
+                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  value={filters.status}
+                  onChange={(e) => setFilters({...filters, status: e.target.value as any})}
+                >
+                  <option value="all">Todos os status</option>
+                  <option value="active">Apenas ativos</option>
+                  <option value="inactive">Apenas inativos</option>
+                </select>
               </div>
             </CardContent>
           </Card>
@@ -303,7 +369,7 @@ const PrestadorManagement = () => {
               <CardContent className="p-4">
                 <div className="text-center">
                   <p className="text-2xl font-bold text-green-600">
-                    {prestadores.filter(p => p.ativo).length}
+                    {prestadores.filter(p => p.em_servico).length}
                   </p>
                   <p className="text-sm text-gray-600">Ativos</p>
                 </div>
@@ -313,9 +379,9 @@ const PrestadorManagement = () => {
               <CardContent className="p-4">
                 <div className="text-center">
                   <p className="text-2xl font-bold text-red-600">
-                    {prestadores.filter(p => !p.ativo).length}
+                    {prestadores.filter(p => !p.em_servico).length}
                   </p>
-                  <p className="text-sm text-gray-600">Banidos</p>
+                  <p className="text-sm text-gray-600">Inativos</p>
                 </div>
               </CardContent>
             </Card>
@@ -354,7 +420,7 @@ const PrestadorManagement = () => {
         </div>
       </div>
 
-      {/* Modal de contato de prestador */}
+      {/* Contact Modal */}
       {selectedPrestador && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <Card className="max-w-md w-full mx-4">
@@ -368,10 +434,10 @@ const PrestadorManagement = () => {
                   <p className="font-medium">{selectedPrestador.email}</p>
                 </div>
                 
-                {selectedPrestador.categoria_servico && (
+                {selectedPrestador.descricao_servico && (
                   <div>
                     <p className="text-sm text-gray-600 mb-2">Categoria:</p>
-                    <p className="font-medium">{selectedPrestador.categoria_servico}</p>
+                    <p className="font-medium">{selectedPrestador.descricao_servico}</p>
                   </div>
                 )}
                 

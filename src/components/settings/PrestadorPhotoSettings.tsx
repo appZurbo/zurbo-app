@@ -25,8 +25,10 @@ export const PrestadorPhotoSettings = () => {
   useEffect(() => {
     if (profile?.portfolio_fotos) {
       try {
-        const parsedPhotos = JSON.parse(profile.portfolio_fotos);
-        setPhotos(Array.isArray(parsedPhotos) ? parsedPhotos : []);
+        const photosData = typeof profile.portfolio_fotos === 'string' 
+          ? JSON.parse(profile.portfolio_fotos)
+          : profile.portfolio_fotos;
+        setPhotos(Array.isArray(photosData) ? photosData : []);
       } catch (error) {
         console.error('Erro ao carregar fotos do portfólio:', error);
         setPhotos([]);
@@ -90,12 +92,12 @@ export const PrestadorPhotoSettings = () => {
       
       const { error } = await supabase
         .from('users')
-        .update({ portfolio_fotos: JSON.stringify(validPhotos) })
+        .update({ portfolio_fotos: JSON.stringify(validPhotos) } as any)
         .eq('id', profile.id);
 
       if (error) throw error;
 
-      updateLocalProfile({ ...profile, portfolio_fotos: JSON.stringify(validPhotos) });
+      updateLocalProfile({ ...profile, portfolio_fotos: JSON.stringify(validPhotos) } as any);
       toast({
         title: "Sucesso",
         description: "Portfólio atualizado com sucesso!"
