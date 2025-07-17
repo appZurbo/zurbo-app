@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -69,7 +68,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return null;
       }
 
-      // Ensure tipo is properly typed
       const profileData: UserProfile = {
         ...data,
         auth_id: data.auth_id || userId,
@@ -97,21 +95,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let isMounted = true;
 
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.id);
         
         if (!isMounted) return;
 
-        // Update session and user state
         setSession(session);
         setUser(session?.user ?? null);
         setError(null);
 
-        // Load profile if user is authenticated
         if (session?.user) {
-          // Defer profile loading to avoid blocking auth state changes
           setTimeout(async () => {
             if (isMounted) {
               const userProfile = await loadProfile(session.user.id);
@@ -130,7 +124,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     );
 
-    // THEN check for existing session
     const initializeAuth = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -199,7 +192,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) return { error };
 
-      // Create user profile if signup was successful
       if (data.user) {
         const { error: profileError } = await supabase
           .from('users')
@@ -240,7 +232,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const logout = signOut; // Alias for signOut
+  const logout = signOut;
 
   const updateLocalProfile = (updates: Partial<UserProfile>) => {
     if (profile) {
@@ -248,7 +240,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Computed properties
   const isAuthenticated = !!user;
   const isPrestador = profile?.tipo === 'prestador';
   const isCliente = profile?.tipo === 'cliente';
