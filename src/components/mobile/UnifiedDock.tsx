@@ -37,8 +37,8 @@ export const UnifiedDock = () => {
     {
       icon: Calendar,
       label: isPrestador ? 'Agenda' : 'Pedidos',
-      path: isPrestador ? '/agenda' : '/pedidos',
-      isActive: isActive('/agenda') || isActive('/pedidos'),
+      path: isPrestador ? '/agenda-prestador' : '/pedidos',
+      isActive: isActive('/agenda-prestador') || isActive('/pedidos'),
       requiresAuth: true
     },
     {
@@ -53,9 +53,9 @@ export const UnifiedDock = () => {
       icon: User,
       label: 'Perfil',
       path: isAuthenticated 
-        ? '/configuracoes'
+        ? '/settings'
         : '/auth',
-      isActive: isActive('/configuracoes') || isActive('/prestador-settings') || isActive('/settings') || isActive('/auth'),
+      isActive: isActive('/settings') || isActive('/prestador-settings') || isActive('/configuracoes') || isActive('/auth'),
       showAlways: true
     }
   ];

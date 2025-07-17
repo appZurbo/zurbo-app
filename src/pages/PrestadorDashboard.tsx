@@ -6,6 +6,7 @@ import { ArrowLeft, Calendar, MessageCircle, Star, TrendingUp, Users, Eye, Crown
 import { useNavigate } from 'react-router-dom';
 import { useMobile } from '@/hooks/useMobile';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
+
 const PrestadorDashboard = () => {
   const navigate = useNavigate();
   const {
@@ -14,6 +15,7 @@ const PrestadorDashboard = () => {
     loading
   } = useAuth();
   const isMobile = useMobile();
+
   if (loading) {
     return <div>
         <UnifiedHeader />
@@ -27,6 +29,7 @@ const PrestadorDashboard = () => {
         </div>
       </div>;
   }
+
   if (!profile) {
     return <div>
         <UnifiedHeader />
@@ -45,6 +48,7 @@ const PrestadorDashboard = () => {
         </div>
       </div>;
   }
+
   if (!isPrestador) {
     return <div>
         <UnifiedHeader />
@@ -71,14 +75,14 @@ const PrestadorDashboard = () => {
     totalGanhos: 2450.00,
     visualizacoes: 1543
   };
-  return <div>
+
+  return (
+    <div>
       <UnifiedHeader />
       <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
         <div className={`${isMobile ? 'px-4 py-4' : 'max-w-6xl mx-auto p-6'}`}>
           {/* Header */}
           <div className="flex items-center gap-4 mb-6">
-            
-            
             <div className="flex-1">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
@@ -92,10 +96,12 @@ const PrestadorDashboard = () => {
                     <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
                       Bem-vindo, {profile.nome}
                     </p>
-                    {profile.premium && <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white">
+                    {profile.premium && (
+                      <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white">
                         <Crown className="h-3 w-3 mr-1" />
                         PRO
-                      </Badge>}
+                      </Badge>
+                    )}
                   </div>
                 </div>
               </div>
@@ -179,11 +185,11 @@ const PrestadorDashboard = () => {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/configuracoes')}>
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/settings')}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users className="h-5 w-5 text-purple-500" />
-                  Perfil
+                  Configurações
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -211,6 +217,8 @@ const PrestadorDashboard = () => {
             </Card>}
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default PrestadorDashboard;
