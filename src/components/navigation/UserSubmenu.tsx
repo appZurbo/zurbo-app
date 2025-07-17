@@ -20,7 +20,8 @@ import {
   Shield,
   Wrench,
   Heart,
-  Users
+  Users,
+  FileText
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -91,9 +92,10 @@ export const UserSubmenu = () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuItem onClick={() => navigate('/configuracoes')}>
+        {/* Configurações unificadas para todos */}
+        <DropdownMenuItem onClick={() => navigate('/settings')}>
           <Settings className="h-4 w-4 mr-2" />
-          {isPrestador ? 'Configurações do Prestador' : 'Perfil e Configurações'}
+          Configurações
         </DropdownMenuItem>
 
         {isPrestador && (
@@ -132,8 +134,8 @@ export const UserSubmenu = () => {
         {isAdmin && (
           <>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate('/admin')}>
-              <Shield className="h-4 w-4 mr-2" />
+            <DropdownMenuItem onClick={() => navigate('/admin/relatorios')}>
+              <FileText className="h-4 w-4 mr-2" />
               Painel Administrativo
             </DropdownMenuItem>
             

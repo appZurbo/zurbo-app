@@ -20,7 +20,12 @@ import {
   Heart,
   Bell,
   ChevronDown,
-  Info
+  Info,
+  BarChart3,
+  FileText,
+  Shield,
+  Users,
+  Clock
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Badge } from '@/components/ui/badge';
@@ -28,12 +33,11 @@ import { Badge } from '@/components/ui/badge';
 export const UnifiedHeader = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, profile, logout } = useAuth();
+  const { user, profile, logout, isPrestador, isAdmin } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Get premium and provider status from profile
   const isPremium = profile?.premium || false;
-  const isProvider = profile?.tipo === 'prestador';
 
   const handleAuthClick = () => {
     setShowAuthModal(true);
@@ -134,38 +138,66 @@ export const UnifiedHeader = () => {
                     <span>Configurações</span>
                   </DropdownMenuItem>
 
-                  {isProvider && (
+                  {isPrestador && (
                     <>
-                      <DropdownMenuItem onClick={() => navigate('/agenda')}>
-                        <Calendar className="mr-2 h-4 w-4 text-blue-600" />
+                      <DropdownMenuItem onClick={() => navigate('/prestador-dashboard')}>
+                        <BarChart3 className="mr-2 h-4 w-4" />
+                        <span>Painel do Prestador</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/agenda-prestador')}>
+                        <Calendar className="mr-2 h-4 w-4" />
                         <span>Agenda</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate('/prestador-settings')}>
-                        <Settings className="mr-2 h-4 w-4 text-green-600" />
-                        <span>Config. Prestador</span>
+                    </>
+                  )}
+
+                  {!isPrestador && !isAdmin && (
+                    <>
+                      <DropdownMenuItem onClick={() => navigate('/pedidos')}>
+                        <Clock className="mr-2 h-4 w-4" />
+                        <span>Meus Agendamentos</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/favoritos')}>
+                        <Heart className="mr-2 h-4 w-4" />
+                        <span>Favoritos</span>
                       </DropdownMenuItem>
                     </>
                   )}
 
                   <DropdownMenuItem onClick={() => navigate('/conversas')}>
-                    <MessageSquare className="mr-2 h-4 w-4 text-blue-600" />
+                    <MessageSquare className="mr-2 h-4 w-4" />
                     <span>Conversas</span>
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem onClick={() => navigate('/favoritos')}>
-                    <Heart className="mr-2 h-4 w-4 text-red-500" />
-                    <span>Favoritos</span>
-                  </DropdownMenuItem>
-
                   <DropdownMenuItem onClick={() => navigate('/notificacoes')}>
-                    <Bell className="mr-2 h-4 w-4 text-yellow-600" />
+                    <Bell className="mr-2 h-4 w-4" />
                     <span>Notificações</span>
                   </DropdownMenuItem>
 
                   <DropdownMenuItem onClick={() => navigate('/informacoes')}>
-                    <Info className="mr-2 h-4 w-4 text-gray-600" />
+                    <Info className="mr-2 h-4 w-4" />
                     <span>Informações</span>
                   </DropdownMenuItem>
+
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => navigate('/admin/relatorios')}>
+                        <FileText className="mr-2 h-4 w-4" />
+                        <span>Painel Administrativo</span>
+                      </DropdownMenuItem>
+                      
+                      <DropdownMenuItem onClick={() => navigate('/admin/usuarios')}>
+                        <Users className="mr-2 h-4 w-4" />
+                        <span>Gerenciar Usuários</span>
+                      </DropdownMenuItem>
+                      
+                      <DropdownMenuItem onClick={() => navigate('/admin/moderacao')}>
+                        <Shield className="mr-2 h-4 w-4" />
+                        <span>Moderação</span>
+                      </DropdownMenuItem>
+                    </>
+                  )}
 
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>

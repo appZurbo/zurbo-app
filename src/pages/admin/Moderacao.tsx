@@ -2,95 +2,149 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { 
+  ArrowLeft, 
   Shield, 
   AlertTriangle, 
-  Users, 
-  MessageSquare, 
-  ArrowLeft,
-  Eye,
-  Ban,
-  CheckCircle,
-  X,
-  Flag,
-  Settings,
-  Database,
-  UserCheck
+  MessageCircle, 
+  Image, 
+  Ban, 
+  Check,
+  Clock,
+  Flag
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useMobile } from '@/hooks/useMobile';
+import { useToast } from '@/hooks/use-toast';
 
-const AdminModeracao = () => {
+const Moderacao = () => {
   const navigate = useNavigate();
-  const { profile, isAdmin } = useAuth();
+  const { isAdmin } = useAuth();
   const isMobile = useMobile();
-  const [reports, setReports] = useState([]);
-  const [users, setUsers] = useState([]);
+  const { toast } = useToast();
 
-  // Mock data for demonstration
-  useEffect(() => {
-    setReports([
-      {
-        id: 1,
-        type: 'usuario',
-        reportedUser: 'João Silva',
-        reportedBy: 'Maria Santos',
-        reason: 'Comportamento inadequado',
-        description: 'Usuário enviou mensagens ofensivas durante negociação de serviço',
-        status: 'pendente',
-        createdAt: '2024-01-15T10:30:00Z'
-      },
-      {
-        id: 2,
-        type: 'conteudo',
-        reportedUser: 'Pedro Oliveira',
-        reportedBy: 'Ana Costa',
-        reason: 'Conteúdo inapropriado',
-        description: 'Perfil contém informações falsas sobre qualificações',
-        status: 'pendente',
-        createdAt: '2024-01-14T15:20:00Z'
-      }
-    ]);
+  // Mock data para demonstração
+  const [reports] = useState([
+    {
+      id: '1',
+      type: 'message',
+      content: 'Conteúdo inadequado reportado por usuário',
+      reporter: 'Cliente Maria',
+      reported: 'Prestador João',
+      status: 'pending',
+      createdAt: new Date('2024-01-15'),
+      category: 'Linguagem inadequada'
+    },
+    {
+      id: '2',
+      type: 'profile',
+      content: 'Perfil com informações falsas',
+      reporter: 'Cliente Ana',
+      reported: 'Prestador Pedro',
+      status: 'resolved',
+      createdAt: new Date('2024-01-14'),
+      category: 'Informações falsas'
+    },
+    {
+      id: '3',
+      type: 'service',
+      content: 'Serviço não foi realizado conforme acordado',
+      reporter: 'Cliente Carlos',
+      reported: 'Prestador José',
+      status: 'pending',
+      createdAt: new Date('2024-01-13'),
+      category: 'Qualidade do serviço'
+    }
+  ]);
 
-    setUsers([
-      {
-        id: 1,
-        name: 'João Silva',
-        email: 'joao@email.com',
-        type: 'cliente',
-        status: 'ativo',
-        reportCount: 2,
-        joinDate: '2023-06-15'
-      },
-      {
-        id: 2,
-        name: 'Pedro Oliveira',
-        email: 'pedro@email.com',
-        type: 'prestador',
-        status: 'ativo',
-        reportCount: 1,
-        joinDate: '2023-08-20'
-      }
-    ]);
-  }, []);
+  const handleApproveReport = (reportId: string) => {
+    toast({
+      title: "Denúncia aprovada",
+      description: "Ação disciplinar será tomada contra o usuário reportado."
+    });
+  };
+
+  const handleRejectReport = (reportId: string) => {
+    toast({
+      title: "Denúncia rejeitada",
+      description: "A denúncia foi considerada improcedente."
+    });
+  };
+
+  const pendingReports = reports.filter(r => r.status === 'pending');
+  const resolvedReports = reports.filter(r => r.status === 'resolved');
+
+  const ReportCard = ({ report }: { report: any }) => (
+    <Card className="mb-4">
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <Badge variant={report.status === 'pending' ? 'destructive' : 'default'}>
+                {report.status === 'pending' ? 'Pendente' : 'Resolvido'}
+              </Badge>
+              <Badge variant="outline">
+                {report.category}
+              </Badge>
+              <div className="flex items-center gap-1 text-sm text-gray-500">
+                {report.type === 'message' && <MessageCircle className="h-4 w-4" />}
+                {report.type === 'profile' && <Shield className="h-4 w-4" />}
+                {report.type === 'service' && <Flag className="h-4 w-4" />}
+                <span className="capitalize">{report.type}</span>
+              </div>
+            </div>
+            
+            <h3 className="font-semibold mb-2">{report.content}</h3>
+            
+            <div className="text-sm text-gray-600 space-y-1">
+              <p><strong>Denunciante:</strong> {report.reporter}</p>
+              <p><strong>Denunciado:</strong> {report.reported}</p>
+              <p><strong>Data:</strong> {report.createdAt.toLocaleDateString()}</p>
+            </div>
+          </div>
+          
+          {report.status === 'pending' && (
+            <div className="flex flex-col gap-2 ml-4">
+              <Button
+                size="sm"
+                variant="default"
+                onClick={() => handleApproveReport(report.id)}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                <Check className="h-4 w-4 mr-1" />
+                Aprovar
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleRejectReport(report.id)}
+              >
+                <Ban className="h-4 w-4 mr-1" />
+                Rejeitar
+              </Button>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   if (!isAdmin) {
     return (
       <div>
         <UnifiedHeader />
-        <div className="min-h-screen flex items-center justify-center p-4">
-          <Card className="w-full max-w-md">
+        <div className="min-h-screen flex items-center justify-center">
+          <Card className="max-w-md">
             <CardContent className="p-6 text-center">
-              <Shield className="h-12 w-12 mx-auto mb-4 text-red-500" />
               <h3 className="text-lg font-semibold mb-2">Acesso Restrito</h3>
               <p className="text-gray-600 mb-4">
-                Esta área é exclusiva para administradores do sistema.
+                Esta página é exclusiva para administradores.
               </p>
-              <Button onClick={() => navigate('/')} className="w-full">
+              <Button onClick={() => navigate('/')}>
                 Voltar à Página Inicial
               </Button>
             </CardContent>
@@ -100,29 +154,13 @@ const AdminModeracao = () => {
     );
   }
 
-  const handleReportAction = (reportId: number, action: 'approve' | 'reject') => {
-    setReports(reports.map(report => 
-      report.id === reportId 
-        ? { ...report, status: action === 'approve' ? 'aprovado' : 'rejeitado' }
-        : report
-    ));
-  };
-
-  const handleUserAction = (userId: number, action: 'ban' | 'unban') => {
-    setUsers(users.map(user => 
-      user.id === userId 
-        ? { ...user, status: action === 'ban' ? 'banido' : 'ativo' }
-        : user
-    ));
-  };
-
   return (
     <div>
       <UnifiedHeader />
       <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
         <div className={`${isMobile ? 'px-4 py-4' : 'max-w-7xl mx-auto p-6'}`}>
           {/* Header */}
-          <div className="flex items-center gap-4 mb-6">
+          <div className="flex items-center gap-3 mb-6">
             <Button 
               variant="ghost" 
               onClick={() => navigate('/admin/relatorios')}
@@ -131,248 +169,131 @@ const AdminModeracao = () => {
               <ArrowLeft className="h-4 w-4 mr-2" />
               {!isMobile && 'Voltar'}
             </Button>
-            
-            <div className="flex-1">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-red-600 rounded-xl flex items-center justify-center">
-                  <Shield className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
-                    Painel de Moderação
-                  </h1>
-                  <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
-                    Gerenciar denúncias e usuários do sistema
-                  </p>
-                </div>
-              </div>
+            <div>
+              <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
+                Moderação de Conteúdo
+              </h1>
+              <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
+                Gerencie denúncias e conteúdo da plataforma
+              </p>
             </div>
           </div>
 
-          {/* Quick Stats */}
-          <div className={`grid gap-4 mb-6 ${isMobile ? 'grid-cols-2' : 'grid-cols-4'}`}>
+          {/* Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <Card>
               <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <Flag className="h-5 w-5 text-red-500" />
-                  <div>
-                    <p className="text-sm text-gray-600">Denúncias Pendentes</p>
-                    <p className="text-2xl font-bold">{reports.filter(r => r.status === 'pendente').length}</p>
-                  </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-red-600">{pendingReports.length}</p>
+                  <p className="text-sm text-gray-600">Pendentes</p>
                 </div>
               </CardContent>
             </Card>
-
             <Card>
               <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-blue-500" />
-                  <div>
-                    <p className="text-sm text-gray-600">Usuários Ativos</p>
-                    <p className="text-2xl font-bold">{users.filter(u => u.status === 'ativo').length}</p>
-                  </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-600">{resolvedReports.length}</p>
+                  <p className="text-sm text-gray-600">Resolvidos</p>
                 </div>
               </CardContent>
             </Card>
-
             <Card>
               <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <Ban className="h-5 w-5 text-orange-500" />
-                  <div>
-                    <p className="text-sm text-gray-600">Usuários Banidos</p>
-                    <p className="text-2xl font-bold">{users.filter(u => u.status === 'banido').length}</p>
-                  </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-blue-600">{reports.length}</p>
+                  <p className="text-sm text-gray-600">Total</p>
                 </div>
               </CardContent>
             </Card>
-
             <Card>
               <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                  <div>
-                    <p className="text-sm text-gray-600">Resolvidas Hoje</p>
-                    <p className="text-2xl font-bold">0</p>
-                  </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-yellow-600">
+                    {Math.round((resolvedReports.length / reports.length) * 100)}%
+                  </p>
+                  <p className="text-sm text-gray-600">Taxa Resolução</p>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Main Content */}
-          <Tabs defaultValue="reports" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="reports">Denúncias</TabsTrigger>
-              <TabsTrigger value="users">Usuários</TabsTrigger>
-              <TabsTrigger value="system">Sistema</TabsTrigger>
+          {/* Tabs */}
+          <Tabs defaultValue="pending" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="pending" className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4" />
+                Pendentes ({pendingReports.length})
+              </TabsTrigger>
+              <TabsTrigger value="resolved" className="flex items-center gap-2">
+                <Check className="h-4 w-4" />
+                Resolvidos ({resolvedReports.length})
+              </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="reports" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Flag className="h-5 w-5 text-red-500" />
-                    Denúncias Pendentes
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {reports.filter(r => r.status === 'pendente').map((report) => (
-                      <div key={report.id} className="border rounded-lg p-4">
-                        <div className="flex items-start justify-between mb-3">
-                          <div>
-                            <div className="flex items-center gap-2 mb-2">
-                              <Badge variant={report.type === 'usuario' ? 'destructive' : 'secondary'}>
-                                {report.type === 'usuario' ? 'Usuário' : 'Conteúdo'}
-                              </Badge>
-                              <span className="text-sm text-gray-500">
-                                {new Date(report.createdAt).toLocaleDateString('pt-BR')}
-                              </span>
-                            </div>
-                            <h4 className="font-semibold">Denúncia contra: {report.reportedUser}</h4>
-                            <p className="text-sm text-gray-600">Por: {report.reportedBy}</p>
-                            <p className="text-sm text-gray-600">Motivo: {report.reason}</p>
-                          </div>
-                        </div>
-                        
-                        <p className="text-sm mb-4 bg-gray-50 p-3 rounded">
-                          {report.description}
-                        </p>
-                        
-                        <div className="flex gap-2">
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => handleReportAction(report.id, 'approve')}
-                          >
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            Aprovar
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => handleReportAction(report.id, 'reject')}
-                          >
-                            <X className="h-4 w-4 mr-2" />
-                            Rejeitar
-                          </Button>
-                          <Button size="sm" variant="ghost">
-                            <Eye className="h-4 w-4 mr-2" />
-                            Ver Detalhes
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+            <TabsContent value="pending">
+              <div className="space-y-4">
+                {pendingReports.length === 0 ? (
+                  <Card>
+                    <CardContent className="text-center py-8">
+                      <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600">Nenhuma denúncia pendente</p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  pendingReports.map(report => (
+                    <ReportCard key={report.id} report={report} />
+                  ))
+                )}
+              </div>
             </TabsContent>
 
-            <TabsContent value="users" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-blue-500" />
-                    Gerenciamento de Usuários
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {users.map((user) => (
-                      <div key={user.id} className="border rounded-lg p-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-semibold">{user.name}</h4>
-                              <Badge variant={user.type === 'prestador' ? 'default' : 'secondary'}>
-                                {user.type === 'prestador' ? 'Prestador' : 'Cliente'}
-                              </Badge>
-                              <Badge variant={user.status === 'ativo' ? 'default' : 'destructive'}>
-                                {user.status === 'ativo' ? 'Ativo' : 'Banido'}
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-gray-600">{user.email}</p>
-                            <p className="text-sm text-gray-600">
-                              {user.reportCount} denúncias • Membro desde {new Date(user.joinDate).toLocaleDateString('pt-BR')}
-                            </p>
-                          </div>
-                          
-                          <div className="flex gap-2">
-                            {user.status === 'ativo' ? (
-                              <Button 
-                                size="sm" 
-                                variant="destructive"
-                                onClick={() => handleUserAction(user.id, 'ban')}
-                              >
-                                <Ban className="h-4 w-4 mr-2" />
-                                Banir
-                              </Button>
-                            ) : (
-                              <Button 
-                                size="sm" 
-                                variant="outline"
-                                onClick={() => handleUserAction(user.id, 'unban')}
-                              >
-                                <UserCheck className="h-4 w-4 mr-2" />
-                                Desbanir
-                              </Button>
-                            )}
-                            <Button size="sm" variant="ghost">
-                              <Eye className="h-4 w-4 mr-2" />
-                              Ver Perfil
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="system" className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Settings className="h-5 w-5 text-purple-500" />
-                      Configurações do Sistema
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Acesse configurações avançadas do sistema, parâmetros globais e ajustes de segurança.
-                    </p>
-                    <Button onClick={() => navigate('/admin/sistema')} className="w-full">
-                      Abrir Configurações
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Database className="h-5 w-5 text-green-500" />
-                      Dados de Teste
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Criar dados de teste para desenvolvimento e demonstração do sistema.
-                    </p>
-                    <Button variant="outline" className="w-full">
-                      Criar Dados de Teste
-                    </Button>
-                  </CardContent>
-                </Card>
+            <TabsContent value="resolved">
+              <div className="space-y-4">
+                {resolvedReports.length === 0 ? (
+                  <Card>
+                    <CardContent className="text-center py-8">
+                      <Check className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600">Nenhuma denúncia resolvida</p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  resolvedReports.map(report => (
+                    <ReportCard key={report.id} report={report} />
+                  ))
+                )}
               </div>
             </TabsContent>
           </Tabs>
+
+          {/* Quick Actions */}
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                Ferramentas de Moderação
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Button variant="outline" className="h-16 flex flex-col gap-2">
+                  <MessageCircle className="h-6 w-6" />
+                  <span>Mensagens Reportadas</span>
+                </Button>
+                <Button variant="outline" className="h-16 flex flex-col gap-2">
+                  <Image className="h-6 w-6" />
+                  <span>Imagens Reportadas</span>
+                </Button>
+                <Button variant="outline" className="h-16 flex flex-col gap-2">
+                  <AlertTriangle className="h-6 w-6" />
+                  <span>Usuários Suspeitos</span>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
   );
 };
 
-export default AdminModeracao;
+export default Moderacao;

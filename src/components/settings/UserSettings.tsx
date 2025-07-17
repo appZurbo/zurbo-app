@@ -2,11 +2,12 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Shield, Bell, MapPin, User, Crown, Palette } from 'lucide-react';
+import { Shield, Bell, MapPin, User, Crown, Palette, Camera } from 'lucide-react';
 import { LocationSettings } from '@/components/location/LocationSettings';
 import { ProfileTab } from './ProfileTab';
 import { NotificationTab } from './NotificationTab';
 import { SecurityTabContent } from './SecurityTabContent';
+import { PrestadorPhotoSettings } from './PrestadorPhotoSettings';
 import { useMobile } from '@/hooks/useMobile';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -35,27 +36,39 @@ export const UserSettings = () => {
         </CardHeader>
         <CardContent className={`${isMobile ? 'px-0 py-0' : ''}`}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className={`grid w-full ${isMobile ? 'grid-cols-4 h-12 mb-6' : 'grid-cols-5 mb-8'}`}>
-              <TabsTrigger value="profile" className={`flex items-center gap-1 ${isMobile ? 'text-xs px-2' : 'gap-2'}`}>
+            <TabsList className={`grid w-full ${isMobile ? 'grid-cols-4 h-auto' : isPrestador ? 'grid-cols-6' : 'grid-cols-4'} mb-8`}>
+              <TabsTrigger value="profile" className={`flex items-center gap-1 ${isMobile ? 'flex-col text-xs px-1 py-2' : 'gap-2'}`}>
                 <User className="h-4 w-4" />
-                <span className={`${isMobile ? 'hidden sm:inline' : ''}`}>Perfil</span>
+                <span>Perfil</span>
               </TabsTrigger>
-              <TabsTrigger value="location" className={`flex items-center gap-1 ${isMobile ? 'text-xs px-2' : 'gap-2'}`}>
+              <TabsTrigger value="location" className={`flex items-center gap-1 ${isMobile ? 'flex-col text-xs px-1 py-2' : 'gap-2'}`}>
                 <MapPin className="h-4 w-4" />
-                <span className={`${isMobile ? 'hidden sm:inline' : ''}`}>Local</span>
+                <span>Local</span>
               </TabsTrigger>
-              <TabsTrigger value="notifications" className={`flex items-center gap-1 ${isMobile ? 'text-xs px-2' : 'gap-2'}`}>
+              <TabsTrigger value="notifications" className={`flex items-center gap-1 ${isMobile ? 'flex-col text-xs px-1 py-2' : 'gap-2'}`}>
                 <Bell className="h-4 w-4" />
-                <span className={`${isMobile ? 'hidden sm:inline' : ''}`}>Notif</span>
+                <span>{isMobile ? 'Notif' : 'Notificações'}</span>
               </TabsTrigger>
-              <TabsTrigger value="security" className={`flex items-center gap-1 ${isMobile ? 'text-xs px-2' : 'gap-2'}`}>
+              <TabsTrigger value="security" className={`flex items-center gap-1 ${isMobile ? 'flex-col text-xs px-1 py-2' : 'gap-2'}`}>
                 <Shield className="h-4 w-4" />
-                <span className={`${isMobile ? 'hidden sm:inline' : ''}`}>Segur</span>
+                <span>{isMobile ? 'Segur' : 'Segurança'}</span>
               </TabsTrigger>
-              {(isPrestador || isAdmin) && (
-                <TabsTrigger value="preferences" className={`flex items-center gap-1 ${isMobile ? 'text-xs px-2' : 'gap-2'}`}>
+              {isPrestador && (
+                <>
+                  <TabsTrigger value="photos" className={`flex items-center gap-1 ${isMobile ? 'flex-col text-xs px-1 py-2' : 'gap-2'}`}>
+                    <Camera className="h-4 w-4" />
+                    <span>Fotos</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="preferences" className={`flex items-center gap-1 ${isMobile ? 'flex-col text-xs px-1 py-2' : 'gap-2'}`}>
+                    <Palette className="h-4 w-4" />
+                    <span>{isMobile ? 'Pref' : 'Preferências'}</span>
+                  </TabsTrigger>
+                </>
+              )}
+              {isAdmin && !isPrestador && (
+                <TabsTrigger value="preferences" className={`flex items-center gap-1 ${isMobile ? 'flex-col text-xs px-1 py-2' : 'gap-2'}`}>
                   <Palette className="h-4 w-4" />
-                  <span className={`${isMobile ? 'hidden sm:inline' : ''}`}>Pref</span>
+                  <span>{isMobile ? 'Pref' : 'Preferências'}</span>
                 </TabsTrigger>
               )}
             </TabsList>
@@ -75,6 +88,12 @@ export const UserSettings = () => {
             <TabsContent value="security" className="mt-6">
               <SecurityTabContent />
             </TabsContent>
+
+            {isPrestador && (
+              <TabsContent value="photos" className="mt-6">
+                <PrestadorPhotoSettings />
+              </TabsContent>
+            )}
 
             {(isPrestador || isAdmin) && (
               <TabsContent value="preferences" className="mt-6">
