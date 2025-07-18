@@ -83,6 +83,44 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const createSocialUserProfile = async (user: User) => {
+    try {
+      const userData = user.user_metadata || {};
+      const nome = userData.full_name || userData.name || user.email?.split('@')[0] || 'Usuário';
+      
+      const { data, error } = await supabase
+        .from('users')
+        .insert({
+          auth_id: user.id,
+          email: user.email || '',
+          nome: nome,
+          tipo: 'cliente',
+          bio: '',
+          endereco_cidade: '',
+          endereco_bairro: '',
+          foto_url: userData.avatar_url || userData.picture || null,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating social user profile:', error);
+        setError(error.message);
+        return null;
+      }
+
+      return {
+        ...data,
+        criado_em: data.criado_em || new Date().toISOString(),
+        tipo: data.tipo as 'cliente' | 'prestador' | 'admin' | 'moderator'
+      } as UserProfile;
+    } catch (error: any) {
+      console.error('Error creating social user profile:', error);
+      setError(error.message);
+      return null;
+    }
+  };
+
   const refreshProfile = async () => {
     if (user) {
       const userProfile = await loadProfile(user.id);
@@ -108,7 +146,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (session?.user) {
           setTimeout(async () => {
             if (isMounted) {
-              const userProfile = await loadProfile(session.user.id);
+              let userProfile = await loadProfile(session.user.id);
+              
+              // Se não existe perfil e é login social, criar automaticamente
+              if (!userProfile && event === 'SIGNED_IN' && session.user.app_metadata.provider !== 'email') {
+                userProfile = await createSocialUserProfile(session.user);
+              }
+              
               if (isMounted && userProfile) {
                 setProfile(userProfile);
               }

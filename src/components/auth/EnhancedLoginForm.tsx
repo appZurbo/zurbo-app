@@ -59,18 +59,26 @@ export const EnhancedLoginForm = ({ onSuccess, onSwitchToRegister }: EnhancedLog
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/`
+          redirectTo: `${window.location.origin}/`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
         }
       });
 
       if (error) throw error;
+      
+      toast({
+        title: "Redirecionando...",
+        description: "Você será redirecionado para fazer login.",
+      });
     } catch (error: any) {
       toast({
         title: "Erro no login social",
         description: error.message || "Não foi possível fazer login. Tente novamente.",
         variant: "destructive",
       });
-    } finally {
       setLoading(false);
     }
   };
