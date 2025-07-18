@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Badge } from '@/components/ui/badge';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 export const UnifiedHeader = () => {
   const navigate = useNavigate();
@@ -89,8 +90,12 @@ export const UnifiedHeader = () => {
             )}
 
             {user && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+              <>
+                {/* Notification Bell */}
+                <NotificationBell />
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center space-x-2 h-auto p-2">
                     <div className="flex items-center space-x-3">
                       {profile?.foto_url ? (
@@ -206,6 +211,7 @@ export const UnifiedHeader = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              </>
             )}
           </div>
         </div>

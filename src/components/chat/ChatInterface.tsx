@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { MessageList } from './MessageList';
 import { MessageInput } from './MessageInput';
 import { PaymentButtons } from './PaymentButtons';
@@ -7,6 +7,7 @@ import { CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 interface ChatInterfaceProps {
   conversation: any;
@@ -30,7 +31,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   onReportUser
 }) => {
   const { profile } = useAuth();
+  const { toast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [sending, setSending] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -77,9 +80,32 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   };
 
+  const handleSendMessage = async (message: string) => {
+    setSending(true);
+    try {
+      await onSendMessage(message);
+      
+      // Show delivery notification
+      toast({
+        title: "Mensagem enviada",
+        description: "Sua mensagem foi entregue com sucesso.",
+        duration: 2000,
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao enviar",
+        description: "Falha no envio da mensagem. Tente novamente.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    } finally {
+      setSending(false);
+    }
+  };
+
   const handleSendMessageWithType = async (message: string, type?: string, metadata?: any) => {
-    // For now, just call the basic onSendMessage
-    onSendMessage(message);
+    // For now, just call the enhanced send message
+    await handleSendMessage(message);
   };
 
   return (
@@ -127,10 +153,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           {/* Input de Mensagem */}
           <div className="mt-4">
             <MessageInput
-              onSendMessage={onSendMessage}
+              onSendMessage={handleSendMessage}
               onUploadImage={onUploadImage}
               imageUploadInfo={imageUploadInfo}
               disabled={conversation.status === 'bloqueado'}
+              sending={sending}
             />
           </div>
 

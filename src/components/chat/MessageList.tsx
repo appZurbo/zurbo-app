@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MoreVertical, Flag } from 'lucide-react';
+import { MessageStatusIndicator, MessageStatus } from './MessageStatus';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ChatMessage } from '@/types';
@@ -90,12 +91,20 @@ export const MessageList: React.FC<MessageListProps> = ({
                   </div>
                   
                   <div className={`flex items-center gap-2 mt-1 ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                    <p className="text-xs text-gray-500">
-                      {formatDistanceToNow(new Date(message.created_at), {
-                        addSuffix: true,
-                        locale: ptBR,
-                      })}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs text-gray-500">
+                        {formatDistanceToNow(new Date(message.created_at), {
+                          addSuffix: true,
+                          locale: ptBR,
+                        })}
+                      </p>
+                      {isOwn && (
+                        <MessageStatusIndicator 
+                          status={'delivered' as MessageStatus}
+                          timestamp={message.created_at}
+                        />
+                      )}
+                    </div>
                     
                     {!isOwn && (
                       <AlertDialog>

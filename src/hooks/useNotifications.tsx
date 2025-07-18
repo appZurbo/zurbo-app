@@ -35,6 +35,11 @@ export const useNotifications = () => {
           (payload) => {
             const newNotification = payload.new as Notification;
             setNotifications(prev => [newNotification, ...prev]);
+            
+            // Play notification sound if available
+            if ((window as any).playNotificationSound) {
+              (window as any).playNotificationSound();
+            }
           }
         )
         .subscribe();

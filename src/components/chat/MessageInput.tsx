@@ -11,13 +11,15 @@ interface MessageInputProps {
   onUploadImage: (file: File) => void;
   imageUploadInfo: ImageUploadInfo;
   disabled?: boolean;
+  sending?: boolean;
 }
 
 export const MessageInput: React.FC<MessageInputProps> = ({
   onSendMessage,
   onUploadImage,
   imageUploadInfo,
-  disabled = false
+  disabled = false,
+  sending = false
 }) => {
   const [message, setMessage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -127,9 +129,13 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           <Button 
             type="submit" 
             size="sm" 
-            disabled={!message.trim() || disabled}
+            disabled={!message.trim() || disabled || sending}
           >
-            <Send className="h-4 w-4" />
+            {sending ? (
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
           </Button>
         </div>
       </form>

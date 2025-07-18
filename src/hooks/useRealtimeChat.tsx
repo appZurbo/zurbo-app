@@ -37,9 +37,14 @@ export const useRealtimeChat = () => {
 
     console.log('Setting up realtime chat for user:', profile.id);
 
-    // Setup realtime subscription for messages
+    // Setup realtime subscription for messages with improved configuration
     const messagesChannel = supabase
-      .channel('chat-messages')
+      .channel('chat-messages', {
+        config: {
+          broadcast: { ack: true },
+          presence: { key: profile.id }
+        }
+      })
       .on(
         'postgres_changes',
         {
@@ -51,19 +56,34 @@ export const useRealtimeChat = () => {
           console.log('New message received:', payload);
           const newMessage = payload.new as RealtimeMessage;
           
-          // Add message to state
-          setMessages(prev => [...prev, newMessage]);
+          // Add message to state with optimistic updates
+          setMessages(prev => {
+            const exists = prev.find(m => m.id === newMessage.id);
+            if (exists) return prev;
+            return [...prev, newMessage].sort((a, b) => 
+              new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+            );
+          });
           
           // Show notification if message is from another user
           if (newMessage.sender_id !== profile.id) {
             setUnreadCount(prev => prev + 1);
             setNewMessageNotification(newMessage);
             
+            // Play notification sound
+            if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification('Nova mensagem no Zurbo', {
+                body: newMessage.content?.substring(0, 100) || 'Você recebeu uma nova mensagem',
+                icon: '/favicon.ico',
+                tag: 'chat-message'
+              });
+            }
+            
             // Show toast notification
             toast({
-              title: "Nova mensagem",
+              title: "💬 Nova mensagem",
               description: newMessage.content?.substring(0, 50) + (newMessage.content?.length > 50 ? '...' : ''),
-              duration: 3000,
+              duration: 4000,
             });
             
             // Clear notification after 5 seconds
@@ -76,6 +96,13 @@ export const useRealtimeChat = () => {
       .subscribe((status) => {
         console.log('Messages channel status:', status);
         setIsConnected(status === 'SUBSCRIBED');
+        
+        if (status === 'SUBSCRIBED') {
+          // Request notification permission
+          if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+          }
+        }
       });
 
     // Setup realtime subscription for conversations

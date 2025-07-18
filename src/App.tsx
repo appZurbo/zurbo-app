@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { NotificationSound } from "@/components/notifications/NotificationSound";
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
 import PrestadoresPage from "./pages/PrestadoresPage";
@@ -47,6 +48,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AuthProvider>
+          <NotificationSound enabled={true} volume={0.3} />
           <Toaster />
           <Sonner />
           <BrowserRouter>
