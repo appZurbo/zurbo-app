@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from '@/components/ui/button';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
-import { ModernFooter } from '@/components/layout/ModernFooter';
+import WatermarkSection from '@/components/sections/WatermarkSection';
 import { Home, ArrowLeft } from 'lucide-react';
 
 const NotFound = () => {
@@ -51,7 +51,7 @@ const NotFound = () => {
       </div>
 
       {/* Footer with watermark */}
-      <ModernFooter />
+      <WatermarkSection />
     </div>
   );
 };

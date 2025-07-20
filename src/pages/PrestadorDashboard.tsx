@@ -27,6 +27,9 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { format, parseISO, isToday, isTomorrow, startOfMonth, endOfMonth, startOfDay, endOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useOnDutyStatus } from '@/hooks/useOnDutyStatus';
+import { Switch } from '@/components/ui/switch';
+import { Activity } from 'lucide-react';
 
 interface DashboardStats {
   pedidosAtivos: number;
@@ -53,6 +56,7 @@ const PrestadorDashboard = () => {
   const navigate = useNavigate();
   const { profile, isPrestador, loading } = useAuth();
   const isMobile = useMobile();
+  const { isOnDuty, loading: onDutyLoading, toggleOnDuty, canToggle } = useOnDutyStatus();
   const [stats, setStats] = useState<DashboardStats>({
     pedidosAtivos: 0,
     avaliacaoMedia: 0,
@@ -264,50 +268,84 @@ const PrestadorDashboard = () => {
       <UnifiedHeader />
       <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
         <div className={`${isMobile ? 'px-4 py-4' : 'max-w-6xl mx-auto p-6'}`}>
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
-                    <span className="text-white font-bold text-xl">P</span>
+          {/* Header with On-Duty Toggle */}
+          <div className="mb-6">
+            {/* On-Duty Toggle - Top of page */}
+            {canToggle && (
+              <Card className={`mb-4 transition-all duration-300 ${isOnDuty ? 'border-orange-200 bg-orange-50' : 'border-gray-200'}`}>
+                <CardContent className="p-4">
+                  <div className={`flex items-center justify-between ${isMobile ? 'flex-col gap-3' : ''}`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${isOnDuty ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                        <Activity className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">Status de Serviço</h3>
+                        <p className={`text-sm ${isOnDuty ? 'text-orange-600' : 'text-gray-500'}`}>
+                          {isOnDuty ? 'Você está disponível para chamados SOS' : 'Você não está recebendo chamados SOS'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className={`text-sm font-medium ${isOnDuty ? 'text-orange-600' : 'text-gray-500'}`}>
+                        {isOnDuty ? 'Em Serviço' : 'Fora de Serviço'}
+                      </span>
+                      <Switch
+                        checked={isOnDuty}
+                        onCheckedChange={toggleOnDuty}
+                        disabled={onDutyLoading}
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
-                      Painel do Prestador
-                    </h1>
-                    <div className="flex items-center gap-2">
-                      <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
-                        Bem-vindo, {profile.nome}
-                      </p>
-                      {profile.premium && (
-                        <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white">
-                          <Crown className="h-3 w-3 mr-1" />
-                          PRO
-                        </Badge>
-                      )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Main Header */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
+                      <span className="text-white font-bold text-xl">P</span>
+                    </div>
+                    <div>
+                      <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
+                        Painel do Prestador
+                      </h1>
+                      <div className="flex items-center gap-2">
+                        <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
+                          Bem-vindo, {profile.nome}
+                        </p>
+                        {profile.premium && (
+                          <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white">
+                            <Crown className="h-3 w-3 mr-1" />
+                            PRO
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <Select value={periodFilter} onValueChange={setPeriodFilter}>
-                <SelectTrigger className="w-32">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="day">Hoje</SelectItem>
-                  <SelectItem value="month">Este Mês</SelectItem>
-                  <SelectItem value="year">Este Ano</SelectItem>
-                </SelectContent>
-              </Select>
               
-              <Button onClick={() => navigate('/agenda-prestador')} className="bg-orange-500 hover:bg-orange-600">
-                <Calendar className="h-4 w-4 mr-2" />
-                Ver Agenda
-              </Button>
+              <div className="flex items-center gap-4">
+                <Select value={periodFilter} onValueChange={setPeriodFilter}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="day">Hoje</SelectItem>
+                    <SelectItem value="month">Este Mês</SelectItem>
+                    <SelectItem value="year">Este Ano</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Button onClick={() => navigate('/agenda')} className="bg-orange-500 hover:bg-orange-600">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Ver Agenda
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -451,7 +489,7 @@ const PrestadorDashboard = () => {
                   <div className="text-center py-6">
                     <Calendar className="h-12 w-12 mx-auto mb-3 text-gray-400" />
                     <p className="text-gray-600 mb-3">Nenhum agendamento próximo</p>
-                    <Button onClick={() => navigate('/agenda-prestador')} variant="outline" size="sm">
+                    <Button onClick={() => navigate('/agenda')} variant="outline" size="sm">
                       Ver Agenda Completa
                     </Button>
                   </div>
@@ -473,7 +511,7 @@ const PrestadorDashboard = () => {
                         </Badge>
                       </div>
                     ))}
-                    <Button onClick={() => navigate('/agenda-prestador')} variant="outline" className="w-full">
+                    <Button onClick={() => navigate('/agenda')} variant="outline" className="w-full">
                       Ver Agenda Completa
                     </Button>
                   </div>
@@ -491,7 +529,7 @@ const PrestadorDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid gap-3">
-                  <Button onClick={() => navigate('/agenda-prestador')} variant="outline" className="justify-start h-auto p-4">
+                  <Button onClick={() => navigate('/agenda')} variant="outline" className="justify-start h-auto p-4">
                     <div className="flex items-center gap-3">
                       <Calendar className="h-5 w-5 text-orange-500" />
                       <div className="text-left">

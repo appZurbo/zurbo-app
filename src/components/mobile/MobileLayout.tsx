@@ -33,8 +33,8 @@ export const MobileLayout = ({
   }, {
     icon: Calendar,
     label: 'Agenda',
-    path: profile?.tipo === 'prestador' ? '/agenda-prestador' : '/pedidos',
-    isActive: isActive('/agenda-prestador') || isActive('/pedidos')
+    path: profile?.tipo === 'prestador' ? '/agenda' : '/pedidos',
+    isActive: isActive('/agenda') || isActive('/pedidos')
   }, {
     icon: Crown,
     label: 'Premium',

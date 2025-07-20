@@ -37,8 +37,8 @@ export const UnifiedDock = () => {
     {
       icon: Calendar,
       label: isPrestador ? 'Agenda' : 'Pedidos',
-      path: isPrestador ? '/agenda-prestador' : '/pedidos',
-      isActive: isActive('/agenda-prestador') || isActive('/pedidos'),
+      path: isPrestador ? '/agenda' : '/pedidos',
+      isActive: isActive('/agenda') || isActive('/pedidos'),
       requiresAuth: true
     },
     {

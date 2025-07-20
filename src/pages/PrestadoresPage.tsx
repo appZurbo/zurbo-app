@@ -9,6 +9,7 @@ import { PremiumHighlightSection } from '@/components/prestadores/PremiumHighlig
 import { PrestadorMiniProfileModal } from '@/components/prestadores/PrestadorMiniProfileModal';
 import { ContactModal } from '@/components/contact/ContactModal';
 import { EmergencyButton } from '@/components/emergency/EmergencyButton';
+import WatermarkSection from '@/components/sections/WatermarkSection';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { getPrestadores } from '@/utils/database/prestadores';
 import { getServicos } from '@/utils/database/servicos';
@@ -113,9 +114,7 @@ const PrestadoresPage = () => {
   return <UnifiedLayout>
       <div className="max-w-7xl mx-[16px]">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6 my-0 py-[13px]">
-          
-          
+        <div className="flex items-center justify-between gap-4 mb-6 my-0 py-[13px]">
           <div className="flex-1">
             <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
               Prestadores de Serviços
@@ -124,12 +123,21 @@ const PrestadoresPage = () => {
               Encontre o profissional ideal para suas necessidades
             </p>
           </div>
+          
+          {/* Emergency SOS Button - Desktop Right Position */}
+          {isAuthenticated && !isMobile && (
+            <div className="flex-shrink-0">
+              <EmergencyButton />
+            </div>
+          )}
         </div>
 
-        {/* Emergency SOS Button */}
-        {isAuthenticated && <div className="mb-8">
+        {/* Emergency SOS Button - Mobile Full Width */}
+        {isAuthenticated && isMobile && (
+          <div className="mb-8">
             <EmergencyButton />
-          </div>}
+          </div>
+        )}
 
         {/* Filtros */}
         <div className="mb-8">
@@ -190,6 +198,9 @@ const PrestadoresPage = () => {
             </>}
         </div>
       </div>
+
+      {/* Footer */}
+      <WatermarkSection />
 
       {/* Modals */}
       {selectedPrestador && <>

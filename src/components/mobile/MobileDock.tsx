@@ -29,7 +29,7 @@ const MobileDock = () => {
     {
       icon: Calendar,
       label: 'Agenda',
-      path: isPrestador ? '/agenda-prestador' : '/pedidos',
+      path: isPrestador ? '/agenda' : '/pedidos',
       requiresAuth: true
     },
     {

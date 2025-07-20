@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Users, MapPin, Clock, Star, Wrench, ArrowRight, Smartphone, Calendar, CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
-import { ModernFooter } from '@/components/layout/ModernFooter';
+import WatermarkSection from '@/components/sections/WatermarkSection';
 
 const TrabalheConosco = () => {
   const navigate = useNavigate();
@@ -160,7 +160,7 @@ const TrabalheConosco = () => {
         </div>
       </section>
 
-      <ModernFooter />
+      <WatermarkSection />
     </div>
   );
 };

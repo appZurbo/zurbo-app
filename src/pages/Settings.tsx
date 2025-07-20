@@ -1,5 +1,6 @@
 
 import { useAuth } from '@/hooks/useAuth';
+import WatermarkSection from '@/components/sections/WatermarkSection';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Settings as SettingsIcon, User, Wrench, Shield } from 'lucide-react';
@@ -152,6 +153,8 @@ const Settings = () => {
           </div>
         </div>
       </div>
+      
+      <WatermarkSection />
     </UnifiedLayout>
   );
 };

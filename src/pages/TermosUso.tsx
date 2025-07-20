@@ -1,5 +1,5 @@
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
-import { ModernFooter } from '@/components/layout/ModernFooter';
+import WatermarkSection from '@/components/sections/WatermarkSection';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, FileText, Shield, Users, AlertTriangle } from 'lucide-react';
@@ -203,7 +203,7 @@ export default function TermosUso() {
         </div>
       </main>
 
-      <ModernFooter />
+      <WatermarkSection />
     </div>
   );
 }

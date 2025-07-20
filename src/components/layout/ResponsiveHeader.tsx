@@ -64,8 +64,8 @@ export const ResponsiveHeader = () => {
 
   const userMenuItems = [
     ...(isPrestador ? [
-      { icon: BarChart3, label: 'Dashboard', path: '/prestador-dashboard' },
-      { icon: Calendar, label: 'Agenda', path: '/agenda-prestador' },
+      { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
+      { icon: Calendar, label: 'Agenda', path: '/agenda' },
     ] : []),
     { icon: User, label: 'Perfil', path: '/settings' },
     { icon: Heart, label: 'Favoritos', path: '/favoritos' },

@@ -34,8 +34,8 @@ export const ZurboDock = () => {
     {
       icon: Calendar,
       label: 'Agenda',
-      path: profile?.tipo === 'prestador' ? '/agenda-prestador' : '/pedidos',
-      isActive: isActive(['/agenda-prestador', '/pedidos', '/agenda']),
+      path: profile?.tipo === 'prestador' ? '/agenda' : '/pedidos',
+      isActive: isActive(['/agenda', '/pedidos']),
       requiresAuth: true
     },
     {

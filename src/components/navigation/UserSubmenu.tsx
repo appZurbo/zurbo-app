@@ -25,10 +25,14 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useOnDutyStatus } from '@/hooks/useOnDutyStatus';
+import { Switch } from '@/components/ui/switch';
+import { Activity } from 'lucide-react';
 
 export const UserSubmenu = () => {
   const navigate = useNavigate();
   const { profile, isPrestador, isAdmin } = useAuth();
+  const { isOnDuty, loading: onDutyLoading, toggleOnDuty, canToggle } = useOnDutyStatus();
 
   if (!profile) return null;
 
@@ -74,11 +78,14 @@ export const UserSubmenu = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="flex items-center gap-2">
+        <Button variant="ghost" className={`flex items-center gap-2 ${isPrestador && isOnDuty ? 'ring-2 ring-orange-500 bg-orange-50 hover:bg-orange-100' : ''}`}>
           <div className="flex flex-col items-start">
             <div className="flex items-center gap-2">
               <User className="h-4 w-4" />
               <span className="font-medium">{profile.nome}</span>
+              {isPrestador && isOnDuty && (
+                <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
+              )}
             </div>
             <Badge 
               variant="secondary" 
@@ -100,12 +107,33 @@ export const UserSubmenu = () => {
 
         {isPrestador && (
           <>
-            <DropdownMenuItem onClick={() => navigate('/prestador-dashboard')}>
+            {canToggle && (
+              <div className="px-2 py-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Activity className={`h-4 w-4 ${isOnDuty ? 'text-orange-500' : 'text-gray-400'}`} />
+                    <span className="text-sm font-medium">Em Serviço</span>
+                  </div>
+                  <Switch
+                    checked={isOnDuty}
+                    onCheckedChange={toggleOnDuty}
+                    disabled={onDutyLoading}
+                    className="scale-75"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1 pl-6">
+                  {isOnDuty ? 'Recebendo chamados SOS' : 'Não está disponível'}
+                </p>
+              </div>
+            )}
+            <DropdownMenuSeparator />
+            
+            <DropdownMenuItem onClick={() => navigate('/dashboard')}>
               <BarChart3 className="h-4 w-4 mr-2" />
               Painel do Prestador
             </DropdownMenuItem>
             
-            <DropdownMenuItem onClick={() => navigate('/agenda-prestador')}>
+            <DropdownMenuItem onClick={() => navigate('/agenda')}>
               <Calendar className="h-4 w-4 mr-2" />
               Agenda Profissional
             </DropdownMenuItem>

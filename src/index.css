@@ -93,6 +93,19 @@
 
   body {
     @apply bg-background text-foreground;
+    /* Hide scrollbar in mobile */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+
+  body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+
+  /* Make sure content uses full width */
+  html, body {
+    width: 100%;
+    overflow-x: hidden;
   }
 }
 

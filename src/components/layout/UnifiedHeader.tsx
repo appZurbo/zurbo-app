@@ -153,11 +153,11 @@ export const UnifiedHeader = () => {
 
                   {isPrestador && (
                     <>
-                      <DropdownMenuItem onClick={() => navigate('/prestador-dashboard')}>
+                      <DropdownMenuItem onClick={() => navigate('/dashboard')}>
                         <BarChart3 className="mr-2 h-4 w-4" />
                         <span>Painel do Prestador</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate('/agenda-prestador')}>
+                      <DropdownMenuItem onClick={() => navigate('/agenda')}>
                         <Calendar className="mr-2 h-4 w-4" />
                         <span>Agenda</span>
                       </DropdownMenuItem>

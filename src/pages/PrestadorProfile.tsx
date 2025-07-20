@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
-import { ModernFooter } from '@/components/layout/ModernFooter';
+import WatermarkSection from '@/components/sections/WatermarkSection';
 import { getUserProfile, getAvaliacoes, getPortfolioFotos } from '@/utils/database';
 import { CommentsList } from '@/components/profile/CommentsList';
 import { AddCommentDialog } from '@/components/profile/AddCommentDialog';
@@ -504,7 +504,7 @@ export default function PrestadorProfile() {
         </Tabs>
       </div>
 
-      <ModernFooter />
+      <WatermarkSection />
     </div>
   );
 }
