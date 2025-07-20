@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from './useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -17,38 +17,58 @@ export const useNotifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
   const { profile } = useAuth();
+  
+  // Use ref to track subscription and prevent duplicates
+  const channelRef = useRef<any>(null);
+  const isSubscribedRef = useRef(false);
 
   useEffect(() => {
-    if (profile) {
-      loadNotifications();
-      // Set up real-time subscription for new notifications
-      const channel = supabase
-        .channel('notifications-changes')
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'notifications',
-            filter: `user_id=eq.${profile.id}`
-          },
-          (payload) => {
-            const newNotification = payload.new as Notification;
-            setNotifications(prev => [newNotification, ...prev]);
-            
-            // Play notification sound if available
-            if ((window as any).playNotificationSound) {
-              (window as any).playNotificationSound();
-            }
-          }
-        )
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
+    if (!profile || isSubscribedRef.current) return;
+    
+    loadNotifications();
+    
+    // Clean up existing channel first
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
     }
-  }, [profile]);
+    
+    // Set up real-time subscription for new notifications with unique channel name
+    const channelName = `notifications-changes-${profile.id}-${Date.now()}`;
+    channelRef.current = supabase
+      .channel(channelName)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${profile.id}`
+        },
+        (payload) => {
+          const newNotification = payload.new as Notification;
+          setNotifications(prev => [newNotification, ...prev]);
+          
+          // Play notification sound if available
+          if ((window as any).playNotificationSound) {
+            (window as any).playNotificationSound();
+          }
+        }
+      );
+
+    channelRef.current.subscribe((status: string) => {
+      console.log('Notifications channel status:', status);
+      isSubscribedRef.current = status === 'SUBSCRIBED';
+    });
+
+    return () => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+      isSubscribedRef.current = false;
+    };
+  }, [profile?.id]); // Only depend on profile.id
 
   const loadNotifications = async () => {
     if (!profile) return;

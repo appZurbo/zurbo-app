@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -31,15 +31,34 @@ export const useRealtimeChat = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [newMessageNotification, setNewMessageNotification] = useState<RealtimeMessage | null>(null);
+  
+  // Use refs to track channels and prevent duplicate subscriptions
+  const messagesChannelRef = useRef<any>(null);
+  const conversationsChannelRef = useRef<any>(null);
+  const isSubscribedRef = useRef(false);
 
   useEffect(() => {
-    if (!profile) return;
+    if (!profile || isSubscribedRef.current) return;
 
     console.log('Setting up realtime chat for user:', profile.id);
 
+    // Clean up any existing channels first
+    if (messagesChannelRef.current) {
+      supabase.removeChannel(messagesChannelRef.current);
+      messagesChannelRef.current = null;
+    }
+    if (conversationsChannelRef.current) {
+      supabase.removeChannel(conversationsChannelRef.current);
+      conversationsChannelRef.current = null;
+    }
+
+    // Create unique channel names to avoid conflicts
+    const messagesChannelName = `chat-messages-${profile.id}-${Date.now()}`;
+    const conversationsChannelName = `chat-conversations-${profile.id}-${Date.now()}`;
+
     // Setup realtime subscription for messages with improved configuration
-    const messagesChannel = supabase
-      .channel('chat-messages', {
+    messagesChannelRef.current = supabase
+      .channel(messagesChannelName, {
         config: {
           broadcast: { ack: true },
           presence: { key: profile.id }
@@ -92,22 +111,11 @@ export const useRealtimeChat = () => {
             }, 5000);
           }
         }
-      )
-      .subscribe((status) => {
-        console.log('Messages channel status:', status);
-        setIsConnected(status === 'SUBSCRIBED');
-        
-        if (status === 'SUBSCRIBED') {
-          // Request notification permission
-          if ('Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission();
-          }
-        }
-      });
+      );
 
     // Setup realtime subscription for conversations
-    const conversationsChannel = supabase
-      .channel('chat-conversations')  
+    conversationsChannelRef.current = supabase
+      .channel(conversationsChannelName)
       .on(
         'postgres_changes',
         {
@@ -129,15 +137,42 @@ export const useRealtimeChat = () => {
             }
           });
         }
-      )
-      .subscribe();
+      );
+
+    // Subscribe to both channels
+    Promise.all([
+      messagesChannelRef.current.subscribe(),
+      conversationsChannelRef.current.subscribe()
+    ]).then((statuses) => {
+      console.log('Channel subscription statuses:', statuses);
+      const allSubscribed = statuses.every(status => status === 'SUBSCRIBED');
+      setIsConnected(allSubscribed);
+      isSubscribedRef.current = allSubscribed;
+      
+      if (allSubscribed) {
+        // Request notification permission
+        if ('Notification' in window && Notification.permission === 'default') {
+          Notification.requestPermission();
+        }
+      }
+    }).catch((error) => {
+      console.error('Subscription error:', error);
+      setIsConnected(false);
+    });
 
     return () => {
       console.log('Cleaning up realtime subscriptions');
-      supabase.removeChannel(messagesChannel);
-      supabase.removeChannel(conversationsChannel);
+      if (messagesChannelRef.current) {
+        supabase.removeChannel(messagesChannelRef.current);
+        messagesChannelRef.current = null;
+      }
+      if (conversationsChannelRef.current) {
+        supabase.removeChannel(conversationsChannelRef.current);
+        conversationsChannelRef.current = null;
+      }
+      isSubscribedRef.current = false;
     };
-  }, [profile, toast]);
+  }, [profile?.id]); // Only depend on profile.id to prevent unnecessary re-runs
 
   const markMessagesAsRead = (conversationId: string) => {
     setUnreadCount(0);
