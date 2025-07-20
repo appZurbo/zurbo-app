@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,10 +7,11 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useMobile } from '@/hooks/useMobile';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft } from 'lucide-react';
+import { useProfilePicture } from '@/hooks/useProfilePicture';
+import { ArrowLeft, Camera } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 const PrestadorSettings = () => {
@@ -18,19 +19,20 @@ const PrestadorSettings = () => {
   const { profile, loading: authLoading, updateLocalProfile } = useAuth();
   const isMobile = useMobile();
   const { toast } = useToast();
+  const { uploadProfilePicture, uploading } = useProfilePicture();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
     bio: '',
-    descricao_servico: '', // Add this field
+    descricao_servico: '',
     endereco_cidade: '',
     endereco_bairro: '',
     endereco_rua: '',
     endereco_numero: '',
     endereco_cep: '',
-    cpf: '',
-    foto_url: ''
+    cpf: ''
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -39,6 +41,42 @@ const PrestadorSettings = () => {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Arquivo inválido",
+        description: "Por favor, selecione uma imagem.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Arquivo muito grande",
+        description: "A imagem deve ter menos de 5MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const result = await uploadProfilePicture(file);
+    if (result) {
+      toast({
+        title: "Sucesso!",
+        description: "Foto de perfil atualizada com sucesso!",
+      });
+    }
+
+    // Limpar o input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,7 +109,6 @@ const PrestadorSettings = () => {
           endereco_numero: formData.endereco_numero,
           endereco_cep: formData.endereco_cep,
           cpf: formData.cpf,
-          foto_url: formData.foto_url,
           updated_at: new Date().toISOString()
         })
         .eq('id', profile.id);
@@ -102,29 +139,25 @@ const PrestadorSettings = () => {
         nome: profile.nome || '',
         email: profile.email || '',
         bio: profile.bio || '',
-        descricao_servico: profile.descricao_servico || '', // Add this
+        descricao_servico: profile.descricao_servico || '',
         endereco_cidade: profile.endereco_cidade || '',
         endereco_bairro: profile.endereco_bairro || '',
         endereco_rua: profile.endereco_rua || '',
         endereco_numero: profile.endereco_numero || '',
         endereco_cep: profile.endereco_cep || '',
-        cpf: profile.cpf || '',
-        foto_url: profile.foto_url || ''
+        cpf: profile.cpf || ''
       });
     }
   }, [profile]);
 
   if (authLoading) {
     return (
-      <div>
-        <UnifiedHeader />
-        <div className="min-h-screen flex items-center justify-center p-4">
-          <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 bg-orange-500 rounded-xl flex items-center justify-center animate-pulse">
-              <span className="text-white font-bold text-2xl">Z</span>
-            </div>
-            <p className="text-gray-600">Carregando configurações...</p>
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-orange-500 rounded-xl flex items-center justify-center animate-pulse">
+            <span className="text-white font-bold text-2xl">Z</span>
           </div>
+          <p className="text-gray-600">Carregando configurações...</p>
         </div>
       </div>
     );
@@ -132,28 +165,24 @@ const PrestadorSettings = () => {
 
   if (!profile) {
     return (
-      <div>
-        <UnifiedHeader />
-        <div className="min-h-screen flex items-center justify-center p-4">
-          <Card className="w-full max-w-md">
-            <CardContent className="p-6 text-center">
-              <h3 className="text-lg font-semibold mb-2">Acesso Restrito</h3>
-              <p className="text-gray-600 mb-4">
-                Você precisa estar logado como prestador para acessar esta página.
-              </p>
-              <Button onClick={() => navigate('/auth')} className="w-full">
-                Fazer Login
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-6 text-center">
+            <h3 className="text-lg font-semibold mb-2">Acesso Restrito</h3>
+            <p className="text-gray-600 mb-4">
+              Você precisa estar logado como prestador para acessar esta página.
+            </p>
+            <Button onClick={() => navigate('/auth')} className="w-full">
+              Fazer Login
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
     <div>
-      <UnifiedHeader />
       <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
         <div className={`${isMobile ? 'px-4 py-4' : 'max-w-4xl mx-auto p-6'}`}>
           {/* Header */}
@@ -175,6 +204,40 @@ const PrestadorSettings = () => {
                 Atualize suas informações de perfil e configurações
               </p>
             </div>
+          </div>
+
+          {/* Avatar Section */}
+          <div className="flex flex-col items-center mb-8">
+            <div className="relative">
+              <Avatar className="w-24 h-24">
+                <AvatarImage src={profile?.foto_url} alt={profile?.nome} />
+                <AvatarFallback className="text-xl bg-orange-100 text-orange-600">
+                  {profile?.nome?.charAt(0)?.toUpperCase() || 'P'}
+                </AvatarFallback>
+              </Avatar>
+              <Button
+                size="sm"
+                variant="outline"
+                className="absolute -bottom-2 -right-2 rounded-full p-2 bg-white shadow-md"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+              >
+                <Camera className="h-3 w-3" />
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+            </div>
+            {uploading && (
+              <p className="text-sm text-orange-500 mt-2">Enviando foto...</p>
+            )}
+            <p className="text-sm text-gray-600 mt-2 text-center">
+              Clique no ícone da câmera para alterar sua foto de perfil
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -213,17 +276,6 @@ const PrestadorSettings = () => {
                     value={formData.cpf}
                     onChange={handleInputChange}
                     placeholder="Seu CPF"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="foto_url">URL da Foto</Label>
-                  <Input
-                    id="foto_url"
-                    name="foto_url"
-                    type="url"
-                    value={formData.foto_url}
-                    onChange={handleInputChange}
-                    placeholder="URL da sua foto de perfil"
                   />
                 </div>
               </CardContent>
