@@ -2,8 +2,8 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { EnhancedLoginForm } from './auth/EnhancedLoginForm';
-import { EnhancedRegisterForm } from './auth/EnhancedRegisterForm';
+import { SecureEnhancedLoginForm } from './auth/SecureEnhancedLoginForm';
+import { SecureEnhancedRegisterForm } from './auth/SecureEnhancedRegisterForm';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 

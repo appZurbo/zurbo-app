@@ -84,6 +84,78 @@ export type Database = {
           },
         ]
       }
+      auth_attempts: {
+        Row: {
+          attempt_type: string
+          created_at: string | null
+          email: string
+          id: string
+          ip_address: unknown | null
+          success: boolean | null
+          user_agent: string | null
+        }
+        Insert: {
+          attempt_type: string
+          created_at?: string | null
+          email: string
+          id?: string
+          ip_address?: unknown | null
+          success?: boolean | null
+          user_agent?: string | null
+        }
+        Update: {
+          attempt_type?: string
+          created_at?: string | null
+          email?: string
+          id?: string
+          ip_address?: unknown | null
+          success?: boolean | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      auth_audit_logs: {
+        Row: {
+          auth_id: string | null
+          created_at: string | null
+          error_message: string | null
+          event_type: string
+          id: string
+          ip_address: unknown | null
+          metadata: Json | null
+          provider: string | null
+          success: boolean | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          auth_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          event_type: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          provider?: string | null
+          success?: boolean | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          auth_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          event_type?: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          provider?: string | null
+          success?: boolean | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       avaliacoes: {
         Row: {
           avaliado_id: string | null
@@ -146,6 +218,38 @@ export type Database = {
           {
             foreignKeyName: "bairros_atendidos_prestador_id_fkey"
             columns: ["prestador_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blocked_emails: {
+        Row: {
+          blocked_reason: string
+          created_at: string | null
+          created_by: string | null
+          email_pattern: string
+          id: string
+        }
+        Insert: {
+          blocked_reason: string
+          created_at?: string | null
+          created_by?: string | null
+          email_pattern: string
+          id?: string
+        }
+        Update: {
+          blocked_reason?: string
+          created_at?: string | null
+          created_by?: string | null
+          email_pattern?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blocked_emails_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
@@ -1480,9 +1584,32 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_rate_limit: {
+        Args: {
+          p_email: string
+          p_attempt_type: string
+          p_max_attempts?: number
+          p_time_window?: unknown
+        }
+        Returns: boolean
+      }
       get_current_user_id: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      is_email_allowed: {
+        Args: { email_to_check: string }
+        Returns: boolean
+      }
+      log_auth_attempt: {
+        Args: {
+          p_email: string
+          p_attempt_type: string
+          p_success?: boolean
+          p_ip_address?: unknown
+          p_user_agent?: string
+        }
+        Returns: undefined
       }
     }
     Enums: {
