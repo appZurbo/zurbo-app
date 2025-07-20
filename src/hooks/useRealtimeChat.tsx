@@ -145,20 +145,23 @@ export const useRealtimeChat = () => {
     // Subscribe to channels
     const subscribeChannels = async () => {
       try {
-        const subscriptions = await Promise.all([
-          messagesChannel.subscribe(),
-          conversationsChannel.subscribe()
-        ]);
-        
-        console.log('Channel subscriptions:', subscriptions);
-        const allSubscribed = subscriptions.every(status => status === 'SUBSCRIBED');
-        setIsConnected(allSubscribed);
-        
-        if (allSubscribed) {
-          // Request notification permission
-          if ('Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission();
+        messagesChannel.subscribe((status) => {
+          console.log('Messages channel status:', status);
+          if (status === 'SUBSCRIBED') {
+            conversationsChannel.subscribe((status) => {
+              console.log('Conversations channel status:', status);
+              if (status === 'SUBSCRIBED') {
+                setIsConnected(true);
+              }
+            });
           }
+        });
+        
+        console.log('Channel subscriptions initialized');
+        
+        // Request notification permission
+        if ('Notification' in window && Notification.permission === 'default') {
+          Notification.requestPermission();
         }
       } catch (error) {
         console.error('Subscription error:', error);
