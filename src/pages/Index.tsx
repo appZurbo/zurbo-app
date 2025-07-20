@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
@@ -10,6 +9,7 @@ import { PrestadorMiniProfileModal } from '@/components/prestadores/PrestadorMin
 import { ContactModal } from '@/components/contact/ContactModal';
 import { UserProfile } from '@/types';
 import PartnersSection from '@/components/sections/PartnersSection';
+import WatermarkSection from '@/components/sections/WatermarkSection';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { useHomepage } from '@/hooks/useHomepage';
 import { HomepageHeader } from '@/components/homepage/HomepageHeader';
@@ -99,6 +99,10 @@ const Index = () => {
 
           <ErrorBoundary>
             <PartnersSection />
+          </ErrorBoundary>
+
+          <ErrorBoundary>
+            <WatermarkSection />
           </ErrorBoundary>
 
           {selectedPrestador && (
