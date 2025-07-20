@@ -56,14 +56,14 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = 'login' }: AuthModal
           </TabsList>
           
           <TabsContent value="login" className="mt-6">
-            <EnhancedLoginForm
+            <SecureEnhancedLoginForm
               onSuccess={handleSuccess}
               onSwitchToRegister={() => setActiveTab('register')}
             />
           </TabsContent>
           
           <TabsContent value="register" className="mt-6">
-            <EnhancedRegisterForm
+            <SecureEnhancedRegisterForm
               onSuccess={() => setActiveTab('login')}
               onSwitchToLogin={() => setActiveTab('login')}
             />
