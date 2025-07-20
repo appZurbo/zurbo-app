@@ -8,10 +8,10 @@ import { updateUserProfile } from '@/utils/database';
 export const useProfilePicture = () => {
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
-  const { profile, updateLocalProfile } = useAuth();
+  const { profile, user, updateLocalProfile } = useAuth();
 
   const uploadProfilePicture = async (file: File) => {
-    if (!profile) {
+    if (!profile || !user) {
       toast({
         title: "Erro",
         description: "Usuário não autenticado",
@@ -22,10 +22,13 @@ export const useProfilePicture = () => {
 
     setUploading(true);
     try {
-      console.log('Starting upload for user:', profile.id);
+      console.log('Starting upload for user:', user.id);
       
       const fileExt = file.name.split('.').pop();
-      const fileName = `${profile.id}/avatar.${fileExt}`;
+      // Use auth.uid() (user.id) for the folder name to match RLS policy
+      const fileName = `${user.id}/avatar.${fileExt}`;
+
+      console.log('Uploading to path:', fileName);
 
       // Upload da imagem
       const { error: uploadError } = await supabase.storage
@@ -46,7 +49,7 @@ export const useProfilePicture = () => {
 
       console.log('Public URL generated:', data.publicUrl);
 
-      // Atualizar perfil do usuário no banco
+      // Atualizar perfil do usuário no banco usando profile.id (UUID da tabela users)
       const updatedProfile = await updateUserProfile(profile.id, { 
         foto_url: data.publicUrl 
       });

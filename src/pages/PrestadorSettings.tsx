@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,7 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 const PrestadorSettings = () => {
   const navigate = useNavigate();
-  const { profile, loading: authLoading, updateLocalProfile } = useAuth();
+  const { profile, loading: authLoading, updateLocalProfile, user } = useAuth();
   const isMobile = useMobile();
   const { toast } = useToast();
   const { uploadProfilePicture, uploading } = useProfilePicture();
@@ -47,6 +46,8 @@ const PrestadorSettings = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    console.log('File selected:', file.name, 'Size:', file.size, 'Type:', file.type);
+
     if (!file.type.startsWith('image/')) {
       toast({
         title: "Arquivo inválido",
@@ -65,8 +66,11 @@ const PrestadorSettings = () => {
       return;
     }
 
+    console.log('Starting upload process...');
     const result = await uploadProfilePicture(file);
+    
     if (result) {
+      console.log('Upload successful, URL:', result);
       toast({
         title: "Sucesso!",
         description: "Foto de perfil atualizada com sucesso!",
@@ -185,59 +189,47 @@ const PrestadorSettings = () => {
     <div>
       <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
         <div className={`${isMobile ? 'px-4 py-4' : 'max-w-4xl mx-auto p-6'}`}>
-          {/* Header */}
-          <div className="flex items-center gap-4 mb-6">
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/prestador-dashboard')}
-              className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              {!isMobile && 'Voltar'}
-            </Button>
+          <div className="flex-1 mb-6">
+            <h1 className={`font-bold text-gray-900 mb-2 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
+              Configurações do Prestador
+            </h1>
+            <p className={`text-gray-600 mb-8 ${isMobile ? 'text-sm' : ''}`}>
+              Atualize suas informações de perfil e configurações
+            </p>
             
-            <div className="flex-1">
-              <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
-                Configurações do Prestador
-              </h1>
-              <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
-                Atualize suas informações de perfil e configurações
+            {/* Avatar Section */}
+            <div className="flex flex-col items-center mb-8">
+              <div className="relative">
+                <Avatar className="w-24 h-24">
+                  <AvatarImage src={profile?.foto_url} alt={profile?.nome} />
+                  <AvatarFallback className="text-xl bg-orange-100 text-orange-600">
+                    {profile?.nome?.charAt(0)?.toUpperCase() || 'P'}
+                  </AvatarFallback>
+                </Avatar>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="absolute -bottom-2 -right-2 rounded-full p-2 bg-white shadow-md"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                >
+                  <Camera className="h-3 w-3" />
+                </Button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+              </div>
+              {uploading && (
+                <p className="text-sm text-orange-500 mt-2">Enviando foto...</p>
+              )}
+              <p className="text-sm text-gray-600 mt-2 text-center">
+                Clique no ícone da câmera para alterar sua foto de perfil
               </p>
             </div>
-          </div>
-
-          {/* Avatar Section */}
-          <div className="flex flex-col items-center mb-8">
-            <div className="relative">
-              <Avatar className="w-24 h-24">
-                <AvatarImage src={profile?.foto_url} alt={profile?.nome} />
-                <AvatarFallback className="text-xl bg-orange-100 text-orange-600">
-                  {profile?.nome?.charAt(0)?.toUpperCase() || 'P'}
-                </AvatarFallback>
-              </Avatar>
-              <Button
-                size="sm"
-                variant="outline"
-                className="absolute -bottom-2 -right-2 rounded-full p-2 bg-white shadow-md"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploading}
-              >
-                <Camera className="h-3 w-3" />
-              </Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileUpload}
-                className="hidden"
-              />
-            </div>
-            {uploading && (
-              <p className="text-sm text-orange-500 mt-2">Enviando foto...</p>
-            )}
-            <p className="text-sm text-gray-600 mt-2 text-center">
-              Clique no ícone da câmera para alterar sua foto de perfil
-            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
