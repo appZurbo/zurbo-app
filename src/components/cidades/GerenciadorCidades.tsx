@@ -46,8 +46,9 @@ const GerenciadorCidades = () => {
 
       if (!profile) return;
 
+      // Usar bairros_atendidos como fallback temporariamente
       const { data, error } = await supabase
-        .from('cidades_atendidas')
+        .from('bairros_atendidos')
         .select('*')
         .eq('prestador_id', profile.id);
 
@@ -56,7 +57,13 @@ const GerenciadorCidades = () => {
         return;
       }
 
-      setCidadesAtendidas(data || []);
+      // Mapear bairros para cidades temporariamente
+      const cidadesMapeadas = (data || []).map(item => ({
+        id: item.id,
+        prestador_id: item.prestador_id,
+        cidade: item.bairro // Usar bairro como cidade temporariamente
+      }));
+      setCidadesAtendidas(cidadesMapeadas);
     } catch (error) {
       console.error('Erro ao carregar cidades:', error);
     }
@@ -79,10 +86,10 @@ const GerenciadorCidades = () => {
       if (!profile) return;
 
       const { error } = await supabase
-        .from('cidades_atendidas')
+        .from('bairros_atendidos')
         .insert({
           prestador_id: profile.id,
-          cidade: cidadeSelecionada
+          bairro: cidadeSelecionada
         });
 
       if (error) throw error;
@@ -107,7 +114,7 @@ const GerenciadorCidades = () => {
   const handleRemoverCidade = async (cidadeId: string, nomeCidade: string) => {
     try {
       const { error } = await supabase
-        .from('cidades_atendidas')
+        .from('bairros_atendidos')
         .delete()
         .eq('id', cidadeId);
 

@@ -2,7 +2,7 @@
 import React from 'react';
 import { UnifiedHeader } from './UnifiedHeader';
 import { ModernFooter } from './ModernFooter';
-import { MobileDock } from '../mobile/MobileDock';
+import MobileDock from '../mobile/MobileDock';
 import { useMobile } from '@/hooks/useMobile';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
