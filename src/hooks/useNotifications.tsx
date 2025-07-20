@@ -18,23 +18,33 @@ export const useNotifications = () => {
   const [loading, setLoading] = useState(false);
   const { profile } = useAuth();
   
-  // Use ref to track subscription and prevent duplicates
+  // Use ref to track initialization and prevent duplicates
   const channelRef = useRef<any>(null);
-  const isSubscribedRef = useRef(false);
+  const isInitializedRef = useRef(false);
 
   useEffect(() => {
-    if (!profile || isSubscribedRef.current) return;
+    // Prevent multiple initializations
+    if (!profile?.id || isInitializedRef.current) {
+      return;
+    }
+
+    console.log('Initializing notifications for user:', profile.id);
+    isInitializedRef.current = true;
     
     loadNotifications();
     
     // Clean up existing channel first
     if (channelRef.current) {
-      supabase.removeChannel(channelRef.current);
+      try {
+        supabase.removeChannel(channelRef.current);
+      } catch (error) {
+        console.warn('Error removing existing channel:', error);
+      }
       channelRef.current = null;
     }
     
-    // Set up real-time subscription for new notifications with unique channel name
-    const channelName = `notifications-changes-${profile.id}-${Date.now()}`;
+    // Set up real-time subscription with unique channel name
+    const channelName = `notifications-${profile.id}-${Date.now()}`;
     channelRef.current = supabase
       .channel(channelName)
       .on(
@@ -56,17 +66,29 @@ export const useNotifications = () => {
         }
       );
 
-    channelRef.current.subscribe((status: string) => {
-      console.log('Notifications channel status:', status);
-      isSubscribedRef.current = status === 'SUBSCRIBED';
-    });
+    // Subscribe to the channel
+    const subscribeToChannel = async () => {
+      try {
+        const status = await channelRef.current.subscribe();
+        console.log('Notifications channel status:', status);
+      } catch (error) {
+        console.error('Error subscribing to notifications channel:', error);
+      }
+    };
+
+    subscribeToChannel();
 
     return () => {
+      console.log('Cleaning up notifications subscription');
       if (channelRef.current) {
-        supabase.removeChannel(channelRef.current);
+        try {
+          supabase.removeChannel(channelRef.current);
+        } catch (error) {
+          console.warn('Error during notifications cleanup:', error);
+        }
         channelRef.current = null;
       }
-      isSubscribedRef.current = false;
+      isInitializedRef.current = false;
     };
   }, [profile?.id]); // Only depend on profile.id
 

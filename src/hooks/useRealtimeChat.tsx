@@ -32,38 +32,39 @@ export const useRealtimeChat = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [newMessageNotification, setNewMessageNotification] = useState<RealtimeMessage | null>(null);
   
-  // Use refs to track channels and prevent duplicate subscriptions
-  const messagesChannelRef = useRef<any>(null);
-  const conversationsChannelRef = useRef<any>(null);
-  const isSubscribedRef = useRef(false);
+  // Use refs to prevent duplicate subscriptions
+  const channelsRef = useRef<any[]>([]);
+  const isInitializedRef = useRef(false);
 
   useEffect(() => {
-    if (!profile || isSubscribedRef.current) return;
-
-    console.log('Setting up realtime chat for user:', profile.id);
-
-    // Clean up any existing channels first
-    if (messagesChannelRef.current) {
-      supabase.removeChannel(messagesChannelRef.current);
-      messagesChannelRef.current = null;
-    }
-    if (conversationsChannelRef.current) {
-      supabase.removeChannel(conversationsChannelRef.current);
-      conversationsChannelRef.current = null;
+    // Prevent multiple initializations
+    if (!profile?.id || isInitializedRef.current) {
+      return;
     }
 
-    // Create unique channel names to avoid conflicts
-    const messagesChannelName = `chat-messages-${profile.id}-${Date.now()}`;
-    const conversationsChannelName = `chat-conversations-${profile.id}-${Date.now()}`;
+    console.log('Initializing realtime chat for user:', profile.id);
+    isInitializedRef.current = true;
 
-    // Setup realtime subscription for messages with improved configuration
-    messagesChannelRef.current = supabase
-      .channel(messagesChannelName, {
-        config: {
-          broadcast: { ack: true },
-          presence: { key: profile.id }
+    // Clean up any existing channels
+    if (channelsRef.current.length > 0) {
+      channelsRef.current.forEach(channel => {
+        try {
+          supabase.removeChannel(channel);
+        } catch (error) {
+          console.warn('Error removing channel:', error);
         }
-      })
+      });
+      channelsRef.current = [];
+    }
+
+    // Create unique channel names with timestamp to avoid conflicts
+    const timestamp = Date.now();
+    const messagesChannelName = `chat-messages-${profile.id}-${timestamp}`;
+    const conversationsChannelName = `chat-conversations-${profile.id}-${timestamp}`;
+
+    // Setup messages channel
+    const messagesChannel = supabase
+      .channel(messagesChannelName)
       .on(
         'postgres_changes',
         {
@@ -75,7 +76,6 @@ export const useRealtimeChat = () => {
           console.log('New message received:', payload);
           const newMessage = payload.new as RealtimeMessage;
           
-          // Add message to state with optimistic updates
           setMessages(prev => {
             const exists = prev.find(m => m.id === newMessage.id);
             if (exists) return prev;
@@ -89,7 +89,7 @@ export const useRealtimeChat = () => {
             setUnreadCount(prev => prev + 1);
             setNewMessageNotification(newMessage);
             
-            // Play notification sound
+            // Browser notification
             if ('Notification' in window && Notification.permission === 'granted') {
               new Notification('Nova mensagem no Zurbo', {
                 body: newMessage.content?.substring(0, 100) || 'Você recebeu uma nova mensagem',
@@ -98,7 +98,7 @@ export const useRealtimeChat = () => {
               });
             }
             
-            // Show toast notification
+            // Toast notification
             toast({
               title: "💬 Nova mensagem",
               description: newMessage.content?.substring(0, 50) + (newMessage.content?.length > 50 ? '...' : ''),
@@ -113,8 +113,8 @@ export const useRealtimeChat = () => {
         }
       );
 
-    // Setup realtime subscription for conversations
-    conversationsChannelRef.current = supabase
+    // Setup conversations channel
+    const conversationsChannel = supabase
       .channel(conversationsChannelName)
       .on(
         'postgres_changes',
@@ -139,40 +139,50 @@ export const useRealtimeChat = () => {
         }
       );
 
-    // Subscribe to both channels
-    Promise.all([
-      messagesChannelRef.current.subscribe(),
-      conversationsChannelRef.current.subscribe()
-    ]).then((statuses) => {
-      console.log('Channel subscription statuses:', statuses);
-      const allSubscribed = statuses.every(status => status === 'SUBSCRIBED');
-      setIsConnected(allSubscribed);
-      isSubscribedRef.current = allSubscribed;
-      
-      if (allSubscribed) {
-        // Request notification permission
-        if ('Notification' in window && Notification.permission === 'default') {
-          Notification.requestPermission();
+    // Store channels for cleanup
+    channelsRef.current = [messagesChannel, conversationsChannel];
+
+    // Subscribe to channels
+    const subscribeChannels = async () => {
+      try {
+        const subscriptions = await Promise.all([
+          messagesChannel.subscribe(),
+          conversationsChannel.subscribe()
+        ]);
+        
+        console.log('Channel subscriptions:', subscriptions);
+        const allSubscribed = subscriptions.every(status => status === 'SUBSCRIBED');
+        setIsConnected(allSubscribed);
+        
+        if (allSubscribed) {
+          // Request notification permission
+          if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+          }
         }
+      } catch (error) {
+        console.error('Subscription error:', error);
+        setIsConnected(false);
       }
-    }).catch((error) => {
-      console.error('Subscription error:', error);
-      setIsConnected(false);
-    });
+    };
+
+    subscribeChannels();
 
     return () => {
       console.log('Cleaning up realtime subscriptions');
-      if (messagesChannelRef.current) {
-        supabase.removeChannel(messagesChannelRef.current);
-        messagesChannelRef.current = null;
+      if (channelsRef.current.length > 0) {
+        channelsRef.current.forEach(channel => {
+          try {
+            supabase.removeChannel(channel);
+          } catch (error) {
+            console.warn('Error during cleanup:', error);
+          }
+        });
+        channelsRef.current = [];
       }
-      if (conversationsChannelRef.current) {
-        supabase.removeChannel(conversationsChannelRef.current);
-        conversationsChannelRef.current = null;
-      }
-      isSubscribedRef.current = false;
+      isInitializedRef.current = false;
     };
-  }, [profile?.id]); // Only depend on profile.id to prevent unnecessary re-runs
+  }, [profile?.id]); // Only depend on profile.id
 
   const markMessagesAsRead = (conversationId: string) => {
     setUnreadCount(0);
