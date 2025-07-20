@@ -30,7 +30,6 @@ export const Header = () => {
   const { user, profile, logout } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  // Get premium and provider status from profile
   const isPremium = profile?.premium || false;
   const isProvider = profile?.tipo === 'prestador';
 
@@ -44,7 +43,7 @@ export const Header = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm border-b">
+    <header className="bg-transparent backdrop-blur-md shadow-sm border-b border-white/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
@@ -52,7 +51,7 @@ export const Header = () => {
               onClick={() => navigate('/')}
               className="flex items-center space-x-2"
             >
-              <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-lg">Z</span>
               </div>
               <span className="text-xl font-bold text-gray-900">Zurbo</span>
@@ -65,15 +64,22 @@ export const Header = () => {
                 <Button
                   variant="ghost"
                   onClick={() => navigate('/informacoes')}
-                  className="text-gray-600 hover:text-gray-900"
+                  className="text-gray-600 hover:text-gray-900 bg-white/10 hover:bg-white/20 backdrop-blur-sm"
                 >
                   <Info className="h-4 w-4 mr-2" />
                   Informações
                 </Button>
-                <Button variant="outline" onClick={handleAuthClick}>
+                <Button 
+                  variant="outline" 
+                  onClick={handleAuthClick}
+                  className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-white/30"
+                >
                   Entrar
                 </Button>
-                <Button onClick={handleAuthClick} className="bg-orange-500 hover:bg-orange-600">
+                <Button 
+                  onClick={handleAuthClick} 
+                  className="bg-orange-500 hover:bg-orange-600 shadow-lg"
+                >
                   Cadastrar
                 </Button>
               </>
@@ -82,16 +88,19 @@ export const Header = () => {
             {user && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Button 
+                    variant="ghost" 
+                    className="relative h-8 w-8 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm"
+                  >
                     <div className="flex items-center space-x-2">
                       {profile?.foto_url ? (
                         <img 
                           src={profile.foto_url} 
                           alt={profile.nome || 'User'}
-                          className="h-8 w-8 rounded-full object-cover"
+                          className="h-8 w-8 rounded-full object-cover border-2 border-white/30"
                         />
                       ) : (
-                        <div className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center">
+                        <div className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center border-2 border-white/30">
                           <User className="h-4 w-4 text-white" />
                         </div>
                       )}
@@ -101,7 +110,7 @@ export const Header = () => {
                     </div>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuContent className="w-56 bg-white/95 backdrop-blur-md" align="end" forceMount>
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
                       <p className="font-medium">{profile?.nome || 'Usuário'}</p>

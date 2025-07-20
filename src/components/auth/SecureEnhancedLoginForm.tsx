@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -5,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Eye, EyeOff, Mail, Lock, Shield, AlertTriangle, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, Shield, Loader2 } from 'lucide-react';
 import { useAuthSecurity } from '@/hooks/useAuthSecurity';
 import { EmailConfirmationModal } from './EmailConfirmationModal';
 
@@ -23,6 +24,15 @@ export const SecureEnhancedLoginForm = ({ onSuccess, onSwitchToRegister }: Secur
   const [pendingConfirmationEmail, setPendingConfirmationEmail] = useState('');
   const { toast } = useToast();
   const { secureSignIn, isLoading: securityLoading } = useAuthSecurity();
+
+  // Get the correct redirect URL
+  const getRedirectUrl = () => {
+    const currentUrl = window.location.origin;
+    if (currentUrl.includes('localhost') || currentUrl.includes('127.0.0.1')) {
+      return currentUrl;
+    }
+    return 'https://zurbo.com.br';
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +52,7 @@ export const SecureEnhancedLoginForm = ({ onSuccess, onSwitchToRegister }: Secur
       const result = await secureSignIn(email, password);
       
       if (!result.success) {
-        if (result.error?.includes('confirme seu email')) {
+        if (result.error?.includes('confirme seu email') || result.error?.includes('email ainda não foi confirmado')) {
           setPendingConfirmationEmail(email);
           setShowEmailConfirmation(true);
         } else if (result.isBlocked) {
@@ -81,10 +91,13 @@ export const SecureEnhancedLoginForm = ({ onSuccess, onSwitchToRegister }: Secur
   const handleSocialLogin = async (provider: 'google' | 'facebook' | 'apple') => {
     setLoading(true);
     try {
+      const redirectUrl = getRedirectUrl();
+      console.log('Using redirect URL for social login:', redirectUrl);
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',

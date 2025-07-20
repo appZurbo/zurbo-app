@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -13,6 +14,17 @@ export const useAuthSecurity = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+  // Get the correct redirect URL based on environment
+  const getRedirectUrl = () => {
+    const currentUrl = window.location.origin;
+    // If we're on localhost, use it for development, otherwise use production URL
+    if (currentUrl.includes('localhost') || currentUrl.includes('127.0.0.1')) {
+      return currentUrl;
+    }
+    // For production, use the actual domain
+    return 'https://zurbo.com.br';
+  };
+
   const checkRateLimit = useCallback(async (
     email: string, 
     attemptType: 'login' | 'signup' | 'password_reset'
@@ -27,13 +39,13 @@ export const useAuthSecurity = () => {
 
       if (error) {
         console.error('Rate limit check error:', error);
-        return true; // Em caso de erro, permitir tentativa
+        return true;
       }
 
       return data;
     } catch (error) {
       console.error('Rate limit check failed:', error);
-      return true; // Em caso de erro, permitir tentativa
+      return true;
     }
   }, []);
 
@@ -48,23 +60,20 @@ export const useAuthSecurity = () => {
         p_email: email,
         p_attempt_type: attemptType,
         p_success: success,
-        p_ip_address: null, // Browser não tem acesso ao IP real
+        p_ip_address: null,
         p_user_agent: navigator.userAgent
       });
 
-      // Log adicional para auditoria se necessário
       if (!success && error) {
         console.warn(`Auth attempt failed for ${email}: ${error}`);
       }
     } catch (logError) {
       console.error('Failed to log auth attempt:', logError);
-      // Não falhar a autenticação por causa do log
     }
   }, []);
 
   const checkEmailAllowed = useCallback(async (email: string): Promise<boolean> => {
     try {
-      // Verificar se é um email temporário conhecido
       const tempEmailPatterns = [
         '10minutemail', 'guerrillamail', 'mailinator', 'tempmail', 
         'throwaway', 'disposable', 'temp-mail', 'fake'
@@ -78,20 +87,19 @@ export const useAuthSecurity = () => {
         return false;
       }
 
-      // Verificar na base de dados
       const { data, error } = await supabase.rpc('is_email_allowed', {
         email_to_check: email
       });
 
       if (error) {
         console.error('Email check error:', error);
-        return true; // Em caso de erro, permitir
+        return true;
       }
 
       return data;
     } catch (error) {
       console.error('Email validation failed:', error);
-      return true; // Em caso de erro, permitir
+      return true;
     }
   }, []);
 
@@ -103,7 +111,6 @@ export const useAuthSecurity = () => {
     setIsLoading(true);
     
     try {
-      // 1. Verificar rate limiting
       const canAttempt = await checkRateLimit(email, 'signup');
       if (!canAttempt) {
         await logAuthAttempt(email, 'signup', false, 'Rate limit exceeded');
@@ -114,7 +121,6 @@ export const useAuthSecurity = () => {
         };
       }
 
-      // 2. Verificar se email é permitido
       const emailAllowed = await checkEmailAllowed(email);
       if (!emailAllowed) {
         await logAuthAttempt(email, 'signup', false, 'Blocked email domain');
@@ -124,12 +130,14 @@ export const useAuthSecurity = () => {
         };
       }
 
-      // 3. Tentar registrar
+      const redirectUrl = getRedirectUrl();
+      console.log('Using redirect URL for signup:', redirectUrl);
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: redirectUrl,
           data: userData
         }
       });
@@ -142,7 +150,6 @@ export const useAuthSecurity = () => {
         };
       }
 
-      // 4. Log sucesso
       await logAuthAttempt(email, 'signup', true);
       
       return {
@@ -167,7 +174,6 @@ export const useAuthSecurity = () => {
     setIsLoading(true);
 
     try {
-      // 1. Verificar rate limiting
       const canAttempt = await checkRateLimit(email, 'login');
       if (!canAttempt) {
         await logAuthAttempt(email, 'login', false, 'Rate limit exceeded');
@@ -178,7 +184,6 @@ export const useAuthSecurity = () => {
         };
       }
 
-      // 2. Tentar fazer login
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
@@ -186,26 +191,43 @@ export const useAuthSecurity = () => {
 
       if (error) {
         await logAuthAttempt(email, 'login', false, error.message);
+        
+        // Check if it's an email confirmation error
+        if (error.message.includes('Email not confirmed') || error.message.includes('email_not_confirmed')) {
+          return {
+            success: false,
+            error: 'Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada e clique no link de confirmação.'
+          };
+        }
+        
         return {
           success: false,
           error: error.message
         };
       }
 
-      // 3. Verificar se email foi confirmado
+      // Enhanced email confirmation check
       if (data.user && !data.user.email_confirmed_at) {
         await logAuthAttempt(email, 'login', false, 'Email not confirmed');
         
-        // Fazer logout do usuário não confirmado
+        // Force sign out the unconfirmed user
         await supabase.auth.signOut();
         
         return {
           success: false,
-          error: 'Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada.'
+          error: 'Seu email ainda não foi confirmado. Por favor, verifique sua caixa de entrada e clique no link de confirmação antes de tentar fazer login novamente.'
         };
       }
 
-      // 4. Log sucesso
+      // Additional check to ensure user is properly authenticated
+      if (!data.session || !data.session.access_token) {
+        await logAuthAttempt(email, 'login', false, 'Invalid session');
+        return {
+          success: false,
+          error: 'Falha na autenticação. Tente novamente.'
+        };
+      }
+
       await logAuthAttempt(email, 'login', true);
       
       return {
@@ -236,11 +258,14 @@ export const useAuthSecurity = () => {
         };
       }
 
+      const redirectUrl = getRedirectUrl();
+      console.log('Using redirect URL for email confirmation:', redirectUrl);
+
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/`
+          emailRedirectTo: redirectUrl
         }
       });
 

@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -53,6 +54,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Get the correct redirect URL
+  const getRedirectUrl = () => {
+    const currentUrl = window.location.origin;
+    if (currentUrl.includes('localhost') || currentUrl.includes('127.0.0.1')) {
+      return currentUrl;
+    }
+    return 'https://zurbo.com.br';
+  };
 
   const loadProfile = async (userId: string) => {
     try {
@@ -144,11 +154,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setError(null);
 
         if (session?.user) {
+          // Enhanced email confirmation check
+          if (!session.user.email_confirmed_at) {
+            console.warn('User email not confirmed, signing out');
+            await supabase.auth.signOut();
+            setSession(null);
+            setUser(null);
+            setProfile(null);
+            return;
+          }
+
           setTimeout(async () => {
             if (isMounted) {
               let userProfile = await loadProfile(session.user.id);
               
-              // Se não existe perfil e é login social, criar automaticamente
               if (!userProfile && event === 'SIGNED_IN' && session.user.app_metadata.provider !== 'email') {
                 userProfile = await createSocialUserProfile(session.user);
               }
@@ -184,6 +203,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(session?.user ?? null);
 
         if (session?.user) {
+          // Check email confirmation on initialization
+          if (!session.user.email_confirmed_at) {
+            console.warn('User email not confirmed during initialization, signing out');
+            await supabase.auth.signOut();
+            setSession(null);
+            setUser(null);
+            setProfile(null);
+            setLoading(false);
+            return;
+          }
+
           const userProfile = await loadProfile(session.user.id);
           if (isMounted && userProfile) {
             setProfile(userProfile);
@@ -210,10 +240,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signIn = async (email: string, password: string) => {
     try {
       setError(null);
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+      
+      // Enhanced email confirmation check
+      if (data.user && !data.user.email_confirmed_at) {
+        // Force sign out if email not confirmed
+        await supabase.auth.signOut();
+        return { error: { message: 'Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada.' } };
+      }
+      
       return { error };
     } catch (error) {
       setError('Erro ao fazer login');
@@ -224,7 +262,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signUp = async (email: string, password: string, userData: Partial<UserProfile>) => {
     try {
       setError(null);
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = getRedirectUrl();
+      console.log('Using redirect URL for signup:', redirectUrl);
       
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -284,7 +323,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const isAuthenticated = !!user;
+  const isAuthenticated = !!user && !!user.email_confirmed_at;
   const isPrestador = profile?.tipo === 'prestador';
   const isCliente = profile?.tipo === 'cliente';
   const isAdmin = profile?.tipo === 'admin' || profile?.tipo === 'moderator';
