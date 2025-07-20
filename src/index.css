@@ -359,3 +359,53 @@
     }
   }
 }
+
+/* Estilos para os Novos Cards de Prestador - Estilo App Moderno */
+.card-prestador-moderno {
+  @apply bg-white border border-gray-200 rounded-2xl p-4 transition-all duration-300 ease-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card-prestador-moderno:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.card-prestador-moderno .header {
+  @apply flex items-center gap-4;
+}
+
+.card-prestador-moderno .avatar {
+  @apply w-16 h-16 rounded-full object-cover;
+}
+
+.card-prestador-moderno .info h3 {
+  @apply text-lg font-semibold text-gray-900 m-0;
+}
+
+.card-prestador-moderno .info p {
+  @apply text-sm text-gray-600 m-0;
+}
+
+.card-prestador-moderno .acoes {
+  @apply flex flex-col gap-2 mt-auto;
+}
+
+.card-prestador-moderno .btn-primario {
+  @apply block bg-orange-500 text-white rounded-xl py-3 px-4 font-semibold text-center no-underline transition-colors duration-200 ease-out;
+}
+
+.card-prestador-moderno .btn-primario:hover {
+  @apply bg-orange-600;
+}
+
+.card-prestador-moderno .btn-secundario {
+  @apply block bg-gray-100 text-gray-700 rounded-xl py-3 px-4 font-semibold text-center no-underline transition-colors duration-200 ease-out;
+}
+
+.card-prestador-moderno .btn-secundario:hover {
+  @apply bg-gray-200;
+}

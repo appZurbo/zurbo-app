@@ -1,20 +1,8 @@
-
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { MessageCircle, Phone, Star, MapPin, Crown, Shield } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { StarRating } from '@/components/ui/star-rating';
-import { FavoriteButton } from '@/components/favorites/FavoriteButton';
-import { 
-  MapPin, 
-  Phone, 
-  MessageCircle, 
-  User, 
-  Crown,
-  Clock,
-  CheckCircle 
-} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { UserProfile } from '@/utils/database/types';
 
 interface PrestadorCardImprovedProps {
@@ -23,148 +11,95 @@ interface PrestadorCardImprovedProps {
   onViewProfile: (prestador: UserProfile) => void;
 }
 
-export const PrestadorCardImproved: React.FC<PrestadorCardImprovedProps> = ({
-  prestador,
-  onContact,
-  onViewProfile
-}) => {
-  if (!prestador || !prestador.id) {
-    return null;
-  }
-
-  const handleContact = () => {
-    onContact(prestador);
-  };
-
-  const handleViewProfile = () => {
-    onViewProfile(prestador);
-  };
-
-  const getInitials = (nome: string) => {
-    if (!nome) return 'UN';
-    return nome
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
-  const formatLocation = () => {
-    const parts = [];
-    if (prestador.endereco_bairro) parts.push(prestador.endereco_bairro);
-    if (prestador.endereco_cidade) parts.push(prestador.endereco_cidade);
-    return parts.join(', ') || 'Localização não informada';
-  };
-
-  const getBio = () => {
-    if (prestador.bio && prestador.bio.trim()) {
-      return prestador.bio.length > 100 
-        ? `${prestador.bio.substring(0, 100)}...` 
-        : prestador.bio;
-    }
-    if (prestador.descricao_servico && prestador.descricao_servico.trim()) {
-      return prestador.descricao_servico.length > 100
-        ? `${prestador.descricao_servico.substring(0, 100)}...`
-        : prestador.descricao_servico;
-    }
-    return 'Profissional disponível para atendimento';
-  };
+export const PrestadorCardImproved = ({ 
+  prestador, 
+  onContact, 
+  onViewProfile 
+}: PrestadorCardImprovedProps) => {
+  const isPremium = prestador.premium || false;
+  const rating = prestador.nota_media || 0;
+  const isOnline = prestador.em_servico ?? true;
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-white relative overflow-hidden">
-      {prestador.premium && (
-        <div className="absolute top-0 right-0 bg-gradient-to-l from-yellow-400 to-orange-400 text-white text-xs px-3 py-1 rounded-bl-lg font-medium">
-          <Crown className="w-3 h-3 inline mr-1" />
-          Premium
+    <div className="card-prestador-moderno">
+      {/* Header Section with Photo and Name */}
+      <div className="header">
+        <img 
+          src={prestador.foto_url || 'https://placehold.co/128x128/E2E8F0/4A5568?text=Foto'} 
+          alt={`Foto de ${prestador.nome}`} 
+          className="avatar"
+        />
+        <div className="info">
+          <h3>{prestador.nome}</h3>
+          <p>{prestador.tipo || 'Prestador de Serviços'}</p>
+          
+          {/* Rating and Status */}
+          {rating > 0 && (
+            <div className="flex items-center gap-2 mt-1">
+              <div className="flex items-center gap-1">
+                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                <span className="text-xs font-medium text-gray-700">
+                  {rating.toFixed(1)}
+                </span>
+              </div>
+              {isPremium && (
+                <Badge className="bg-gradient-to-r from-amber-400 to-yellow-500 text-white text-xs border-0">
+                  <Crown className="h-2 w-2 mr-1" />
+                  PRO
+                </Badge>
+              )}
+            </div>
+          )}
+
+          {/* Location */}
+          {(prestador.endereco_cidade || prestador.endereco_bairro) && (
+            <div className="flex items-center gap-1 text-gray-500 mt-1">
+              <MapPin className="h-3 w-3" />
+              <span className="text-xs truncate">
+                {prestador.endereco_bairro && `${prestador.endereco_bairro}, `}
+                {prestador.endereco_cidade}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Service Description */}
+      {prestador.descricao_servico && (
+        <div className="px-1">
+          <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
+            {prestador.descricao_servico}
+          </p>
         </div>
       )}
 
-      <CardContent className="p-4">
-        <div className="flex items-start gap-3 mb-3">
-          <div className="relative">
-            <Avatar className="h-12 w-12 border-2 border-orange-200">
-              <AvatarImage 
-                src={prestador.foto_url || undefined} 
-                alt={prestador.nome || 'Prestador'} 
-              />
-              <AvatarFallback className="bg-orange-100 text-orange-600 font-semibold">
-                {getInitials(prestador.nome || 'Usuario')}
-              </AvatarFallback>
-            </Avatar>
-            {prestador.em_servico && (
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
-            )}
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-gray-900 truncate">
-                {prestador.nome || 'Nome não informado'}
-              </h3>
-              <FavoriteButton prestadorId={prestador.id} />
-            </div>
-
-            <div className="flex items-center gap-1 mt-1">
-              <StarRating 
-                rating={Number(prestador.nota_media) || 0} 
-                size="sm" 
-                readonly 
-              />
-              <span className="text-sm text-gray-600 ml-1">
-                ({Number(prestador.nota_media).toFixed(1) || '0.0'})
-              </span>
-            </div>
-
-            <div className="flex items-center text-sm text-gray-500 mt-1">
-              <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
-              <span className="truncate">{formatLocation()}</span>
-            </div>
+      {/* Premium Benefits */}
+      {isPremium && (
+        <div className="p-2 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-lg border border-amber-200">
+          <div className="flex items-center gap-2 text-xs text-amber-800">
+            <Shield className="h-3 w-3" />
+            <span>Prestador Verificado</span>
           </div>
         </div>
+      )}
 
-        <div className="mb-3">
-          <p className="text-sm text-gray-600 leading-relaxed">
-            {getBio()}
-          </p>
-        </div>
-
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            {prestador.em_servico ? (
-              <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">
-                <CheckCircle className="w-3 h-3 mr-1" />
-                Disponível
-              </Badge>
-            ) : (
-              <Badge variant="secondary" className="bg-gray-100 text-gray-600 border-gray-200">
-                <Clock className="w-3 h-3 mr-1" />
-                Ocupado
-              </Badge>
-            )}
-          </div>
-        </div>
-
-        <div className="flex gap-2">
-          <Button 
-            size="sm" 
-            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
-            onClick={handleContact}
-          >
-            <MessageCircle className="w-4 h-4 mr-2" />
-            Contatar
-          </Button>
-          <Button 
-            size="sm" 
-            variant="outline" 
-            className="flex-1 border-orange-200 text-orange-600 hover:bg-orange-50"
-            onClick={handleViewProfile}
-          >
-            <User className="w-4 h-4 mr-2" />
-            Perfil
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+      {/* Action Buttons */}
+      <div className="acoes">
+        <button
+          onClick={() => onContact(prestador)}
+          className="btn-primario"
+        >
+          <MessageCircle className="inline h-4 w-4 mr-2" />
+          Contatar
+        </button>
+        
+        <button
+          onClick={() => onViewProfile(prestador)}
+          className="btn-secundario"
+        >
+          Ver Perfil
+        </button>
+      </div>
+    </div>
   );
 };
