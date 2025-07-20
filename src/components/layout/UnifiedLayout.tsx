@@ -1,39 +1,32 @@
 
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { UnifiedHeader } from './UnifiedHeader';
-import { ZurboDock } from '../mobile/ZurboDock';
-import { useMobile, useTablet } from '@/hooks/useMobile';
+import { ModernFooter } from './ModernFooter';
+import { MobileDock } from '../mobile/MobileDock';
+import { useMobile } from '@/hooks/useMobile';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface UnifiedLayoutProps {
-  children: ReactNode;
-  showDock?: boolean;
-  className?: string;
+  children: React.ReactNode;
+  showMobileDock?: boolean;
 }
 
-export const UnifiedLayout = ({ 
-  children, 
-  showDock = true,
-  className = ""
-}: UnifiedLayoutProps) => {
+export const UnifiedLayout = ({ children, showMobileDock = true }: UnifiedLayoutProps) => {
   const isMobile = useMobile();
-  const isTablet = useTablet();
-  const showBottomDock = showDock && (isMobile || isTablet);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50/30 to-white flex flex-col">
-      <UnifiedHeader />
-      
-      <main 
-        className={`
-          flex-1 
-          ${showBottomDock ? 'pb-24' : 'pb-4'} 
-          ${className}
-        `}
-      >
-        {children}
-      </main>
-
-      {showBottomDock && <ZurboDock />}
-    </div>
+    <ErrorBoundary>
+      <div className="min-h-screen flex flex-col bg-gray-50">
+        <UnifiedHeader />
+        
+        <main className="flex-1">
+          {children}
+        </main>
+        
+        <ModernFooter />
+        
+        {isMobile && showMobileDock && <MobileDock />}
+      </div>
+    </ErrorBoundary>
   );
 };

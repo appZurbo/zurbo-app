@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -126,7 +127,9 @@ const PrestadorSettings = () => {
         title: "Sucesso",
         description: "Perfil atualizado com sucesso!",
       });
-      navigate('/prestador-dashboard');
+      
+      // Redirect to dashboard instead of prestador-dashboard
+      navigate('/dashboard');
     } catch (error: any) {
       console.error('Erro ao atualizar perfil:', error);
       toast({

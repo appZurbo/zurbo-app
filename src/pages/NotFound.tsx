@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from '@/components/ui/button';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
+import { ModernFooter } from '@/components/layout/ModernFooter';
 import { Home, ArrowLeft } from 'lucide-react';
 
 const NotFound = () => {
@@ -16,9 +17,10 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <UnifiedHeader />
-      <div className="flex items-center justify-center min-h-[80vh]">
+      
+      <div className="flex-1 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-4">
           <div className="mb-8">
             <h1 className="text-6xl font-bold text-orange-500 mb-4">404</h1>
@@ -47,6 +49,9 @@ const NotFound = () => {
           </div>
         </div>
       </div>
+
+      {/* Footer with watermark */}
+      <ModernFooter />
     </div>
   );
 };

@@ -1,8 +1,8 @@
 
-import { MapPin, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { ServiceFilterPopover } from './ServiceFilterPopover';
-import { CityAutocomplete } from './CityAutocomplete';
+import { CityFilter } from './CityFilter';
 
 interface BasicFiltersProps {
   filters: {
@@ -17,16 +17,10 @@ interface BasicFiltersProps {
 export const BasicFilters = ({ filters, servicos, onFilterUpdate }: BasicFiltersProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-      <div className="space-y-2">
-        <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-          <MapPin className="w-4 h-4" />
-          Cidade
-        </label>
-        <CityAutocomplete
-          value={filters.cidade}
-          onChange={(value) => onFilterUpdate('cidade', value)}
-        />
-      </div>
+      <CityFilter
+        value={filters.cidade}
+        onChange={(value) => onFilterUpdate('cidade', value)}
+      />
 
       <div className="space-y-2">
         <label className="text-sm font-medium text-gray-700">Serviços</label>
