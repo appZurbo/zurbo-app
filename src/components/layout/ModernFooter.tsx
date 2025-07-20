@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom';
 import { Separator } from '@/components/ui/separator';
 import { Heart, Mail, Phone, MapPin } from 'lucide-react';
 export const ModernFooter = () => {
-  return <footer className="bg-gray-900 text-white">
-      <div className="max-w-6xl mx-auto px-4 py-12">
+  return <footer className="bg-gray-900 text-white relative overflow-hidden">
+      <div className="max-w-6xl mx-auto px-4 py-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Section */}
           <div className="space-y-4">
@@ -86,6 +86,12 @@ export const ModernFooter = () => {
             Versão 1.0 - Sinop, MT
           </div>
         </div>
+      </div>
+      
+      {/* Marca d'água "zurbo" */}
+      <div className="absolute left-1/2 transform -translate-x-1/2 text-orange-500 font-extrabold text-[15vw] lowercase select-none z-0" 
+           style={{ bottom: '-6.5vw' }}>
+        zurbo
       </div>
     </footer>;
 };
