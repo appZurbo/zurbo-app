@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -13,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useProfilePicture } from '@/hooks/useProfilePicture';
 import { ArrowLeft, Camera } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { PortfolioUpload } from '@/components/prestador/PortfolioUpload';
 
 const PrestadorSettings = () => {
   const navigate = useNavigate();
@@ -310,6 +310,12 @@ const PrestadorSettings = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Portfolio Photos Section */}
+            <div className="space-y-6">
+              <h2 className="text-lg font-semibold">Portfólio de Trabalhos</h2>
+              <PortfolioUpload />
+            </div>
 
             {/* Address Section */}
             <Card>

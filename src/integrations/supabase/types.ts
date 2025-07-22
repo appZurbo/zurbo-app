@@ -400,6 +400,35 @@ export type Database = {
           },
         ]
       }
+      cidades_atendidas: {
+        Row: {
+          cidade: string
+          created_at: string | null
+          id: string
+          prestador_id: string | null
+        }
+        Insert: {
+          cidade: string
+          created_at?: string | null
+          id?: string
+          prestador_id?: string | null
+        }
+        Update: {
+          cidade?: string
+          created_at?: string | null
+          id?: string
+          prestador_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cidades_atendidas_prestador_id_fkey"
+            columns: ["prestador_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cidades_brasileiras: {
         Row: {
           codigo_ibge: string | null
