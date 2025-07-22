@@ -15,7 +15,7 @@ const InformacoesPage = () => {
 
   return (
     <UnifiedLayout>
-      <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
+      <div className={`bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
         <div className={`${isMobile ? 'px-4 py-4' : 'max-w-4xl mx-auto p-6'}`}>
           <div className="flex items-center gap-4 mb-6">
             <Button variant="ghost" onClick={() => navigate('/')} className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}>
