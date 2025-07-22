@@ -16,10 +16,10 @@ export const UnifiedLayout = ({ children, showMobileDock = true }: UnifiedLayout
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-gray-50">
         <UnifiedHeader />
         
-        <main className="flex-1">
+        <main className="flex-1 pt-16">
           {children}
         </main>
         

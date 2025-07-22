@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,7 +14,7 @@ const InformacoesPage = () => {
 
   return (
     <UnifiedLayout>
-      <div className={`bg-gray-50 min-h-screen ${isMobile ? 'pb-20' : ''}`}>
+      <div className={`w-full ${isMobile ? 'pb-20' : ''}`}>
         <div className={`w-full ${isMobile ? 'px-4 py-4' : 'px-6 py-6'}`}>
           <div className="flex items-center gap-4 mb-6">
             <Button variant="ghost" onClick={() => navigate('/')} className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}>
