@@ -8,8 +8,8 @@ const FavoritosPage = () => {
   const navigate = useNavigate();
   const isMobile = useMobile();
   return <UnifiedLayout>
-      <div className="min-h-screen bg-gray-50">
-        <div className={`${isMobile ? 'px-4 py-4' : 'max-w-4xl mx-auto p-6'}`}>
+      <div className="w-full">
+        <div className={`w-full ${isMobile ? 'px-4 py-4' : 'px-6 py-6'}`}>
           {/* Header */}
           <div className="flex items-center gap-3 mb-6">
             

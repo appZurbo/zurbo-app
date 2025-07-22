@@ -55,8 +55,8 @@ const Settings = () => {
 
   return (
     <UnifiedLayout>
-      <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
-        <div className={`${isMobile ? 'px-4 py-4' : 'max-w-4xl mx-auto p-6'}`}>
+      <div className={`w-full ${isMobile ? 'pb-20' : ''}`}>
+        <div className={`w-full ${isMobile ? 'px-4 py-4' : 'px-6 py-6'}`}>
           {/* Header centralizado */}
           <div className="text-center mb-8">
             <Button variant="ghost" onClick={() => navigate('/')} className="absolute left-4 top-4">
@@ -87,7 +87,7 @@ const Settings = () => {
           </div>
 
           {/* Tabs organizadas centralmente */}
-          <div className="max-w-2xl mx-auto">
+          <div className="w-full max-w-none">
             <Tabs defaultValue="profile" className="space-y-6">
               <TabsList className={`grid w-full ${isPrestador ? 'grid-cols-3' : 'grid-cols-2'} bg-white shadow-sm`}>
                 <TabsTrigger value="profile" className="flex items-center gap-2 data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600">
