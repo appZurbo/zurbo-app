@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -35,6 +34,10 @@ export const UserSubmenu = () => {
   const { isOnDuty, loading: onDutyLoading, toggleOnDuty, canToggle } = useOnDutyStatus();
 
   if (!profile) return null;
+
+  const getSettingsPath = () => {
+    return isPrestador ? '/workersettings' : '/clientsettings';
+  };
 
   const getUserTypeColor = (tipo: string) => {
     switch (tipo) {
@@ -100,7 +103,7 @@ export const UserSubmenu = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         {/* Configurações unificadas para todos */}
-        <DropdownMenuItem onClick={() => navigate('/settings')}>
+        <DropdownMenuItem onClick={() => navigate(getSettingsPath())}>
           <Settings className="h-4 w-4 mr-2" />
           Configurações
         </DropdownMenuItem>
