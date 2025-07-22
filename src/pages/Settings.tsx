@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserSettings } from '@/components/settings/UserSettings';
 import PrestadorSettings from './PrestadorSettings';
 import SecuritySettings from '@/components/settings/SecuritySettings';
-import GerenciadorBairros from '@/components/bairros/GerenciadorBairros';
+import GerenciadorCidades from '@/components/cidades/GerenciadorCidades';
 import { useMobile } from '@/hooks/useMobile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
@@ -95,10 +95,10 @@ const Settings = () => {
                   {isMobile ? 'Perfil' : 'Meu Perfil'}
                 </TabsTrigger>
                 {isPrestador && (
-                  <TabsTrigger value="bairros" className="flex items-center gap-2 data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600">
-                    <SettingsIcon className="h-4 w-4" />
-                    {isMobile ? 'Bairros' : 'Área de Atendimento'}
-                  </TabsTrigger>
+                   <TabsTrigger value="cidades" className="flex items-center gap-2 data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600">
+                     <SettingsIcon className="h-4 w-4" />
+                     {isMobile ? 'Cidades' : 'Área de Atendimento'}
+                   </TabsTrigger>
                 )}
                 <TabsTrigger value="security" className="flex items-center gap-0.5 data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600">
                   <Shield className="h-4 w-4" />
@@ -120,21 +120,21 @@ const Settings = () => {
                 </Card>
               </TabsContent>
               
-              {isPrestador && (
-                <TabsContent value="bairros" className="space-y-6">
-                  <Card className="shadow-sm">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <SettingsIcon className="h-5 w-5 text-orange-500" />
-                        Área de Atendimento
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <GerenciadorBairros />
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              )}
+               {isPrestador && (
+                 <TabsContent value="cidades" className="space-y-6">
+                   <Card className="shadow-sm">
+                     <CardHeader>
+                       <CardTitle className="flex items-center gap-2">
+                         <SettingsIcon className="h-5 w-5 text-orange-500" />
+                         Área de Atendimento
+                       </CardTitle>
+                     </CardHeader>
+                     <CardContent>
+                       <GerenciadorCidades />
+                     </CardContent>
+                   </Card>
+                 </TabsContent>
+               )}
               
               <TabsContent value="security" className="space-y-6">
                 <Card className="shadow-sm">
