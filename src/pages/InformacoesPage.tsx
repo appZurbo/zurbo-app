@@ -1,16 +1,20 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Shield, FileText, Users, HelpCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
+import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { useMobile } from '@/hooks/useMobile';
+import WatermarkSection from '@/components/sections/WatermarkSection';
+
 const InformacoesPage = () => {
   const navigate = useNavigate();
   const isMobile = useMobile();
-  return <div>
-      <UnifiedHeader />
+
+  return (
+    <UnifiedLayout>
       <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
         <div className={`${isMobile ? 'px-4 py-4' : 'max-w-4xl mx-auto p-6'}`}>
           <div className="flex items-center gap-4 mb-6">
@@ -212,6 +216,10 @@ const InformacoesPage = () => {
           </Card>
         </div>
       </div>
-    </div>;
+      
+      <WatermarkSection />
+    </UnifiedLayout>
+  );
 };
+
 export default InformacoesPage;

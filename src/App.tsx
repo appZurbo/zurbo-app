@@ -1,3 +1,4 @@
+
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/hooks/useAuth';
@@ -24,7 +25,7 @@ import PoliticaPrivacidade from '@/pages/PoliticaPrivacidade';
 import TermosUso from '@/pages/TermosUso';
 import CentralAjuda from '@/pages/CentralAjuda';
 import TrabalheConosco from '@/pages/TrabalheConosco';
-import InformacoesUnificada from '@/pages/InformacoesUnificada';
+import InformacoesPage from '@/pages/InformacoesPage';
 import AdsPage from '@/pages/AdsPage';
 import TestingDashboard from '@/pages/TestingDashboard';
 import SystemSettings from '@/pages/SystemSettings';
@@ -78,7 +79,7 @@ function App() {
               <Route path="/termos-uso" element={<TermosUso />} />
               <Route path="/central-ajuda" element={<CentralAjuda />} />
               <Route path="/trabalhe-conosco" element={<TrabalheConosco />} />
-              <Route path="/informacoes" element={<InformacoesUnificada />} />
+              <Route path="/informacoes" element={<InformacoesPage />} />
               <Route path="/ads" element={<AdsPage />} />
               <Route path="/testing" element={<TestingDashboard />} />
               <Route path="/system-settings" element={<SystemSettings />} />
