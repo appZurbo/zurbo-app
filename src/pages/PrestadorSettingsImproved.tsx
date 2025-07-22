@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import { PrestadorPhotoSettings } from '@/components/settings/PrestadorPhotoSettings';
 import { ServiceSelectionImproved } from '@/components/settings/ServiceSelectionImproved';
 import GerenciadorCidades from '@/components/cidades/GerenciadorCidades';
+import { PortfolioUpload } from '@/components/prestador/PortfolioUpload';
 
 const PrestadorSettingsImproved = () => {
   const { profile, loading } = useAuth();

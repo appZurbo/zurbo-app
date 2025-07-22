@@ -79,19 +79,27 @@ export const getPrestadores = async (filters?: {
 
     // City filtering with normalization
     if (filters?.cidade) {
-      const normalizedFilterCity = normalizeCityForFilter(filters.cidade);
+      // First get prestadores who serve this city
+      const { data: cidadesAtendidas } = await supabase
+        .from('cidades_atendidas')
+        .select('prestador_id')
+        .eq('cidade', filters.cidade);
       
-      // Get all prestadores first, then filter by city match
+      const prestadorIds = cidadesAtendidas?.map(c => c.prestador_id) || [];
+      
+      if (prestadorIds.length === 0) {
+        return { prestadores: [], hasMore: false, total: 0 };
+      }
+      
+      // Filter the query to only include those prestadores
+      query = query.in('id', prestadorIds);
+      
       const { data: allPrestadores, error: allError } = await query;
       
       if (allError) throw allError;
       
-      const filteredByCity = allPrestadores?.filter(prestador => 
-        citiesMatch(prestador.endereco_cidade, normalizedFilterCity)
-      ) || [];
-      
       // Continue with other filters on the city-filtered results
-      let filteredPrestadores = filteredByCity;
+      let filteredPrestadores = allPrestadores || [];
       
       // Service filtering
       if (filters.servicos && filters.servicos.length > 0) {
