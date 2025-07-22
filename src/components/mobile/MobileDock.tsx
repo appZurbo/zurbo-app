@@ -15,11 +15,6 @@ const MobileDock = () => {
   
   const isPrestador = profile?.tipo === 'prestador';
 
-  const getSettingsPath = () => {
-    if (!isAuthenticated) return '/auth';
-    return isPrestador ? '/workersettings' : '/clientsettings';
-  };
-
   const navItems = [
     {
       icon: Home,
@@ -46,7 +41,9 @@ const MobileDock = () => {
     {
       icon: User,
       label: 'Perfil',
-      path: getSettingsPath()
+      path: isAuthenticated 
+        ? (isPrestador ? '/configuracoes' : '/configuracoes') 
+        : '/auth'
     }
   ];
 

@@ -4,18 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Shield, FileText, Users, HelpCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
+import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useMobile } from '@/hooks/useMobile';
-import WatermarkSection from '@/components/sections/WatermarkSection';
-
 const InformacoesPage = () => {
   const navigate = useNavigate();
   const isMobile = useMobile();
-
-  return (
-    <UnifiedLayout>
-      <div className={`w-full ${isMobile ? 'pb-20' : ''}`}>
-        <div className={`w-full ${isMobile ? 'px-4 py-4' : 'px-6 py-6'}`}>
+  return <div>
+      <UnifiedHeader />
+      <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
+        <div className={`${isMobile ? 'px-4 py-4' : 'max-w-4xl mx-auto p-6'}`}>
           <div className="flex items-center gap-4 mb-6">
             <Button variant="ghost" onClick={() => navigate('/')} className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}>
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -39,7 +36,7 @@ const InformacoesPage = () => {
             </div>
           </div>
 
-          <Card className="w-full">
+          <Card>
             <CardContent className="p-0">
               <Tabs defaultValue="regras" className="w-full">
                 <TabsList className="grid w-full grid-cols-4">
@@ -215,10 +212,6 @@ const InformacoesPage = () => {
           </Card>
         </div>
       </div>
-      
-      <WatermarkSection />
-    </UnifiedLayout>
-  );
+    </div>;
 };
-
 export default InformacoesPage;

@@ -7,8 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import { useMobile } from '@/hooks/useMobile';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { AppointmentSystem } from '@/components/appointments/AppointmentSystem';
-import WatermarkSection from '@/components/sections/WatermarkSection';
-
 const Pedidos = () => {
   const navigate = useNavigate();
   const {
@@ -16,7 +14,6 @@ const Pedidos = () => {
     loading
   } = useAuth();
   const isMobile = useMobile();
-
   if (loading) {
     return <UnifiedLayout>
         <div className="min-h-screen flex items-center justify-center p-4">
@@ -29,7 +26,6 @@ const Pedidos = () => {
         </div>
       </UnifiedLayout>;
   }
-
   if (!profile) {
     return <UnifiedLayout>
         <div className="min-h-screen flex items-center justify-center p-4">
@@ -47,10 +43,9 @@ const Pedidos = () => {
         </div>
       </UnifiedLayout>;
   }
-
   return <UnifiedLayout>
-      <div className="w-full">
-        <div className={`w-full ${isMobile ? 'px-4 py-4' : 'px-6 py-6'}`}>
+      <div className="min-h-screen bg-gray-50">
+        <div className={`${isMobile ? 'px-4 py-4' : 'max-w-6xl mx-auto p-6'}`}>
           {/* Header */}
           <div className="flex items-center gap-3 mb-6">
             
@@ -68,9 +63,6 @@ const Pedidos = () => {
           <AppointmentSystem />
         </div>
       </div>
-      
-      <WatermarkSection />
     </UnifiedLayout>;
 };
-
 export default Pedidos;

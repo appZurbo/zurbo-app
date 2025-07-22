@@ -74,8 +74,8 @@ const Conversas = () => {
       </UnifiedLayout>;
   }
   return <UnifiedLayout>
-      <div className="w-full">
-        <div className={`w-full ${isMobile ? 'px-4 py-4' : 'px-6 py-6'}`}>
+      <div className="min-h-screen bg-gray-50">
+        <div className={`${isMobile ? 'px-4 py-4' : 'max-w-6xl mx-auto p-6'}`}>
           
           {/* Mobile: Show chat interface when conversation is selected */}
           {isMobile && currentConversation ? <div className="h-[calc(100vh-140px)]">

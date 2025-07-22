@@ -36,8 +36,8 @@ const NotificacoesPage = () => {
 
   return (
     <UnifiedLayout>
-      <div className="w-full">
-        <div className={`w-full ${isMobile ? 'px-4 py-4' : 'px-6 py-6'}`}>
+      <div className="min-h-screen bg-gray-50">
+        <div className={`${isMobile ? 'px-4 py-4' : 'max-w-4xl mx-auto p-6'}`}>
           {/* Header */}
           <div className="flex items-center gap-4 mb-6">
             <Button 
