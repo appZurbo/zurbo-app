@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Settings as SettingsIcon, User, Wrench, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { UserSettings } from '@/components/settings/UserSettings';
-import PrestadorSettings from './PrestadorSettings';
 import SecuritySettings from '@/components/settings/SecuritySettings';
+import { ProviderProfileSection } from '@/components/settings/ProviderProfileSection';
 import GerenciadorCidades from '@/components/cidades/GerenciadorCidades';
 import { useMobile } from '@/hooks/useMobile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -115,7 +115,7 @@ const Settings = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {isPrestador ? <PrestadorSettings /> : <UserSettings />}
+                    {isPrestador ? <ProviderProfileSection /> : <UserSettings />}
                   </CardContent>
                 </Card>
               </TabsContent>

@@ -231,7 +231,7 @@ const AdminDashboard = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Button
-                  onClick={() => navigate('/admin/usuarios')}
+                  onClick={() => navigate('/admin/users')}
                   variant="outline"
                   className="justify-start"
                 >
