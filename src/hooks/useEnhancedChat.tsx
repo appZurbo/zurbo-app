@@ -19,44 +19,28 @@ export const useEnhancedChat = () => {
   const { profile } = useAuth();
   const { toast } = useToast();
 
-  // Load conversations
+  // Load conversations using optimized RPC function
   const loadConversations = useCallback(async () => {
     if (!profile) return;
-    
+
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('chat_conversations')
-        .select(`
-          *,
-          cliente:users!chat_conversations_cliente_id_fkey (nome, foto_url),
-          prestador:users!chat_conversations_prestador_id_fkey (nome, foto_url)
-        `)
-        .or(`cliente_id.eq.${profile.id},prestador_id.eq.${profile.id}`)
-        .order('updated_at', { ascending: false });
+        .rpc('get_conversations_with_last_message', {
+          user_id_param: profile.id
+        });
 
       if (error) throw error;
-      
-      // Get last message for each conversation
-      const conversationsWithLastMessage = await Promise.all(
-        (data || []).map(async (conv) => {
-          const { data: lastMsg } = await supabase
-            .from('chat_messages')
-            .select('content')
-            .eq('conversation_id', conv.id)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .single();
-          
-          return {
-            ...conv,
-            status: conv.status as ChatConversation['status'],
-            last_message: lastMsg?.content || 'Nova conversa'
-          } as ChatConversation;
-        })
-      );
-      
-      setConversations(conversationsWithLastMessage);
+
+      const formattedConversations = (data || []).map(conv => ({
+        ...conv,
+        status: conv.status as ChatConversation['status'],
+        cliente: { nome: conv.cliente_nome, foto_url: conv.cliente_foto_url },
+        prestador: { nome: conv.prestador_nome, foto_url: conv.prestador_foto_url },
+        last_message: conv.last_message_content || 'Nova conversa'
+      })) as ChatConversation[];
+
+      setConversations(formattedConversations);
     } catch (error) {
       console.error('Error loading conversations:', error);
       toast({
@@ -378,7 +362,7 @@ export const useEnhancedChat = () => {
     if (!currentConversation) return;
 
     const channel = supabase
-      .channel(`conversation-${currentConversation.id}`)
+      .channel(`messages-${currentConversation.id}-${Date.now()}`)
       .on(
         'postgres_changes',
         {
@@ -388,17 +372,26 @@ export const useEnhancedChat = () => {
           filter: `conversation_id=eq.${currentConversation.id}`
         },
         (payload) => {
+          console.log('Real-time message received:', payload);
           const newMessage = {
             ...payload.new,
             message_type: payload.new.message_type as ChatMessage['message_type']
           } as ChatMessage;
           
-          setMessages(prev => [...prev, newMessage]);
+          setMessages(prev => {
+            // Prevent duplicates
+            const exists = prev.find(m => m.id === newMessage.id);
+            if (exists) return prev;
+            return [...prev, newMessage];
+          });
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Messages channel status:', status);
+      });
 
     return () => {
+      console.log('Removing messages channel');
       supabase.removeChannel(channel);
     };
   }, [currentConversation]);
@@ -408,7 +401,7 @@ export const useEnhancedChat = () => {
     if (!profile) return;
 
     const channel = supabase
-      .channel('conversations-changes')
+      .channel(`conversations-${profile.id}-${Date.now()}`)
       .on(
         'postgres_changes',
         {
@@ -416,13 +409,18 @@ export const useEnhancedChat = () => {
           schema: 'public',
           table: 'chat_conversations'
         },
-        () => {
+        (payload) => {
+          console.log('Real-time conversation update:', payload);
+          // Reload conversations using our optimized RPC
           loadConversations();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Conversations channel status:', status);
+      });
 
     return () => {
+      console.log('Removing conversations channel');
       supabase.removeChannel(channel);
     };
   }, [profile, loadConversations]);
