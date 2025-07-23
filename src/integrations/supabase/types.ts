@@ -1622,6 +1622,28 @@ export type Database = {
         }
         Returns: boolean
       }
+      get_conversations_with_last_message: {
+        Args: { user_id_param: string }
+        Returns: {
+          id: string
+          created_at: string
+          updated_at: string
+          cliente_id: string
+          prestador_id: string
+          servico_solicitado: string
+          preco_proposto: number
+          status: string
+          client_message_count: number
+          provider_message_count: number
+          pedido_id: string
+          cliente_nome: string
+          cliente_foto_url: string
+          prestador_nome: string
+          prestador_foto_url: string
+          last_message_content: string
+          last_message_created_at: string
+        }[]
+      }
       get_current_user_id: {
         Args: Record<PropertyKey, never>
         Returns: string
