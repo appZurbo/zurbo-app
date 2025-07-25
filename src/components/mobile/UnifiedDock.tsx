@@ -55,7 +55,7 @@ export const UnifiedDock = () => {
       path: isAuthenticated 
         ? '/settings'
         : '/auth',
-      isActive: isActive('/settings') || isActive('/prestador-settings') || isActive('/configuracoes') || isActive('/auth'),
+      isActive: isActive('/settings') || isActive('/configuracoes') || isActive('/auth'),
       showAlways: true
     }
   ];

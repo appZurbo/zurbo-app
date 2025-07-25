@@ -16,6 +16,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useMobile, useTablet } from '@/hooks/useMobile';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import AuthModal from '@/components/AuthModal';
 
 export const ResponsiveHeader = () => {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ export const ResponsiveHeader = () => {
   const isTablet = useTablet();
   const { toast } = useToast();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [emServico, setEmServico] = useState(profile?.em_servico ?? true);
 
   const handleLogout = async () => {
@@ -170,7 +172,7 @@ export const ResponsiveHeader = () => {
                   variant="outline"
                   className="w-full"
                   onClick={() => {
-                    navigate('/auth');
+                    setShowAuthModal(true);
                     setMobileMenuOpen(false);
                   }}
                 >
@@ -179,7 +181,7 @@ export const ResponsiveHeader = () => {
                 <Button
                   className="w-full bg-orange-500 hover:bg-orange-600"
                   onClick={() => {
-                    navigate('/auth');
+                    setShowAuthModal(true);
                     setMobileMenuOpen(false);
                   }}
                 >
@@ -305,14 +307,14 @@ export const ResponsiveHeader = () => {
                 <Button
                   variant="ghost"
                   size={isMobile ? "touch" : "default"}
-                  onClick={() => navigate('/auth')}
+                  onClick={() => setShowAuthModal(true)}
                   className="text-gray-700 hover:text-orange-600"
                 >
                   Entrar
                 </Button>
                 <Button
                   size={isMobile ? "touch" : "default"}
-                  onClick={() => navigate('/auth')}
+                  onClick={() => setShowAuthModal(true)}
                   className="bg-orange-500 hover:bg-orange-600 text-white"
                 >
                   Cadastrar
@@ -322,6 +324,12 @@ export const ResponsiveHeader = () => {
           </div>
         </div>
       </div>
+      
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onLogin={() => {}}
+      />
     </header>
   );
 };

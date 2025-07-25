@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Search, MessageCircle, CheckCircle, Star, Shield, CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMobile } from '@/hooks/useMobile';
+import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
+import AuthButton from '@/components/auth/AuthModalHelper';
 
 const ComoFunciona = () => {
   const navigate = useNavigate();
@@ -56,7 +58,7 @@ const ComoFunciona = () => {
   ];
 
   return (
-    <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
+    <UnifiedLayout>
       <div className={`${isMobile ? 'px-4 py-4' : 'max-w-6xl mx-auto p-6'}`}>
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
@@ -164,22 +166,16 @@ const ComoFunciona = () => {
         <div className="text-center">
           <h3 className="text-xl font-semibold mb-4">Pronto para começar?</h3>
           <div className="flex gap-4 justify-center">
-            <Button 
-              onClick={() => navigate('/auth')}
-              className="bg-blue-500 hover:bg-blue-600"
-            >
+            <AuthButton className="bg-blue-500 hover:bg-blue-600">
               Buscar Serviços
-            </Button>
-            <Button 
-              onClick={() => navigate('/auth')}
-              className="bg-orange-500 hover:bg-orange-600"
-            >
+            </AuthButton>
+            <AuthButton className="bg-orange-500 hover:bg-orange-600">
               Oferecer Serviços
-            </Button>
+            </AuthButton>
           </div>
         </div>
       </div>
-    </div>
+    </UnifiedLayout>
   );
 };
 

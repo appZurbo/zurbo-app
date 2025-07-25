@@ -49,14 +49,14 @@ export const ZurboDock = () => {
       icon: User,
       label: 'Perfil',
       path: profile?.tipo === 'prestador' ? '/configuracoes' : '/settings',
-      isActive: isActive(['/configuracoes', '/settings', '/prestador-settings']),
+      isActive: isActive(['/configuracoes', '/settings']),
       fallbackPath: '/auth'
     }
   ];
 
   const handleNavigation = (item: typeof navigationItems[0]) => {
     if (item.requiresAuth && !isAuthenticated) {
-      navigate('/auth');
+      // Open auth modal instead of navigating
       return;
     }
     

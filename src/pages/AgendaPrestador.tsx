@@ -9,10 +9,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
+import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { useMobile } from '@/hooks/useMobile';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import AuthButton from '@/components/auth/AuthModalHelper';
 import { 
   ArrowLeft, 
   Calendar as CalendarIcon, 
@@ -225,8 +226,7 @@ const AgendaPrestador = () => {
 
   if (authLoading) {
     return (
-      <div>
-        <UnifiedHeader />
+      <UnifiedLayout>
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-orange-500 rounded-xl flex items-center justify-center animate-pulse">
@@ -235,14 +235,13 @@ const AgendaPrestador = () => {
             <p className="text-gray-600">Carregando agenda...</p>
           </div>
         </div>
-      </div>
+      </UnifiedLayout>
     );
   }
 
   if (!profile || profile.tipo !== 'prestador') {
     return (
-      <div>
-        <UnifiedHeader />
+      <UnifiedLayout>
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="w-full max-w-md">
             <CardContent className="p-6 text-center">
@@ -250,19 +249,18 @@ const AgendaPrestador = () => {
               <p className="text-gray-600 mb-4">
                 Apenas prestadores podem acessar a agenda.
               </p>
-              <Button onClick={() => navigate('/auth')} className="w-full">
+              <AuthButton className="w-full">
                 Fazer Login
-              </Button>
+              </AuthButton>
             </CardContent>
           </Card>
         </div>
-      </div>
+      </UnifiedLayout>
     );
   }
 
   return (
-    <div>
-      <UnifiedHeader />
+    <UnifiedLayout>
       <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
         <div className={`${isMobile ? 'px-4 py-4' : 'max-w-6xl mx-auto p-6'}`}>
           {/* Header */}
@@ -624,7 +622,7 @@ const AgendaPrestador = () => {
           )}
         </div>
       </div>
-    </div>
+    </UnifiedLayout>
   );
 };
 

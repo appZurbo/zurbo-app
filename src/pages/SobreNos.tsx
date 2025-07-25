@@ -3,10 +3,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, Users, Target, Heart, Lightbulb } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMobile } from '@/hooks/useMobile';
+import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
+import AuthButton from '@/components/auth/AuthModalHelper';
 const SobreNos = () => {
   const navigate = useNavigate();
   const isMobile = useMobile();
-  return <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
+  return <UnifiedLayout>
       <div className={`${isMobile ? 'px-4 py-4' : 'max-w-4xl mx-auto p-6'}`}>
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
@@ -93,15 +95,15 @@ const SobreNos = () => {
         <div className="text-center">
           <h3 className="text-xl font-semibold mb-4">Faça parte da nossa comunidade</h3>
           <div className="flex gap-1 justify-center">
-            <Button onClick={() => navigate('/auth')} className="bg-orange-500 hover:bg-orange-600">
+            <AuthButton className="bg-orange-500 hover:bg-orange-600">
               Cadastre-se como Cliente
-            </Button>
-            <Button variant="outline" onClick={() => navigate('/auth')}>
+            </AuthButton>
+            <AuthButton variant="outline">
               Seja um Prestador
-            </Button>
+            </AuthButton>
           </div>
         </div>
       </div>
-    </div>;
+    </UnifiedLayout>;
 };
 export default SobreNos;

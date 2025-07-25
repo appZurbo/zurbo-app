@@ -30,7 +30,7 @@ import TermosUso from "./pages/TermosUso";
 import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
 import RegrasComunidade from "./pages/RegrasComunidade";
 import SobreNos from "./pages/SobreNos";
-import InformacoesPage from "./pages/InformacoesPage";
+
 import InformacoesUnificada from "./pages/InformacoesUnificada";
 import UserManagement from "./pages/admin/UserManagement";
 import PrestadorManagement from "./pages/admin/PrestadorManagement";
@@ -67,7 +67,7 @@ function App() {
               <Route path="/favoritos" element={<FavoritosPage />} />
               <Route path="/agenda" element={<AgendaPrestador />} />
               <Route path="/dashboard" element={<PrestadorDashboard />} />
-              <Route path="/prestador-settings" element={<PrestadorSettingsImproved />} />
+              
               <Route path="/ads" element={<AdsPage />} />
               <Route path="/planos" element={<Planos />} />
               <Route path="/premium-overview" element={<PremiumOverview />} />
