@@ -70,12 +70,16 @@ const ServiceCategories = ({
                         {category.name}
                       </h3>
                     </div>
-                    <div className="w-20 h-16 flex items-center justify-center bg-muted/30 rounded-lg overflow-hidden group-hover:bg-primary/10 transition-colors">
+                    <div className="w-28 h-20 flex items-center justify-center bg-muted/30 rounded-lg overflow-hidden group-hover:bg-primary/10 transition-colors relative">
                       {imageStatus === 'loading' && (
                         <img 
                           src={imageUrl} 
                           alt={category.name}
-                          className="w-full h-full object-contain p-2"
+                          className="absolute inset-0 w-full h-full object-cover transform scale-150"
+                          style={{ 
+                            objectPosition: 'center 20%',
+                            transformOrigin: 'center center'
+                          }}
                           onLoad={() => handleImageLoad(category.id)}
                           onError={() => handleImageError(category.id)}
                         />
@@ -84,7 +88,11 @@ const ServiceCategories = ({
                         <img 
                           src={imageUrl} 
                           alt={category.name}
-                          className="w-full h-full object-contain p-2"
+                          className="absolute inset-0 w-full h-full object-cover transform scale-150 group-hover:scale-160 transition-transform duration-300"
+                          style={{ 
+                            objectPosition: 'center 20%',
+                            transformOrigin: 'center center'
+                          }}
                         />
                       )}
                       {imageStatus === 'error' && IconComponent && (
