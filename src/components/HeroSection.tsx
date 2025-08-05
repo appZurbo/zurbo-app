@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, MapPin } from 'lucide-react';
-import { LocalBannerImages } from '@/components/banners/LocalBannerImages';
+import { EnhancedLocalBannerImages } from '@/components/banners/EnhancedLocalBannerImages';
 
 interface BannerImage {
   name: string;
@@ -90,7 +90,7 @@ export const HeroSection = () => {
             </div>
           </div>
 
-          {/* Right Content - Banner Images */}
+          {/* Right Content - Enhanced Banner Images */}
           <div className="relative">
             <div className="absolute -inset-4 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 rounded-2xl blur-2xl"></div>
             
@@ -99,7 +99,7 @@ export const HeroSection = () => {
                 Nossos Serviços em Destaque
               </h3>
               
-              <LocalBannerImages 
+              <EnhancedLocalBannerImages 
                 onImagesLoaded={setBannerImages}
                 className="min-h-[300px]"
               />
