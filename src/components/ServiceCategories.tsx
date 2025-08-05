@@ -71,14 +71,20 @@ const ServiceCategories = ({
                       </h3>
                     </div>
                     <div className="w-20 h-16 flex items-center justify-center bg-muted/30 rounded-lg overflow-hidden group-hover:bg-primary/10 transition-colors">
-                      {imageStatus !== 'error' && (
+                      {imageStatus === 'loading' && (
                         <img 
                           src={imageUrl} 
                           alt={category.name}
                           className="w-full h-full object-contain p-2"
                           onLoad={() => handleImageLoad(category.id)}
                           onError={() => handleImageError(category.id)}
-                          style={{ display: imageStatus === 'error' ? 'none' : 'block' }}
+                        />
+                      )}
+                      {imageStatus === 'loaded' && (
+                        <img 
+                          src={imageUrl} 
+                          alt={category.name}
+                          className="w-full h-full object-contain p-2"
                         />
                       )}
                       {imageStatus === 'error' && IconComponent && (
