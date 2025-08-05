@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -43,7 +42,7 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
       construcao: 'bg-gradient-to-br from-green-50 to-green-100/50',
       jardinagem: 'bg-gradient-to-br from-emerald-50 to-emerald-100/50',
       fretes: 'bg-gradient-to-br from-red-50 to-red-100/50',
-      domestico: 'bg-gradient-to-br from-purple-50 to-purple-100/50',
+      chaveiro: 'bg-gradient-to-br from-yellow-50 to-yellow-100/50',
       tecnologia: 'bg-gradient-to-br from-indigo-50 to-indigo-100/50',
       cuidados: 'bg-gradient-to-br from-teal-50 to-teal-100/50',
       refrigeracao: 'bg-gradient-to-br from-cyan-50 to-cyan-100/50',
@@ -80,9 +79,9 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
             <MorphingDialogImage
               src={imageUrl}
               alt={category.name}
-              className="absolute inset-0 w-full h-full object-cover transform scale-100 group-hover:scale-110 transition-transform duration-300"
+              className="absolute inset-0 w-full h-full object-contain transform scale-90 group-hover:scale-100 transition-transform duration-300"
               style={{ 
-                objectPosition: 'center 30%' // Move image down to focus on face and tools
+                objectPosition: 'center 60%' // Focus more on face and tools area
               }}
             />
           </div>
@@ -154,9 +153,9 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
             <MorphingDialogImage
               src={imageUrl}
               alt={category.name}
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-contain p-4"
               style={{ 
-                objectPosition: 'center 30%' // Same positioning adjustment for modal
+                objectPosition: 'center 60%' // Same positioning adjustment for modal
               }}
             />
           </div>
