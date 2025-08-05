@@ -16,7 +16,7 @@ export const CategoryShortcutButton: React.FC<CategoryShortcutButtonProps> = ({
 }) => {
   const imageUrl = `/${category.image}`;
 
-  // Get image positioning based on category needs (using same logic as CategoryModal)
+  // Get image positioning based on category needs - focus more on faces and top border
   const getImageStyles = (categoryId: string) => {
     const baseStyles = {
       objectFit: 'cover' as const,
@@ -36,9 +36,12 @@ export const CategoryShortcutButton: React.FC<CategoryShortcutButtonProps> = ({
       case 'construcao':
       case 'jardinagem':
       case 'refrigeracao':
+      case 'cuidados':
+      case 'tecnologia':
+        // Focus much more on the top/faces - using top 0% positioning
         return {
           ...baseStyles,
-          objectPosition: 'center 15%',
+          objectPosition: 'center 0%',
           transform: 'scale(1.6)'
         };
       default:
