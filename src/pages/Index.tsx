@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
@@ -59,6 +60,7 @@ const Index = () => {
           <HeroDemo />
           
           <div className="max-w-7xl mx-auto px-[30px] py-[15px]">
+            {/* ServiceCategories now serves as the main interactive element replacing banners */}
             <ErrorBoundary>
               <ServiceCategories onCategorySelect={handleCategorySelect} />
             </ErrorBoundary>

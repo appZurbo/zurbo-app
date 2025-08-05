@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Search, MapPin, Star, ArrowRight, Play, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { SimplifiedLocalBannerImages } from '@/components/banners/SimplifiedLocalBannerImages';
 
 export const HeroSection = () => {
   const [busca, setBusca] = useState('');
@@ -135,23 +134,9 @@ export const HeroSection = () => {
             </div>
           </div>
 
-          {/* Visual side - Banners dos Profissionais */}
+          {/* Visual side - Simplified floating cards */}
           <div className="relative">
-            {/* Seção de banners com profissionais */}
-            <div className="relative bg-gradient-to-br from-orange-500/10 to-orange-600/5 p-8 rounded-2xl backdrop-blur-sm">
-              <div className="mb-4 text-center">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                  Nossos Profissionais
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Especialistas qualificados em diversas áreas
-                </p>
-              </div>
-              
-              <SimplifiedLocalBannerImages className="w-full" />
-            </div>
-
-            {/* Cards flutuantes menores */}
+            {/* Cards flutuantes com informações dos profissionais */}
             <div className="absolute -top-4 -right-4 grid grid-cols-1 gap-3">
               {/* Card 1 - Prestador */}
               <Card className="bg-white shadow-xl transform rotate-3 hover:rotate-0 transition-transform duration-300 w-48">
