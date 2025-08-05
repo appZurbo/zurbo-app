@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -32,23 +33,25 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
     navigate(`/prestadores?${searchParams.toString()}`);
   };
 
-  // Get subtle background color for transparent images
-  const getImageBackground = (categoryId: string) => {
-    const backgroundMap: Record<string, string> = {
-      limpeza: 'bg-gradient-to-br from-blue-50 to-blue-100/50',
-      reparos: 'bg-gradient-to-br from-orange-50 to-orange-100/50',
-      eletrica: 'bg-gradient-to-br from-yellow-50 to-yellow-100/50',
-      beleza: 'bg-gradient-to-br from-pink-50 to-pink-100/50',
-      construcao: 'bg-gradient-to-br from-green-50 to-green-100/50',
-      jardinagem: 'bg-gradient-to-br from-emerald-50 to-emerald-100/50',
-      fretes: 'bg-gradient-to-br from-red-50 to-red-100/50',
-      chaveiro: 'bg-gradient-to-br from-yellow-50 to-yellow-100/50',
-      tecnologia: 'bg-gradient-to-br from-indigo-50 to-indigo-100/50',
-      cuidados: 'bg-gradient-to-br from-teal-50 to-teal-100/50',
-      refrigeracao: 'bg-gradient-to-br from-cyan-50 to-cyan-100/50',
-      mecanico: 'bg-gradient-to-br from-gray-50 to-gray-100/50'
+  // White background for all categories (images are transparent)
+  const getImageBackground = () => {
+    return 'bg-white';
+  };
+
+  // Special handling for fretes image positioning and sizing
+  const getImageStyles = (categoryId: string) => {
+    if (categoryId === 'fretes') {
+      return {
+        objectFit: 'cover' as const,
+        objectPosition: 'center 70%',
+        transform: 'scale(1.4)'
+      };
+    }
+    return {
+      objectFit: 'contain' as const,
+      objectPosition: 'center 70%',
+      transform: 'scale(1.4)'
     };
-    return backgroundMap[categoryId] || 'bg-gradient-to-br from-gray-50 to-gray-100/50';
   };
 
   return (
@@ -75,14 +78,12 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
           </div>
           
           {/* Image section - 40% width, full height */}
-          <div className={`w-[40%] h-full relative overflow-hidden ${getImageBackground(category.id)}`}>
+          <div className={`w-[40%] h-full relative overflow-hidden ${getImageBackground()}`}>
             <MorphingDialogImage
               src={imageUrl}
               alt={category.name}
-              className="absolute inset-0 w-full h-full object-contain transform scale-90 group-hover:scale-100 transition-transform duration-300"
-              style={{ 
-                objectPosition: 'center 60%' // Focus more on face and tools area
-              }}
+              className="absolute inset-0 w-full h-full group-hover:scale-[1.5] transition-transform duration-300"
+              style={getImageStyles(category.id)}
             />
           </div>
         </div>
@@ -149,14 +150,12 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
           </div>
 
           {/* Image Section - Right on desktop, bottom on mobile */}
-          <div className={`w-full md:w-80 h-64 md:h-auto relative ${getImageBackground(category.id)}`}>
+          <div className={`w-full md:w-80 h-64 md:h-auto relative ${getImageBackground()}`}>
             <MorphingDialogImage
               src={imageUrl}
               alt={category.name}
-              className="absolute inset-0 w-full h-full object-contain p-4"
-              style={{ 
-                objectPosition: 'center 60%' // Same positioning adjustment for modal
-              }}
+              className="absolute inset-0 w-full h-full"
+              style={getImageStyles(category.id)}
             />
           </div>
 
