@@ -1,3 +1,4 @@
+
 import { 
   Wrench, Zap, Scissors, Brush, Hammer, TreePine, Car, Home, Laptop, Baby,
   ChefHat, Heart, Droplets, Truck, Sparkles, Snowflake, Monitor, Paintbrush
@@ -18,7 +19,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Limpeza',
     icon: Sparkles,
     color: 'bg-blue-50 border-blue-200 hover:bg-blue-100',
-    image: 'limpeza.png',
+    image: 'lovable-uploads/324802ef-8854-41f3-ab47-ed00e0f52df9.png',
     serviceIds: ['13e3d8e2-ca44-4f37-bf48-d5900766a4ed', '49b33016-e956-432d-9887-40f54e02e630'] // Limpeza, Diarista
   },
   {
@@ -26,7 +27,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Reparos',
     icon: Wrench,
     color: 'bg-orange-50 border-orange-200 hover:bg-orange-100',
-    image: 'mecanico.png', // Using mecanico.png for repairs as requested
+    image: 'lovable-uploads/4d14f71d-55b2-460f-8647-4b565a382aef.png',
     serviceIds: ['ce1a57d6-df65-42e4-bc5e-1daf54ba5958', 'eed94aa8-4055-40ac-a7cf-18212dfc97e3'] // Montador de móveis, Pedreiro
   },
   {
@@ -34,7 +35,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Elétrica',
     icon: Zap,
     color: 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100',
-    image: 'eletricista.png',
+    image: 'eletricista.png', // Keep original as transparent version not available
     serviceIds: ['929a9d65-45ae-4bc3-9aca-8672d9700d7b', 'bd19e35c-d9a8-41a6-a792-5e4343309139'] // Elétrica, Eletricista
   },
   {
@@ -42,7 +43,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Beleza',
     icon: Scissors,
     color: 'bg-pink-50 border-pink-200 hover:bg-pink-100',
-    image: 'beleza.png',
+    image: 'beleza.png', // Keep original as transparent version not available
     serviceIds: ['ca56750e-8d06-4586-958c-c3d6c9a7b995', 'db2f4ed1-9506-4c01-8ea1-87a068dc2e9b'] // Beleza, Cabeleireiro(a)
   },
   {
@@ -50,7 +51,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Construção',
     icon: Hammer,
     color: 'bg-green-50 border-green-200 hover:bg-green-100',
-    image: 'construcao.png',
+    image: 'construcao.png', // Keep original as transparent version not available
     serviceIds: ['fb0f8f1d-6734-4d25-b9e4-bcae95faf5b5', 'bc344b0e-551a-4253-90bf-74a8ad8095ca', 'a0e99c0b-dc37-4ff1-93c4-895f3d784fd9'] // Construção, Pintor, Pintura
   },
   {
@@ -58,7 +59,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Jardinagem',
     icon: TreePine,
     color: 'bg-emerald-50 border-emerald-200 hover:bg-emerald-100',
-    image: 'jardinagem.png',
+    image: 'jardinagem.png', // Keep original as transparent version not available
     serviceIds: ['3a876101-e4b9-40fa-828f-7a25ee4d3127', 'f2f93a54-860e-4af3-941b-95e32a772428'] // Jardinagem, Jardineiro
   },
   {
@@ -66,7 +67,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Fretes',
     icon: Truck,
     color: 'bg-red-50 border-red-200 hover:bg-red-100',
-    image: 'frete.png',
+    image: 'lovable-uploads/5f1e1fa9-b5f9-42cc-8574-dc3ca6dbe0f4.jpg',
     serviceIds: ['5c19ce68-8639-4eed-bf3c-1ec673d43add', 'd61fbe10-657a-45a4-9476-8a2f37988c42'] // Fretes, Serviços de Frete
   },
   {
@@ -74,7 +75,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Doméstico',
     icon: Home,
     color: 'bg-purple-50 border-purple-200 hover:bg-purple-100',
-    image: 'limpeza.png', // Usando limpeza como representação de doméstico
+    image: 'lovable-uploads/324802ef-8854-41f3-ab47-ed00e0f52df9.png', // Using cleaning image as domestic representation
     serviceIds: ['5fbb818e-a0ba-4be9-a81a-4fced06e6c5e', '20c31e3d-3728-4822-8df3-a061d6c524e2', '80a5a9ef-5f11-4cd7-9766-62e671a0b201'] // Cozinha, Encanador, Encanamento
   },
   {
@@ -82,7 +83,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Tecnologia',
     icon: Laptop,
     color: 'bg-indigo-50 border-indigo-200 hover:bg-indigo-100',
-    image: 'tecnicoinformatica.png',
+    image: 'lovable-uploads/23923192-d3bc-4751-82d3-665cae0d614f.jpg',
     serviceIds: ['b8a42132-1792-4ee4-bafe-b74f771e26ab'] // Serviços de TI
   },
   {
@@ -90,7 +91,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Cuidados',
     icon: Baby,
     color: 'bg-teal-50 border-teal-200 hover:bg-teal-100',
-    image: 'cuidados.png',
+    image: 'cuidados.png', // Keep original as transparent version not available
     serviceIds: ['ab0869db-7537-46fe-b823-b8490ab364ff', '480b2d2c-58a6-4000-8a47-e75a949d882d', '70fc8f4b-f6b9-465e-864d-e497631948b4'] // Babá, Cuidador(a) de idosos, Pet Care
   },
   {
@@ -98,7 +99,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Refrigeração',
     icon: Snowflake,
     color: 'bg-cyan-50 border-cyan-200 hover:bg-cyan-100',
-    image: 'refrigeracao.png',
+    image: 'refrigeracao.png', // Keep original as transparent version not available
     serviceIds: ['d7956946-b312-4f8b-bfae-e6ca5f91e3f3', 'd397bcc6-883a-495f-b19e-f1a34c1b0312'] // Manutenção de Ar-condicionado, Refrigeração
   },
   {
@@ -106,7 +107,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Mecânico',
     icon: Car,
     color: 'bg-gray-50 border-gray-200 hover:bg-gray-100',
-    image: 'mecanicos.png', // Using mecanicos.png for the mechanic category
+    image: 'lovable-uploads/64d7aaaf-9336-4676-b67a-56bc33735766.jpg',
     serviceIds: [] // Adicionar IDs de serviços mecânicos quando estiverem disponíveis
   }
 ];

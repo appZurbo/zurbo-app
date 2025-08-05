@@ -33,6 +33,25 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
     navigate(`/prestadores?${searchParams.toString()}`);
   };
 
+  // Get subtle background color for transparent images
+  const getImageBackground = (categoryId: string) => {
+    const backgroundMap: Record<string, string> = {
+      limpeza: 'bg-gradient-to-br from-blue-50 to-blue-100/50',
+      reparos: 'bg-gradient-to-br from-orange-50 to-orange-100/50',
+      eletrica: 'bg-gradient-to-br from-yellow-50 to-yellow-100/50',
+      beleza: 'bg-gradient-to-br from-pink-50 to-pink-100/50',
+      construcao: 'bg-gradient-to-br from-green-50 to-green-100/50',
+      jardinagem: 'bg-gradient-to-br from-emerald-50 to-emerald-100/50',
+      fretes: 'bg-gradient-to-br from-red-50 to-red-100/50',
+      domestico: 'bg-gradient-to-br from-purple-50 to-purple-100/50',
+      tecnologia: 'bg-gradient-to-br from-indigo-50 to-indigo-100/50',
+      cuidados: 'bg-gradient-to-br from-teal-50 to-teal-100/50',
+      refrigeracao: 'bg-gradient-to-br from-cyan-50 to-cyan-100/50',
+      mecanico: 'bg-gradient-to-br from-gray-50 to-gray-100/50'
+    };
+    return backgroundMap[categoryId] || 'bg-gradient-to-br from-gray-50 to-gray-100/50';
+  };
+
   return (
     <MorphingDialog
       transition={{
@@ -57,13 +76,13 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
           </div>
           
           {/* Image section - 40% width, full height */}
-          <div className="w-[40%] h-full relative overflow-hidden">
+          <div className={`w-[40%] h-full relative overflow-hidden ${getImageBackground(category.id)}`}>
             <MorphingDialogImage
               src={imageUrl}
               alt={category.name}
               className="absolute inset-0 w-full h-full object-cover transform scale-100 group-hover:scale-110 transition-transform duration-300"
               style={{ 
-                objectPosition: 'center center'
+                objectPosition: 'center 30%' // Move image down to focus on face and tools
               }}
             />
           </div>
@@ -131,13 +150,13 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
           </div>
 
           {/* Image Section - Right on desktop, bottom on mobile */}
-          <div className="w-full md:w-80 h-64 md:h-auto relative bg-muted/30">
+          <div className={`w-full md:w-80 h-64 md:h-auto relative ${getImageBackground(category.id)}`}>
             <MorphingDialogImage
               src={imageUrl}
               alt={category.name}
               className="absolute inset-0 w-full h-full object-cover"
               style={{ 
-                objectPosition: 'center center'
+                objectPosition: 'center 30%' // Same positioning adjustment for modal
               }}
             />
           </div>
