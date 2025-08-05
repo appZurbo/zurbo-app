@@ -25,12 +25,18 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
   const navigate = useNavigate();
   const { services, description } = getCategoryInfo(category.id);
   const imageUrl = `/${category.image}`;
+  const hasServices = category.serviceIds && category.serviceIds.length > 0;
 
   const handleFindProviders = () => {
-    // Navigate to prestadores page with pre-applied filters
-    const searchParams = new URLSearchParams();
-    searchParams.set('servicos', category.serviceIds.join(','));
-    navigate(`/prestadores?${searchParams.toString()}`);
+    if (hasServices) {
+      // Navigate to prestadores page with pre-applied filters
+      const searchParams = new URLSearchParams();
+      searchParams.set('servicos', category.serviceIds.join(','));
+      navigate(`/prestadores?${searchParams.toString()}`);
+    } else {
+      // For categories without services, navigate to general prestadores page
+      navigate('/prestadores');
+    }
   };
 
   // White background for all categories (images are transparent)
@@ -52,6 +58,20 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
           objectFit: 'cover' as const,
           objectPosition: 'center 75%',
           transform: 'scale(1.2)' // Reduced from 1.4 to prevent cutting left character
+        };
+      case 'encanador':
+        // New encanador category positioning
+        return {
+          ...baseStyles,
+          objectPosition: 'center 20%',
+          transform: 'scale(1.5)'
+        };
+      case 'cozinha':
+        // New cozinha category positioning
+        return {
+          ...baseStyles,
+          objectPosition: 'center 25%',
+          transform: 'scale(1.4)'
         };
       case 'limpeza':
       case 'beleza':
@@ -96,6 +116,7 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
           <div className="flex-1 p-4 flex items-center justify-center bg-background">
             <MorphingDialogTitle className="font-semibold text-foreground text-lg group-hover:text-primary transition-colors text-center">
               {category.name}
+              {!hasServices && <span className="text-xs block text-muted-foreground">Em breve</span>}
             </MorphingDialogTitle>
           </div>
           
@@ -122,6 +143,7 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
           <div className="flex-1 p-8">
             <MorphingDialogTitle className="text-3xl font-bold text-foreground mb-4">
               {category.name}
+              {!hasServices && <span className="text-sm block text-muted-foreground mt-1">Em breve</span>}
             </MorphingDialogTitle>
             
             <MorphingDialogDescription
@@ -139,7 +161,7 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
 
               <div>
                 <h3 className="text-xl font-semibold text-foreground mb-4">
-                  Serviços Disponíveis:
+                  {hasServices ? 'Serviços Disponíveis:' : 'Serviços Planejados:'}
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {services.map((service, serviceIndex) => {
@@ -149,12 +171,16 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
                     return (
                       <div 
                         key={serviceIndex}
-                        className="flex items-center gap-3 p-3 rounded-lg bg-muted/20 border border-border/50"
+                        className={`flex items-center gap-3 p-3 rounded-lg border border-border/50 ${
+                          hasServices ? 'bg-muted/20' : 'bg-muted/10 opacity-70'
+                        }`}
                       >
                         <div className={`p-2 rounded-lg ${serviceIcon.bgColor}`}>
                           <IconComponent size={20} className={serviceIcon.color} />
                         </div>
-                        <span className="font-medium text-foreground">{service}</span>
+                        <span className={`font-medium ${hasServices ? 'text-foreground' : 'text-muted-foreground'}`}>
+                          {service}
+                        </span>
                       </div>
                     );
                   })}
@@ -163,11 +189,21 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
 
               <Button 
                 onClick={handleFindProviders}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 px-6 rounded-xl transition-colors"
+                className={`w-full font-semibold py-3 px-6 rounded-xl transition-colors ${
+                  hasServices 
+                    ? 'bg-primary hover:bg-primary/90 text-primary-foreground' 
+                    : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                }`}
                 size="lg"
               >
-                Encontrar Profissionais
+                {hasServices ? 'Encontrar Profissionais' : 'Ver Todos os Prestadores'}
               </Button>
+              
+              {!hasServices && (
+                <p className="text-center text-sm text-muted-foreground">
+                  Esta categoria será disponibilizada em breve!
+                </p>
+              )}
             </MorphingDialogDescription>
           </div>
 

@@ -1,4 +1,3 @@
-
 import { 
   Wrench, Zap, Scissors, Brush, Hammer, TreePine, Car, Home, Laptop, Baby,
   ChefHat, Heart, Droplets, Truck, Sparkles, Snowflake, Monitor, Paintbrush, Key
@@ -76,7 +75,23 @@ export const serviceCategories: ServiceCategory[] = [
     icon: Key,
     color: 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100',
     image: 'chaveiro.png',
-    serviceIds: [] // Adicionar IDs de serviços de chaveiro quando estiverem disponíveis
+    serviceIds: [] // Em breve
+  },
+  {
+    id: 'encanador',
+    name: 'Encanador',
+    icon: Droplets,
+    color: 'bg-blue-50 border-blue-200 hover:bg-blue-100',
+    image: 'lovable-uploads/encanador.png',
+    serviceIds: [] // Em breve
+  },
+  {
+    id: 'cozinha',
+    name: 'Cozinha',
+    icon: ChefHat,
+    color: 'bg-orange-50 border-orange-200 hover:bg-orange-100',
+    image: 'lovable-uploads/cozinha.png',
+    serviceIds: [] // Em breve
   },
   {
     id: 'tecnologia',
@@ -108,7 +123,7 @@ export const serviceCategories: ServiceCategory[] = [
     icon: Car,
     color: 'bg-gray-50 border-gray-200 hover:bg-gray-100',
     image: 'mecanicos.png',
-    serviceIds: [] // Adicionar IDs de serviços mecânicos quando estiverem disponíveis
+    serviceIds: [] // Em breve
   }
 ];
 

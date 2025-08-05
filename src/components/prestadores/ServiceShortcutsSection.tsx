@@ -12,18 +12,19 @@ export const ServiceShortcutsSection: React.FC<ServiceShortcutsSectionProps> = (
   onCategorySelect,
   selectedServices
 }) => {
-  // Filter out categories that have no serviceIds (like chaveiro and mecanico)
-  const availableCategories = serviceCategories.filter(category => 
-    category.serviceIds && category.serviceIds.length > 0
-  );
+  // Show all categories now, including those without serviceIds
+  const availableCategories = serviceCategories;
 
   if (availableCategories.length === 0) return null;
 
   const handleCategoryClick = (category: typeof serviceCategories[0]) => {
-    onCategorySelect(category.serviceIds);
+    // If category has no services, pass empty array
+    onCategorySelect(category.serviceIds || []);
   };
 
   const isCategorySelected = (category: typeof serviceCategories[0]) => {
+    // If category has no services, it can't be selected
+    if (!category.serviceIds || category.serviceIds.length === 0) return false;
     return category.serviceIds.some(serviceId => selectedServices.includes(serviceId));
   };
 
