@@ -51,31 +51,24 @@ const ServiceCategories = ({
                 }} 
                 onClick={() => onCategorySelect(category.serviceIds)}
               >
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between h-16">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between gap-4 h-20">
                     <div className="flex-1">
                       <h3 className="font-semibold text-foreground text-lg group-hover:text-primary transition-colors">
                         {category.name}
                       </h3>
                     </div>
-                    <div className="w-16 h-16 flex items-center justify-center bg-muted/50 rounded-xl ml-4 group-hover:bg-primary/10 transition-colors">
+                    <div className="w-20 h-16 flex items-center justify-center bg-muted/30 rounded-lg overflow-hidden group-hover:bg-primary/10 transition-colors">
                       <img 
                         src={imageUrl} 
                         alt={category.name}
-                        className="w-10 h-10 object-contain"
+                        className="w-full h-full object-contain p-2"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
                           const container = target.parentElement;
-                          if (container) {
-                            const iconElement = document.createElement('div');
-                            iconElement.className = 'text-primary';
-                            container.appendChild(iconElement);
-                            // Render the Lucide icon as fallback
-                            const icon = IconComponent ? IconComponent : null;
-                            if (icon) {
-                              iconElement.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="12 6v6l4 2"/></svg>`;
-                            }
+                          if (container && !container.querySelector('.fallback-icon')) {
+                            container.innerHTML = `<div class="fallback-icon text-primary w-8 h-8 flex items-center justify-center">${IconComponent ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>` : ''}</div>`;
                           }
                         }}
                       />
