@@ -36,7 +36,7 @@ export const serviceCategories: ServiceCategory[] = [
     icon: Zap,
     color: 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100',
     image: 'eletricista.png',
-    serviceIds: ['bd19e35c-d9a8-41a6-a792-5e4343309139'] // Apenas Eletricista (Elétrica foi desativado)
+    serviceIds: ['bd19e35c-d9a8-41a6-a792-5e4343309139'] // Eletricista
   },
   {
     id: 'beleza',
@@ -52,7 +52,7 @@ export const serviceCategories: ServiceCategory[] = [
     icon: Hammer,
     color: 'bg-green-50 border-green-200 hover:bg-green-100',
     image: 'construcao.png',
-    serviceIds: ['fb0f8f1d-6734-4d25-b9e4-bcae95faf5b5', 'bc344b0e-551a-4253-90bf-74a8ad8095ca'] // Construção, Pintor (Pintura foi desativado)
+    serviceIds: ['fb0f8f1d-6734-4d25-b9e4-bcae95faf5b5', 'bc344b0e-551a-4253-90bf-74a8ad8095ca'] // Construção, Pintor
   },
   {
     id: 'jardinagem',
@@ -60,7 +60,7 @@ export const serviceCategories: ServiceCategory[] = [
     icon: TreePine,
     color: 'bg-emerald-50 border-emerald-200 hover:bg-emerald-100',
     image: 'jardinagem.png',
-    serviceIds: ['f2f93a54-860e-4af3-941b-95e32a772428'] // Apenas Jardineiro (Jardinagem foi desativado)
+    serviceIds: ['f2f93a54-860e-4af3-941b-95e32a772428'] // Jardineiro
   },
   {
     id: 'fretes',
@@ -68,7 +68,7 @@ export const serviceCategories: ServiceCategory[] = [
     icon: Truck,
     color: 'bg-red-50 border-red-200 hover:bg-red-100',
     image: 'frete2 (1).png',
-    serviceIds: ['5c19ce68-8639-4eed-bf3c-1ec673d43add'] // Apenas Fretes (Serviços de Frete foi desativado)
+    serviceIds: ['5c19ce68-8639-4eed-bf3c-1ec673d43add'] // Fretes
   },
   {
     id: 'chaveiro',
@@ -116,7 +116,7 @@ export const serviceCategories: ServiceCategory[] = [
     icon: Snowflake,
     color: 'bg-cyan-50 border-cyan-200 hover:bg-cyan-100',
     image: 'refrigeracao.png',
-    serviceIds: ['d397bcc6-883a-495f-b19e-f1a34c1b0312'] // Apenas Refrigeração (Manutenção de Ar-condicionado foi desativado)
+    serviceIds: ['d397bcc6-883a-495f-b19e-f1a34c1b0312'] // Refrigeração
   },
   {
     id: 'mecanico',
@@ -128,17 +128,15 @@ export const serviceCategories: ServiceCategory[] = [
   }
 ];
 
-// Mapeamento atualizado para os serviços ativos restantes
+// Mapeamento atualizado apenas para os serviços ativos
 export const serviceIconMap = {
   'babá': { icon: Baby, color: 'text-pink-600', bgColor: 'bg-pink-100' },
   'beleza': { icon: Scissors, color: 'text-pink-600', bgColor: 'bg-pink-100' },
   'cabeleireiro(a)': { icon: Scissors, color: 'text-amber-600', bgColor: 'bg-amber-100' },
   'construção': { icon: Hammer, color: 'text-orange-600', bgColor: 'bg-orange-100' },
-  'cozinha': { icon: ChefHat, color: 'text-orange-600', bgColor: 'bg-orange-100' },
   'cuidador(a) de idosos': { icon: Heart, color: 'text-red-600', bgColor: 'bg-red-100' },
   'diarista': { icon: Sparkles, color: 'text-emerald-600', bgColor: 'bg-emerald-100' },
   'eletricista': { icon: Zap, color: 'text-orange-600', bgColor: 'bg-orange-100' },
-  'encanador': { icon: Droplets, color: 'text-blue-600', bgColor: 'bg-blue-100' },
   'fretes': { icon: Truck, color: 'text-orange-600', bgColor: 'bg-orange-100' },
   'jardineiro': { icon: TreePine, color: 'text-green-600', bgColor: 'bg-green-100' },
   'limpeza': { icon: Sparkles, color: 'text-orange-600', bgColor: 'bg-orange-100' },
@@ -147,9 +145,7 @@ export const serviceIconMap = {
   'pet care': { icon: Heart, color: 'text-orange-600', bgColor: 'bg-orange-100' },
   'pintor': { icon: Paintbrush, color: 'text-purple-600', bgColor: 'bg-purple-100' },
   'refrigeração': { icon: Snowflake, color: 'text-blue-600', bgColor: 'bg-blue-100' },
-  'serviços de ti': { icon: Monitor, color: 'text-cyan-600', bgColor: 'bg-cyan-100' },
-  'chaveiro': { icon: Key, color: 'text-yellow-600', bgColor: 'bg-yellow-100' },
-  'marido de aluguel': { icon: Hammer, color: 'text-green-600', bgColor: 'bg-green-100' }
+  'serviços de ti': { icon: Monitor, color: 'text-cyan-600', bgColor: 'bg-cyan-100' }
 };
 
 export const getServiceIcon = (serviceName: string) => {

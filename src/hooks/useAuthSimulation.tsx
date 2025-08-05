@@ -1,48 +1,71 @@
-
 import { useState, useCallback } from 'react';
 import { useAuth } from './useAuth';
 
-export const useAuthSimulation = () => {
-  const originalAuth = useAuth();
-  const [isSimulating, setIsSimulating] = useState(false);
-  const [simulatedRole, setSimulatedRole] = useState<'cliente' | 'prestador' | null>(null);
+type UserType = 'cliente' | 'prestador' | 'admin';
 
-  const enableSimulation = useCallback((role: 'cliente' | 'prestador') => {
-    // Só admins podem simular
-    if (!originalAuth.isAdmin) return;
+interface UseAuthSimulation {
+  isSimulating: boolean;
+  simulatedUserType: UserType;
+  enableSimulation: (userType: UserType) => void;
+  disableSimulation: () => void;
+  getEffectiveUserType: () => UserType;
+  isEffectivelyPrestador: () => boolean;
+  isEffectivelyCliente: () => boolean;
+  isEffectivelyAdmin: () => boolean;
+}
+
+export const useAuthSimulation = (): UseAuthSimulation => {
+  const { profile } = useAuth();
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [simulatedUserType, setSimulatedUserType] = useState<UserType>('cliente');
+
+  const enableSimulation = useCallback((userType: UserType) => {
+    // Only admins can simulate
+    if (profile?.tipo !== 'admin') return;
     
+    setSimulatedUserType(userType);
     setIsSimulating(true);
-    setSimulatedRole(role);
-  }, [originalAuth.isAdmin]);
+    console.log(`🎭 Admin simulation enabled: ${userType}`);
+  }, [profile]);
 
   const disableSimulation = useCallback(() => {
     setIsSimulating(false);
-    setSimulatedRole(null);
+    console.log('🎭 Admin simulation disabled');
   }, []);
 
-  // Retornar auth modificado se estiver simulando
-  if (isSimulating && simulatedRole && originalAuth.isAdmin) {
-    return {
-      ...originalAuth,
-      // Manter privilégios de admin
-      isAdmin: true,
-      // Simular o tipo de usuário
-      isPrestador: simulatedRole === 'prestador',
-      isCliente: simulatedRole === 'cliente',
-      // Indicadores de simulação
-      isSimulating,
-      simulatedRole,
-      enableSimulation,
-      disableSimulation,
-    };
-  }
+  const getEffectiveUserType = useCallback((): UserType => {
+    if (!profile) return 'cliente';
+    
+    // If admin is simulating, return simulated type
+    if (profile.tipo === 'admin' && isSimulating) {
+      return simulatedUserType;
+    }
+    
+    // Otherwise return actual user type
+    return profile.tipo as UserType;
+  }, [profile, isSimulating, simulatedUserType]);
 
-  // Retornar auth normal com funções de simulação
+  const isEffectivelyPrestador = useCallback(() => {
+    return getEffectiveUserType() === 'prestador';
+  }, [getEffectiveUserType]);
+
+  const isEffectivelyCliente = useCallback(() => {
+    return getEffectiveUserType() === 'cliente';
+  }, [getEffectiveUserType]);
+
+  const isEffectivelyAdmin = useCallback(() => {
+    // Admin always has admin privileges, even when simulating
+    return profile?.tipo === 'admin';
+  }, [profile]);
+
   return {
-    ...originalAuth,
-    isSimulating: false,
-    simulatedRole: null,
+    isSimulating: profile?.tipo === 'admin' ? isSimulating : false,
+    simulatedUserType,
     enableSimulation,
     disableSimulation,
+    getEffectiveUserType,
+    isEffectivelyPrestador,
+    isEffectivelyCliente,
+    isEffectivelyAdmin
   };
 };

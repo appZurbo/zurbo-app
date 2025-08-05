@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -26,10 +25,12 @@ export const ServiceFilterPopover: React.FC<ServiceFilterPopoverProps> = ({
 
   const loadServicos = async () => {
     try {
+      console.log('🔄 ServiceFilterPopover: Loading services from database...');
       const servicosData = await getServicos();
+      console.log(`✅ ServiceFilterPopover: Loaded ${servicosData.length} active services`);
       setServicos(servicosData);
     } catch (error) {
-      console.error('Erro ao carregar serviços:', error);
+      console.error('❌ ServiceFilterPopover: Error loading services:', error);
     } finally {
       setLoading(false);
     }
@@ -136,4 +137,18 @@ export const ServiceFilterPopover: React.FC<ServiceFilterPopoverProps> = ({
       </Popover>
     </div>
   );
+
+  function handleServiceToggle(servicoId: string) {
+    const newSelection = selectedServices.includes(servicoId)
+      ? selectedServices.filter(id => id !== servicoId)
+      : [...selectedServices, servicoId];
+    
+    onSelectionChange(newSelection);
+  }
+
+  function clearSelection() {
+    onSelectionChange([]);
+  }
+
+  const selectedCount = selectedServices.length;
 };

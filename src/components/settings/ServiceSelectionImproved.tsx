@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,10 +25,12 @@ export const ServiceSelectionImproved: React.FC = () => {
 
   const loadServicos = async () => {
     try {
+      console.log('🔄 Loading services from database...');
       const servicosData = await getServicos();
+      console.log(`✅ Loaded ${servicosData.length} active services:`, servicosData.map(s => s.nome));
       setServicos(servicosData);
     } catch (error) {
-      console.error('Erro ao carregar serviços:', error);
+      console.error('❌ Error loading services:', error);
       toast.error('Erro ao carregar serviços disponíveis');
     } finally {
       setLoading(false);
@@ -75,6 +76,7 @@ export const ServiceSelectionImproved: React.FC = () => {
       }
     }
 
+    console.log('💾 Saving services:', servicosSelecionados);
     toast.success('Serviços salvos com sucesso!');
   };
 

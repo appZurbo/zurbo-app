@@ -1,52 +1,42 @@
+
 import React from 'react';
 import { UnifiedHeader } from './UnifiedHeader';
-import { UnifiedDock } from './UnifiedDock';
+import { UnifiedDock } from '@/components/mobile/UnifiedDock';
 import { useMobile } from '@/hooks/useMobile';
+import { useAuth } from '@/hooks/useAuth';
+import { AdminViewToggle } from '@/components/admin/AdminViewToggle';
 
-export interface UnifiedLayoutProps {
+interface UnifiedLayoutProps {
   children: React.ReactNode;
-  showMobileDock?: boolean;
-  showHeader?: boolean;
+  showDock?: boolean;
 }
 
-import { AdminViewToggle } from '@/components/admin/AdminViewToggle';
-import { useAuthSimulation } from '@/hooks/useAuthSimulation';
-
-export const UnifiedLayout: React.FC<UnifiedLayoutProps> = ({ 
-  children, 
-  showMobileDock = true,
-  showHeader = true 
+export const UnifiedLayout: React.FC<UnifiedLayoutProps> = ({
+  children,
+  showDock = true
 }) => {
-  const auth = useAuthSimulation();
   const isMobile = useMobile();
-
-  const handleSimulationChange = (isSimulating: boolean, simulatedRole?: 'cliente' | 'prestador') => {
-    if (isSimulating && simulatedRole) {
-      auth.enableSimulation(simulatedRole);
-    } else {
-      auth.disableSimulation();
-    }
-  };
+  const { profile } = useAuth();
+  const isAdmin = profile?.tipo === 'admin';
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header Admin Toggle - Apenas para admins */}
-      {auth.isAdmin && showHeader && (
-        <div className="bg-white border-b border-gray-200 px-4 py-2">
-          <AdminViewToggle onSimulationChange={handleSimulationChange} />
+      <UnifiedHeader />
+      
+      {/* Admin View Toggle - only show for admins */}
+      {isAdmin && (
+        <div className="sticky top-16 z-40 px-4 py-2 bg-gray-50 border-b">
+          <div className="max-w-7xl mx-auto">
+            <AdminViewToggle />
+          </div>
         </div>
       )}
-
-      {/* Header Principal */}
-      {showHeader && <UnifiedHeader />}
       
-      {/* Main Content */}
-      <main className={`${isMobile && showMobileDock ? 'pb-20' : ''}`}>
+      <main className={`${isMobile && showDock ? 'pb-20' : ''}`}>
         {children}
       </main>
       
-      {/* Mobile Dock */}
-      {showMobileDock && isMobile && <UnifiedDock />}
+      {isMobile && showDock && <UnifiedDock />}
     </div>
   );
 };
