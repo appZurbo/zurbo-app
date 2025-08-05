@@ -16,7 +16,7 @@ export const CategoryShortcutButton: React.FC<CategoryShortcutButtonProps> = ({
 }) => {
   const imageUrl = `/${category.image}`;
 
-  // Get image positioning based on category needs - align top of image with top of button border
+  // Get image positioning based on category needs - move images down to show more content
   const getImageStyles = (categoryId: string) => {
     const baseStyles = {
       objectFit: 'cover' as const,
@@ -38,17 +38,17 @@ export const CategoryShortcutButton: React.FC<CategoryShortcutButtonProps> = ({
       case 'refrigeracao':
       case 'cuidados':
       case 'tecnologia':
-        // Move image up more to show faces clearly and align with button top
+        // Move image down to show faces clearly
         return {
           ...baseStyles,
           objectPosition: 'center top',
-          transform: 'scale(1.6) translateY(-15px)'
+          transform: 'scale(1.6) translateY(15px)'
         };
       default:
         return {
           ...baseStyles,
           objectPosition: 'center top',
-          transform: 'scale(1.4) translateY(-10px)'
+          transform: 'scale(1.4) translateY(10px)'
         };
     }
   };
