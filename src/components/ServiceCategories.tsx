@@ -75,10 +75,10 @@ const ServiceCategories = ({
                         <img 
                           src={imageUrl} 
                           alt={category.name}
-                          className="absolute inset-0 w-full h-full object-cover transform scale-150"
+                          className="absolute inset-0 w-full h-full object-cover transform scale-175"
                           style={{ 
-                            objectPosition: 'center 20%',
-                            transformOrigin: 'center center'
+                            objectPosition: 'center 75%',
+                            transformOrigin: 'center bottom'
                           }}
                           onLoad={() => handleImageLoad(category.id)}
                           onError={() => handleImageError(category.id)}
@@ -88,10 +88,10 @@ const ServiceCategories = ({
                         <img 
                           src={imageUrl} 
                           alt={category.name}
-                          className="absolute inset-0 w-full h-full object-cover transform scale-150 group-hover:scale-160 transition-transform duration-300"
+                          className="absolute inset-0 w-full h-full object-cover transform scale-175 group-hover:scale-185 transition-transform duration-300"
                           style={{ 
-                            objectPosition: 'center 20%',
-                            transformOrigin: 'center center'
+                            objectPosition: 'center 75%',
+                            transformOrigin: 'center bottom'
                           }}
                         />
                       )}
