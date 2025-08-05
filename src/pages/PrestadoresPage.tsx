@@ -14,7 +14,6 @@ import { EmergencyButton } from '@/components/emergency/EmergencyButton';
 import WatermarkSection from '@/components/sections/WatermarkSection';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { getPrestadores } from '@/utils/database/prestadores';
-import { getServicos } from '@/utils/database/servicos';
 import { UserProfile } from '@/utils/database/types';
 import { useToast } from '@/hooks/use-toast';
 import { useMobile } from '@/hooks/useMobile';
@@ -27,7 +26,6 @@ const PrestadoresPage = () => {
   const { isAuthenticated } = useAuth();
 
   const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
-  const [servicos, setServicos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -47,21 +45,8 @@ const PrestadoresPage = () => {
   const ITEMS_PER_PAGE = 5;
 
   useEffect(() => {
-    loadInitialData();
-  }, []);
-
-  useEffect(() => {
     loadPrestadores(true);
   }, [filters]);
-
-  const loadInitialData = async () => {
-    try {
-      const servicosData = await getServicos();
-      setServicos(servicosData);
-    } catch (error) {
-      console.error('Error loading initial data:', error);
-    }
-  };
 
   const loadPrestadores = async (reset = false) => {
     if (reset) {
@@ -124,13 +109,20 @@ const PrestadoresPage = () => {
     setFilters(newFilters);
   };
 
-  const handleServiceSelect = (servicoId: string) => {
+  const handleCategorySelect = (serviceIds: string[]) => {
     const currentServicos = filters.servicos;
-    const isSelected = currentServicos.includes(servicoId);
     
-    const newServicos = isSelected 
-      ? currentServicos.filter(id => id !== servicoId)
-      : [...currentServicos, servicoId];
+    // Check if any of the category's services are already selected
+    const hasSelectedServices = serviceIds.some(id => currentServicos.includes(id));
+    
+    let newServicos: string[];
+    if (hasSelectedServices) {
+      // Remove all services from this category
+      newServicos = currentServicos.filter(id => !serviceIds.includes(id));
+    } else {
+      // Add all services from this category
+      newServicos = [...currentServicos, ...serviceIds];
+    }
     
     setFilters(prev => ({
       ...prev,
@@ -167,10 +159,9 @@ const PrestadoresPage = () => {
           </div>
         )}
 
-        {/* Service Shortcuts Section */}
+        {/* Service Categories Section */}
         <ServiceShortcutsSection
-          servicos={servicos}
-          onServiceSelect={handleServiceSelect}
+          onCategorySelect={handleCategorySelect}
           selectedServices={filters.servicos}
         />
 
