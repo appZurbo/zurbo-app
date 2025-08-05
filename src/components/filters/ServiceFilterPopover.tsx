@@ -1,23 +1,39 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
 import { ChevronDown, X, Check } from 'lucide-react';
 import { getServiceIcon } from '@/config/serviceCategories';
+import { getServicos } from '@/utils/database/servicos';
 
 interface ServiceFilterPopoverProps {
-  servicos: Array<{ id: string; nome: string; icone?: string }>;
   selectedServices: string[];
   onSelectionChange: (services: string[]) => void;
 }
 
 export const ServiceFilterPopover: React.FC<ServiceFilterPopoverProps> = ({
-  servicos,
   selectedServices,
   onSelectionChange
 }) => {
   const [open, setOpen] = useState(false);
+  const [servicos, setServicos] = useState<Array<{ id: string; nome: string; icone?: string }>>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadServicos();
+  }, []);
+
+  const loadServicos = async () => {
+    try {
+      const servicosData = await getServicos();
+      setServicos(servicosData);
+    } catch (error) {
+      console.error('Erro ao carregar serviços:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleServiceToggle = (servicoId: string) => {
     const newSelection = selectedServices.includes(servicoId)
@@ -32,6 +48,14 @@ export const ServiceFilterPopover: React.FC<ServiceFilterPopoverProps> = ({
   };
 
   const selectedCount = selectedServices.length;
+
+  if (loading) {
+    return (
+      <Button variant="outline" size="sm" disabled>
+        Carregando...
+      </Button>
+    );
+  }
 
   return (
     <div className="flex items-center gap-2">
