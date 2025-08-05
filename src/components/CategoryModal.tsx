@@ -54,15 +54,15 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
           transform: 'scale(1.2)' // Reduced from 1.4 to prevent cutting left character
         };
       case 'limpeza':
+      case 'reparos':
       case 'eletrica':
-      case 'beleza':
       case 'construcao':
       case 'jardinagem':
       case 'refrigeracao':
-        // Categories with head cropping issues - position lower
+        // Categories with head cropping issues - position much lower
         return {
           ...baseStyles,
-          objectPosition: 'center 85%',
+          objectPosition: 'center 90%',
           transform: 'scale(1.4)'
         };
       default:
