@@ -1,106 +1,102 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface BannerImage {
-  id: string;
   name: string;
-  category: string;
-  description: string;
+  url: string;
 }
 
-export const bannerImages: BannerImage[] = [
-  {
-    id: 'cuidados',
-    name: 'cuidados-banner.png',
-    category: 'Cuidados',
-    description: 'Profissionais de saúde e cuidados infantis'
-  },
-  {
-    id: 'beleza',
-    name: 'beleza-banner.png', 
-    category: 'Beleza',
-    description: 'Cabeleireira profissional'
-  },
-  {
-    id: 'chaveiro',
-    name: 'chaveiro-banner.png',
-    category: 'Chaveiro',
-    description: 'Chaveiro especializado'
-  },
-  {
-    id: 'construcao',
-    name: 'construcao-banner.png',
-    category: 'Construção',
-    description: 'Profissional da construção civil'
-  },
-  {
-    id: 'eletrica',
-    name: 'eletrica-banner.png',
-    category: 'Elétrica',
-    description: 'Eletricista profissional'
-  },
-  {
-    id: 'fretes',
-    name: 'fretes-banner.png',
-    category: 'Fretes',
-    description: 'Equipe de frete e mudanças'
-  },
-  {
-    id: 'mecanico',
-    name: 'mecanico-banner.png',
-    category: 'Mecânico',
-    description: 'Mecânico automotivo'
-  }
-];
-
-interface BannerImageProps {
-  imageId: string;
+interface BannerImagesProps {
   className?: string;
-  alt?: string;
+  onImagesLoaded?: (images: BannerImage[]) => void;
 }
 
-export const BannerImage = ({ imageId, className = "", alt }: BannerImageProps) => {
-  const [imageStatus, setImageStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
-  
-  const imageInfo = bannerImages.find(img => img.id === imageId);
-  const imageUrl = `https://mbzxifrkabfnufliawzo.supabase.co/storage/v1/object/public/banner-images/${imageInfo?.name}`;
-  
-  const handleImageLoad = () => {
-    setImageStatus('loaded');
-  };
+export const BannerImages = ({ className = "", onImagesLoaded }: BannerImagesProps) => {
+  const [images, setImages] = useState<BannerImage[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleImageError = () => {
-    setImageStatus('error');
-  };
+  useEffect(() => {
+    const loadBannerImages = async () => {
+      try {
+        const { data, error } = await supabase.storage
+          .from('banner-images')
+          .list('', {
+            limit: 100,
+            sortBy: { column: 'name', order: 'asc' }
+          });
 
-  if (!imageInfo) return null;
+        if (error) {
+          console.error('Erro ao carregar imagens dos banners:', error);
+          return;
+        }
+
+        if (data) {
+          const imagePromises = data
+            .filter(file => file.name.endsWith('.png') || file.name.endsWith('.jpg') || file.name.endsWith('.jpeg'))
+            .map(async (file) => {
+              const { data: urlData } = await supabase.storage
+                .from('banner-images')
+                .getPublicUrl(file.name);
+              
+              return {
+                name: file.name,
+                url: urlData.publicUrl
+              };
+            });
+
+          const loadedImages = await Promise.all(imagePromises);
+          setImages(loadedImages);
+          onImagesLoaded?.(loadedImages);
+        }
+      } catch (error) {
+        console.error('Erro geral ao carregar imagens:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadBannerImages();
+  }, [onImagesLoaded]);
+
+  if (loading) {
+    return (
+      <div className={`flex items-center justify-center ${className}`}>
+        <div className="animate-pulse text-muted-foreground">Carregando imagens...</div>
+      </div>
+    );
+  }
+
+  if (images.length === 0) {
+    return (
+      <div className={`flex items-center justify-center ${className}`}>
+        <div className="text-muted-foreground text-center">
+          <p>Nenhuma imagem encontrada.</p>
+          <p className="text-xs mt-1">Faça upload das imagens via painel admin.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className={`relative ${className}`}>
-      {imageStatus === 'loading' && (
-        <div className="absolute inset-0 bg-muted/20 rounded-lg animate-pulse" />
-      )}
-      
-      {(imageStatus === 'loading' || imageStatus === 'loaded') && (
-        <img 
-          src={imageUrl}
-          alt={alt || imageInfo.description}
-          className={`w-full h-full object-contain transition-opacity duration-300 ${
-            imageStatus === 'loaded' ? 'opacity-100' : 'opacity-0'
-          }`}
-          onLoad={handleImageLoad}
-          onError={handleImageError}
-          style={{ backgroundColor: 'transparent' }}
-        />
-      )}
-      
-      {imageStatus === 'error' && (
-        <div className="flex items-center justify-center h-full text-muted-foreground bg-muted/10 rounded-lg">
-          <span className="text-sm">Imagem não encontrada</span>
+    <div className={`grid grid-cols-2 md:grid-cols-3 gap-4 ${className}`}>
+      {images.map((image, index) => (
+        <div key={image.name} className="relative group">
+          <img
+            src={image.url}
+            alt={`Banner ${index + 1}`}
+            className="w-full h-24 object-contain rounded-lg bg-white/5 backdrop-blur-sm 
+                     group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 
+                        transition-opacity duration-300 rounded-lg flex items-center justify-center">
+            <span className="text-white text-xs font-medium">
+              {image.name.replace(/\.[^/.]+$/, "")}
+            </span>
+          </div>
         </div>
-      )}
+      ))}
     </div>
   );
 };
-
-export default BannerImage;

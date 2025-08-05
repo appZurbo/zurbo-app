@@ -1,143 +1,191 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Upload, Check, AlertCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Upload, Trash2, Eye, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { bannerImages } from '@/components/banners/BannerImages';
+import { toast } from 'sonner';
+import { BannerImages } from '@/components/banners/BannerImages';
 
-interface UploadStatus {
-  [key: string]: 'pending' | 'uploading' | 'success' | 'error';
+interface BannerImage {
+  name: string;
+  url: string;
 }
 
 export const BannerImageUploader = () => {
-  const [uploadStatus, setUploadStatus] = useState<UploadStatus>({});
-  const [selectedFiles, setSelectedFiles] = useState<{[key: string]: File}>({});
+  const [uploading, setUploading] = useState(false);
+  const [images, setImages] = useState<BannerImage[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  const handleFileSelect = (imageName: string, file: File) => {
-    setSelectedFiles(prev => ({
-      ...prev,
-      [imageName]: file
-    }));
-  };
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  const uploadImage = async (imageName: string, file: File) => {
-    setUploadStatus(prev => ({ ...prev, [imageName]: 'uploading' }));
-    
+    // Validar tipo de arquivo
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Apenas arquivos PNG e JPG são permitidos');
+      return;
+    }
+
+    // Validar tamanho (máximo 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Arquivo deve ter no máximo 5MB');
+      return;
+    }
+
+    setUploading(true);
     try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+
       const { error } = await supabase.storage
         .from('banner-images')
-        .upload(imageName, file, {
-          cacheControl: '3600',
-          upsert: true
-        });
+        .upload(fileName, file);
 
       if (error) {
-        console.error(`Error uploading ${imageName}:`, error);
-        setUploadStatus(prev => ({ ...prev, [imageName]: 'error' }));
-        return false;
+        throw error;
       }
 
-      setUploadStatus(prev => ({ ...prev, [imageName]: 'success' }));
-      return true;
-    } catch (error) {
-      console.error(`Error uploading ${imageName}:`, error);
-      setUploadStatus(prev => ({ ...prev, [imageName]: 'error' }));
-      return false;
+      toast.success('Imagem enviada com sucesso!');
+      
+      // Recarregar a lista
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+      
+    } catch (error: any) {
+      console.error('Erro no upload:', error);
+      toast.error('Erro ao enviar imagem: ' + error.message);
+    } finally {
+      setUploading(false);
+      if (event.target) {
+        event.target.value = '';
+      }
     }
   };
 
-  const uploadAllSelected = async () => {
-    const uploads = Object.entries(selectedFiles).map(([imageName, file]) => 
-      uploadImage(imageName, file)
-    );
-    
-    await Promise.all(uploads);
-  };
+  const handleDeleteImage = async (imageName: string) => {
+    if (!confirm('Tem certeza que deseja excluir esta imagem?')) return;
 
-  const getStatusIcon = (imageName: string) => {
-    const status = uploadStatus[imageName];
-    switch (status) {
-      case 'uploading':
-        return <div className="animate-spin w-4 h-4 border-2 border-primary border-t-transparent rounded-full" />;
-      case 'success':
-        return <Check className="w-4 h-4 text-green-500" />;
-      case 'error':
-        return <AlertCircle className="w-4 h-4 text-red-500" />;
-      default:
-        return <Upload className="w-4 h-4 text-muted-foreground" />;
+    try {
+      const { error } = await supabase.storage
+        .from('banner-images')
+        .remove([imageName]);
+
+      if (error) throw error;
+
+      toast.success('Imagem excluída com sucesso!');
+      setImages(prev => prev.filter(img => img.name !== imageName));
+      
+    } catch (error: any) {
+      console.error('Erro ao excluir:', error);
+      toast.error('Erro ao excluir imagem: ' + error.message);
     }
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
-      <CardHeader>
-        <CardTitle>Upload de Imagens dos Banners</CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Faça upload das imagens 3D para os banners da home page
-        </p>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {bannerImages.map((imageInfo) => (
-            <div key={imageInfo.id} className="border rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <span className="text-sm font-medium">{imageInfo.name}</span>
-                  <p className="text-xs text-muted-foreground">{imageInfo.category}</p>
-                </div>
-                {getStatusIcon(imageInfo.name)}
-              </div>
-              
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    handleFileSelect(imageInfo.name, file);
-                  }
-                }}
-                className="w-full text-sm file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-              />
-              
-              {selectedFiles[imageInfo.name] && (
-                <Button
-                  size="sm"
-                  className="w-full mt-2"
-                  onClick={() => uploadImage(imageInfo.name, selectedFiles[imageInfo.name])}
-                  disabled={uploadStatus[imageInfo.name] === 'uploading'}
-                >
-                  {uploadStatus[imageInfo.name] === 'uploading' ? 'Enviando...' : 'Enviar'}
-                </Button>
-              )}
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Upload className="h-5 w-5" />
+            Upload de Imagens para Banners
+          </CardTitle>
+          <CardDescription>
+            Faça upload das imagens 3D que serão exibidas nos banners da página inicial.
+            Formatos suportados: PNG, JPG (máximo 5MB cada).
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <Input
+              type="file"
+              accept="image/png,image/jpeg,image/jpg"
+              onChange={handleFileUpload}
+              disabled={uploading}
+              className="cursor-pointer"
+            />
+            <div className="text-sm text-muted-foreground">
+              <p>• Use imagens com fundo transparente (PNG recomendado)</p>
+              <p>• Resolução recomendada: 512x512px ou maior</p>
+              <p>• As imagens devem representar categorias de serviços</p>
             </div>
-          ))}
-        </div>
-        
-        {Object.keys(selectedFiles).length > 0 && (
-          <div className="mt-6 pt-4 border-t">
-            <Button
-              onClick={uploadAllSelected}
-              className="w-full"
-              disabled={Object.values(uploadStatus).some(status => status === 'uploading')}
-            >
-              Enviar Todas as Imagens Selecionadas
-            </Button>
           </div>
-        )}
+        </CardContent>
+      </Card>
 
-        <div className="mt-4 p-4 bg-muted/50 rounded-lg">
-          <h4 className="font-medium mb-2">Instruções:</h4>
-          <ul className="text-sm text-muted-foreground space-y-1">
-            <li>• Use as imagens 3D fornecidas para cada categoria</li>
-            <li>• Mantenha o fundo transparente das imagens</li>
-            <li>• Formato recomendado: PNG com transparência</li>
-            <li>• Resolução ideal: 400x400px ou similar</li>
-            <li>• As imagens aparecerão nos banners da home page</li>
-          </ul>
+      <Card>
+        <CardHeader>
+          <CardTitle>Imagens Atuais</CardTitle>
+          <CardDescription>
+            Gerencie as imagens que estão sendo exibidas nos banners
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <BannerImages 
+            onImagesLoaded={setImages}
+            className="min-h-[200px]"
+          />
+          
+          {images.length > 0 && (
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {images.map((image) => (
+                <div key={image.name} className="border rounded-lg p-3 space-y-2">
+                  <img 
+                    src={image.url} 
+                    alt={image.name}
+                    className="w-full h-20 object-contain bg-gray-50 rounded"
+                  />
+                  <p className="text-sm font-medium truncate">{image.name}</p>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setSelectedImage(image.url)}
+                      className="flex-1"
+                    >
+                      <Eye className="h-3 w-3 mr-1" />
+                      Ver
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => handleDeleteImage(image.name)}
+                      className="flex-1"
+                    >
+                      <Trash2 className="h-3 w-3 mr-1" />
+                      Excluir
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Modal para visualizar imagem */}
+      {selectedImage && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="relative max-w-4xl max-h-full">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setSelectedImage(null)}
+              className="absolute -top-12 right-0 text-white hover:text-white"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            <img 
+              src={selectedImage} 
+              alt="Preview"
+              className="max-w-full max-h-[80vh] object-contain rounded-lg"
+            />
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 };
