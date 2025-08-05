@@ -37,6 +37,8 @@ import PrestadorManagement from "./pages/admin/PrestadorManagement";
 import Moderacao from "./pages/admin/Moderacao";
 import Relatorios from "./pages/admin/Relatorios";
 import AdminContentModeration from "./pages/AdminContentModeration";
+import ImageManager from "./pages/admin/ImageManager";
+import BannerImageManager from "./pages/admin/BannerImageManager";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +65,8 @@ function App() {
               <Route path="/admin/moderacao" element={<Moderacao />} />
               <Route path="/admin/relatorios" element={<Relatorios />} />
               <Route path="/admin/content-moderation" element={<AdminContentModeration />} />
+              <Route path="/admin/image-manager" element={<ImageManager />} />
+              <Route path="/admin/banner-image-manager" element={<BannerImageManager />} />
               <Route path="/notificacoes" element={<NotificacoesPage />} />
               <Route path="/favoritos" element={<FavoritosPage />} />
               <Route path="/agenda" element={<AgendaPrestador />} />
