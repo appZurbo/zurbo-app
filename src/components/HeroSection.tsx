@@ -2,127 +2,179 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, MapPin } from 'lucide-react';
-import { EnhancedLocalBannerImages } from '@/components/banners/EnhancedLocalBannerImages';
-
-interface BannerImage {
-  name: string;
-  url: string;
-}
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { Search, MapPin, Star, ArrowRight, Play, CheckCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const HeroSection = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [bannerImages, setBannerImages] = useState<BannerImage[]>([]);
+  const [busca, setBusca] = useState('');
+  const [cidade, setCidade] = useState('');
+  const navigate = useNavigate();
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Buscar por:', searchTerm);
+  const handleSearch = () => {
+    // Redirecionar para busca com parâmetros
+    const searchParams = new URLSearchParams();
+    if (busca) searchParams.set('servico', busca);
+    if (cidade) searchParams.set('cidade', cidade);
+
+    // Scroll para seção de resultados
+    const resultsSection = document.getElementById('resultados');
+    if (resultsSection) {
+      resultsSection.scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const handleComoFunciona = () => {
+    const comoFuncionaSection = document.getElementById('como-funciona');
+    if (comoFuncionaSection) {
+      comoFuncionaSection.scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
   };
 
   return (
-    <section className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 text-white overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"m36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+    <section className="relative bg-gradient-to-br from-orange-50 via-white to-orange-50 py-16 lg:py-24 overflow-hidden">
+      {/* Background decorativo */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-orange-200 to-yellow-200 rounded-full blur-3xl opacity-20 -translate-y-1/2 translate-x-1/2"></div>
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-br from-blue-200 to-purple-200 rounded-full blur-3xl opacity-20 translate-y-1/2 -translate-x-1/2"></div>
       
-      <div className="container mx-auto px-4 py-16 lg:py-24 relative">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          
-          {/* Left Content */}
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
-                Encontre o 
-                <span className="block bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
-                  profissional ideal
-                </span>
-                para você
+          {/* Conteúdo principal */}
+          <div className="text-center lg:text-left">
+            <div className="mb-6">
+              <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+                Encontre os
+                <span className="bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent"> melhores</span>
+                <br />
+                profissionais
               </h1>
               
-              <p className="text-xl lg:text-2xl text-blue-100 leading-relaxed">
-                Conectamos você aos melhores prestadores de serviços da sua região. 
-                Rapidez, qualidade e confiança em um só lugar.
+              <p className="text-xl text-gray-600 mb-8 max-w-2xl">
+                Conecte-se com prestadores de serviços qualificados na sua região. 
+                Rápido, seguro e com avaliações reais.
               </p>
             </div>
 
-            {/* Search Form */}
-            <form onSubmit={handleSearch} className="space-y-4">
-              <div className="flex flex-col sm:flex-row gap-3">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                  <Input
-                    type="text"
-                    placeholder="Que serviço você procura? (ex: eletricista, encanador...)"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 h-12 text-gray-900 bg-white border-0 focus:ring-2 focus:ring-yellow-400"
-                  />
-                </div>
-                <Button 
-                  type="submit" 
-                  size="lg"
-                  className="h-12 px-6 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-semibold shadow-lg transition-all duration-200 hover:shadow-xl"
-                >
-                  <Search className="mr-2 h-5 w-5" />
-                  Buscar
-                </Button>
-              </div>
-              
-              <div className="flex items-center text-blue-100 text-sm">
-                <MapPin className="mr-2 h-4 w-4" />
-                <span>📍 Atendemos toda a região de Sinop - MT</span>
-              </div>
-            </form>
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-8 pt-8 border-t border-blue-400/20">
-              <div className="text-center">
-                <div className="text-2xl lg:text-3xl font-bold text-yellow-300">500+</div>
-                <div className="text-blue-200 text-sm">Profissionais</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl lg:text-3xl font-bold text-yellow-300">2k+</div>
-                <div className="text-blue-200 text-sm">Serviços Realizados</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl lg:text-3xl font-bold text-yellow-300">4.9</div>
-                <div className="text-blue-200 text-sm">Avaliação Média</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Content - Enhanced Banner Images */}
-          <div className="relative">
-            <div className="absolute -inset-4 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 rounded-2xl blur-2xl"></div>
-            
-            <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <h3 className="text-xl font-semibold mb-4 text-center">
-                Nossos Serviços em Destaque
-              </h3>
-              
-              <EnhancedLocalBannerImages 
-                onImagesLoaded={setBannerImages}
-                className="min-h-[300px]"
-              />
-              
-              {bannerImages.length === 0 && (
-                <div className="flex items-center justify-center min-h-[300px] text-blue-200">
-                  <div className="text-center space-y-2">
-                    <div className="text-6xl">🔧</div>
-                    <p>Carregando serviços...</p>
+            {/* Barra de busca hero */}
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl mb-8">
+              <CardContent className="p-6">
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex-1 relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                    <Input 
+                      placeholder="O que você precisa? (ex: limpeza, jardinagem...)" 
+                      value={busca} 
+                      onChange={(e) => setBusca(e.target.value)} 
+                      className="pl-10 h-12 text-base border-gray-200 focus:border-orange-500 focus:ring-orange-500" 
+                      onKeyPress={(e) => e.key === 'Enter' && handleSearch()} 
+                    />
                   </div>
+                  
+                  <div className="relative min-w-[200px]">
+                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                    <Input 
+                      placeholder="Sua cidade" 
+                      value={cidade} 
+                      onChange={(e) => setCidade(e.target.value)} 
+                      className="pl-10 h-12 text-base border-gray-200 focus:border-orange-500 focus:ring-orange-500" 
+                      onKeyPress={(e) => e.key === 'Enter' && handleSearch()} 
+                    />
+                  </div>
+                  
+                  <Button 
+                    onClick={handleSearch} 
+                    className="h-12 px-8 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold"
+                  >
+                    Buscar
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
                 </div>
-              )}
+              </CardContent>
+            </Card>
+
+            {/* Recursos principais */}
+            <div className="flex flex-wrap gap-6 text-sm text-gray-600 mb-8">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                Profissionais verificados
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                Avaliações reais
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                Pagamento seguro
+              </div>
+            </div>
+
+            {/* CTA secundário */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button variant="outline" size="lg" className="group" onClick={handleComoFunciona}>
+                <Play className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
+                Como funciona
+              </Button>
+              
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <div className="flex -space-x-2">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-400 to-orange-600 border-2 border-white flex items-center justify-center text-white text-xs font-bold">
+                      {i}
+                    </div>
+                  ))}
+                </div>
+                <span>+1000 usuários satisfeitos</span>
+              </div>
             </div>
           </div>
 
-        </div>
-      </div>
+          {/* Visual side - Quadro laranja simples */}
+          <div className="relative">
+            {/* Cards flutuantes menores */}
+            <div className="absolute -top-4 -right-4 grid grid-cols-1 gap-3">
+              {/* Card 1 - Prestador */}
+              <Card className="bg-white shadow-xl transform rotate-3 hover:rotate-0 transition-transform duration-300 w-48">
+                <CardContent className="p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                      JS
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-xs">João Silva</h4>
+                      <p className="text-xs text-gray-600">Eletricista</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                    ))}
+                    <span className="text-xs text-gray-600 ml-1">4.8</span>
+                  </div>
+                </CardContent>
+              </Card>
 
-      {/* Bottom Wave */}
-      <div className="absolute bottom-0 left-0 right-0">
-        <svg viewBox="0 0 1200 120" className="w-full h-12 fill-current text-background">
-          <path d="M0,120 L0,60 Q300,0 600,60 T1200,60 L1200,120 Z"></path>
-        </svg>
+              {/* Card 2 - Serviço */}
+              <Card className="bg-white shadow-xl transform -rotate-2 hover:rotate-0 transition-transform duration-300 w-44">
+                <CardContent className="p-3">
+                  <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center mb-2">
+                    <span className="text-white text-xs">🔧</span>
+                  </div>
+                  <h4 className="font-semibold text-xs mb-1">Reparos</h4>
+                  <p className="text-xs text-gray-600">87 profissionais</p>
+                  <Badge className="bg-green-100 text-green-700 text-xs mt-1">
+                    Disponível
+                  </Badge>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

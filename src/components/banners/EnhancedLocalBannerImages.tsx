@@ -117,9 +117,12 @@ export const EnhancedLocalBannerImages = ({ className = "", onImagesLoaded }: En
               src={image.processedUrl || image.url}
               alt={`Banner ${image.name}`}
               className="w-full h-full object-cover object-center 
-                       group-hover:scale-110 transition-transform duration-300"
+                       group-hover:scale-125 transition-transform duration-300 scale-150"
               loading="lazy"
-              style={{ objectPosition: 'center 30%' }}
+              style={{ 
+                objectPosition: 'center 15%',
+                transform: 'scale(2.5) translateY(-15%)'
+              }}
             />
           </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent 
