@@ -38,20 +38,41 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
     return 'bg-white';
   };
 
-  // Special handling for fretes image positioning and sizing
+  // Dynamic positioning and sizing based on category needs
   const getImageStyles = (categoryId: string) => {
-    if (categoryId === 'fretes') {
-      return {
-        objectFit: 'cover' as const,
-        objectPosition: 'center 70%',
-        transform: 'scale(1.4)'
-      };
-    }
-    return {
+    const baseStyles = {
       objectFit: 'contain' as const,
-      objectPosition: 'center 70%',
-      transform: 'scale(1.4)'
     };
+
+    switch (categoryId) {
+      case 'fretes':
+        // Special handling for fretes - reduce scale and use object-cover for edge cropping
+        return {
+          ...baseStyles,
+          objectFit: 'cover' as const,
+          objectPosition: 'center 75%',
+          transform: 'scale(1.2)' // Reduced from 1.4 to prevent cutting left character
+        };
+      case 'limpeza':
+      case 'eletrica':
+      case 'beleza':
+      case 'construcao':
+      case 'jardinagem':
+      case 'refrigeracao':
+        // Categories with head cropping issues - position lower
+        return {
+          ...baseStyles,
+          objectPosition: 'center 85%',
+          transform: 'scale(1.4)'
+        };
+      default:
+        // Default positioning for other categories
+        return {
+          ...baseStyles,
+          objectPosition: 'center 70%',
+          transform: 'scale(1.4)'
+        };
+    }
   };
 
   return (
