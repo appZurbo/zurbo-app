@@ -37,23 +37,35 @@ const ServiceCategories = ({
           </p>
         </div>
         
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {serviceCategories.map((category, index) => {
-            const IconComponent = category.icon;
+            const imageUrl = `https://mbzxifrkabfnufliawzo.supabase.co/storage/v1/object/public/site-images/${category.image}`;
             return (
               <Card 
                 key={category.id} 
-                className={`cursor-pointer transition-all duration-500 hover-lift border-2 ${category.color} animate-on-scroll`} 
+                className="cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg border border-gray-200 rounded-xl overflow-hidden animate-on-scroll" 
                 style={{
                   animationDelay: `${index * 0.1}s`
                 }} 
                 onClick={() => onCategorySelect(category.serviceIds)}
               >
-                <CardContent className="p-8 text-center py-0 px-0 my-[5px]">
-                  <div className="w-16 h-16 mx-auto mb-4 orange-gradient rounded-2xl flex items-center justify-center shadow-lg">
-                    <IconComponent className="h-8 w-8 text-white" />
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-800 text-lg">{category.name}</h3>
+                    </div>
+                    <div className="w-16 h-16 flex items-center justify-center">
+                      <img 
+                        src={imageUrl} 
+                        alt={category.name}
+                        className="w-12 h-12 object-contain"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
+                      />
+                    </div>
                   </div>
-                  <h3 className="font-semibold text-gray-800 text-lg">{category.name}</h3>
                 </CardContent>
               </Card>
             );
