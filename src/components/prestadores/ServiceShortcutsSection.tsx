@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { CategoryShortcutButton } from './CategoryShortcutButton';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { serviceCategories } from '@/config/serviceCategories';
 
 interface ServiceShortcutsSectionProps {
@@ -29,16 +28,15 @@ export const ServiceShortcutsSection: React.FC<ServiceShortcutsSectionProps> = (
   };
 
   return (
-    <Card className="mb-6">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg font-semibold text-gray-900">
-          Categorias de Serviços
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {/* Scrollable carousel for all screen sizes */}
-        <div className="overflow-x-auto">
-          <div className="flex gap-3 pb-2" style={{ width: 'max-content' }}>
+    <div className="mb-6">
+      <h2 className="text-lg font-semibold text-gray-900 mb-4 px-1">
+        Categorias de Serviços
+      </h2>
+      
+      {/* Enhanced scrollable carousel with better mobile indicators */}
+      <div className="relative">
+        <div className="overflow-x-auto scrollbar-hide">
+          <div className="flex gap-3 pb-2 px-1" style={{ width: 'max-content' }}>
             {availableCategories.map((category) => (
               <CategoryShortcutButton
                 key={category.id}
@@ -49,7 +47,17 @@ export const ServiceShortcutsSection: React.FC<ServiceShortcutsSectionProps> = (
             ))}
           </div>
         </div>
-      </CardContent>
-    </Card>
+        
+        {/* Mobile scroll indicators */}
+        <div className="flex justify-center mt-2 gap-1 md:hidden">
+          {availableCategories.slice(0, Math.ceil(availableCategories.length / 3)).map((_, index) => (
+            <div
+              key={index}
+              className="w-1.5 h-1.5 rounded-full bg-gray-300"
+            />
+          ))}
+        </div>
+      </div>
+    </div>
   );
 };

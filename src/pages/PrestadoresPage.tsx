@@ -132,9 +132,10 @@ const PrestadoresPage = () => {
 
   return (
     <UnifiedLayout>
-      <div className="max-w-7xl mx-[16px]">
+      {/* Centralized container matching header width */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="flex items-center justify-between gap-4 mb-6 my-0 py-[13px]">
+        <div className="flex items-center justify-between gap-4 mb-6 py-4">
           <div className="flex-1">
             <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
               Prestadores de Serviços
