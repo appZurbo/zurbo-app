@@ -27,7 +27,7 @@ export const CategoryShortcutButton: React.FC<CategoryShortcutButtonProps> = ({
         return {
           ...baseStyles,
           objectPosition: 'center top',
-          transform: 'scale(1.2) translateY(0)'
+          transform: 'scale(1.2) translateY(-5px)'
         };
       case 'limpeza':
       case 'beleza':
@@ -38,17 +38,17 @@ export const CategoryShortcutButton: React.FC<CategoryShortcutButtonProps> = ({
       case 'refrigeracao':
       case 'cuidados':
       case 'tecnologia':
-        // Align image top with button top and scale appropriately
+        // Move image up more to show faces clearly and align with button top
         return {
           ...baseStyles,
           objectPosition: 'center top',
-          transform: 'scale(1.6) translateY(0)'
+          transform: 'scale(1.6) translateY(-15px)'
         };
       default:
         return {
           ...baseStyles,
           objectPosition: 'center top',
-          transform: 'scale(1.4) translateY(0)'
+          transform: 'scale(1.4) translateY(-10px)'
         };
     }
   };
