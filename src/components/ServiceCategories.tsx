@@ -1,14 +1,17 @@
+
 import { Card, CardContent } from '@/components/ui/card';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { serviceCategories, type ServiceCategory } from '@/config/serviceCategories';
 
 interface ServiceCategoriesProps {
   onCategorySelect: (serviceIds: string[]) => void;
 }
+
 const ServiceCategories = ({
   onCategorySelect
 }: ServiceCategoriesProps) => {
   const categoriesRef = useRef<HTMLDivElement>(null);
+  const [imageStatuses, setImageStatuses] = useState<{[key: string]: 'loading' | 'loaded' | 'error'}>({});
   
   useEffect(() => {
     const observer = new IntersectionObserver(entries => {
@@ -24,6 +27,14 @@ const ServiceCategories = ({
     cards?.forEach(card => observer.observe(card));
     return () => observer.disconnect();
   }, []);
+
+  const handleImageLoad = (categoryId: string) => {
+    setImageStatuses(prev => ({ ...prev, [categoryId]: 'loaded' }));
+  };
+
+  const handleImageError = (categoryId: string) => {
+    setImageStatuses(prev => ({ ...prev, [categoryId]: 'error' }));
+  };
 
   return (
     <section ref={categoriesRef} className="bg-gradient-to-b from-muted/30 to-background py-16">
@@ -41,6 +52,7 @@ const ServiceCategories = ({
           {serviceCategories.map((category, index) => {
             const imageUrl = `https://mbzxifrkabfnufliawzo.supabase.co/storage/v1/object/public/site-images/${category.image}`;
             const IconComponent = category.icon;
+            const imageStatus = imageStatuses[category.id] || 'loading';
             
             return (
               <Card 
@@ -59,19 +71,21 @@ const ServiceCategories = ({
                       </h3>
                     </div>
                     <div className="w-20 h-16 flex items-center justify-center bg-muted/30 rounded-lg overflow-hidden group-hover:bg-primary/10 transition-colors">
-                      <img 
-                        src={imageUrl} 
-                        alt={category.name}
-                        className="w-full h-full object-contain p-2"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          const container = target.parentElement;
-                          if (container && !container.querySelector('.fallback-icon')) {
-                            container.innerHTML = `<div class="fallback-icon text-primary w-8 h-8 flex items-center justify-center">${IconComponent ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>` : ''}</div>`;
-                          }
-                        }}
-                      />
+                      {imageStatus !== 'error' && (
+                        <img 
+                          src={imageUrl} 
+                          alt={category.name}
+                          className="w-full h-full object-contain p-2"
+                          onLoad={() => handleImageLoad(category.id)}
+                          onError={() => handleImageError(category.id)}
+                          style={{ display: imageStatus === 'error' ? 'none' : 'block' }}
+                        />
+                      )}
+                      {imageStatus === 'error' && IconComponent && (
+                        <div className="text-primary w-8 h-8 flex items-center justify-center">
+                          <IconComponent size={24} />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -83,4 +97,5 @@ const ServiceCategories = ({
     </section>
   );
 };
+
 export default ServiceCategories;
