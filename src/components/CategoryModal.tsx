@@ -46,26 +46,26 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
           borderRadius: "16px",
           animationDelay: `${index * 0.1}s`
         }}
-        className="cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-lg border border-border rounded-2xl overflow-hidden animate-on-scroll group w-full"
+        className="cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-lg border border-border rounded-2xl overflow-hidden animate-on-scroll group w-full h-24"
       >
-        <div className="p-4">
-          <div className="flex items-center justify-between gap-4 h-20">
-            <div className="flex-1">
-              <MorphingDialogTitle className="font-semibold text-foreground text-lg group-hover:text-primary transition-colors">
-                {category.name}
-              </MorphingDialogTitle>
-            </div>
-            <div className="w-28 h-20 flex items-center justify-center bg-muted/30 rounded-lg overflow-hidden group-hover:bg-primary/10 transition-colors relative">
-              <MorphingDialogImage
-                src={imageUrl}
-                alt={category.name}
-                className="absolute inset-0 w-full h-full object-cover transform scale-175 group-hover:scale-185 transition-transform duration-300"
-                style={{ 
-                  objectPosition: 'center 75%',
-                  transformOrigin: 'center bottom'
-                }}
-              />
-            </div>
+        <div className="flex h-full">
+          {/* Text content - 60% width */}
+          <div className="flex-1 p-4 flex items-center justify-center bg-background">
+            <MorphingDialogTitle className="font-semibold text-foreground text-lg group-hover:text-primary transition-colors text-center">
+              {category.name}
+            </MorphingDialogTitle>
+          </div>
+          
+          {/* Image section - 40% width, full height */}
+          <div className="w-[40%] h-full relative overflow-hidden">
+            <MorphingDialogImage
+              src={imageUrl}
+              alt={category.name}
+              className="absolute inset-0 w-full h-full object-cover transform scale-100 group-hover:scale-110 transition-transform duration-300"
+              style={{ 
+                objectPosition: 'center center'
+              }}
+            />
           </div>
         </div>
       </MorphingDialogTrigger>
@@ -137,8 +137,7 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
               alt={category.name}
               className="absolute inset-0 w-full h-full object-cover"
               style={{ 
-                objectPosition: 'center 75%',
-                transformOrigin: 'center bottom'
+                objectPosition: 'center center'
               }}
             />
           </div>
