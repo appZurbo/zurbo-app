@@ -26,7 +26,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Reparos',
     icon: Wrench,
     color: 'bg-orange-50 border-orange-200 hover:bg-orange-100',
-    image: 'chaveiro.png', // Usando chaveiro como representação de reparos
+    image: 'mecanico.png', // Using mecanico.png for repairs as requested
     serviceIds: ['ce1a57d6-df65-42e4-bc5e-1daf54ba5958', 'eed94aa8-4055-40ac-a7cf-18212dfc97e3'] // Montador de móveis, Pedreiro
   },
   {
@@ -106,7 +106,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Mecânico',
     icon: Car,
     color: 'bg-gray-50 border-gray-200 hover:bg-gray-100',
-    image: 'mecanico.png',
+    image: 'mecanicos.png', // Using mecanicos.png for the mechanic category
     serviceIds: [] // Adicionar IDs de serviços mecânicos quando estiverem disponíveis
   }
 ];

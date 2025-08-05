@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, MapPin } from 'lucide-react';
-import { BannerImages } from '@/components/banners/BannerImages';
+import { LocalBannerImages } from '@/components/banners/LocalBannerImages';
 
 interface BannerImage {
   name: string;
@@ -99,7 +99,7 @@ export const HeroSection = () => {
                 Nossos Serviços em Destaque
               </h3>
               
-              <BannerImages 
+              <LocalBannerImages 
                 onImagesLoaded={setBannerImages}
                 className="min-h-[300px]"
               />

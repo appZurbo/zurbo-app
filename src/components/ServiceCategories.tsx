@@ -50,7 +50,7 @@ const ServiceCategories = ({
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {serviceCategories.map((category, index) => {
-            const imageUrl = `https://mbzxifrkabfnufliawzo.supabase.co/storage/v1/object/public/site-images/${category.image}`;
+            const imageUrl = `/${category.image}`;
             const IconComponent = category.icon;
             const imageStatus = imageStatuses[category.id] || 'loading';
             
