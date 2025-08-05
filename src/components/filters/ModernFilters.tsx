@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { FilterHeader } from './FilterHeader';
 import { BasicFilters } from './BasicFilters';
 import { AdvancedFilters } from './AdvancedFilters';
+import { getServicos } from '@/utils/database/servicos';
 
 interface FilterState {
   cidade: string;
@@ -16,10 +17,10 @@ interface FilterState {
 
 interface ModernFiltersProps {
   onFiltersChange: (filters: FilterState) => void;
-  servicos: Array<{ id: string; nome: string; icone: string; cor?: string }>;
 }
 
-export const ModernFilters = ({ onFiltersChange, servicos }: ModernFiltersProps) => {
+export const ModernFilters = ({ onFiltersChange }: ModernFiltersProps) => {
+  const [servicos, setServicos] = useState<Array<{ id: string; nome: string; icone: string; cor?: string }>>([]);
   const [filters, setFilters] = useState<FilterState>({
     cidade: 'Sinop, Mato Grosso', // Updated to use normalized city name
     precoMin: 0,
@@ -31,8 +32,13 @@ export const ModernFilters = ({ onFiltersChange, servicos }: ModernFiltersProps)
 
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  // Apply default filters on mount
+  // Load services and apply default filters on mount
   useEffect(() => {
+    const loadServicos = async () => {
+      const servicosData = await getServicos();
+      setServicos(servicosData);
+    };
+    loadServicos();
     onFiltersChange(filters);
   }, []);
 

@@ -26,6 +26,7 @@ const Index = () => {
     prestadores,
     loading,
     error,
+    filters,
     showFavoritesOnly,
     isAuthenticated,
     handleFiltersChange,
@@ -43,9 +44,12 @@ const Index = () => {
     setShowProfileModal(true);
   };
 
-  const handleCategorySelect = (categoryId: string) => {
-    console.log('📂 Category selected:', categoryId);
-    navigate(`/prestadores?servico=${categoryId}`);
+  const handleCategorySelect = (serviceIds: string[]) => {
+    console.log('📂 Services selected:', serviceIds);
+    handleFiltersChange({
+      ...filters,
+      servicos: serviceIds
+    });
   };
 
   return (
@@ -61,7 +65,7 @@ const Index = () => {
             
             <div className="mt-12">
               <ErrorBoundary>
-                <ModernFilters onFiltersChange={handleFiltersChange} servicos={[]} />
+                <ModernFilters onFiltersChange={handleFiltersChange} />
               </ErrorBoundary>
             </div>
 
@@ -80,7 +84,7 @@ const Index = () => {
                   onRetry={retry}
                   onClearFilters={() => handleFiltersChange({
                     cidade: '',
-                    servico: '',
+                    servicos: [],
                     precoMin: undefined,
                     precoMax: undefined,
                     notaMin: undefined

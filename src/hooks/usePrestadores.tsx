@@ -6,11 +6,10 @@ import { useToast } from '@/hooks/use-toast';
 
 interface UsePrestadoresFilters {
   cidade?: string;
-  servico?: string;
+  servicos?: string[];
   precoMin?: number;
   precoMax?: number;
   notaMin?: number;
-  servicos?: string[];
   apenasPremium?: boolean;
 }
 

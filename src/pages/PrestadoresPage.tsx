@@ -176,7 +176,7 @@ const PrestadoresPage = () => {
 
         {/* Filtros */}
         <div className="mb-8">
-          <ModernFilters onFiltersChange={handleFiltersChange} servicos={servicos} />
+          <ModernFilters onFiltersChange={handleFiltersChange} />
         </div>
 
         {/* Premium/Highlight Section */}

@@ -5,7 +5,7 @@ import { useAuth } from './useAuth';
 
 interface UseHomepageFilters {
   cidade: string;
-  servico: string;
+  servicos: string[];
   precoMin?: number;
   precoMax?: number;
   notaMin?: number;
@@ -15,7 +15,7 @@ export const useHomepage = () => {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [filters, setFilters] = useState<UseHomepageFilters>({
     cidade: '',
-    servico: '',
+    servicos: [],
     precoMin: undefined,
     precoMax: undefined,
     notaMin: undefined
