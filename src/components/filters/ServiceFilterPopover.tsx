@@ -137,18 +137,4 @@ export const ServiceFilterPopover: React.FC<ServiceFilterPopoverProps> = ({
       </Popover>
     </div>
   );
-
-  function handleServiceToggle(servicoId: string) {
-    const newSelection = selectedServices.includes(servicoId)
-      ? selectedServices.filter(id => id !== servicoId)
-      : [...selectedServices, servicoId];
-    
-    onSelectionChange(newSelection);
-  }
-
-  function clearSelection() {
-    onSelectionChange([]);
-  }
-
-  const selectedCount = selectedServices.length;
 };

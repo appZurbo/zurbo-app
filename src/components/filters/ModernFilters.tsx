@@ -78,7 +78,6 @@ export const ModernFilters = ({ onFiltersChange }: ModernFiltersProps) => {
 
       <BasicFilters
         filters={filters}
-        servicos={servicos}
         onFilterUpdate={updateFilter}
       />
 
