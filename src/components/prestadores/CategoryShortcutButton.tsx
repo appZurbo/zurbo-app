@@ -16,7 +16,7 @@ export const CategoryShortcutButton: React.FC<CategoryShortcutButtonProps> = ({
 }) => {
   const imageUrl = `/${category.image}`;
 
-  // Get image positioning based on category needs - focus more on faces and top border
+  // Get image positioning based on category needs - align top of image with top of button border
   const getImageStyles = (categoryId: string) => {
     const baseStyles = {
       objectFit: 'cover' as const,
@@ -26,8 +26,8 @@ export const CategoryShortcutButton: React.FC<CategoryShortcutButtonProps> = ({
       case 'fretes':
         return {
           ...baseStyles,
-          objectPosition: 'center 75%',
-          transform: 'scale(1.2)'
+          objectPosition: 'center top',
+          transform: 'scale(1.2) translateY(0)'
         };
       case 'limpeza':
       case 'beleza':
@@ -38,17 +38,17 @@ export const CategoryShortcutButton: React.FC<CategoryShortcutButtonProps> = ({
       case 'refrigeracao':
       case 'cuidados':
       case 'tecnologia':
-        // Focus much more on the top/faces - using top 0% positioning
+        // Align image top with button top and scale appropriately
         return {
           ...baseStyles,
-          objectPosition: 'center 0%',
-          transform: 'scale(1.6)'
+          objectPosition: 'center top',
+          transform: 'scale(1.6) translateY(0)'
         };
       default:
         return {
           ...baseStyles,
-          objectPosition: 'center 70%',
-          transform: 'scale(1.4)'
+          objectPosition: 'center top',
+          transform: 'scale(1.4) translateY(0)'
         };
     }
   };
