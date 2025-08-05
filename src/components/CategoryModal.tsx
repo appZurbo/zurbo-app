@@ -60,10 +60,10 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
       case 'construcao':
       case 'jardinagem':
       case 'refrigeracao':
-        // Categories that need to be enlarged and positioned at the top to show faces
+        // Categories that need to be enlarged and positioned at the very top to show faces clearly
         return {
           ...baseStyles,
-          objectPosition: 'center 30%',
+          objectPosition: 'center 15%',
           transform: 'scale(1.6)' // Keep enlarged to make them visible
         };
       default:
