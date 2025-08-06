@@ -389,6 +389,7 @@
 
 .card-prestador-moderno .avatar {
   @apply w-16 h-16 rounded-full object-cover;
+  object-position: center top;
 }
 
 .card-prestador-moderno .info h3 {
