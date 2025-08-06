@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { UserSettings } from '@/components/settings/UserSettings';
 import SecuritySettings from '@/components/settings/SecuritySettings';
 import { ProviderProfileSection } from '@/components/settings/ProviderProfileSection';
+import { ServiceSelectionImproved } from '@/components/settings/ServiceSelectionImproved';
+import { PrestadorPhotoSettings } from '@/components/settings/PrestadorPhotoSettings';
 import GerenciadorCidades from '@/components/cidades/GerenciadorCidades';
 import { useMobile } from '@/hooks/useMobile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -95,9 +97,9 @@ const Settings = () => {
                   {isMobile ? 'Perfil' : 'Meu Perfil'}
                 </TabsTrigger>
                 {isPrestador && (
-                   <TabsTrigger value="cidades" className="flex items-center gap-2 data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600">
-                     <SettingsIcon className="h-4 w-4" />
-                     {isMobile ? 'Cidades' : 'Área de Atendimento'}
+                   <TabsTrigger value="services" className="flex items-center gap-2 data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600">
+                     <Wrench className="h-4 w-4" />
+                     {isMobile ? 'Serviços' : 'Configurações de Serviços'}
                    </TabsTrigger>
                 )}
                 <TabsTrigger value="security" className="flex items-center gap-0.5 data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600">
@@ -107,32 +109,42 @@ const Settings = () => {
               </TabsList>
               
               <TabsContent value="profile" className="space-y-6">
-                <Card className="shadow-sm">
-                  <CardHeader className="pb-4">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <User className="h-5 w-5 text-orange-500" />
-                      Informações Pessoais
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {isPrestador ? <ProviderProfileSection /> : <UserSettings />}
-                  </CardContent>
-                </Card>
+                {isPrestador ? (
+                  <div className="space-y-6">
+                    <ProviderProfileSection />
+                    <PrestadorPhotoSettings />
+                  </div>
+                ) : (
+                  <Card className="shadow-sm">
+                    <CardHeader className="pb-4">
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <User className="h-5 w-5 text-orange-500" />
+                        Informações Pessoais
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <UserSettings />
+                    </CardContent>
+                  </Card>
+                )}
               </TabsContent>
               
                {isPrestador && (
-                 <TabsContent value="cidades" className="space-y-6">
-                   <Card className="shadow-sm">
-                     <CardHeader>
-                       <CardTitle className="flex items-center gap-2">
-                         <SettingsIcon className="h-5 w-5 text-orange-500" />
-                         Área de Atendimento
-                       </CardTitle>
-                     </CardHeader>
-                     <CardContent>
-                       <GerenciadorCidades />
-                     </CardContent>
-                   </Card>
+                 <TabsContent value="services" className="space-y-6">
+                   <div className="space-y-6">
+                     <ServiceSelectionImproved />
+                     <Card className="shadow-sm">
+                       <CardHeader>
+                         <CardTitle className="flex items-center gap-2">
+                           <SettingsIcon className="h-5 w-5 text-orange-500" />
+                           Área de Atendimento
+                         </CardTitle>
+                       </CardHeader>
+                       <CardContent>
+                         <GerenciadorCidades />
+                       </CardContent>
+                     </Card>
+                   </div>
                  </TabsContent>
                )}
               
