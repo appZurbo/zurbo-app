@@ -83,7 +83,7 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
         // Categories that need to be enlarged and positioned at the very top to show faces clearly
         return {
           ...baseStyles,
-          objectPosition: 'center 15%',
+          objectPosition: 'center 5%', // Moved to 5% to show more of the top/face
           transform: 'scale(1.6)' // Keep enlarged to make them visible
         };
       default:

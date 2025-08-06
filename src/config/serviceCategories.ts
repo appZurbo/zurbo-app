@@ -84,7 +84,7 @@ export const serviceCategories: ServiceCategory[] = [
     icon: Droplets,
     color: 'bg-blue-50 border-blue-200 hover:bg-blue-100',
     image: 'lovable-uploads/encanador.png',
-    serviceIds: [] // Em breve - será populado quando o serviço for adicionado
+    serviceIds: ['20c31e3d-3728-4822-8df3-a061d6c524e2'] // Encanador
   },
   {
     id: 'cozinha',
@@ -92,7 +92,7 @@ export const serviceCategories: ServiceCategory[] = [
     icon: ChefHat,
     color: 'bg-orange-50 border-orange-200 hover:bg-orange-100',
     image: 'lovable-uploads/cozinha.png',
-    serviceIds: [] // Em breve
+    serviceIds: ['5fbb818e-a0ba-4be9-a81a-4fced06e6c5e'] // Cozinha
   },
   {
     id: 'tecnologia',
@@ -134,9 +134,11 @@ export const serviceIconMap = {
   'beleza': { icon: Scissors, color: 'text-pink-600', bgColor: 'bg-pink-100' },
   'cabeleireiro(a)': { icon: Scissors, color: 'text-amber-600', bgColor: 'bg-amber-100' },
   'construção': { icon: Hammer, color: 'text-orange-600', bgColor: 'bg-orange-100' },
+  'cozinha': { icon: ChefHat, color: 'text-orange-600', bgColor: 'bg-orange-100' },
   'cuidador(a) de idosos': { icon: Heart, color: 'text-red-600', bgColor: 'bg-red-100' },
   'diarista': { icon: Sparkles, color: 'text-emerald-600', bgColor: 'bg-emerald-100' },
   'eletricista': { icon: Zap, color: 'text-orange-600', bgColor: 'bg-orange-100' },
+  'encanador': { icon: Droplets, color: 'text-blue-600', bgColor: 'bg-blue-100' },
   'fretes': { icon: Truck, color: 'text-orange-600', bgColor: 'bg-orange-100' },
   'jardineiro': { icon: TreePine, color: 'text-green-600', bgColor: 'bg-green-100' },
   'limpeza': { icon: Sparkles, color: 'text-orange-600', bgColor: 'bg-orange-100' },
