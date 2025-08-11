@@ -53,13 +53,16 @@ interface VerificationRow {
   updated_at?: string;
 }
 
+// Novo alias simples para evitar tipos profundos
+type PendingVerification = VerificationRow & { user: Prestador };
+
 const PrestadorManagement = () => {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
   const { toast } = useToast();
   
   const [prestadores, setPrestadores] = useState<Prestador[]>([]);
-  const [pendingVerifs, setPendingVerifs] = useState<(VerificationRow & { user: Prestador })[]>([]);
+  const [pendingVerifs, setPendingVerifs] = useState<PendingVerification[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingPending, setLoadingPending] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -86,12 +89,23 @@ const PrestadorManagement = () => {
 
       if (error) throw error;
       
-      const transformedData = (data || []).map((user: any) => ({
-        ...user,
+      // Mapeia explicitamente para o tipo Prestador (evita conflito com tipos gerados do Supabase)
+      const transformedData: Prestador[] = (data || []).map((user: any) => ({
+        id: user.id,
+        nome: user.nome,
+        email: user.email,
+        telefone: user.telefone ?? undefined,
+        foto_perfil: user.foto_perfil || user.foto_url || undefined,
+        verificado: !!user.verificado,
+        ativo: user.ativo !== false,
+        endereco_cidade: user.endereco_cidade,
+        endereco_bairro: user.endereco_bairro,
         cidade: user.endereco_cidade,
         bairro: user.endereco_bairro,
-        verificado: user.verificado || false,
-        ativo: user.ativo !== false
+        servicos: user.servicos ?? undefined,
+        media_avaliacoes: user.media_avaliacoes ?? user.nota_media,
+        total_avaliacoes: user.total_avaliacoes ?? undefined,
+        created_at: user.created_at,
       }));
       
       setPrestadores(transformedData);
@@ -132,10 +146,30 @@ const PrestadorManagement = () => {
 
       if (usersErr) throw usersErr;
 
-      const merged = (verifs || []).map(v => {
-        const u = (usersData || []).find((x: any) => x.id === v.user_id);
-        return { ...(v as VerificationRow), user: u as Prestador };
-      }).filter(x => x.user);
+      const merged: PendingVerification[] = (verifs || [])
+        .map((v) => {
+          const u: any = (usersData || []).find((x: any) => x.id === v.user_id);
+          if (!u) return null;
+          const prestador: Prestador = {
+            id: u.id,
+            nome: u.nome,
+            email: u.email,
+            telefone: u.telefone ?? undefined,
+            foto_perfil: u.foto_perfil || u.foto_url || undefined,
+            verificado: !!u.verificado,
+            ativo: u.ativo !== false,
+            endereco_cidade: u.endereco_cidade,
+            endereco_bairro: u.endereco_bairro,
+            cidade: u.endereco_cidade,
+            bairro: u.endereco_bairro,
+            servicos: u.servicos ?? undefined,
+            media_avaliacoes: u.media_avaliacoes ?? u.nota_media,
+            total_avaliacoes: u.total_avaliacoes ?? undefined,
+            created_at: u.created_at,
+          };
+          return { ...(v as VerificationRow), user: prestador };
+        })
+        .filter((x): x is PendingVerification => !!x);
 
       setPendingVerifs(merged);
     } catch (error) {
@@ -152,9 +186,10 @@ const PrestadorManagement = () => {
 
   const handleStatusChange = async (prestadorId: string, field: 'verificado' | 'ativo', value: boolean) => {
     try {
+      // Faz cast do payload para any, pois 'verificado' pode não constar nos tipos gerados
       const { error } = await supabase
         .from('users')
-        .update({ [field]: value })
+        .update({ [field]: value } as any)
         .eq('id', prestadorId);
 
       if (error) throw error;
