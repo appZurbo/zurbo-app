@@ -13,6 +13,8 @@ import LocationConsentDialog from './LocationConsentDialog';
 import { useSecureLocation } from '@/hooks/useSecureLocation';
 import { getCidades } from '@/utils/database';
 import { fetchActiveLegalDocument, mapUserTipoToDocType, savePendingAcceptance, type LegalDocument } from '@/utils/legal';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface ExtendedRegisterFormProps {
   onSuccess: (userType: string) => void;
