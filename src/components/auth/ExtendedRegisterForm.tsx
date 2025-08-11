@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,11 +8,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { validateCPF, validateEmail, validatePassword, sanitizeText, formatCPF } from '@/utils/validation';
-import { AlertCircle, Eye, EyeOff, MapPin, User } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff, MapPin, User, FileText } from 'lucide-react';
 import LocationConsentDialog from './LocationConsentDialog';
 import { useSecureLocation } from '@/hooks/useSecureLocation';
 import { getCidades } from '@/utils/database';
-import { useEffect } from 'react';
+import { fetchActiveLegalDocument, mapUserTipoToDocType, savePendingAcceptance, type LegalDocument } from '@/utils/legal';
 
 interface ExtendedRegisterFormProps {
   onSuccess: (userType: string) => void;
@@ -45,9 +44,22 @@ const ExtendedRegisterForm = ({ onSuccess, onSwitchToLogin }: ExtendedRegisterFo
   const { toast } = useToast();
   const { latitude, longitude, requestLocation } = useSecureLocation();
 
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [legalDoc, setLegalDoc] = useState<LegalDocument | null>(null);
+  const [showContract, setShowContract] = useState(false);
+
   useEffect(() => {
     loadCidades();
   }, []);
+
+  useEffect(() => {
+    const loadDoc = async () => {
+      const docType = mapUserTipoToDocType(formData.tipo);
+      const doc = await fetchActiveLegalDocument(docType);
+      setLegalDoc(doc);
+    };
+    loadDoc();
+  }, [formData.tipo]);
 
   const loadCidades = async () => {
     const cidadesData = await getCidades();
@@ -79,6 +91,10 @@ const ExtendedRegisterForm = ({ onSuccess, onSwitchToLogin }: ExtendedRegisterFo
       newErrors.confirmPassword = 'Senhas não coincidem';
     }
 
+    if (!agreedToTerms) {
+      newErrors.termos = 'Você deve aceitar os termos para continuar';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -105,7 +121,8 @@ const ExtendedRegisterForm = ({ onSuccess, onSwitchToLogin }: ExtendedRegisterFo
             nome: sanitizeText(formData.nome),
             cpf: formData.cpf.replace(/\D/g, ''),
             tipo: formData.tipo
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/`,
         }
       });
 
@@ -123,34 +140,46 @@ const ExtendedRegisterForm = ({ onSuccess, onSwitchToLogin }: ExtendedRegisterFo
       }
 
       if (data.user) {
-        const { error: profileError } = await supabase
+        const { data: existing } = await supabase
           .from('users')
-          .insert({
-            auth_id: data.user.id,
-            nome: sanitizeText(formData.nome),
-            email: formData.email,
-            cpf: formData.cpf.replace(/\D/g, ''),
-            tipo: formData.tipo,
-            endereco_rua: formData.endereco_rua?.trim() || null,
-            endereco_numero: formData.endereco_numero?.trim() || null,
-            endereco_bairro: formData.endereco_bairro?.trim() || null,
-            endereco_cidade: formData.endereco_cidade?.trim() || null,
-            endereco_cep: formData.endereco_cep?.trim() || null,
-            latitude: latitude,
-            longitude: longitude
-          });
+          .select('id')
+          .eq('auth_id', data.user.id)
+          .maybeSingle();
 
-        if (profileError) {
-          if (profileError.message.includes('unique_cpf')) {
-            toast({
-              title: "CPF já cadastrado",
-              description: "Este CPF já está em uso no sistema.",
-              variant: "destructive",
+        if (!existing) {
+          const { error: profileError } = await supabase
+            .from('users')
+            .insert({
+              auth_id: data.user.id,
+              nome: sanitizeText(formData.nome),
+              email: formData.email,
+              cpf: formData.cpf.replace(/\D/g, ''),
+              tipo: formData.tipo,
+              endereco_rua: formData.endereco_rua?.trim() || null,
+              endereco_numero: formData.endereco_numero?.trim() || null,
+              endereco_bairro: formData.endereco_bairro?.trim() || null,
+              endereco_cidade: formData.endereco_cidade?.trim() || null,
+              endereco_cep: formData.endereco_cep?.trim() || null,
+              latitude: latitude,
+              longitude: longitude
             });
-          } else {
-            throw profileError;
+
+          if (profileError) {
+            if (profileError.message.includes('unique_cpf')) {
+              toast({
+                title: "CPF já cadastrado",
+                description: "Este CPF já está em uso no sistema.",
+                variant: "destructive",
+              });
+            } else {
+              throw profileError;
+            }
+            return;
           }
-          return;
+        }
+
+        if (legalDoc) {
+          savePendingAcceptance(legalDoc);
         }
 
         toast({
@@ -341,6 +370,37 @@ const ExtendedRegisterForm = ({ onSuccess, onSwitchToLogin }: ExtendedRegisterFo
                   </RadioGroup>
                 </div>
 
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2">
+                    <Checkbox
+                      id="agree"
+                      checked={agreedToTerms}
+                      onCheckedChange={(c) => setAgreedToTerms(!!c)}
+                    />
+                    <Label htmlFor="agree" className="text-sm">
+                      Li e aceito os{' '}
+                      <button
+                        type="button"
+                        className="text-blue-600 underline-offset-2 hover:underline"
+                        onClick={() => setShowContract(true)}
+                      >
+                        {formData.tipo === 'cliente' ? 'Termos do Cliente' : 'Contrato do Prestador'}
+                      </button>
+                    </Label>
+                  </div>
+                  {errors.termos && (
+                    <p className="text-sm text-red-500 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {errors.termos}
+                    </p>
+                  )}
+                  {legalDoc?.summary && (
+                    <p className="text-xs text-muted-foreground whitespace-pre-line">
+                      {legalDoc.summary}
+                    </p>
+                  )}
+                </div>
+
                 <Button 
                   type="button" 
                   onClick={() => canProceedToLocation() && setActiveTab('location')}
@@ -457,6 +517,22 @@ const ExtendedRegisterForm = ({ onSuccess, onSwitchToLogin }: ExtendedRegisterFo
         open={showLocationDialog}
         onConsent={handleLocationConsent}
       />
+
+      <Dialog open={showContract} onOpenChange={setShowContract}>
+        <DialogContent className="max-w-2xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              {formData.tipo === 'cliente' ? 'Termos do Cliente' : 'Contrato do Prestador'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="h-96 w-full rounded-md border p-4 overflow-auto">
+            <pre className="whitespace-pre-wrap text-sm">
+              {legalDoc?.content || ''}
+            </pre>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

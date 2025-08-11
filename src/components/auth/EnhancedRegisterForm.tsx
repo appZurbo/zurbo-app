@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,6 +11,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Eye, EyeOff, Mail, Lock, Phone, User, FileText } from 'lucide-react';
+import { fetchActiveLegalDocument, mapUserTipoToDocType, savePendingAcceptance, type LegalDocument } from '@/utils/legal';
 
 interface EnhancedRegisterFormProps {
   onSuccess: () => void;
@@ -33,6 +33,16 @@ export const EnhancedRegisterForm = ({ onSuccess, onSwitchToLogin }: EnhancedReg
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [showContract, setShowContract] = useState(false);
   const { toast } = useToast();
+  const [legalDoc, setLegalDoc] = useState<LegalDocument | null>(null);
+
+  useEffect(() => {
+    const loadDoc = async () => {
+      const docType = mapUserTipoToDocType(formData.tipo);
+      const doc = await fetchActiveLegalDocument(docType);
+      setLegalDoc(doc);
+    };
+    loadDoc();
+  }, [formData.tipo]);
 
   const handleGoogleRegister = async () => {
     setLoading(true);
@@ -99,7 +109,7 @@ export const EnhancedRegisterForm = ({ onSuccess, onSwitchToLogin }: EnhancedReg
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -113,6 +123,29 @@ export const EnhancedRegisterForm = ({ onSuccess, onSwitchToLogin }: EnhancedReg
       });
 
       if (error) throw error;
+
+      // Garantir criação do perfil na tabela users para viabilizar aceite futuro
+      if (data.user) {
+        const { data: existing } = await supabase
+          .from('users')
+          .select('id')
+          .eq('auth_id', data.user.id)
+          .maybeSingle();
+
+        if (!existing) {
+          await supabase.from('users').insert({
+            auth_id: data.user.id,
+            email: formData.email,
+            nome: formData.nome,
+            tipo: formData.tipo,
+          });
+        }
+      }
+
+      // Salvar aceite pendente localmente (será consumido após o primeiro login)
+      if (legalDoc) {
+        savePendingAcceptance(legalDoc);
+      }
 
       toast({
         title: "Cadastro realizado com sucesso!",
@@ -138,6 +171,7 @@ export const EnhancedRegisterForm = ({ onSuccess, onSwitchToLogin }: EnhancedReg
   };
 
   const getContractContent = () => {
+    if (legalDoc?.content) return legalDoc.content;
     if (formData.tipo === 'cliente') {
       return `
 CONTRATO DE PRESTAÇÃO DE SERVIÇOS - ZURBO ↔ CLIENTE
@@ -398,11 +432,18 @@ Ao aceitar este contrato, você concorda com todos os termos acima.
                       </DialogTitle>
                     </DialogHeader>
                     <ScrollArea className="h-96 w-full rounded-md border p-4">
-                      <pre className="whitespace-pre-wrap text-sm">{getContractContent()}</pre>
+                      <pre className="whitespace-pre-wrap text-sm">
+                        {getContractContent()}
+                      </pre>
                     </ScrollArea>
                   </DialogContent>
                 </Dialog>
               </Label>
+              {legalDoc?.summary && (
+                <p className="text-xs text-muted-foreground mt-1 whitespace-pre-line">
+                  {legalDoc.summary}
+                </p>
+              )}
             </div>
           </div>
         </div>

@@ -1,9 +1,8 @@
-
 import { useAuth } from '@/hooks/useAuth';
 import WatermarkSection from '@/components/sections/WatermarkSection';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Settings as SettingsIcon, User, Wrench, Shield } from 'lucide-react';
+import { ArrowLeft, Settings as SettingsIcon, User, Wrench, Shield, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { UserSettings } from '@/components/settings/UserSettings';
 import SecuritySettings from '@/components/settings/SecuritySettings';
@@ -14,6 +13,7 @@ import GerenciadorCidades from '@/components/cidades/GerenciadorCidades';
 import { useMobile } from '@/hooks/useMobile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
+import { LegalDocumentsTab } from '@/components/settings/LegalDocumentsTab';
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -91,7 +91,7 @@ const Settings = () => {
           {/* Tabs organizadas centralmente */}
           <div className="max-w-2xl mx-auto">
             <Tabs defaultValue="profile" className="space-y-6">
-              <TabsList className={`grid w-full ${isPrestador ? 'grid-cols-3' : 'grid-cols-2'} bg-white shadow-sm`}>
+              <TabsList className={`grid w-full ${isPrestador ? 'grid-cols-4' : 'grid-cols-3'} bg-white shadow-sm`}>
                 <TabsTrigger value="profile" className="flex items-center gap-2 data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600">
                   <User className="h-4 w-4" />
                   {isMobile ? 'Perfil' : 'Meu Perfil'}
@@ -105,6 +105,10 @@ const Settings = () => {
                 <TabsTrigger value="security" className="flex items-center gap-0.5 data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600">
                   <Shield className="h-4 w-4" />
                   {isMobile ? 'Segurança' : 'Privacidade & Segurança'}
+                </TabsTrigger>
+                <TabsTrigger value="legal" className="flex items-center gap-0.5 data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600">
+                  <FileText className="h-4 w-4" />
+                  {isMobile ? 'Contrato' : 'Meu Contrato'}
                 </TabsTrigger>
               </TabsList>
               
@@ -160,6 +164,10 @@ const Settings = () => {
                     <SecuritySettings />
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="legal" className="space-y-6">
+                <LegalDocumentsTab />
               </TabsContent>
             </Tabs>
           </div>
