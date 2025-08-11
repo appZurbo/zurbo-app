@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -80,12 +79,14 @@ const PrestadorManagement = () => {
   const loadPrestadores = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      // Cast para any para evitar inferência profunda dos tipos do Supabase
+      const usersQuery = supabase
         .from('users')
         .select('*')
         .eq('tipo', 'prestador')
         .eq('ativo', true)
         .order('created_at', { ascending: false });
+      const { data, error } = await (usersQuery as any);
 
       if (error) throw error;
       
@@ -124,30 +125,32 @@ const PrestadorManagement = () => {
   const loadPendingVerifications = async () => {
     try {
       setLoadingPending(true);
-      // Buscar verificações pendentes
-      const { data: verifs, error: verErr } = await supabase
+      // Buscar verificações pendentes - cast para any para evitar tipos profundos
+      const verifsQuery = supabase
         .from('provider_verifications')
         .select('*')
         .eq('status', 'pending')
         .order('updated_at', { ascending: false });
+      const { data: verifs, error: verErr } = await (verifsQuery as any);
 
       if (verErr) throw verErr;
 
-      const userIds = (verifs || []).map(v => v.user_id);
+      const userIds = (verifs || []).map((v: any) => v.user_id);
       if (userIds.length === 0) {
         setPendingVerifs([]);
         return;
       }
 
-      const { data: usersData, error: usersErr } = await supabase
+      const usersQuery = supabase
         .from('users')
         .select('*')
         .in('id', userIds);
+      const { data: usersData, error: usersErr } = await (usersQuery as any);
 
       if (usersErr) throw usersErr;
 
       const merged: PendingVerification[] = (verifs || [])
-        .map((v) => {
+        .map((v: any) => {
           const u: any = (usersData || []).find((x: any) => x.id === v.user_id);
           if (!u) return null;
           const prestador: Prestador = {
@@ -248,10 +251,10 @@ const PrestadorManagement = () => {
 
       if (verErr) throw verErr;
 
-      // Marcar usuário como verificado e ativo
+      // Marcar usuário como verificado e ativo - cast para any
       const { error: usrErr } = await supabase
         .from('users')
-        .update({ verificado: true, ativo: true })
+        .update({ verificado: true, ativo: true } as any)
         .eq('id', userId);
 
       if (usrErr) throw usrErr;
