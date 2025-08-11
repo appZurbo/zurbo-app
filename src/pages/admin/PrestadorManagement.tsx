@@ -79,14 +79,15 @@ const PrestadorManagement = () => {
   const loadPrestadores = async () => {
     try {
       setLoading(true);
-      // Cast para any para evitar inferência profunda dos tipos do Supabase
-      const usersQuery = supabase
+      // Busca simples para evitar types complexos do Supabase
+      const response: any = await (supabase as any)
         .from('users')
         .select('*')
         .eq('tipo', 'prestador')
         .eq('ativo', true)
         .order('created_at', { ascending: false });
-      const { data, error } = await (usersQuery as any);
+      
+      const { data, error } = response;
 
       if (error) throw error;
       
