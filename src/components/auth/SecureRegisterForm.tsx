@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +10,7 @@ import { validateCPF, validateEmail, validatePassword, sanitizeText, formatCPF }
 import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 import LocationConsentDialog from './LocationConsentDialog';
 import { useSecureLocation } from '@/hooks/useSecureLocation';
+import ProviderVerificationUpload, { VerificationFiles } from './ProviderVerificationUpload';
 
 interface SecureRegisterFormProps {
   onSuccess: (userType: string) => void;
@@ -26,6 +26,7 @@ const SecureRegisterForm = ({ onSuccess, onSwitchToLogin }: SecureRegisterFormPr
     confirmPassword: '',
     tipo: 'cliente'
   });
+  const [verificationFiles, setVerificationFiles] = useState<VerificationFiles>({});
   const [showPassword, setShowPassword] = useState(false);
   const [showLocationDialog, setShowLocationDialog] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -78,6 +79,42 @@ const SecureRegisterForm = ({ onSuccess, onSwitchToLogin }: SecureRegisterFormPr
     }
   };
 
+  const uploadVerificationIfNeeded = async (publicUserId: string) => {
+    if (formData.tipo !== 'prestador') return;
+    if (!verificationFiles.documentFile && !verificationFiles.selfieFile) return;
+
+    // Enviar arquivos para pasta privada do usuário: {user_id}/...
+    const bucket = supabase.storage.from('provider-verifications');
+    const uploaded: { documentPath?: string; selfiePath?: string } = {};
+
+    if (verificationFiles.documentFile) {
+      const docPath = `${publicUserId}/document-${Date.now()}-${verificationFiles.documentFile.name}`;
+      const { error: docErr } = await bucket.upload(docPath, verificationFiles.documentFile, { upsert: false });
+      if (docErr) throw docErr;
+      uploaded.documentPath = docPath;
+    }
+
+    if (verificationFiles.selfieFile) {
+      const selfiePath = `${publicUserId}/selfie-${Date.now()}-${verificationFiles.selfieFile.name}`;
+      const { error: selfieErr } = await bucket.upload(selfiePath, verificationFiles.selfieFile, { upsert: false });
+      if (selfieErr) throw selfieErr;
+      uploaded.selfiePath = selfiePath;
+    }
+
+    // Criar/atualizar registro de verificação
+    const { error: verErr } = await supabase
+      .from('provider_verifications')
+      .upsert({
+        user_id: publicUserId,
+        document_url: uploaded.documentPath,
+        selfie_url: uploaded.selfiePath,
+        status: 'pending',
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id' });
+
+    if (verErr) throw verErr;
+  };
+
   const proceedWithRegistration = async () => {
     setLoading(true);
     try {
@@ -107,7 +144,7 @@ const SecureRegisterForm = ({ onSuccess, onSwitchToLogin }: SecureRegisterFormPr
       }
 
       if (data.user) {
-        const { error: profileError } = await supabase
+        const { data: insertedUser, error: profileError } = await supabase
           .from('users')
           .insert({
             auth_id: data.user.id,
@@ -117,7 +154,9 @@ const SecureRegisterForm = ({ onSuccess, onSwitchToLogin }: SecureRegisterFormPr
             tipo: formData.tipo,
             latitude: latitude,
             longitude: longitude
-          });
+          })
+          .select('*')
+          .single();
 
         if (profileError) {
           if (profileError.message.includes('unique_cpf')) {
@@ -130,6 +169,21 @@ const SecureRegisterForm = ({ onSuccess, onSwitchToLogin }: SecureRegisterFormPr
             throw profileError;
           }
           return;
+        }
+
+        // Após criar perfil público, subir arquivos de verificação (se prestador)
+        if (insertedUser?.id) {
+          try {
+            await uploadVerificationIfNeeded(insertedUser.id);
+          } catch (upErr: any) {
+            console.error('Verification upload error:', upErr);
+            // Não bloqueia o cadastro, apenas informa
+            toast({
+              title: "Aviso",
+              description: "Conta criada, mas houve problema ao enviar documentos. Você pode reenviar depois em suas configurações.",
+              variant: "destructive",
+            });
+          }
         }
 
         toast({
@@ -297,6 +351,13 @@ const SecureRegisterForm = ({ onSuccess, onSwitchToLogin }: SecureRegisterFormPr
                 </div>
               </RadioGroup>
             </div>
+
+            {formData.tipo === 'prestador' && (
+              <ProviderVerificationUpload
+                value={verificationFiles}
+                onChange={setVerificationFiles}
+              />
+            )}
 
             <Button type="submit" disabled={loading} className="w-full bg-orange-500 hover:bg-orange-600">
               {loading ? 'Criando conta...' : 'Criar Conta'}

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,22 +8,23 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   ArrowLeft, 
   Search, 
-  Filter, 
   Eye, 
-  Edit, 
   UserX, 
   CheckCircle, 
   XCircle,
   MapPin,
   Star,
   Phone,
-  Mail
+  Mail,
+  FileText,
+  Image as ImageIcon
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { ProviderVerificationChecklist } from '@/components/admin/ProviderVerificationChecklist';
 
 interface Prestador {
   id: string;
@@ -42,15 +44,26 @@ interface Prestador {
   created_at?: string;
 }
 
+interface VerificationRow {
+  id: string;
+  user_id: string;
+  document_url?: string | null;
+  selfie_url?: string | null;
+  status: 'pending' | 'approved' | 'rejected';
+  updated_at?: string;
+}
+
 const PrestadorManagement = () => {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
   const { toast } = useToast();
   
   const [prestadores, setPrestadores] = useState<Prestador[]>([]);
+  const [pendingVerifs, setPendingVerifs] = useState<(VerificationRow & { user: Prestador })[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingPending, setLoadingPending] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'verified' | 'unverified' | 'active' | 'inactive'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'verified' | 'active'>('all');
 
   useEffect(() => {
     if (!isAdmin) {
@@ -58,6 +71,7 @@ const PrestadorManagement = () => {
       return;
     }
     loadPrestadores();
+    loadPendingVerifications();
   }, [isAdmin, navigate]);
 
   const loadPrestadores = async () => {
@@ -67,11 +81,11 @@ const PrestadorManagement = () => {
         .from('users')
         .select('*')
         .eq('tipo', 'prestador')
+        .eq('ativo', true)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       
-      // Transform data to match interface
       const transformedData = (data || []).map((user: any) => ({
         ...user,
         cidade: user.endereco_cidade,
@@ -90,6 +104,49 @@ const PrestadorManagement = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadPendingVerifications = async () => {
+    try {
+      setLoadingPending(true);
+      // Buscar verificações pendentes
+      const { data: verifs, error: verErr } = await supabase
+        .from('provider_verifications')
+        .select('*')
+        .eq('status', 'pending')
+        .order('updated_at', { ascending: false });
+
+      if (verErr) throw verErr;
+
+      const userIds = (verifs || []).map(v => v.user_id);
+      if (userIds.length === 0) {
+        setPendingVerifs([]);
+        return;
+      }
+
+      const { data: usersData, error: usersErr } = await supabase
+        .from('users')
+        .select('*')
+        .in('id', userIds);
+
+      if (usersErr) throw usersErr;
+
+      const merged = (verifs || []).map(v => {
+        const u = (usersData || []).find((x: any) => x.id === v.user_id);
+        return { ...(v as VerificationRow), user: u as Prestador };
+      }).filter(x => x.user);
+
+      setPendingVerifs(merged);
+    } catch (error) {
+      console.error('Error loading pending verifications:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar solicitações pendentes.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoadingPending(false);
     }
   };
 
@@ -124,6 +181,103 @@ const PrestadorManagement = () => {
     }
   };
 
+  const createSignedUrl = async (path?: string | null) => {
+    if (!path) return null;
+    const { data, error } = await supabase
+      .storage
+      .from('provider-verifications')
+      .createSignedUrl(path, 60 * 10); // 10 minutos
+
+    if (error) {
+      console.error('Error creating signed URL', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível gerar link do arquivo.",
+        variant: "destructive"
+      });
+      return null;
+    }
+    return data.signedUrl;
+  };
+
+  const approveProvider = async (userId: string, verifId: string) => {
+    try {
+      // Aprovar verificação
+      const { error: verErr } = await supabase
+        .from('provider_verifications')
+        .update({
+          status: 'approved',
+          reviewed_at: new Date().toISOString()
+        })
+        .eq('id', verifId);
+
+      if (verErr) throw verErr;
+
+      // Marcar usuário como verificado e ativo
+      const { error: usrErr } = await supabase
+        .from('users')
+        .update({ verificado: true, ativo: true })
+        .eq('id', userId);
+
+      if (usrErr) throw usrErr;
+
+      // Chamar Edge Function para backup
+      const { data: backupRes, error: backupErr } = await supabase.functions.invoke('create-provider-backup', {
+        body: { userId }
+      });
+
+      if (backupErr) {
+        console.warn('Backup function error:', backupErr);
+      } else {
+        console.log('Backup result:', backupRes);
+      }
+
+      toast({
+        title: "Prestador aprovado",
+        description: "O prestador foi aprovado e seus dados foram salvos em backup."
+      });
+
+      // Atualiza listas
+      await loadPrestadores();
+      await loadPendingVerifications();
+    } catch (e) {
+      console.error('Error approving provider:', e);
+      toast({
+        title: "Erro",
+        description: "Não foi possível aprovar o prestador.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const rejectProvider = async (verifId: string) => {
+    try {
+      const { error } = await supabase
+        .from('provider_verifications')
+        .update({
+          status: 'rejected',
+          reviewed_at: new Date().toISOString()
+        })
+        .eq('id', verifId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Solicitação recusada",
+        description: "O prestador foi marcado como recusado."
+      });
+
+      await loadPendingVerifications();
+    } catch (e) {
+      console.error('Error rejecting provider:', e);
+      toast({
+        title: "Erro",
+        description: "Não foi possível recusar o prestador.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const filteredPrestadores = prestadores.filter(prestador => {
     const matchesSearch = 
       prestador.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -134,9 +288,7 @@ const PrestadorManagement = () => {
     const matchesFilter = 
       filterStatus === 'all' ||
       (filterStatus === 'verified' && prestador.verificado) ||
-      (filterStatus === 'unverified' && !prestador.verificado) ||
-      (filterStatus === 'active' && prestador.ativo) ||
-      (filterStatus === 'inactive' && !prestador.ativo);
+      (filterStatus === 'active' && prestador.ativo);
 
     return matchesSearch && matchesFilter;
   });
@@ -163,12 +315,114 @@ const PrestadorManagement = () => {
                 Gerenciar Prestadores
               </h1>
               <p className="text-gray-600">
-                Visualize e gerencie todos os prestadores de serviço
+                Visualize, aprove e gerencie os prestadores de serviço
               </p>
             </div>
           </div>
 
-          {/* Filters */}
+          {/* Pendentes de aprovação */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Solicitações aguardando aprovação</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {loadingPending ? (
+                <p>Carregando solicitações...</p>
+              ) : pendingVerifs.length === 0 ? (
+                <p className="text-gray-500">Nenhuma solicitação pendente.</p>
+              ) : (
+                pendingVerifs.map((item) => (
+                  <div key={item.id} className="p-4 border rounded-lg bg-white">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-start gap-3">
+                        <Avatar className="h-12 w-12">
+                          <AvatarImage src={(item.user as any)?.foto_perfil} />
+                          <AvatarFallback>
+                            {item.user.nome.substring(0, 2).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-semibold">{item.user.nome}</h3>
+                            <Badge variant="outline">Prestador</Badge>
+                          </div>
+                          <div className="mt-1 text-sm text-gray-600 flex flex-col sm:flex-row sm:items-center gap-2">
+                            <span className="flex items-center gap-1">
+                              <Mail className="h-4 w-4" /> {item.user.email}
+                            </span>
+                            {item.user.telefone && (
+                              <span className="flex items-center gap-1">
+                                <Phone className="h-4 w-4" /> {item.user.telefone}
+                              </span>
+                            )}
+                            {item.user.endereco_cidade && (
+                              <span className="flex items-center gap-1">
+                                <MapPin className="h-4 w-4" /> {item.user.endereco_cidade}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="mt-3">
+                            <ProviderVerificationChecklist
+                              hasDocument={!!item.document_url}
+                              hasSelfie={!!item.selfie_url}
+                              hasProfileData={!!(item.user.nome && item.user.email)}
+                              status={item.status}
+                            />
+                          </div>
+
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={async () => {
+                                const url = await createSignedUrl(item.document_url || undefined);
+                                if (url) window.open(url, '_blank');
+                              }}
+                            >
+                              <FileText className="h-4 w-4 mr-1" />
+                              Ver Documento
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={async () => {
+                                const url = await createSignedUrl(item.selfie_url || undefined);
+                                if (url) window.open(url, '_blank');
+                              }}
+                            >
+                              <ImageIcon className="h-4 w-4 mr-1" />
+                              Ver Selfie
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => approveProvider(item.user_id, item.id)}
+                        >
+                          <CheckCircle className="h-4 w-4 text-green-600" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => rejectProvider(item.id)}
+                        >
+                          <XCircle className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Filtros simples */}
           <Card className="mb-6">
             <CardContent className="p-4">
               <div className="flex flex-col md:flex-row gap-4">
@@ -210,50 +464,8 @@ const PrestadorManagement = () => {
             </CardContent>
           </Card>
 
-          {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-center">
-                  <p className="text-2xl font-bold">{prestadores.length}</p>
-                  <p className="text-sm text-gray-600">Total</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600">
-                    {prestadores.filter(p => p.verificado || false).length}
-                  </p>
-                  <p className="text-sm text-gray-600">Verificados</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-blue-600">
-                    {prestadores.filter(p => p.ativo || true).length}
-                  </p>
-                  <p className="text-sm text-gray-600">Ativos</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-orange-600">
-                    {filteredPrestadores.length}
-                  </p>
-                  <p className="text-sm text-gray-600">Filtrados</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Prestadores List */}
-          <div className="space-y-4">
+          {/* Prestadores Ativos */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {loading ? (
               <Card>
                 <CardContent className="p-6 text-center">
@@ -296,18 +508,18 @@ const PrestadorManagement = () => {
                           <div className="space-y-1 text-sm text-gray-600">
                             <div className="flex items-center gap-2">
                               <Mail className="h-4 w-4" />
-                              {prestador.email}
+                              <a href={`mailto:${prestador.email}`} className="hover:underline">{prestador.email}</a>
                             </div>
                             {prestador.telefone && (
                               <div className="flex items-center gap-2">
                                 <Phone className="h-4 w-4" />
-                                {prestador.telefone}
+                                <a href={`tel:${prestador.telefone}`} className="hover:underline">{prestador.telefone}</a>
                               </div>
                             )}
                             {prestador.cidade && (
                               <div className="flex items-center gap-2">
                                 <MapPin className="h-4 w-4" />
-                                {prestador.cidade} - {prestador.bairro}
+                                {prestador.cidade} {prestador.bairro ? `- ${prestador.bairro}` : ''}
                               </div>
                             )}
                             {prestador.media_avaliacoes && (
@@ -317,18 +529,29 @@ const PrestadorManagement = () => {
                               </div>
                             )}
                           </div>
+
+                          <div className="mt-3 flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => navigate(`/prestador/${prestador.id}`)}
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              Ver Perfil
+                            </Button>
+                            {prestador.telefone && (
+                              <Button asChild variant="outline" size="sm">
+                                <a href={`tel:${prestador.telefone}`}>Ligar</a>
+                              </Button>
+                            )}
+                            <Button asChild variant="outline" size="sm">
+                              <a href={`mailto:${prestador.email}`}>Email</a>
+                            </Button>
+                          </div>
                         </div>
                       </div>
                       
                       <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => navigate(`/prestador/${prestador.id}`)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        
                         <Button
                           variant="outline"
                           size="sm"
