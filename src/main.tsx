@@ -1,10 +1,10 @@
-// COMPLETELY NEW MAIN FILE - CACHE BREAKER v63.0
+// ULTIMATE MINIMAL ENTRY POINT
 import { createRoot } from 'react-dom/client'
-import AppClean from './AppClean.tsx'
+import MinimalApp from './MinimalApp.tsx'
 import './index.css'
 
-console.log('🆕 BRAND NEW MAIN v63.0 - FRESH START');
+console.log('🎯 MINIMAL APP v64.0 - NO TOAST WHATSOEVER');
 
 createRoot(document.getElementById("root")!).render(
-  <AppClean />
+  <MinimalApp />
 )
