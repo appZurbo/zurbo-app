@@ -1,4 +1,4 @@
-// Emergency toast replacement - no React hooks
+// Emergency toast replacement - completely non-React
 import { toast as sonnerToast } from 'sonner';
 
 interface ToastProps {
@@ -7,7 +7,7 @@ interface ToastProps {
   variant?: 'default' | 'destructive';
 }
 
-// Simple function that doesn't use React hooks
+// Simple function that doesn't use React hooks AT ALL
 export const useToast = () => {
   return { 
     toast: ({ title, description, variant }: ToastProps) => {
