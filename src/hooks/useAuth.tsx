@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, createContext } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
+import { toast } from "@/hooks/use-toast";
 
 interface Profile {
   id: string;
@@ -26,6 +26,7 @@ interface Profile {
   endereco_cidade?: string;
   endereco_cep?: string;
   cpf?: string;
+  em_servico?: boolean;  // Added missing field
   // Flexible portfolio_fotos to match different type expectations
   portfolio_fotos?: any;
 }
@@ -103,7 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const fetchProfile = async (userId: string) => {
     try {
       const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
+        .from('users')
         .select('*')
         .eq('id', userId)
         .single();
@@ -123,20 +124,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: profileData.id,
           nome: profileData.nome || '',
           email: profileData.email || '',
-          telefone: profileData.telefone || '',
+          telefone: '',  // telefone field doesn't exist in database
           foto_url: profileData.foto_url || '',
-          is_prestador: profileData.is_prestador || false,
-          is_admin: profileData.is_admin || false,
-          cidade: profileData.cidade || '',
-          estado: profileData.estado || '',
+          is_prestador: profileData.tipo === 'prestador',
+          is_admin: profileData.tipo === 'admin' || profileData.tipo === 'moderator',
+          cidade: profileData.endereco_cidade || '',
+          estado: '',  // No endereco_estado field exists
           bio: profileData.bio || '',
-          auth_id: profileData.id, // Set auth_id to id
-          tipo: profileData.is_prestador ? "prestador" : "cliente",
-          criado_em: profileData.created_at || new Date().toISOString(),
+          auth_id: profileData.auth_id || profileData.id,
+          tipo: profileData.tipo as "cliente" | "prestador" | "admin" | "moderator",
+          criado_em: profileData.criado_em || new Date().toISOString(),
         };
         setProfile(typedProfile);
-        setIsPrestador(profileData.is_prestador);
-        setIsAdmin(profileData.is_admin);
+        setIsPrestador(profileData.tipo === 'prestador');
+        setIsAdmin(profileData.tipo === 'admin' || profileData.tipo === 'moderator');
       }
     } catch (error) {
       console.error("Erro ao processar dados do perfil:", error);
@@ -211,17 +212,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsAuthenticated(true);
 
         // Cria um perfil padrão para o usuário
-        await supabase.from('profiles').insert([
+        await supabase.from('users').insert([
           {
             id: data.user?.id,
+            auth_id: data.user?.id,
             nome: nomeStr,
             email: email,
-            telefone: telefoneStr,
             foto_url: '',
-            is_prestador: false,
-            is_admin: false,
-            cidade: '',
-            estado: '',
+            tipo: 'cliente',
+            endereco_cidade: '',
             bio: '',
           },
         ]);
@@ -267,7 +266,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('profiles')
+        .from('users')
         .update(updates)
         .eq('id', user?.id)
         .select()
@@ -281,16 +280,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: data.id,
           nome: data.nome || '',
           email: data.email || '',
-          telefone: data.telefone || '',
+          telefone: '',  // telefone field doesn't exist in database
           foto_url: data.foto_url || '',
-          is_prestador: data.is_prestador || false,
-          is_admin: data.is_admin || false,
-          cidade: data.cidade || '',
-          estado: data.estado || '',
+          is_prestador: data.tipo === 'prestador',
+          is_admin: data.tipo === 'admin' || data.tipo === 'moderator',
+          cidade: data.endereco_cidade || '',
+          estado: '',  // No endereco_estado field exists
           bio: data.bio || '',
-          auth_id: data.id, // Set auth_id to id
-          tipo: data.is_prestador ? "prestador" : "cliente",
-          criado_em: data.created_at || new Date().toISOString(),
+          auth_id: data.auth_id || data.id,
+          tipo: data.tipo as "cliente" | "prestador" | "admin" | "moderator",
+          criado_em: data.criado_em || new Date().toISOString(),
         };
         setProfile(typedProfile);
         toast.success('Seu perfil foi atualizado com sucesso!');

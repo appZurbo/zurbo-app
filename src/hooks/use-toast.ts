@@ -1,8 +1,16 @@
-// ULTIMATE CACHE BREAKER - Wrapper for old toast API  
+// ULTIMATE CACHE BREAKER - Properly typed toast wrapper
 import { toast as sonnerToast } from 'sonner';
 
-// Create a wrapper that handles both old and new API
-function toast(options: any): void {
+interface ToastInterface {
+  (options: any): void;
+  success: typeof sonnerToast.success;
+  error: typeof sonnerToast.error;
+  info: typeof sonnerToast.info;
+  warning: typeof sonnerToast.warning;
+}
+
+// Create the main toast function
+function toastFunction(options: any): void {
   if (typeof options === 'string') {
     sonnerToast.success(options);
   } else if (options && typeof options === 'object') {
@@ -15,15 +23,16 @@ function toast(options: any): void {
   }
 }
 
-// Add sonner methods to the wrapper function
-(toast as any).success = sonnerToast.success;
-(toast as any).error = sonnerToast.error;
-(toast as any).info = sonnerToast.info;
-(toast as any).warning = sonnerToast.warning;
+// Create the toast object with methods
+const toast = toastFunction as ToastInterface;
+toast.success = sonnerToast.success;
+toast.error = sonnerToast.error;
+toast.info = sonnerToast.info;
+toast.warning = sonnerToast.warning;
 
 export { toast };
 
 // Simple function that returns compatible toast API
 export const useToast = () => ({ toast });
 
-console.log('🚀 ULTIMATE CACHE BREAKER: Compatible toast wrapper v16.1');
+console.log('🚀 ULTIMATE CACHE BREAKER: Properly typed toast wrapper v17.0');
