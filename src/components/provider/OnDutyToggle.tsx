@@ -5,25 +5,19 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Bell, BellOff } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export const OnDutyToggle = () => {
   const [isOnDuty, setIsOnDuty] = useState(false);
-  const { toast } = useToast();
+  
 
   const handleToggle = (checked: boolean) => {
     setIsOnDuty(checked);
     
     if (checked) {
-      toast({
-        title: "Você está Em Serviço!",
-        description: "Agora você receberá notificações de pedidos emergenciais.",
-      });
+      toast.success("Agora você receberá notificações de pedidos emergenciais.");
     } else {
-      toast({
-        title: "Você saiu de serviço",
-        description: "Você não receberá mais notificações emergenciais.",
-      });
+      toast("Você não receberá mais notificações emergenciais.");
     }
   };
 

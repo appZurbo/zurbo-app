@@ -1,5 +1,5 @@
 
-// System restart v4 - complete toast system overhaul
+// Cache cleared - toast fixed v4
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
