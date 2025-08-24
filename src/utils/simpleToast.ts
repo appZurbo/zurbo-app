@@ -169,12 +169,18 @@ export const toast = {
 
 export const useToast = () => {
   return {
-    toast: (props: { title?: string; description?: string; variant?: 'default' | 'destructive' }) => {
+    toast: (props: { 
+      title?: string; 
+      description?: string; 
+      variant?: 'default' | 'destructive';
+      duration?: number;
+    }) => {
       const type = props.variant === 'destructive' ? 'error' : 'info';
       return simpleToast.show({
         title: props.title,
         description: props.description,
-        type
+        type,
+        duration: props.duration
       });
     },
     dismiss: (id?: string) => {

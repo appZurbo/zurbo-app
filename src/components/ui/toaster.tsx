@@ -1,4 +1,5 @@
 import { simpleToast, useToast } from "@/utils/simpleToast";
+// Compatibility imports - not actually used, but prevents import errors
 import {
   Toast,
   ToastClose,
@@ -9,6 +10,7 @@ import {
 } from "@/components/ui/toast"
 
 export function Toaster() {
-  // Sistema simples sem hooks para evitar erros
-  return null; // O sistema de toast agora funciona via DOM direto
+  // Sistema simples sem hooks React - retorna null
+  // O toast é renderizado diretamente no DOM via simpleToast
+  return null;
 }
