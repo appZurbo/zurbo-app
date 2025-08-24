@@ -14,7 +14,18 @@ interface Profile {
   cidade: string;
   estado: string;
   bio: string;
-  // Adicione outros campos conforme necessário
+  // Additional properties
+  premium?: boolean;
+  tipo?: "cliente" | "prestador" | "admin" | "moderator";
+  endereco_rua?: string;
+  endereco_numero?: string;
+  endereco_bairro?: string;
+  endereco_cidade?: string;
+  endereco_cep?: string;
+  cpf?: string;
+  auth_id: string; // Required field
+  criado_em?: string;
+  portfolio_fotos?: string[];
 }
 
 interface AuthContextType {
@@ -25,11 +36,16 @@ interface AuthContextType {
   loading: boolean;
   isPrestador: boolean;
   isAdmin: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, nome: string, telefone: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<{ error?: any }>;
+  register: (email: string, password: string, nome?: string | any, telefone?: string | any) => Promise<{ error?: any }>;
   logout: () => Promise<void>;
   updateProfile: (updates: Partial<Profile>) => Promise<void>;
   refreshProfile: () => Promise<void>;
+  // Additional methods for compatibility
+  signIn: (email: string, password: string) => Promise<{ error?: any }>;
+  signUp: (email: string, password: string, nome?: string | any, telefone?: string | any) => Promise<{ error?: any }>;
+  signOut: () => Promise<void>;
+  updateLocalProfile?: (updates: Partial<Profile>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -112,6 +128,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           cidade: profileData.cidade,
           estado: profileData.estado,
           bio: profileData.bio,
+          auth_id: profileData.id, // Set auth_id to id
         };
         setProfile(typedProfile);
         setIsPrestador(profileData.is_prestador);
@@ -138,6 +155,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) {
         console.error("Erro ao fazer login:", error.message);
         toast.error(error.message || 'Credenciais inválidas.');
+        return { error };
       } else {
         setUser(data.user);
         setSession(data.session);
@@ -150,25 +168,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } else {
           navigate('/');
         }
+        return { error: null };
       }
     } catch (error) {
       console.error("Erro durante o login:", error);
       toast.error('Por favor, tente novamente.');
+      return { error };
     } finally {
       setLoading(false);
     }
   };
 
-  const register = async (email: string, password: string, nome: string, telefone: string) => {
+  const register = async (email: string, password: string, nome: string | any = '', telefone: string | any = '') => {
     setLoading(true);
     try {
+      // Extract string values if objects are passed
+      const nomeStr = typeof nome === 'string' ? nome : (nome?.nome || '');
+      const telefoneStr = typeof telefone === 'string' ? telefone : (telefone?.telefone || '');
+      
       const { data, error } = await supabase.auth.signUp({
         email: email,
         password: password,
         options: {
           data: {
-            nome: nome,
-            telefone: telefone,
+            nome: nomeStr,
+            telefone: telefoneStr,
           },
         },
       });
@@ -176,6 +200,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) {
         console.error("Erro ao registrar:", error.message);
         toast.error(error.message || 'Por favor, tente novamente.');
+        return { error };
       } else {
         setUser(data.user);
         setSession(data.session);
@@ -185,9 +210,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await supabase.from('profiles').insert([
           {
             id: data.user?.id,
-            nome: nome,
+            nome: nomeStr,
             email: email,
-            telefone: telefone,
+            telefone: telefoneStr,
             foto_url: '',
             is_prestador: false,
             is_admin: false,
@@ -199,10 +224,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         toast.success('Sua conta foi criada com sucesso!');
         navigate('/');
+        return { error: null };
       }
     } catch (error) {
       console.error("Erro durante o registro:", error);
       toast.error('Por favor, tente novamente mais tarde.');
+      return { error };
     } finally {
       setLoading(false);
     }
@@ -257,6 +284,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           cidade: data.cidade,
           estado: data.estado,
           bio: data.bio,
+          auth_id: data.id, // Set auth_id to id
         };
         setProfile(typedProfile);
         toast.success('Seu perfil foi atualizado com sucesso!');
@@ -288,10 +316,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       register,
       logout,
       updateProfile,
-      refreshProfile
+      refreshProfile,
+      // Additional methods for compatibility
+      signIn: login,
+      signUp: register,
+      signOut: logout,
+      updateLocalProfile: updateProfile
     }}>
       {children}
-      {/* No Toaster here - moved to App.tsx */}
     </AuthContext.Provider>
   );
 };
