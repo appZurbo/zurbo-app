@@ -1,9 +1,9 @@
 
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/hooks/useAuth";
+import { AuthProvider } from "@/hooks/useAuthHookFree";
 import { NotificationSound } from "@/components/notifications/NotificationSound";
 import { PWAInstallPrompt } from "@/components/mobile/PWAInstallPrompt";
 import { initializeCapacitor } from "@/utils/capacitor";
@@ -53,12 +53,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster 
-          position="top-right" 
-          richColors 
-          closeButton
-          expand={false}
-        />
+        <Toaster />
         <BrowserRouter>
           <AuthProvider>
             <NotificationSound enabled={true} volume={0.3} />
