@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -6,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, Phone, Crown } from 'lucide-react';
 import { useSOSLimits } from '@/hooks/useSOSLimits';
 import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export const EnhancedEmergencyButton = () => {
   const [showConfirm, setShowConfirm] = useState(false);

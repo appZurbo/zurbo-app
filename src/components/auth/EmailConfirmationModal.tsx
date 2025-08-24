@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuthSecurity } from '@/hooks/useAuthSecurity';
 import { Mail, RefreshCw, CheckCircle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface EmailConfirmationModalProps {
   isOpen: boolean;
@@ -25,7 +25,6 @@ export const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({
   const [resendCount, setResendCount] = useState(0);
   const [lastResendTime, setLastResendTime] = useState<Date | null>(null);
   const { resendConfirmation } = useAuthSecurity();
-  const { toast } = useToast();
 
   const handleResendConfirmation = async () => {
     if (!email) {

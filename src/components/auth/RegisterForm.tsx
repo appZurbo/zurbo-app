@@ -1,179 +1,86 @@
-
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { validateCPF, validateEmail, validatePassword, sanitizeText, formatCPF } from '@/utils/validation';
-import { AlertCircle, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Eye, EyeOff, User, Mail, Lock, Phone } from 'lucide-react';
+import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 interface RegisterFormProps {
-  onSuccess: (userType: string) => void;
-  onSwitchToLogin: () => void;
+  onSuccess?: () => void;
 }
 
-const RegisterForm = ({ onSuccess, onSwitchToLogin }: RegisterFormProps) => {
-  const [formData, setFormData] = useState({
-    nome: '',
-    email: '',
-    cpf: '',
-    password: '',
-    confirmPassword: '',
-    tipo: 'cliente'
-  });
+export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const { toast } = useToast();
+  const [role, setRole] = useState<'cliente' | 'prestador'>('cliente');
+  const { signUp } = useAuth();
 
-  const validateField = (field: string, value: string) => {
-    const newErrors = { ...errors };
-
-    switch (field) {
-      case 'nome':
-        const cleanName = sanitizeText(value);
-        if (!cleanName || cleanName.length < 2) {
-          newErrors.nome = 'Nome deve ter pelo menos 2 caracteres';
-        } else {
-          delete newErrors.nome;
-        }
-        break;
-
-      case 'email':
-        if (!validateEmail(value)) {
-          newErrors.email = 'Email inválido';
-        } else {
-          delete newErrors.email;
-        }
-        break;
-
-      case 'cpf':
-        if (!validateCPF(value)) {
-          newErrors.cpf = 'CPF inválido';
-        } else {
-          delete newErrors.cpf;
-        }
-        break;
-
-      case 'password':
-        const passwordValidation = validatePassword(value);
-        if (!passwordValidation.isValid) {
-          newErrors.password = passwordValidation.errors[0];
-        } else {
-          delete newErrors.password;
-        }
-        break;
-
-      case 'confirmPassword':
-        if (value !== formData.password) {
-          newErrors.confirmPassword = 'Senhas não coincidem';
-        } else {
-          delete newErrors.confirmPassword;
-        }
-        break;
-    }
-
-    setErrors(newErrors);
-  };
-
-  const handleInputChange = (field: string, value: string) => {
-    if (field === 'cpf') {
-      value = formatCPF(value);
-    }
-    
-    setFormData({ ...formData, [field]: value });
-    validateField(field, value);
-  };
-
-  const isFormValid = () => {
-    const fields = ['nome', 'email', 'cpf', 'password', 'confirmPassword'];
-    return fields.every(field => {
-      const value = formData[field as keyof typeof formData];
-      if (!value) return false;
-      
-      switch (field) {
-        case 'nome':
-          return sanitizeText(value).length >= 2;
-        case 'email':
-          return validateEmail(value);
-        case 'cpf':
-          return validateCPF(value);
-        case 'password':
-          return validatePassword(value).isValid;
-        case 'confirmPassword':
-          return value === formData.password;
-        default:
-          return true;
-      }
-    });
-  };
-
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isFormValid()) {
+    if (!name || !email || !phone || !password || !confirmPassword) {
       toast({
-        title: "Dados inválidos",
-        description: "Por favor, corrija os erros antes de continuar",
+        title: "Campos obrigatórios",
+        description: "Preencha todos os campos.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast({
+        title: "Senhas não conferem",
+        description: "As senhas devem ser iguais.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!acceptedTerms) {
+      toast({
+        title: "Termos não aceitos",
+        description: "Aceite os termos de uso para continuar.",
         variant: "destructive",
       });
       return;
     }
 
     setLoading(true);
-
     try {
-      const cleanEmail = sanitizeText(formData.email.toLowerCase());
-      const cleanName = sanitizeText(formData.nome);
-      const cleanCPF = formData.cpf.replace(/\D/g, '');
-
-      const { data, error } = await supabase.auth.signUp({
-        email: cleanEmail,
-        password: formData.password,
-        options: {
-          data: {
-            nome: cleanName,
-            cpf: cleanCPF,
-            tipo: formData.tipo
-          },
-          emailRedirectTo: `${window.location.origin}/`
-        }
+      const result = await signUp(email, password, {
+        name,
+        phone,
+        role,
       });
 
-      if (error) {
-        if (error.message.includes('User already registered')) {
-          toast({
-            title: "Email já cadastrado",
-            description: "Este email já está em uso. Tente fazer login ou use outro email.",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Erro no cadastro",
-            description: error.message,
-            variant: "destructive",
-          });
-        }
-        return;
-      }
-
-      if (data.user) {
+      if (result.error) {
         toast({
-          title: "Cadastro realizado com sucesso!",
+          title: "Erro ao criar conta",
+          description: result.error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Conta criada com sucesso!",
           description: "Verifique seu email para confirmar a conta.",
         });
-
-        onSuccess(formData.tipo);
+        onSuccess?.();
       }
     } catch (error: any) {
-      console.error('Registration error:', error);
       toast({
         title: "Erro inesperado",
-        description: "Ocorreu um erro durante o cadastro. Tente novamente.",
+        description: error.message || "Ocorreu um erro ao criar a conta.",
         variant: "destructive",
       });
     } finally {
@@ -181,213 +88,117 @@ const RegisterForm = ({ onSuccess, onSwitchToLogin }: RegisterFormProps) => {
     }
   };
 
-  const getFieldIcon = (field: string) => {
-    if (errors[field]) {
-      return <AlertCircle className="h-4 w-4 text-red-500" />;
-    }
-    
-    const value = formData[field as keyof typeof formData];
-    if (value) {
-      switch (field) {
-        case 'nome':
-          return sanitizeText(value).length >= 2 ? <CheckCircle className="h-4 w-4 text-green-500" /> : null;
-        case 'email':
-          return validateEmail(value) ? <CheckCircle className="h-4 w-4 text-green-500" /> : null;
-        case 'cpf':
-          return validateCPF(value) ? <CheckCircle className="h-4 w-4 text-green-500" /> : null;
-        case 'password':
-          return validatePassword(value).isValid ? <CheckCircle className="h-4 w-4 text-green-500" /> : null;
-        case 'confirmPassword':
-          return value === formData.password ? <CheckCircle className="h-4 w-4 text-green-500" /> : null;
-      }
-    }
-    return null;
-  };
-
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card>
       <CardHeader>
-        <CardTitle>Criar Conta</CardTitle>
-        <CardDescription>
-          Cadastre-se no ZURBO
-        </CardDescription>
+        <CardTitle>Criar uma conta</CardTitle>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleRegister} className="space-y-4">
+      <CardContent className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="nome">Nome Completo</Label>
-            <div className="relative">
-              <Input
-                id="nome"
-                type="text"
-                value={formData.nome}
-                onChange={(e) => handleInputChange('nome', e.target.value)}
-                required
-                maxLength={100}
-                className={errors.nome ? 'border-red-500' : ''}
-              />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                {getFieldIcon('nome')}
-              </div>
-            </div>
-            {errors.nome && (
-              <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
-                <AlertCircle className="h-3 w-3" />
-                {errors.nome}
-              </p>
-            )}
+            <Label htmlFor="name">Nome Completo</Label>
+            <Input
+              type="text"
+              id="name"
+              placeholder="Seu nome"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
           </div>
-
           <div>
             <Label htmlFor="email">Email</Label>
-            <div className="relative">
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                required
-                className={errors.email ? 'border-red-500' : ''}
-              />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                {getFieldIcon('email')}
-              </div>
-            </div>
-            {errors.email && (
-              <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
-                <AlertCircle className="h-3 w-3" />
-                {errors.email}
-              </p>
-            )}
+            <Input
+              type="email"
+              id="email"
+              placeholder="seu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
-
           <div>
-            <Label htmlFor="cpf">CPF</Label>
-            <div className="relative">
-              <Input
-                id="cpf"
-                type="text"
-                value={formData.cpf}
-                onChange={(e) => handleInputChange('cpf', e.target.value)}
-                placeholder="000.000.000-00"
-                maxLength={14}
-                required
-                className={errors.cpf ? 'border-red-500' : ''}
-              />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                {getFieldIcon('cpf')}
-              </div>
-            </div>
-            {errors.cpf && (
-              <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
-                <AlertCircle className="h-3 w-3" />
-                {errors.cpf}
-              </p>
-            )}
+            <Label htmlFor="phone">Telefone</Label>
+            <Input
+              type="tel"
+              id="phone"
+              placeholder="(66) 99999-9999"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
           </div>
-
           <div>
             <Label htmlFor="password">Senha</Label>
             <div className="relative">
               <Input
+                type={showPassword ? 'text' : 'password'}
                 id="password"
-                type={showPassword ? "text" : "password"}
-                value={formData.password}
-                onChange={(e) => handleInputChange('password', e.target.value)}
-                required
-                className={errors.password ? 'border-red-500' : ''}
+                placeholder="Senha"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                {getFieldIcon('password')}
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-8 p-0"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-2 top-1/2 -translate-y-1/2"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
             </div>
-            {errors.password && (
-              <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
-                <AlertCircle className="h-3 w-3" />
-                {errors.password}
-              </p>
-            )}
           </div>
-
           <div>
             <Label htmlFor="confirmPassword">Confirmar Senha</Label>
             <div className="relative">
               <Input
+                type={showConfirmPassword ? 'text' : 'password'}
                 id="confirmPassword"
-                type={showConfirmPassword ? "text" : "password"}
-                value={formData.confirmPassword}
-                onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                required
-                className={errors.confirmPassword ? 'border-red-500' : ''}
+                placeholder="Confirmar Senha"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
               />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                {getFieldIcon('confirmPassword')}
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-8 p-0"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-2 top-1/2 -translate-y-1/2"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
             </div>
-            {errors.confirmPassword && (
-              <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
-                <AlertCircle className="h-3 w-3" />
-                {errors.confirmPassword}
-              </p>
-            )}
           </div>
 
           <div>
-            <Label>Tipo de Conta</Label>
-            <RadioGroup
-              value={formData.tipo}
-              onValueChange={(value) => setFormData({ ...formData, tipo: value })}
-              className="mt-2"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="cliente" id="cliente" />
-                <Label htmlFor="cliente">Cliente - Quero contratar serviços</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="prestador" id="prestador" />
-                <Label htmlFor="prestador">Prestador - Quero oferecer serviços</Label>
-              </div>
-            </RadioGroup>
+            <Label htmlFor="role">Tipo de Conta</Label>
+            <Select onValueChange={(value) => setRole(value as 'cliente' | 'prestador')}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o tipo de conta" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="cliente">Cliente</SelectItem>
+                <SelectItem value="prestador">Prestador de Serviço</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          <Button 
-            type="submit" 
-            disabled={loading || !isFormValid()} 
-            className="w-full bg-orange-500 hover:bg-orange-600"
-          >
-            {loading ? 'Criando conta...' : 'Criar Conta'}
-          </Button>
+          <div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="terms"
+                checked={acceptedTerms}
+                onCheckedChange={(checked) => setAcceptedTerms(!!checked)}
+              />
+              <Label htmlFor="terms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed">
+                Aceito os <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline">termos de uso</a>
+              </Label>
+            </div>
+          </div>
 
-          <Button 
-            type="button" 
-            variant="link" 
-            className="w-full"
-            onClick={onSwitchToLogin}
-          >
-            Já tem conta? Entre aqui
+          <Button disabled={loading} className="w-full">
+            {loading ? "Criando conta..." : "Criar conta"}
           </Button>
         </form>
       </CardContent>
     </Card>
   );
 };
-
-export default RegisterForm;

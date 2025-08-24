@@ -1,468 +1,200 @@
-import { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { Eye, EyeOff, Mail, Lock, Phone, User, FileText } from 'lucide-react';
-import { fetchActiveLegalDocument, mapUserTipoToDocType, savePendingAcceptance, type LegalDocument } from '@/utils/legal';
+import { Eye, EyeOff, User, Mail, Lock, Phone, MapPin } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 interface EnhancedRegisterFormProps {
-  onSuccess: () => void;
-  onSwitchToLogin: () => void;
+  onSuccess?: () => void;
 }
 
-export const EnhancedRegisterForm = ({ onSuccess, onSwitchToLogin }: EnhancedRegisterFormProps) => {
-  const [formData, setFormData] = useState({
-    nome: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    phone: '',
-    tipo: 'cliente' as 'cliente' | 'prestador'
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+export const EnhancedRegisterForm: React.FC<EnhancedRegisterFormProps> = ({ onSuccess }) => {
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [telefone, setTelefone] = useState('');
+  const [cidade, setCidade] = useState('');
+  const [bairro, setBairro] = useState('');
+  const [endereco, setEndereco] = useState('');
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [termosAceitos, setTermosAceitos] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const [showContract, setShowContract] = useState(false);
-  const { toast } = useToast();
-  const [legalDoc, setLegalDoc] = useState<LegalDocument | null>(null);
+  const { signUp } = useAuth();
 
-  useEffect(() => {
-    const loadDoc = async () => {
-      const docType = mapUserTipoToDocType(formData.tipo);
-      const doc = await fetchActiveLegalDocument(docType);
-      setLegalDoc(doc);
-    };
-    loadDoc();
-  }, [formData.tipo]);
+  const cidades = ['Sinop', 'Sorriso', 'Lucas do Rio Verde'];
+  const bairros = ['Centro', 'Jardim Botânico', 'Setor Industrial'];
 
-  const handleGoogleRegister = async () => {
-    setLoading(true);
-    
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          }
-        }
-      });
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
 
-      if (error) throw error;
-      
+    if (!termosAceitos) {
       toast({
-        title: "Redirecionando para Google...",
-        description: "Você será redirecionado para criar sua conta com Google.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Erro no cadastro com Google",
-        description: error.message || "Não foi possível fazer cadastro com Google. Tente novamente.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Erro",
-        description: "As senhas não coincidem.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!agreedToTerms) {
-      toast({
-        title: "Erro",
-        description: "Você deve aceitar os termos de uso para prosseguir.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!formData.phone) {
-      toast({
-        title: "Erro",
-        description: "O número de telefone é obrigatório.",
+        title: "Termos não aceitos",
+        description: "Você precisa aceitar os termos de uso para se cadastrar.",
         variant: "destructive",
       });
       return;
     }
 
     setLoading(true);
-
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`,
-          data: {
-            nome: formData.nome,
-            tipo: formData.tipo,
-            telefone: formData.phone
-          }
-        }
+      const result = await signUp(email, password, {
+        nome,
+        telefone,
+        cidade,
+        bairro,
+        endereco
       });
 
-      if (error) throw error;
-
-      // Garantir criação do perfil na tabela users para viabilizar aceite futuro
-      if (data.user) {
-        const { data: existing } = await supabase
-          .from('users')
-          .select('id')
-          .eq('auth_id', data.user.id)
-          .maybeSingle();
-
-        if (!existing) {
-          await supabase.from('users').insert({
-            auth_id: data.user.id,
-            email: formData.email,
-            nome: formData.nome,
-            tipo: formData.tipo,
-          });
-        }
+      if (result.error) {
+        toast({
+          title: "Erro ao cadastrar",
+          description: result.error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Cadastro realizado!",
+          description: "Confirme seu email para ativar sua conta.",
+        });
+        onSuccess?.();
       }
-
-      // Salvar aceite pendente localmente (será consumido após o primeiro login)
-      if (legalDoc) {
-        savePendingAcceptance(legalDoc);
-      }
-
-      toast({
-        title: "Cadastro realizado com sucesso!",
-        description: "Verifique seu email para confirmar a conta.",
-      });
-      
-      onSuccess();
     } catch (error: any) {
       toast({
-        title: "Erro no cadastro",
-        description: error.message || "Não foi possível criar a conta. Tente novamente.",
+        title: "Erro inesperado",
+        description: error.message || "Ocorreu um erro ao cadastrar.",
         variant: "destructive",
       });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const getContractTitle = () => {
-    return formData.tipo === 'cliente' 
-      ? 'Contrato ZURBO ↔ Cliente' 
-      : 'Contrato ZURBO ↔ Prestador';
-  };
-
-  const getContractContent = () => {
-    if (legalDoc?.content) return legalDoc.content;
-    if (formData.tipo === 'cliente') {
-      return `
-CONTRATO DE PRESTAÇÃO DE SERVIÇOS - ZURBO ↔ CLIENTE
-
-1. OBJETO DO CONTRATO
-Este contrato estabelece os termos e condições para uso da plataforma ZURBO como cliente.
-
-2. RESPONSABILIDADES DO CLIENTE
-- Fornecer informações verdadeiras e atualizadas
-- Tratar prestadores com respeito e cordialidade
-- Pagar pelos serviços conforme acordado
-- Avaliar prestadores de forma honesta
-
-3. RESPONSABILIDADES DA ZURBO
-- Conectar clientes a prestadores qualificados
-- Manter a plataforma funcionando adequadamente
-- Proteger dados pessoais conforme LGPD
-- Mediar conflitos quando necessário
-
-4. PAGAMENTOS
-- Pagamentos são feitos diretamente aos prestadores
-- ZURBO não se responsabiliza por transações financeiras
-- Valores acordados devem ser respeitados
-
-5. CANCELAMENTOS
-- Cancelamentos devem ser comunicados com antecedência
-- Políticas de cancelamento variam por prestador
-
-6. PRIVACIDADE E DADOS
-- Seus dados são protegidos conforme nossa Política de Privacidade
-- Compartilhamos apenas informações necessárias para os serviços
-
-Ao aceitar este contrato, você concorda com todos os termos acima.
-      `;
-    } else {
-      return `
-CONTRATO DE PRESTAÇÃO DE SERVIÇOS - ZURBO ↔ PRESTADOR
-
-1. OBJETO DO CONTRATO
-Este contrato estabelece os termos e condições para atuar como prestador de serviços na plataforma ZURBO.
-
-2. RESPONSABILIDADES DO PRESTADOR
-- Executar serviços com qualidade e profissionalismo
-- Manter documentação e certificações em dia
-- Cumprir horários e compromissos acordados
-- Tratar clientes com respeito e cordialidade
-- Manter perfil atualizado na plataforma
-
-3. RESPONSABILIDADES DA ZURBO
-- Conectar prestadores a clientes potenciais
-- Fornecer plataforma para gestão de serviços
-- Proteger dados pessoais conforme LGPD
-- Suporte técnico e comercial
-
-4. COMISSÕES E PAGAMENTOS
-- ZURBO cobra taxa de administração sobre serviços
-- Pagamentos são processados conforme cronograma estabelecido
-- Prestador é responsável por impostos e tributos
-
-5. QUALIDADE DOS SERVIÇOS
-- Prestador deve manter padrão de qualidade
-- Avaliações negativas podem resultar em suspensão
-- Reclamações são investigadas individualmente
-
-6. EXCLUSIVIDADE
-- Prestador pode atuar em outras plataformas
-- Deve informar indisponibilidades na agenda
-
-7. RESCISÃO
-- Qualquer parte pode rescindir com aviso prévio
-- Obrigações pendentes devem ser cumpridas
-
-Ao aceitar este contrato, você concorda com todos os termos acima.
-      `;
     }
   };
 
   return (
-    <div className="space-y-6">
-      {/* Google Register Option */}
-      <div className="space-y-3">
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          onClick={handleGoogleRegister}
-          disabled={loading}
-        >
-          <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-          </svg>
-          Cadastrar com Google
-        </Button>
-      </div>
-
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <Separator className="w-full" />
+    <Card>
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl">Criar uma conta</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Preencha o formulário abaixo para se cadastrar.
+        </p>
+      </CardHeader>
+      <CardContent className="grid gap-4">
+        <div className="grid gap-2">
+          <Label htmlFor="name">Nome Completo</Label>
+          <Input
+            id="name"
+            placeholder="Digite seu nome completo"
+            type="text"
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+          />
         </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">Ou cadastre-se com email</span>
-        </div>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* User Type Selection */}
-        <div className="space-y-3">
-          <Label>Tipo de usuário</Label>
-          <RadioGroup
-            value={formData.tipo}
-            onValueChange={(value: 'cliente' | 'prestador') => 
-              setFormData(prev => ({ ...prev, tipo: value }))
-            }
-            className="flex space-x-6"
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="cliente" id="cliente" />
-              <Label htmlFor="cliente">Cliente</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="prestador" id="prestador" />
-              <Label htmlFor="prestador">Prestador</Label>
-            </div>
-          </RadioGroup>
-        </div>
-
-        {/* Nome */}
-        <div className="space-y-2">
-          <Label htmlFor="nome">Nome completo</Label>
-          <div className="relative">
-            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              id="nome"
-              type="text"
-              placeholder="Seu nome completo"
-              value={formData.nome}
-              onChange={(e) => setFormData(prev => ({ ...prev, nome: e.target.value }))}
-              className="pl-10"
-              required
-            />
-          </div>
-        </div>
-
-        {/* Email */}
-        <div className="space-y-2">
+        <div className="grid gap-2">
           <Label htmlFor="email">Email</Label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              id="email"
-              type="email"
-              placeholder="seu@email.com"
-              value={formData.email}
-              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-              className="pl-10"
-              required
-            />
-          </div>
+          <Input
+            id="email"
+            placeholder="Digite seu email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </div>
-
-        {/* Phone - Mandatory */}
-        <div className="space-y-2">
-          <Label htmlFor="phone">Telefone *</Label>
-          <div className="relative">
-            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              id="phone"
-              type="tel"
-              placeholder="(65) 99999-9999"
-              value={formData.phone}
-              onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-              className="pl-10"
-              required
-            />
-          </div>
-          <p className="text-xs text-muted-foreground">
-            * Obrigatório. Não poderá ser alterado após o cadastro.
-          </p>
-        </div>
-
-        {/* Password */}
-        <div className="space-y-2">
+        <div className="grid gap-2">
           <Label htmlFor="password">Senha</Label>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               id="password"
-              type={showPassword ? 'text' : 'password'}
-              placeholder="Sua senha"
-              value={formData.password}
-              onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-              className="pl-10 pr-10"
-              required
+              placeholder="Digite sua senha"
+              type={mostrarSenha ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-auto p-1"
-              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2"
+              onClick={() => setMostrarSenha(!mostrarSenha)}
             >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            </Button>
-          </div>
-        </div>
-
-        {/* Confirm Password */}
-        <div className="space-y-2">
-          <Label htmlFor="confirmPassword">Confirmar senha</Label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              id="confirmPassword"
-              type={showConfirmPassword ? 'text' : 'password'}
-              placeholder="Confirme sua senha"
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-              className="pl-10 pr-10"
-              required
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-auto p-1"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            >
-              {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            </Button>
-          </div>
-        </div>
-
-        {/* Contract Agreement */}
-        <div className="space-y-3">
-          <div className="flex items-start space-x-2">
-            <Checkbox
-              id="terms"
-              checked={agreedToTerms}
-              onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)}
-            />
-            <div className="space-y-1 leading-none">
-              <Label htmlFor="terms" className="text-sm">
-                Li e aceito o{' '}
-                <Dialog open={showContract} onOpenChange={setShowContract}>
-                  <DialogTrigger asChild>
-                    <Button variant="link" className="p-0 h-auto text-sm text-blue-600">
-                      {getContractTitle()}
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl max-h-[80vh]">
-                    <DialogHeader>
-                      <DialogTitle className="flex items-center gap-2">
-                        <FileText className="h-5 w-5" />
-                        {getContractTitle()}
-                      </DialogTitle>
-                    </DialogHeader>
-                    <ScrollArea className="h-96 w-full rounded-md border p-4">
-                      <pre className="whitespace-pre-wrap text-sm">
-                        {getContractContent()}
-                      </pre>
-                    </ScrollArea>
-                  </DialogContent>
-                </Dialog>
-              </Label>
-              {legalDoc?.summary && (
-                <p className="text-xs text-muted-foreground mt-1 whitespace-pre-line">
-                  {legalDoc.summary}
-                </p>
+              {mostrarSenha ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
               )}
-            </div>
+            </Button>
           </div>
         </div>
-
-        <Button type="submit" className="w-full gradient-bg" disabled={loading || !agreedToTerms}>
-          {loading ? 'Criando conta...' : 'Criar conta'}
+        <Separator />
+        <div className="grid gap-2">
+          <Label htmlFor="telefone">Telefone</Label>
+          <Input
+            id="telefone"
+            placeholder="Digite seu telefone"
+            type="tel"
+            value={telefone}
+            onChange={(e) => setTelefone(e.target.value)}
+          />
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="cidade">Cidade</Label>
+          <Select onValueChange={setCidade} defaultValue={cidade}>
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione a cidade" />
+            </SelectTrigger>
+            <SelectContent>
+              {cidades.map((city) => (
+                <SelectItem key={city} value={city}>
+                  {city}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="bairro">Bairro</Label>
+          <Select onValueChange={setBairro} defaultValue={bairro}>
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione o bairro" />
+            </SelectTrigger>
+            <SelectContent>
+              {bairros.map((neighborhood) => (
+                <SelectItem key={neighborhood} value={neighborhood}>
+                  {neighborhood}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="endereco">Endereço</Label>
+          <Input
+            id="endereco"
+            placeholder="Digite seu endereço"
+            type="text"
+            value={endereco}
+            onChange={(e) => setEndereco(e.target.value)}
+          />
+        </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="terms"
+            checked={termosAceitos}
+            onCheckedChange={(checked) => setTermosAceitos(!!checked)}
+          />
+          <Label htmlFor="terms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed">
+            Aceito os <a href="/terms" className="underline">termos de uso</a>
+          </Label>
+        </div>
+        <Button disabled={loading} onClick={handleSubmit}>
+          {loading ? 'Cadastrando...' : 'Criar conta'}
         </Button>
-      </form>
-
-      <div className="text-center">
-        <Button
-          type="button"
-          variant="link"
-          onClick={onSwitchToLogin}
-          className="text-sm"
-        >
-          Já tem uma conta? Faça login
-        </Button>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };

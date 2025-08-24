@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Send, Paperclip, X } from 'lucide-react';
 import { ImageUploadInfo } from '@/hooks/useEnhancedChat';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface MessageInputProps {
   onSendMessage: (content: string) => void;
@@ -23,7 +22,6 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 }) => {
   const [message, setMessage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
-  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

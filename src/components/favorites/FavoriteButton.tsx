@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Heart } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface FavoriteButtonProps {
   prestadorId: string;
@@ -17,7 +16,6 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(false);
   const { profile, isAuthenticated } = useAuth();
-  const { toast } = useToast();
 
   useEffect(() => {
     // Simular verificação se é favorito

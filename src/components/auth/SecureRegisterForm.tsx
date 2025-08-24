@@ -1,387 +1,173 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { validateCPF, validateEmail, validatePassword, sanitizeText, formatCPF } from '@/utils/validation';
-import { AlertCircle, Eye, EyeOff } from 'lucide-react';
-import LocationConsentDialog from './LocationConsentDialog';
-import { useSecureLocation } from '@/hooks/useSecureLocation';
-import ProviderVerificationUpload, { VerificationFiles } from './ProviderVerificationUpload';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Eye, EyeOff, User, Mail, Lock, Phone } from 'lucide-react';
+import { toast } from 'sonner';
+import { useAuthSecurity } from '@/hooks/useAuthSecurity';
 
-interface SecureRegisterFormProps {
-  onSuccess: (userType: string) => void;
-  onSwitchToLogin: () => void;
-}
-
-const SecureRegisterForm = ({ onSuccess, onSwitchToLogin }: SecureRegisterFormProps) => {
-  const [formData, setFormData] = useState({
-    nome: '',
-    email: '',
-    cpf: '',
-    password: '',
-    confirmPassword: '',
-    tipo: 'cliente'
-  });
-  const [verificationFiles, setVerificationFiles] = useState<VerificationFiles>({});
-  const [showPassword, setShowPassword] = useState(false);
-  const [showLocationDialog, setShowLocationDialog] = useState(false);
+export const SecureRegisterForm = () => {
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [telefone, setTelefone] = useState('');
+  const [cidade, setCidade] = useState('');
+  const [estado, setEstado] = useState('');
+  const [termos, setTermos] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const { toast } = useToast();
-  const { latitude, longitude, requestLocation } = useSecureLocation();
+  const [showPassword, setShowPassword] = useState(false);
+  const { signUp } = useAuthSecurity();
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+  const estadosBrasil = [
+    'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA',
+    'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN',
+    'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
+  ];
 
-    // Validate and sanitize name
-    const cleanName = sanitizeText(formData.nome);
-    if (!cleanName || cleanName.length < 2) {
-      newErrors.nome = 'Nome deve ter pelo menos 2 caracteres';
-    }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-    // Validate email
-    if (!validateEmail(formData.email)) {
-      newErrors.email = 'Email inválido';
-    }
-
-    // Validate CPF
-    if (!validateCPF(formData.cpf)) {
-      newErrors.cpf = 'CPF inválido';
-    }
-
-    // Validate password
-    const passwordValidation = validatePassword(formData.password);
-    if (!passwordValidation.isValid) {
-      newErrors.password = passwordValidation.errors[0];
-    }
-
-    // Validate password confirmation
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Senhas não coincidem';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleLocationConsent = (granted: boolean) => {
-    setShowLocationDialog(false);
-    if (granted) {
-      requestLocation(() => {
-        proceedWithRegistration();
+    if (!nome || !email || !password || !telefone || !cidade || !estado || !termos) {
+      toast({
+        title: "Preencha todos os campos",
+        description: "Por favor, verifique se todos os campos obrigatórios foram preenchidos.",
+        variant: "destructive"
       });
-    } else {
-      proceedWithRegistration();
-    }
-  };
-
-  const uploadVerificationIfNeeded = async (publicUserId: string) => {
-    if (formData.tipo !== 'prestador') return;
-    if (!verificationFiles.documentFile && !verificationFiles.selfieFile) return;
-
-    // Enviar arquivos para pasta privada do usuário: {user_id}/...
-    const bucket = supabase.storage.from('provider-verifications');
-    const uploaded: { documentPath?: string; selfiePath?: string } = {};
-
-    if (verificationFiles.documentFile) {
-      const docPath = `${publicUserId}/document-${Date.now()}-${verificationFiles.documentFile.name}`;
-      const { error: docErr } = await bucket.upload(docPath, verificationFiles.documentFile, { upsert: false });
-      if (docErr) throw docErr;
-      uploaded.documentPath = docPath;
+      return;
     }
 
-    if (verificationFiles.selfieFile) {
-      const selfiePath = `${publicUserId}/selfie-${Date.now()}-${verificationFiles.selfieFile.name}`;
-      const { error: selfieErr } = await bucket.upload(selfiePath, verificationFiles.selfieFile, { upsert: false });
-      if (selfieErr) throw selfieErr;
-      uploaded.selfiePath = selfiePath;
-    }
-
-    // Criar/atualizar registro de verificação
-    const { error: verErr } = await supabase
-      .from('provider_verifications')
-      .upsert({
-        user_id: publicUserId,
-        document_url: uploaded.documentPath,
-        selfie_url: uploaded.selfiePath,
-        status: 'pending',
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'user_id' });
-
-    if (verErr) throw verErr;
-  };
-
-  const proceedWithRegistration = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            nome: sanitizeText(formData.nome),
-            cpf: formData.cpf.replace(/\D/g, ''),
-            tipo: formData.tipo
-          }
+      const result = await signUp(email, password, {
+        data: {
+          nome,
+          telefone,
+          cidade,
+          estado,
+          tipo: 'cliente'
         }
       });
 
-      if (error) {
-        if (error.message.includes('duplicate')) {
-          toast({
-            title: "Email já cadastrado",
-            description: "Este email já está em uso. Tente fazer login ou use outro email.",
-            variant: "destructive",
-          });
-        } else {
-          throw error;
-        }
-        return;
-      }
-
-      if (data.user) {
-        const { data: insertedUser, error: profileError } = await supabase
-          .from('users')
-          .insert({
-            auth_id: data.user.id,
-            nome: sanitizeText(formData.nome),
-            email: formData.email,
-            cpf: formData.cpf.replace(/\D/g, ''),
-            tipo: formData.tipo,
-            latitude: latitude,
-            longitude: longitude
-          })
-          .select('*')
-          .single();
-
-        if (profileError) {
-          if (profileError.message.includes('unique_cpf')) {
-            toast({
-              title: "CPF já cadastrado",
-              description: "Este CPF já está em uso no sistema.",
-              variant: "destructive",
-            });
-          } else {
-            throw profileError;
-          }
-          return;
-        }
-
-        // Após criar perfil público, subir arquivos de verificação (se prestador)
-        if (insertedUser?.id) {
-          try {
-            await uploadVerificationIfNeeded(insertedUser.id);
-          } catch (upErr: any) {
-            console.error('Verification upload error:', upErr);
-            // Não bloqueia o cadastro, apenas informa
-            toast({
-              title: "Aviso",
-              description: "Conta criada, mas houve problema ao enviar documentos. Você pode reenviar depois em suas configurações.",
-              variant: "destructive",
-            });
-          }
-        }
-
+      if (result.error) {
         toast({
-          title: "Cadastro realizado!",
-          description: "Bem-vindo ao ZURBO! Verifique seu email para confirmar a conta.",
+          title: "Erro ao criar conta",
+          description: result.error.message,
+          variant: "destructive"
         });
-
-        onSuccess(formData.tipo);
+      } else {
+        toast({
+          title: "Conta criada com sucesso!",
+          description: "Verifique seu email para confirmar a conta.",
+        });
       }
-    } catch (error: any) {
-      console.error('Registration error:', error);
-      toast({
-        title: "Erro no cadastro",
-        description: error.message || "Ocorreu um erro inesperado.",
-        variant: "destructive",
-      });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-
-    if (formData.tipo === 'prestador') {
-      setShowLocationDialog(true);
-    } else {
-      await proceedWithRegistration();
-    }
-  };
-
-  const handleCPFChange = (value: string) => {
-    const formattedCPF = formatCPF(value);
-    setFormData({ ...formData, cpf: formattedCPF });
-    if (errors.cpf && validateCPF(value)) {
-      setErrors({ ...errors, cpf: '' });
-    }
-  };
-
   return (
-    <>
-      <Card className="w-full max-w-md mx-auto">
-        <CardHeader>
-          <CardTitle>Criar Conta</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="nome">Nome Completo</Label>
+    <Card>
+      <CardHeader>
+        <CardTitle>Criar uma conta</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="nome">Nome Completo</Label>
+            <Input
+              type="text"
+              id="nome"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              placeholder="Digite seu nome completo"
+            />
+          </div>
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="seu@email.com"
+            />
+          </div>
+          <div>
+            <Label htmlFor="password">Senha</Label>
+            <div className="relative">
               <Input
-                id="nome"
-                type="text"
-                value={formData.nome}
-                onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                required
-                maxLength={100}
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Senha segura"
               />
-              {errors.nome && (
-                <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
-                  <AlertCircle className="h-3 w-3" />
-                  {errors.nome}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-              />
-              {errors.email && (
-                <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
-                  <AlertCircle className="h-3 w-3" />
-                  {errors.email}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="cpf">CPF</Label>
-              <Input
-                id="cpf"
-                type="text"
-                value={formData.cpf}
-                onChange={(e) => handleCPFChange(e.target.value)}
-                placeholder="000.000.000-00"
-                maxLength={14}
-                required
-              />
-              {errors.cpf && (
-                <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
-                  <AlertCircle className="h-3 w-3" />
-                  {errors.cpf}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="password">Senha</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  required
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-              </div>
-              {errors.password && (
-                <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
-                  <AlertCircle className="h-3 w-3" />
-                  {errors.password}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="confirmPassword">Confirmar Senha</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                required
-              />
-              {errors.confirmPassword && (
-                <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
-                  <AlertCircle className="h-3 w-3" />
-                  {errors.confirmPassword}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label>Tipo de Conta</Label>
-              <RadioGroup
-                value={formData.tipo}
-                onValueChange={(value) => setFormData({ ...formData, tipo: value })}
-                className="mt-2"
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-2 top-1/2 -translate-y-1/2"
+                onClick={() => setShowPassword(!showPassword)}
               >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="cliente" id="cliente" />
-                  <Label htmlFor="cliente">Cliente - Quero contratar serviços</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="prestador" id="prestador" />
-                  <Label htmlFor="prestador">Prestador - Quero oferecer serviços</Label>
-                </div>
-              </RadioGroup>
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
             </div>
-
-            {formData.tipo === 'prestador' && (
-              <ProviderVerificationUpload
-                value={verificationFiles}
-                onChange={setVerificationFiles}
+          </div>
+          <div>
+            <Label htmlFor="telefone">Telefone</Label>
+            <Input
+              type="tel"
+              id="telefone"
+              value={telefone}
+              onChange={(e) => setTelefone(e.target.value)}
+              placeholder="(99) 99999-9999"
+            />
+          </div>
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <Label htmlFor="cidade">Cidade</Label>
+              <Input
+                type="text"
+                id="cidade"
+                value={cidade}
+                onChange={(e) => setCidade(e.target.value)}
+                placeholder="Cidade"
               />
-            )}
-
-            <Button type="submit" disabled={loading} className="w-full bg-orange-500 hover:bg-orange-600">
-              {loading ? 'Criando conta...' : 'Criar Conta'}
-            </Button>
-          </form>
-
-          <p className="text-center mt-4 text-sm text-gray-600">
-            Já tem uma conta?{' '}
-            <button
-              onClick={onSwitchToLogin}
-              className="text-orange-500 hover:text-orange-600 font-medium"
-            >
-              Fazer login
-            </button>
-          </p>
-        </CardContent>
-      </Card>
-
-      <LocationConsentDialog
-        open={showLocationDialog}
-        onConsent={handleLocationConsent}
-      />
-    </>
+            </div>
+            <div className="flex-1">
+              <Label htmlFor="estado">Estado</Label>
+              <Select onValueChange={setCidade}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectContent>
+                  {estadosBrasil.map((estado) => (
+                    <SelectItem key={estado} value={estado}>
+                      {estado}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div>
+            <Label htmlFor="termos" className="flex items-center space-x-2">
+              <Checkbox
+                id="termos"
+                checked={termos}
+                onCheckedChange={setTermos}
+              />
+              <span>Eu concordo com os <a href="#" className="text-blue-500">Termos de Serviço</a> e <a href="#" className="text-blue-500">Política de Privacidade</a>.</span>
+            </Label>
+          </div>
+          <Button disabled={loading} className="w-full">
+            {loading ? "Criando conta..." : "Criar conta"}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
-
-export default SecureRegisterForm;

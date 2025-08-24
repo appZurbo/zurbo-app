@@ -1,11 +1,10 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Eye, EyeOff, User, UserCheck, AlertTriangle } from 'lucide-react';
 
 interface SimulationModeProps {
@@ -16,7 +15,6 @@ export const SimulationMode = ({ onSimulationChange }: SimulationModeProps) => {
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulatedRole, setSimulatedRole] = useState('cliente');
   const [isOpen, setIsOpen] = useState(false);
-  const { toast } = useToast();
 
   const roleOptions = [
     { value: 'cliente', label: 'Cliente', icon: User },
