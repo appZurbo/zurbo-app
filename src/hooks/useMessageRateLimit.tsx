@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { securityLogger } from '@/utils/securityLogger';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -20,7 +20,6 @@ export const useMessageRateLimit = (config: MessageRateLimitConfig = DEFAULT_CON
   const [messageCount, setMessageCount] = useState(0);
   const [firstMessageTime, setFirstMessageTime] = useState(0);
   const [blockedUntil, setBlockedUntil] = useState(0);
-  const { toast } = useToast();
   const { profile } = useAuth();
 
   const isBlocked = useCallback(() => {

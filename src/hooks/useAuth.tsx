@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, createContext } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface Profile {
   id: string;
@@ -137,11 +137,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error("Erro ao fazer login:", error.message);
-        toast({
-          title: 'Falha no login',
-          description: error.message || 'Credenciais inválidas.',
-          variant: 'destructive',
-        });
+        toast.error(error.message || 'Credenciais inválidas.');
       } else {
         setUser(data.user);
         setSession(data.session);
@@ -157,11 +153,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (error) {
       console.error("Erro durante o login:", error);
-      toast({
-        title: 'Erro inesperado',
-        description: 'Por favor, tente novamente.',
-        variant: 'destructive',
-      });
+      toast.error('Por favor, tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -183,11 +175,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error("Erro ao registrar:", error.message);
-        toast({
-          title: 'Falha no registro',
-          description: error.message || 'Por favor, tente novamente.',
-          variant: 'destructive',
-        });
+        toast.error(error.message || 'Por favor, tente novamente.');
       } else {
         setUser(data.user);
         setSession(data.session);
@@ -209,19 +197,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           },
         ]);
 
-        toast({
-          title: 'Registro bem-sucedido',
-          description: 'Sua conta foi criada com sucesso!',
-        });
+        toast.success('Sua conta foi criada com sucesso!');
         navigate('/');
       }
     } catch (error) {
       console.error("Erro durante o registro:", error);
-      toast({
-        title: 'Erro inesperado',
-        description: 'Por favor, tente novamente mais tarde.',
-        variant: 'destructive',
-      });
+      toast.error('Por favor, tente novamente mais tarde.');
     } finally {
       setLoading(false);
     }
@@ -233,11 +214,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error("Erro ao fazer logout:", error.message);
-        toast({
-          title: 'Falha ao sair',
-          description: 'Não foi possível encerrar a sessão.',
-          variant: 'destructive',
-        });
+        toast.error('Não foi possível encerrar a sessão.');
       } else {
         setUser(null);
         setProfile(null);
@@ -249,11 +226,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (error) {
       console.error("Erro durante o logout:", error);
-      toast({
-        title: 'Erro inesperado',
-        description: 'Tente novamente.',
-        variant: 'destructive',
-      });
+      toast.error('Tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -271,11 +244,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error("Erro ao atualizar o perfil:", error);
-        toast({
-          title: 'Erro ao atualizar perfil',
-          description: error.message || 'Por favor, tente novamente.',
-          variant: 'destructive',
-        });
+        toast.error(error.message || 'Por favor, tente novamente.');
       } else if (data) {
         const typedProfile: Profile = {
           id: data.id,
@@ -290,18 +259,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           bio: data.bio,
         };
         setProfile(typedProfile);
-        toast({
-          title: 'Perfil atualizado',
-          description: 'Seu perfil foi atualizado com sucesso!',
-        });
+        toast.success('Seu perfil foi atualizado com sucesso!');
       }
     } catch (error) {
       console.error("Erro ao atualizar o perfil:", error);
-      toast({
-        title: 'Erro inesperado',
-        description: 'Tente novamente mais tarde.',
-        variant: 'destructive',
-      });
+      toast.error('Tente novamente mais tarde.');
     } finally {
       setLoading(false);
     }

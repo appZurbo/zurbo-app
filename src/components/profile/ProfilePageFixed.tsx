@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MapPin, User, Mail, FileText, Camera, MessageSquare, Star, Settings } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfilePicture } from '@/hooks/useProfilePicture';
 import { CommentsList } from './CommentsList';
@@ -24,7 +24,6 @@ export const ProfilePageFixed = () => {
     endereco_cidade: '',
     bio: '',
   });
-  const { toast } = useToast();
   const { uploadProfilePicture, uploading } = useProfilePicture();
   const fileInputRef = useRef<HTMLInputElement>(null);
 

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Camera, Plus, Trash2, Upload } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
 interface PhotoItem {
@@ -17,7 +17,6 @@ interface PhotoItem {
 
 export const PrestadorPhotoSettings = () => {
   const { profile, updateLocalProfile } = useAuth();
-  const { toast } = useToast();
   const [photos, setPhotos] = useState<PhotoItem[]>([]);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState(profile?.foto_url || '');
   const [loading, setLoading] = useState(false);

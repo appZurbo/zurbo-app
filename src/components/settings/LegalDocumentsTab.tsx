@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchActiveLegalDocument, mapUserTipoToDocType, consumePendingAcceptanceIfAny, type LegalDocument } from "@/utils/legal";
@@ -21,7 +21,6 @@ type AcceptanceRow = {
 
 export function LegalDocumentsTab() {
   const { profile } = useAuth();
-  const { toast } = useToast();
   const [doc, setDoc] = useState<LegalDocument | null>(null);
   const [acceptance, setAcceptance] = useState<AcceptanceRow | null>(null);
   const [loading, setLoading] = useState(true);

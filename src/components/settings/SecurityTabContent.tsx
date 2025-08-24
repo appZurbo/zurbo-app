@@ -5,13 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Trash2, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useMobile } from '@/hooks/useMobile';
 
 export const SecurityTabContent = () => {
   const { profile } = useAuth();
-  const { toast } = useToast();
   const isMobile = useMobile();
   const [loading, setLoading] = useState(false);
 

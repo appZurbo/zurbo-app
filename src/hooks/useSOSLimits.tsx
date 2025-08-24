@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from './useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export interface SOSUsage {
   current: number;
@@ -14,7 +14,6 @@ export const useSOSLimits = () => {
   const [sosUsage, setSOSUsage] = useState<SOSUsage>({ current: 0, limit: 3, remaining: 3 });
   const [loading, setLoading] = useState(false);
   const { profile } = useAuth();
-  const { toast } = useToast();
 
   const loadSOSUsage = useCallback(async () => {
     if (!profile) return;

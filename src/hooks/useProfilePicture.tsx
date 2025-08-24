@@ -1,13 +1,12 @@
 
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { updateUserProfile } from '@/utils/database';
 
 export const useProfilePicture = () => {
   const [uploading, setUploading] = useState(false);
-  const { toast } = useToast();
   const { profile, user, updateLocalProfile } = useAuth();
 
   const uploadProfilePicture = async (file: File) => {

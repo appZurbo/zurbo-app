@@ -5,7 +5,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Settings, Shield, Bell, Database } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export const SystemToggleControls = () => {
   const [settings, setSettings] = useState({
@@ -14,7 +14,6 @@ export const SystemToggleControls = () => {
     periodic_notifications: false
   });
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
 
   useEffect(() => {
     loadSettings();

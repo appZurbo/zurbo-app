@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 
 export interface UsageLimits {
@@ -16,7 +16,6 @@ export interface UsageLimits {
 
 export const useUsageLimits = () => {
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
   const { user } = useAuth();
 
   const checkLimits = useCallback(async (): Promise<boolean> => {

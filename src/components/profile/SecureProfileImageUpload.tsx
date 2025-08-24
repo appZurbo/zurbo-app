@@ -1,7 +1,7 @@
 
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Camera, Upload, AlertTriangle, Shield } from 'lucide-react';
 import { FileValidator } from '@/utils/fileValidator';
 import { securityLogger } from '@/utils/securityLogger';
@@ -17,7 +17,6 @@ const SecureProfileImageUpload = ({ onImageUploaded, currentImageUrl }: SecurePr
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [validationWarnings, setValidationWarnings] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
   const { profile } = useAuth();
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {

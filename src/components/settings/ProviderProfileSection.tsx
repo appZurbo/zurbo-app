@@ -9,11 +9,10 @@ import { Button } from '@/components/ui/button';
 import { User, Mail, Phone, MapPin, CreditCard, Calendar, Wrench, Edit3, Save, X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export const ProviderProfileSection = () => {
   const { profile } = useAuth();
-  const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   

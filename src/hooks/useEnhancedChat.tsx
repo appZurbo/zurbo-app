@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from './useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { ChatConversation, ChatMessage } from '@/types';
 
 export interface ImageUploadInfo {
@@ -17,7 +17,6 @@ export const useEnhancedChat = () => {
   const [loading, setLoading] = useState(false);
   const [imageUploadInfo, setImageUploadInfo] = useState<ImageUploadInfo>({ remaining: 5, total: 5 });
   const { profile } = useAuth();
-  const { toast } = useToast();
 
   // Load conversations using optimized RPC function
   const loadConversations = useCallback(async () => {

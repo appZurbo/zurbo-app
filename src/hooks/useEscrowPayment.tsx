@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export interface EscrowPayment {
   id: string;
@@ -23,7 +23,6 @@ export interface EscrowPayment {
 
 export const useEscrowPayment = () => {
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
 
   const createEscrowPayment = useCallback(async (
     conversationId: string,
