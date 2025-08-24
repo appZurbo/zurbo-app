@@ -1,4 +1,4 @@
-// Simple toast implementation without React hooks
+// Emergency toast replacement - no React hooks
 import { toast as sonnerToast } from 'sonner';
 
 interface ToastProps {
@@ -7,22 +7,21 @@ interface ToastProps {
   variant?: 'default' | 'destructive';
 }
 
-// Simple function without hooks
+// Simple function that doesn't use React hooks
 export const useToast = () => {
-  const toast = ({ title, description, variant }: ToastProps) => {
-    const message = title || description || '';
-    
-    if (variant === 'destructive') {
-      sonnerToast.error(message);
-    } else {
-      sonnerToast.success(message);
+  return { 
+    toast: ({ title, description, variant }: ToastProps) => {
+      const message = title || description || '';
+      
+      if (variant === 'destructive') {
+        sonnerToast.error(message);
+      } else {
+        sonnerToast.success(message);
+      }
     }
   };
-
-  return { toast };
 };
 
-// Direct toast function
 export const toast = (props: ToastProps) => {
   const message = props.title || props.description || '';
   
