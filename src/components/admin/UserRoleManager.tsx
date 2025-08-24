@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { UserCheck, UserX, Crown, Shield, User } from 'lucide-react';
 
@@ -14,7 +14,6 @@ export const UserRoleManager = ({ userId, currentRole, userName, onRoleUpdate }:
   const [newRole, setNewRole] = useState(currentRole);
   const [isOpen, setIsOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const { toast } = useToast();
 
   const roleOptions = [
     { value: 'cliente', label: 'Cliente', icon: User, color: 'bg-blue-100 text-blue-800' },
@@ -42,20 +41,13 @@ export const UserRoleManager = ({ userId, currentRole, userName, onRoleUpdate }:
 
       if (error) throw error;
 
-      toast({
-        title: "Cargo atualizado",
-        description: `${userName} agora é ${roleOptions.find(r => r.value === newRole)?.label}`,
-      });
+      toast.success(`Cargo atualizado - ${userName} agora é ${roleOptions.find(r => r.value === newRole)?.label}`);
 
       onRoleUpdate();
       setIsOpen(false);
     } catch (error) {
       console.error('Erro ao atualizar cargo:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível atualizar o cargo do usuário",
-        variant: "destructive",
-      });
+      toast.error("Não foi possível atualizar o cargo do usuário");
     } finally {
       setIsUpdating(false);
     }
