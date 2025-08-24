@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Trash2, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from 'sonner';
+import { toast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
 import { useMobile } from '@/hooks/useMobile';
 

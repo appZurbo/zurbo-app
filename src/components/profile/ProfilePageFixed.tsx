@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MapPin, User, Mail, FileText, Camera, MessageSquare, Star, Settings } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { toast } from "@/hooks/use-toast";
 import { useAuth } from '@/hooks/useAuth';
 import { useProfilePicture } from '@/hooks/useProfilePicture';
 import { CommentsList } from './CommentsList';

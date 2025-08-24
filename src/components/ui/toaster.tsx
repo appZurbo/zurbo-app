@@ -1,9 +1,9 @@
-// EMERGENCY CACHE BREAKER - No hooks component
+// ULTIMATE CACHE BREAKER - Pure component
 import { Toaster as SonnerToaster } from 'sonner';
 
-// Simple component with no React hooks
+// Zero React hooks - pure JSX only
 export function Toaster() {
-  console.log('✅ CACHE BREAKER: Toaster v15.0 rendered');
+  console.log('🚀 ULTIMATE CACHE BREAKER: Toaster v16.0 - Zero hooks');
   
   return (
     <SonnerToaster

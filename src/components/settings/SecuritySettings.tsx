@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Shield, Key, Eye, Download, Trash2, AlertCircle, User, MapPin, Phone, Mail } from 'lucide-react';
 import { securityLogger } from '@/utils/securityLogger';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from 'sonner';
+import { toast } from "@/hooks/use-toast";
 import { useMobile } from '@/hooks/useMobile';
 
 const SecuritySettings = () => {

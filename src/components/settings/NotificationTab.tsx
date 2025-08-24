@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from 'sonner';
+import { toast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
 import { useMobile } from '@/hooks/useMobile';
 
