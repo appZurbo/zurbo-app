@@ -1,5 +1,5 @@
 
-import { Toaster } from "@/components/ui/toaster";
+import { ToastProvider } from "@/components/ui/toast-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -53,7 +53,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
+        <ToastProvider />
         <BrowserRouter>
           <AuthProvider>
             <NotificationSound enabled={true} volume={0.3} />
