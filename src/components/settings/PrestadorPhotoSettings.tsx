@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Camera, Plus, Trash2, Upload } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from "@/hooks/toast-system";
+import { toast } from "@/utils/toast";
 import { supabase } from '@/integrations/supabase/client';
 
 interface PhotoItem {

@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
-import { toast } from "@/hooks/toast-system";
+import { toast } from "@/utils/toast";
   const isMobile = useMobile();
 const Planos = () => {
   const navigate = useNavigate();

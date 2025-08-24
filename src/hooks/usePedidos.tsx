@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getPedidos, updatePedido } from '@/utils/database/pedidos';
 import { Pedido, StatusType } from '@/types';
-import { toast } from "@/hooks/toast-system";
+import { toast } from "@/utils/toast";
 
 export const usePedidos = (userId?: string) => {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);

@@ -1,6 +1,6 @@
 import { Toaster } from "sonner";
 
-export function ToastProvider() {
+export function ToasterComponent() {
   return (
     <Toaster
       position="top-right"

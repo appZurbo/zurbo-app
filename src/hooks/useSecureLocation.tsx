@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { toast } from "@/hooks/toast-system";
+import { toast } from "@/utils/toast";
 
 interface LocationState {
   latitude: number | null;

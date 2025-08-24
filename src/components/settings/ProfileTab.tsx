@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Camera, Save, Mail, MapPin, Calendar, CreditCard } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from "@/hooks/toast-system";
+import { toast } from "@/utils/toast";
 import { useProfilePicture } from '@/hooks/useProfilePicture';
 import { BecomeProviderButton } from '@/components/migration/BecomeProviderButton';
 import { supabase } from '@/integrations/supabase/client';

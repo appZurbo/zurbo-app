@@ -2,7 +2,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from "@/hooks/toast-system";
+import { toast } from "@/utils/toast";
 
 export interface StripeSubscription {
   id: string;

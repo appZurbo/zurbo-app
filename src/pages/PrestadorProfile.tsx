@@ -10,7 +10,7 @@ import WatermarkSection from '@/components/sections/WatermarkSection';
 import { getUserProfile, getAvaliacoes, getPortfolioFotos } from '@/utils/database';
 import { CommentsList } from '@/components/profile/CommentsList';
 import { AddCommentDialog } from '@/components/profile/AddCommentDialog';
-import { toast } from "@/hooks/toast-system";
+import { toast } from "@/utils/toast";
 import { useMobile } from '@/hooks/useMobile';
 import { useAuth } from '@/hooks/useAuth';
 import { 

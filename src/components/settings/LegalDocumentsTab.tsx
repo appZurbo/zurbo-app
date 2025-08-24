@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { toast } from "@/hooks/toast-system";
+import { toast } from "@/utils/toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchActiveLegalDocument, mapUserTipoToDocType, consumePendingAcceptanceIfAny, type LegalDocument } from "@/utils/legal";

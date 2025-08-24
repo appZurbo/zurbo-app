@@ -2,7 +2,7 @@
 import React, { createContext, useContext } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { toast } from '@/hooks/toast-system';
+import { toast } from "@/utils/toast";
 
 interface Profile {
   id: string;

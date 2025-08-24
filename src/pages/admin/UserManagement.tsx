@@ -20,7 +20,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useMobile } from '@/hooks/useMobile';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/toast-system';
+import { toast } from "@/utils/toast";
 import { UserProfile } from '@/types';
 
 const UserManagement = () => {

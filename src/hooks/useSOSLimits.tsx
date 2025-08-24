@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from './useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from "@/hooks/toast-system";
+import { toast } from "@/utils/toast";
 
 export interface SOSUsage {
   current: number;

@@ -22,7 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/toast-system';
+import { toast } from "@/utils/toast";
 import { ProviderVerificationChecklist } from '@/components/admin/ProviderVerificationChecklist';
 
 interface Prestador {

@@ -12,7 +12,7 @@ import { useMobile } from '@/hooks/useMobile';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart as RechartsPieChart, Cell, Pie } from 'recharts';
 import { CreateTestData } from '@/components/admin/CreateTestData';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/toast-system';
+import { toast } from "@/utils/toast";
 
 const Relatorios = () => {
   const navigate = useNavigate();
