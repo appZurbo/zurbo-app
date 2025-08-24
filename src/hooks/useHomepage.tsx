@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { usePrestadores } from './usePrestadores';
-import { useAuth } from './useAuth';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 interface UseHomepageFilters {
   cidade: string;
@@ -21,7 +21,7 @@ export const useHomepage = () => {
     notaMin: undefined
   });
 
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuthContext();
   const { prestadores, loading, error, loadPrestadores, filterByFavorites, retry } = usePrestadores();
 
   const displayedPrestadores = showFavoritesOnly && isAuthenticated 
