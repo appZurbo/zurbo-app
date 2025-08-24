@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +7,6 @@ import { Trash2, Plus, Edit2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
 
 interface Bairro {
   id: string;
@@ -33,18 +33,11 @@ export const GerenciadorBairros: React.FC<GerenciadorBairrosProps> = ({ cidadeId
   const loadBairros = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('bairros')
-        .select('*')
-        .eq('cidade_id', cidadeId)
-        .order('nome', { ascending: true });
-
-      if (error) {
-        toast.error('Erro ao carregar bairros.');
-        return;
-      }
-
-      setBairros(data || []);
+      // TODO: Implement bairros table in database
+      // For now, we'll use mock data or disable this functionality
+      console.log('Bairros functionality disabled - table not in database schema');
+      setBairros([]);
+      toast.error('Funcionalidade de bairros temporariamente indisponível.');
     } finally {
       setLoading(false);
     }
@@ -57,19 +50,8 @@ export const GerenciadorBairros: React.FC<GerenciadorBairrosProps> = ({ cidadeId
     }
 
     try {
-      const { error } = await supabase
-        .from('bairros')
-        .insert([{ nome: nomeBairro, cidade_id: cidadeId }]);
-
-      if (error) {
-        toast.error('Erro ao criar bairro.');
-        return;
-      }
-
-      toast.success('Bairro criado com sucesso!');
-      setNomeBairro('');
-      setOpenModal(false);
-      await loadBairros();
+      // TODO: Implement bairros table in database
+      toast.error('Funcionalidade temporariamente indisponível.');
     } catch (error) {
       toast.error('Erro ao criar bairro.');
     }
@@ -79,21 +61,8 @@ export const GerenciadorBairros: React.FC<GerenciadorBairrosProps> = ({ cidadeId
     if (!selectedBairro) return;
 
     try {
-      const { error } = await supabase
-        .from('bairros')
-        .update({ nome: nomeBairro })
-        .eq('id', selectedBairro.id);
-
-      if (error) {
-        toast.error('Erro ao atualizar bairro.');
-        return;
-      }
-
-      toast.success('Bairro atualizado com sucesso!');
-      setNomeBairro('');
-      setSelectedBairro(null);
-      setOpenModal(false);
-      await loadBairros();
+      // TODO: Implement bairros table in database
+      toast.error('Funcionalidade temporariamente indisponível.');
     } catch (error) {
       toast.error('Erro ao atualizar bairro.');
     }
@@ -101,18 +70,8 @@ export const GerenciadorBairros: React.FC<GerenciadorBairrosProps> = ({ cidadeId
 
   const handleDeleteBairro = async (bairroId: string) => {
     try {
-      const { error } = await supabase
-        .from('bairros')
-        .delete()
-        .eq('id', bairroId);
-
-      if (error) {
-        toast.error('Erro ao excluir bairro.');
-        return;
-      }
-
-      toast.success('Bairro excluído com sucesso!');
-      await loadBairros();
+      // TODO: Implement bairros table in database
+      toast.error('Funcionalidade temporariamente indisponível.');
     } catch (error) {
       toast.error('Erro ao excluir bairro.');
     }
@@ -166,28 +125,35 @@ export const GerenciadorBairros: React.FC<GerenciadorBairrosProps> = ({ cidadeId
           <p>Carregando bairros...</p>
         ) : (
           <div className="divide-y divide-gray-200">
-            {bairros.map((bairro) => (
-              <div key={bairro.id} className="py-2 flex items-center justify-between">
-                <span>{bairro.nome}</span>
-                <div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleOpenEditModal(bairro)}
-                  >
-                    <Edit2 className="h-4 w-4 mr-2" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-red-500 hover:text-red-600"
-                    onClick={() => handleDeleteBairro(bairro.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+            {bairros.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <p>Funcionalidade de bairros temporariamente indisponível.</p>
+                <p className="text-sm">A tabela de bairros precisa ser criada no banco de dados.</p>
               </div>
-            ))}
+            ) : (
+              bairros.map((bairro) => (
+                <div key={bairro.id} className="py-2 flex items-center justify-between">
+                  <span>{bairro.nome}</span>
+                  <div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleOpenEditModal(bairro)}
+                    >
+                      <Edit2 className="h-4 w-4 mr-2" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-red-500 hover:text-red-600"
+                      onClick={() => handleDeleteBairro(bairro.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         )}
       </CardContent>

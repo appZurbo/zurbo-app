@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,15 +7,23 @@ import { toast } from 'sonner';
 
 interface BotaoFavoritoProps {
   prestadorId: string;
-  isFavorito: boolean;
-  onToggle: () => void;
+  isFavorito?: boolean;
+  onToggle?: () => void;
 }
 
 export const BotaoFavorito: React.FC<BotaoFavoritoProps> = ({
   prestadorId,
-  isFavorito,
+  isFavorito: initialFavorito,
   onToggle,
 }) => {
+  const [isFavorito, setIsFavorito] = useState(initialFavorito || false);
+
+  useEffect(() => {
+    if (initialFavorito !== undefined) {
+      setIsFavorito(initialFavorito);
+    }
+  }, [initialFavorito]);
+
   const handleToggleFavorito = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -34,6 +42,7 @@ export const BotaoFavorito: React.FC<BotaoFavoritoProps> = ({
           .eq('prestador_id', prestadorId);
         
         toast.success('Removido dos favoritos');
+        setIsFavorito(false);
       } else {
         // Add to favorites
         await supabase
@@ -44,9 +53,12 @@ export const BotaoFavorito: React.FC<BotaoFavoritoProps> = ({
           });
         
         toast.success('Adicionado aos favoritos');
+        setIsFavorito(true);
       }
       
-      onToggle();
+      if (onToggle) {
+        onToggle();
+      }
     } catch (error) {
       console.error('Erro ao gerenciar favorito:', error);
       toast.error('Erro ao gerenciar favorito');
@@ -67,5 +79,4 @@ export const BotaoFavorito: React.FC<BotaoFavoritoProps> = ({
   );
 };
 
-// Add default export
 export default BotaoFavorito;

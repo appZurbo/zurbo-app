@@ -1,88 +1,51 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Eye, EyeOff, User, Mail, Lock, Phone } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 
 interface RegisterFormProps {
   onSuccess?: () => void;
+  onSwitchToLogin?: () => void;
 }
 
-export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
+export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onSwitchToLogin }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [userType, setUserType] = useState<'cliente' | 'prestador'>('cliente');
   const [loading, setLoading] = useState(false);
-  const [role, setRole] = useState<'cliente' | 'prestador'>('cliente');
   const { signUp } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!name || !email || !phone || !password || !confirmPassword) {
-      toast({
-        title: "Campos obrigatórios",
-        description: "Preencha todos os campos.",
-        variant: "destructive",
-      });
-      return;
-    }
-
+    
     if (password !== confirmPassword) {
-      toast({
-        title: "Senhas não conferem",
-        description: "As senhas devem ser iguais.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!acceptedTerms) {
-      toast({
-        title: "Termos não aceitos",
-        description: "Aceite os termos de uso para continuar.",
-        variant: "destructive",
-      });
+      toast.error('As senhas não coincidem');
       return;
     }
 
     setLoading(true);
     try {
       const result = await signUp(email, password, {
-        name,
-        phone,
-        role,
+        nome: name,
+        tipo: userType,
+        bio: '',
       });
 
-      if (result.error) {
-        toast({
-          title: "Erro ao criar conta",
-          description: result.error.message,
-          variant: "destructive",
-        });
+      if (result?.error) {
+        toast.error(result.error.message);
       } else {
-        toast({
-          title: "Conta criada com sucesso!",
-          description: "Verifique seu email para confirmar a conta.",
-        });
+        toast.success('Conta criada com sucesso! Verifique seu email.');
         onSuccess?.();
       }
     } catch (error: any) {
-      toast({
-        title: "Erro inesperado",
-        description: error.message || "Ocorreu um erro ao criar a conta.",
-        variant: "destructive",
-      });
+      toast.error('Erro ao criar conta');
     } finally {
       setLoading(false);
     }
@@ -91,112 +54,84 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Criar uma conta</CardTitle>
+        <CardTitle>Criar Conta</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="name">Nome Completo</Label>
+            <Label htmlFor="name">Nome</Label>
             <Input
-              type="text"
               id="name"
-              placeholder="Seu nome"
+              type="text"
+              placeholder="Seu nome completo"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              required
             />
-          </div>
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              type="email"
-              id="email"
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
-            <Label htmlFor="phone">Telefone</Label>
-            <Input
-              type="tel"
-              id="phone"
-              placeholder="(66) 99999-9999"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-          </div>
-          <div>
-            <Label htmlFor="password">Senha</Label>
-            <div className="relative">
-              <Input
-                type={showPassword ? 'text' : 'password'}
-                id="password"
-                placeholder="Senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="absolute right-2 top-1/2 -translate-y-1/2"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </Button>
-            </div>
-          </div>
-          <div>
-            <Label htmlFor="confirmPassword">Confirmar Senha</Label>
-            <div className="relative">
-              <Input
-                type={showConfirmPassword ? 'text' : 'password'}
-                id="confirmPassword"
-                placeholder="Confirmar Senha"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="absolute right-2 top-1/2 -translate-y-1/2"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </Button>
-            </div>
           </div>
 
           <div>
-            <Label htmlFor="role">Tipo de Conta</Label>
-            <Select onValueChange={(value) => setRole(value as 'cliente' | 'prestador')}>
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="seu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="password">Senha</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Digite sua senha"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              placeholder="Confirme sua senha"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="userType">Tipo de Usuário</Label>
+            <Select value={userType} onValueChange={(value: 'cliente' | 'prestador') => setUserType(value)}>
               <SelectTrigger>
-                <SelectValue placeholder="Selecione o tipo de conta" />
+                <SelectValue placeholder="Selecione o tipo" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="cliente">Cliente</SelectItem>
-                <SelectItem value="prestador">Prestador de Serviço</SelectItem>
+                <SelectItem value="prestador">Prestador</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          <div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="terms"
-                checked={acceptedTerms}
-                onCheckedChange={(checked) => setAcceptedTerms(!!checked)}
-              />
-              <Label htmlFor="terms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed">
-                Aceito os <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline">termos de uso</a>
-              </Label>
-            </div>
-          </div>
-
-          <Button disabled={loading} className="w-full">
-            {loading ? "Criando conta..." : "Criar conta"}
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? 'Criando conta...' : 'Criar Conta'}
           </Button>
+
+          <div className="text-center">
+            <Button
+              type="button"
+              variant="link"
+              onClick={onSwitchToLogin}
+            >
+              Já tem uma conta? Faça login
+            </Button>
+          </div>
         </form>
       </CardContent>
     </Card>

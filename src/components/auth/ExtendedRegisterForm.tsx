@@ -1,11 +1,11 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Eye, EyeOff, User, Mail, Lock, Phone, MapPin } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -30,52 +30,39 @@ export const ExtendedRegisterForm: React.FC<ExtendedRegisterFormProps> = ({ onSu
     e.preventDefault();
 
     if (!termsAccepted) {
-      toast({
-        title: "Termos não aceitos",
-        description: "Você precisa aceitar os termos de uso para se registrar.",
-        variant: "destructive",
-      });
+      toast.error('Você precisa aceitar os termos de uso para se registrar.');
       return;
     }
 
     setLoading(true);
     try {
-      const result = await signUp({
-        email,
-        password,
-        options: {
-          data: {
-            nome: name,
-            telefone: phone,
-            cidade: city,
-            endereco: address,
-            is_prestador: isProvider,
-          },
-        },
+      const result = await signUp(email, password, {
+        nome: name,
+        endereco_cidade: city,
+        endereco_rua: address,
+        tipo: isProvider ? 'prestador' : 'cliente',
+        bio: '',
       });
 
       if (result?.error) {
-        toast({
-          title: "Erro ao registrar",
-          description: result.error.message,
-          variant: "destructive",
-        });
+        toast.error(result.error.message);
       } else {
-        toast({
-          title: "Registro realizado!",
-          description: "Confirme seu email para ativar sua conta.",
-        });
+        toast.success('Registro realizado! Confirme seu email para ativar sua conta.');
         onSuccess?.();
       }
     } catch (error: any) {
-      toast({
-        title: "Erro inesperado",
-        description: error.message || "Ocorreu um erro ao registrar.",
-        variant: "destructive",
-      });
+      toast.error(error.message || 'Ocorreu um erro ao registrar.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleProviderChange = (checked: boolean | 'indeterminate') => {
+    setIsProvider(checked === true);
+  };
+
+  const handleTermsChange = (checked: boolean | 'indeterminate') => {
+    setTermsAccepted(checked === true);
   };
 
   return (
@@ -165,7 +152,7 @@ export const ExtendedRegisterForm: React.FC<ExtendedRegisterFormProps> = ({ onSu
                 <Checkbox
                   id="isProvider"
                   checked={isProvider}
-                  onCheckedChange={setIsProvider}
+                  onCheckedChange={handleProviderChange}
                 />
                 <span className="ml-2">Quero me cadastrar como prestador de serviços</span>
               </div>
@@ -177,7 +164,7 @@ export const ExtendedRegisterForm: React.FC<ExtendedRegisterFormProps> = ({ onSu
                 <Checkbox
                   id="terms"
                   checked={termsAccepted}
-                  onCheckedChange={setTermsAccepted}
+                  onCheckedChange={handleTermsChange}
                   required
                 />
                 <span className="ml-2">

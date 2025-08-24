@@ -1,71 +1,68 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Eye, EyeOff, User, Mail, Lock, Phone } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthSecurity } from '@/hooks/useAuthSecurity';
 
-export const SecureRegisterForm = () => {
-  const [nome, setNome] = useState('');
+interface SecureRegisterFormProps {
+  onSuccess?: () => void;
+}
+
+export const SecureRegisterForm: React.FC<SecureRegisterFormProps> = ({ onSuccess }) => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [telefone, setTelefone] = useState('');
-  const [cidade, setCidade] = useState('');
-  const [estado, setEstado] = useState('');
-  const [termos, setTermos] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [phone, setPhone] = useState('');
+  const [city, setCity] = useState('');
+  const [address, setAddress] = useState('');
+  const [isProvider, setIsProvider] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { signUp } = useAuthSecurity();
-
-  const estadosBrasil = [
-    'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA',
-    'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN',
-    'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
-  ];
+  const [loading, setLoading] = useState(false);
+  const { secureSignUp } = useAuthSecurity();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!nome || !email || !password || !telefone || !cidade || !estado || !termos) {
-      toast({
-        title: "Preencha todos os campos",
-        description: "Por favor, verifique se todos os campos obrigatórios foram preenchidos.",
-        variant: "destructive"
-      });
+    if (!termsAccepted) {
+      toast.error('Você precisa aceitar os termos de uso para se registrar.');
       return;
     }
 
     setLoading(true);
     try {
-      const result = await signUp(email, password, {
-        data: {
-          nome,
-          telefone,
-          cidade,
-          estado,
-          tipo: 'cliente'
-        }
+      const result = await secureSignUp(email, password, {
+        nome: name,
+        endereco_cidade: city,
+        endereco_rua: address,
+        tipo: isProvider ? 'prestador' : 'cliente',
+        bio: '',
       });
 
-      if (result.error) {
-        toast({
-          title: "Erro ao criar conta",
-          description: result.error.message,
-          variant: "destructive"
-        });
+      if (result?.error) {
+        toast.error(result.error.message);
       } else {
-        toast({
-          title: "Conta criada com sucesso!",
-          description: "Verifique seu email para confirmar a conta.",
-        });
+        toast.success('Registro realizado! Confirme seu email para ativar sua conta.');
+        onSuccess?.();
       }
+    } catch (error: any) {
+      toast.error(error.message || 'Ocorreu um erro ao registrar.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleProviderChange = (checked: boolean | 'indeterminate') => {
+    setIsProvider(checked === true);
+  };
+
+  const handleTermsChange = (checked: boolean | 'indeterminate') => {
+    setTermsAccepted(checked === true);
   };
 
   return (
@@ -73,16 +70,17 @@ export const SecureRegisterForm = () => {
       <CardHeader>
         <CardTitle>Criar uma conta</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="nome">Nome Completo</Label>
+            <Label htmlFor="name">Nome Completo</Label>
             <Input
               type="text"
-              id="nome"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              placeholder="Digite seu nome completo"
+              id="name"
+              placeholder="Seu nome completo"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
             />
           </div>
           <div>
@@ -90,9 +88,10 @@ export const SecureRegisterForm = () => {
             <Input
               type="email"
               id="email"
+              placeholder="seu@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="seu@email.com"
+              required
             />
           </div>
           <div>
@@ -101,9 +100,10 @@ export const SecureRegisterForm = () => {
               <Input
                 type={showPassword ? 'text' : 'password'}
                 id="password"
+                placeholder="Senha segura"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Senha segura"
+                required
               />
               <Button
                 type="button"
@@ -117,50 +117,60 @@ export const SecureRegisterForm = () => {
             </div>
           </div>
           <div>
-            <Label htmlFor="telefone">Telefone</Label>
+            <Label htmlFor="phone">Telefone</Label>
             <Input
               type="tel"
-              id="telefone"
-              value={telefone}
-              onChange={(e) => setTelefone(e.target.value)}
+              id="phone"
               placeholder="(99) 99999-9999"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
             />
           </div>
-          <div className="flex gap-2">
-            <div className="flex-1">
-              <Label htmlFor="cidade">Cidade</Label>
-              <Input
-                type="text"
-                id="cidade"
-                value={cidade}
-                onChange={(e) => setCidade(e.target.value)}
-                placeholder="Cidade"
-              />
-            </div>
-            <div className="flex-1">
-              <Label htmlFor="estado">Estado</Label>
-              <Select onValueChange={setCidade}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecione" />
-                </SelectTrigger>
-                <SelectContent>
-                  {estadosBrasil.map((estado) => (
-                    <SelectItem key={estado} value={estado}>
-                      {estado}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div>
+            <Label htmlFor="city">Cidade</Label>
+            <Input
+              type="text"
+              id="city"
+              placeholder="Sua cidade"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+            />
           </div>
           <div>
-            <Label htmlFor="termos" className="flex items-center space-x-2">
-              <Checkbox
-                id="termos"
-                checked={termos}
-                onCheckedChange={setTermos}
-              />
-              <span>Eu concordo com os <a href="#" className="text-blue-500">Termos de Serviço</a> e <a href="#" className="text-blue-500">Política de Privacidade</a>.</span>
+            <Label htmlFor="address">Endereço</Label>
+            <Input
+              type="text"
+              id="address"
+              placeholder="Seu endereço"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+            />
+          </div>
+          <div>
+            <Label htmlFor="isProvider">
+              <div className="flex items-center">
+                <Checkbox
+                  id="isProvider"
+                  checked={isProvider}
+                  onCheckedChange={handleProviderChange}
+                />
+                <span className="ml-2">Quero me cadastrar como prestador de serviços</span>
+              </div>
+            </Label>
+          </div>
+          <div>
+            <Label htmlFor="terms">
+              <div className="flex items-center">
+                <Checkbox
+                  id="terms"
+                  checked={termsAccepted}
+                  onCheckedChange={handleTermsChange}
+                  required
+                />
+                <span className="ml-2">
+                  Eu aceito os <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-blue-500">termos de uso</a> e a <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-500">política de privacidade</a>
+                </span>
+              </div>
             </Label>
           </div>
           <Button disabled={loading} className="w-full">
