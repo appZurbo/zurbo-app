@@ -1,4 +1,3 @@
-
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -8,7 +7,6 @@ import { NotificationSound } from "@/components/notifications/NotificationSound"
 import { PWAInstallPrompt } from "@/components/mobile/PWAInstallPrompt";
 import { initializeCapacitor } from "@/utils/capacitor";
 import { useEffect } from "react";
-import TestMinimal from "./pages/TestMinimal";
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
 import PrestadoresPage from "./pages/PrestadoresPage";
@@ -59,7 +57,7 @@ function App() {
             <NotificationSound enabled={true} volume={0.3} />
             <PWAInstallPrompt />
             <Routes>
-              <Route path="/" element={<TestMinimal />} />
+              <Route path="/" element={<Index />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/prestadores" element={<PrestadoresPage />} />
               <Route path="/conversas" element={<Conversas />} />

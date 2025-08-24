@@ -1,6 +1,6 @@
+
 // Ultra-simple toast system - NO React hooks at all
-// Updated to fix persistent cache issues
-console.log("use-toast.ts loaded at:", new Date().toISOString());
+console.log("Fixed use-toast.ts loaded");
 
 interface SimpleToastOptions {
   title?: string;
@@ -79,9 +79,9 @@ const showToast = (options: SimpleToastOptions) => {
   return Math.random().toString(36);
 };
 
-// Export hook that DOESN'T use React hooks - CACHE BUSTER v2
+// Export hook that DOESN'T use React hooks
 export const useToast = () => {
-  console.log("useToast called from NEW implementation");
+  console.log("useToast called - NO hooks version");
   return {
     toast: showToast,
     dismiss: () => {} // Not implemented for simplicity
