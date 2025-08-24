@@ -1,10 +1,10 @@
 
-// Emergency cache breaker - useToast completely removed v4
+// Complete cache reset - deleted problematic files
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 
-console.log('🚨 HOOK-FREE PLACEHOLDERS - Extreme cache-breaking fix v11.0');
+console.log('🔥 COMPLETE CLEANUP - Deleted toast files to break cache v12.0');
 
 createRoot(document.getElementById("root")!).render(
   <App />
