@@ -1,354 +1,343 @@
-
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, Session } from '@supabase/supabase-js';
+import { useState, useEffect, useContext, createContext } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { UserProfile } from '@/types';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
+
+interface Profile {
+  id: string;
+  nome: string;
+  email: string;
+  telefone: string;
+  foto_url: string;
+  is_prestador: boolean;
+  is_admin: boolean;
+  cidade: string;
+  estado: string;
+  bio: string;
+  // Adicione outros campos conforme necessário
+}
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
-  profile: UserProfile | null;
-  loading: boolean;
-  error: string | null;
+  user: any | null;
+  profile: Profile | null;
+  session: any | null;
   isAuthenticated: boolean;
+  loading: boolean;
   isPrestador: boolean;
-  isCliente: boolean;
   isAdmin: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string, userData: Partial<UserProfile>) => Promise<{ error: any }>;
-  signOut: () => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, nome: string, telefone: string) => Promise<void>;
   logout: () => Promise<void>;
-  updateLocalProfile: (updates: Partial<UserProfile>) => void;
+  updateProfile: (updates: Partial<Profile>) => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  session: null,
-  profile: null,
-  loading: true,
-  error: null,
-  isAuthenticated: false,
-  isPrestador: false,
-  isCliente: false,
-  isAdmin: false,
-  signIn: async () => ({ error: null }),
-  signUp: async () => ({ error: null }),
-  signOut: async () => {},
-  logout: async () => {},
-  updateLocalProfile: () => {},
-  refreshProfile: async () => {},
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<any | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [session, setSession] = useState<any | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isPrestador, setIsPrestador] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    const loadSession = async () => {
+      try {
+        setLoading(true);
+        const { data: { session } } = await supabase.auth.getSession();
 
-  // Get the correct redirect URL
-  const getRedirectUrl = () => {
-    const currentUrl = window.location.origin;
-    if (currentUrl.includes('localhost') || currentUrl.includes('127.0.0.1')) {
-      return currentUrl;
-    }
-    return 'https://zurbo.com.br';
-  };
+        setSession(session);
+        setUser(session?.user ?? null);
+        setIsAuthenticated(!!session?.user);
 
-  const loadProfile = async (userId: string) => {
+        if (session?.user) {
+          await fetchProfile(session.user.id);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar a sessão:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSession();
+
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setIsAuthenticated(!!session?.user);
+
+      if (session?.user) {
+        await fetchProfile(session.user.id);
+      } else {
+        setProfile(null);
+        setIsPrestador(false);
+        setIsAdmin(false);
+      }
+    });
+  }, []);
+
+  const fetchProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('users')
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
         .select('*')
-        .eq('auth_id', userId)
+        .eq('id', userId)
         .single();
 
-      if (error) {
-        console.error('Error loading profile:', error);
-        setError(error.message);
-        return null;
+      if (profileError) {
+        console.error("Erro ao buscar o perfil:", profileError);
+        // toast({
+        //   title: 'Erro ao carregar perfil',
+        //   description: 'Por favor, tente novamente.',
+        //   variant: 'destructive',
+        // });
+        return;
       }
 
-      const profileData: UserProfile = {
-        ...data,
-        auth_id: data.auth_id || userId,
-        criado_em: data.criado_em || new Date().toISOString(),
-        tipo: data.tipo as 'cliente' | 'prestador' | 'admin' | 'moderator'
-      };
-
-      return profileData;
-    } catch (error: any) {
-      console.error('Error loading profile:', error);
-      setError(error.message);
-      return null;
+      if (profileData) {
+        const typedProfile: Profile = {
+          id: profileData.id,
+          nome: profileData.nome,
+          email: profileData.email,
+          telefone: profileData.telefone,
+          foto_url: profileData.foto_url,
+          is_prestador: profileData.is_prestador,
+          is_admin: profileData.is_admin,
+          cidade: profileData.cidade,
+          estado: profileData.estado,
+          bio: profileData.bio,
+        };
+        setProfile(typedProfile);
+        setIsPrestador(profileData.is_prestador);
+        setIsAdmin(profileData.is_admin);
+      }
+    } catch (error) {
+      console.error("Erro ao processar dados do perfil:", error);
+      // toast({
+      //   title: 'Erro ao processar perfil',
+      //   description: 'Tente novamente mais tarde.',
+      //   variant: 'destructive',
+      // });
     }
   };
 
-  const createSocialUserProfile = async (user: User) => {
+  const login = async (email: string, password: string) => {
+    setLoading(true);
     try {
-      const userData = user.user_metadata || {};
-      const nome = userData.full_name || userData.name || user.email?.split('@')[0] || 'Usuário';
-      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (error) {
+        console.error("Erro ao fazer login:", error.message);
+        toast({
+          title: 'Falha no login',
+          description: error.message || 'Credenciais inválidas.',
+          variant: 'destructive',
+        });
+      } else {
+        setUser(data.user);
+        setSession(data.session);
+        setIsAuthenticated(true);
+        await fetchProfile(data.user?.id);
+
+        // Redireciona com base no tipo de usuário
+        if (isPrestador) {
+          navigate('/dashboard');
+        } else {
+          navigate('/');
+        }
+      }
+    } catch (error) {
+      console.error("Erro durante o login:", error);
+      toast({
+        title: 'Erro inesperado',
+        description: 'Por favor, tente novamente.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const register = async (email: string, password: string, nome: string, telefone: string) => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            nome: nome,
+            telefone: telefone,
+          },
+        },
+      });
+
+      if (error) {
+        console.error("Erro ao registrar:", error.message);
+        toast({
+          title: 'Falha no registro',
+          description: error.message || 'Por favor, tente novamente.',
+          variant: 'destructive',
+        });
+      } else {
+        setUser(data.user);
+        setSession(data.session);
+        setIsAuthenticated(true);
+
+        // Cria um perfil padrão para o usuário
+        await supabase.from('profiles').insert([
+          {
+            id: data.user?.id,
+            nome: nome,
+            email: email,
+            telefone: telefone,
+            foto_url: '',
+            is_prestador: false,
+            is_admin: false,
+            cidade: '',
+            estado: '',
+            bio: '',
+          },
+        ]);
+
+        toast({
+          title: 'Registro bem-sucedido',
+          description: 'Sua conta foi criada com sucesso!',
+        });
+        navigate('/');
+      }
+    } catch (error) {
+      console.error("Erro durante o registro:", error);
+      toast({
+        title: 'Erro inesperado',
+        description: 'Por favor, tente novamente mais tarde.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Erro ao fazer logout:", error.message);
+        toast({
+          title: 'Falha ao sair',
+          description: 'Não foi possível encerrar a sessão.',
+          variant: 'destructive',
+        });
+      } else {
+        setUser(null);
+        setProfile(null);
+        setSession(null);
+        setIsAuthenticated(false);
+        setIsPrestador(false);
+        setIsAdmin(false);
+        navigate('/auth');
+      }
+    } catch (error) {
+      console.error("Erro durante o logout:", error);
+      toast({
+        title: 'Erro inesperado',
+        description: 'Tente novamente.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateProfile = async (updates: Partial<Profile>) => {
+    setLoading(true);
+    try {
       const { data, error } = await supabase
-        .from('users')
-        .insert({
-          auth_id: user.id,
-          email: user.email || '',
-          nome: nome,
-          tipo: 'cliente',
-          bio: '',
-          endereco_cidade: '',
-          endereco_bairro: '',
-          foto_url: userData.avatar_url || userData.picture || null,
-        })
+        .from('profiles')
+        .update(updates)
+        .eq('id', user?.id)
         .select()
         .single();
 
       if (error) {
-        console.error('Error creating social user profile:', error);
-        setError(error.message);
-        return null;
+        console.error("Erro ao atualizar o perfil:", error);
+        toast({
+          title: 'Erro ao atualizar perfil',
+          description: error.message || 'Por favor, tente novamente.',
+          variant: 'destructive',
+        });
+      } else if (data) {
+        const typedProfile: Profile = {
+          id: data.id,
+          nome: data.nome,
+          email: data.email,
+          telefone: data.telefone,
+          foto_url: data.foto_url,
+          is_prestador: data.is_prestador,
+          is_admin: data.is_admin,
+          cidade: data.cidade,
+          estado: data.estado,
+          bio: data.bio,
+        };
+        setProfile(typedProfile);
+        toast({
+          title: 'Perfil atualizado',
+          description: 'Seu perfil foi atualizado com sucesso!',
+        });
       }
-
-      return {
-        ...data,
-        criado_em: data.criado_em || new Date().toISOString(),
-        tipo: data.tipo as 'cliente' | 'prestador' | 'admin' | 'moderator'
-      } as UserProfile;
-    } catch (error: any) {
-      console.error('Error creating social user profile:', error);
-      setError(error.message);
-      return null;
+    } catch (error) {
+      console.error("Erro ao atualizar o perfil:", error);
+      toast({
+        title: 'Erro inesperado',
+        description: 'Tente novamente mais tarde.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   const refreshProfile = async () => {
-    if (user) {
-      const userProfile = await loadProfile(user.id);
-      if (userProfile) {
-        setProfile(userProfile);
-      }
+    if (user?.id) {
+      await fetchProfile(user.id);
     }
-  };
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.id);
-        
-        if (!isMounted) return;
-
-        setSession(session);
-        setUser(session?.user ?? null);
-        setError(null);
-
-        if (session?.user) {
-          // Enhanced email confirmation check
-          if (!session.user.email_confirmed_at) {
-            console.warn('User email not confirmed, signing out');
-            await supabase.auth.signOut();
-            setSession(null);
-            setUser(null);
-            setProfile(null);
-            return;
-          }
-
-          setTimeout(async () => {
-            if (isMounted) {
-              let userProfile = await loadProfile(session.user.id);
-              
-              if (!userProfile && event === 'SIGNED_IN' && session.user.app_metadata.provider !== 'email') {
-                userProfile = await createSocialUserProfile(session.user);
-              }
-              
-              if (isMounted && userProfile) {
-                setProfile(userProfile);
-              }
-            }
-          }, 0);
-        } else {
-          setProfile(null);
-        }
-
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    );
-
-    const initializeAuth = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('Error getting session:', error);
-          setError(error.message);
-          return;
-        }
-
-        if (!isMounted) return;
-
-        setSession(session);
-        setUser(session?.user ?? null);
-
-        if (session?.user) {
-          // Check email confirmation on initialization
-          if (!session.user.email_confirmed_at) {
-            console.warn('User email not confirmed during initialization, signing out');
-            await supabase.auth.signOut();
-            setSession(null);
-            setUser(null);
-            setProfile(null);
-            setLoading(false);
-            return;
-          }
-
-          const userProfile = await loadProfile(session.user.id);
-          if (isMounted && userProfile) {
-            setProfile(userProfile);
-          }
-        }
-      } catch (error: any) {
-        console.error('Error initializing auth:', error);
-        setError(error.message);
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    initializeAuth();
-
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  const signIn = async (email: string, password: string) => {
-    try {
-      setError(null);
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      // Enhanced email confirmation check
-      if (data.user && !data.user.email_confirmed_at) {
-        // Force sign out if email not confirmed
-        await supabase.auth.signOut();
-        return { error: { message: 'Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada.' } };
-      }
-      
-      return { error };
-    } catch (error) {
-      setError('Erro ao fazer login');
-      return { error };
-    }
-  };
-
-  const signUp = async (email: string, password: string, userData: Partial<UserProfile>) => {
-    try {
-      setError(null);
-      const redirectUrl = getRedirectUrl();
-      console.log('Using redirect URL for signup:', redirectUrl);
-      
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: redirectUrl,
-        },
-      });
-
-      if (error) return { error };
-
-      if (data.user) {
-        const { error: profileError } = await supabase
-          .from('users')
-          .insert({
-            auth_id: data.user.id,
-            email: email,
-            nome: userData.nome || '',
-            tipo: userData.tipo || 'cliente',
-            bio: userData.bio || '',
-            endereco_cidade: userData.endereco_cidade || '',
-            endereco_bairro: userData.endereco_bairro || '',
-          });
-
-        if (profileError) {
-          console.error('Error creating profile:', profileError);
-          setError(profileError.message);
-          return { error: profileError };
-        }
-      }
-
-      return { error: null };
-    } catch (error: any) {
-      setError('Erro ao criar conta');
-      return { error };
-    }
-  };
-
-  const signOut = async () => {
-    try {
-      setError(null);
-      await supabase.auth.signOut();
-      setUser(null);
-      setSession(null);
-      setProfile(null);
-    } catch (error: any) {
-      setError('Erro ao sair');
-      console.error('Error signing out:', error);
-    }
-  };
-
-  const logout = signOut;
-
-  const updateLocalProfile = (updates: Partial<UserProfile>) => {
-    if (profile) {
-      setProfile({ ...profile, ...updates });
-    }
-  };
-
-  const isAuthenticated = !!user && !!user.email_confirmed_at;
-  const isPrestador = profile?.tipo === 'prestador';
-  const isCliente = profile?.tipo === 'cliente';
-  const isAdmin = profile?.tipo === 'admin' || profile?.tipo === 'moderator';
-
-  const value = {
-    user,
-    session,
-    profile,
-    loading,
-    error,
-    isAuthenticated,
-    isPrestador,
-    isCliente,
-    isAdmin,
-    signIn,
-    signUp,
-    signOut,
-    logout,
-    updateLocalProfile,
-    refreshProfile,
   };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{
+      user,
+      profile,
+      session,
+      isAuthenticated,
+      loading,
+      isPrestador,
+      isAdmin,
+      login,
+      register,
+      logout,
+      updateProfile,
+      refreshProfile
+    }}>
       {children}
+      {/* No Toaster here - moved to App.tsx */}
     </AuthContext.Provider>
   );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth deve ser usado dentro de um AuthProvider");
+  }
+  return context;
 };

@@ -53,7 +53,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        {/* Toaster disabled - cache issue fix */}
+        <Toaster 
+          position="top-right" 
+          richColors 
+          closeButton
+          expand={false}
+        />
         <BrowserRouter>
           <AuthProvider>
             <NotificationSound enabled={true} volume={0.3} />

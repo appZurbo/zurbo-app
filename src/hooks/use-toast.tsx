@@ -1,4 +1,5 @@
-// Emergency toast replacement - completely non-React
+
+// Simple toast without React hooks - direct Sonner integration
 import { toast as sonnerToast } from 'sonner';
 
 interface ToastProps {
@@ -7,21 +8,7 @@ interface ToastProps {
   variant?: 'default' | 'destructive';
 }
 
-// Simple function that doesn't use React hooks AT ALL
-export const useToast = () => {
-  return { 
-    toast: ({ title, description, variant }: ToastProps) => {
-      const message = title || description || '';
-      
-      if (variant === 'destructive') {
-        sonnerToast.error(message);
-      } else {
-        sonnerToast.success(message);
-      }
-    }
-  };
-};
-
+// No hooks - just direct function calls
 export const toast = (props: ToastProps) => {
   const message = props.title || props.description || '';
   
@@ -30,4 +17,9 @@ export const toast = (props: ToastProps) => {
   } else {
     sonnerToast.success(message);
   }
+};
+
+// Export a function that returns toast (no useState hook)
+export const useToast = () => {
+  return { toast };
 };
