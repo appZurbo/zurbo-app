@@ -1,4 +1,5 @@
 
+// Toast implementation using sonner
 import { toast as sonnerToast } from 'sonner';
 
 interface ToastProps {
