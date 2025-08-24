@@ -15,7 +15,7 @@ import WatermarkSection from '@/components/sections/WatermarkSection';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { getPrestadores } from '@/utils/database/prestadores';
 import { UserProfile } from '@/utils/database/types';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { useMobile } from '@/hooks/useMobile';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -77,11 +77,7 @@ const PrestadoresPage = () => {
       }
     } catch (error) {
       console.error('Error loading prestadores:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível carregar os prestadores.",
-        variant: "destructive"
-      });
+      toast.error("Não foi possível carregar os prestadores.");
     } finally {
       setLoading(false);
       setLoadingMore(false);

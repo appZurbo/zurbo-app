@@ -12,11 +12,12 @@ import { useMobile } from '@/hooks/useMobile';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart as RechartsPieChart, Cell, Pie } from 'recharts';
 import { CreateTestData } from '@/components/admin/CreateTestData';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 const Relatorios = () => {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
+  const isMobile = useMobile();
   const [timeRange, setTimeRange] = useState('30');
 
   const [stats, setStats] = useState({
@@ -67,11 +68,7 @@ const Relatorios = () => {
 
     } catch (error) {
       console.error('Error loading stats:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível carregar as estatísticas.",
-        variant: "destructive"
-      });
+      toast.error("Não foi possível carregar as estatísticas.");
     }
   };
 

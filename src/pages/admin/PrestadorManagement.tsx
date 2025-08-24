@@ -22,7 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 import { ProviderVerificationChecklist } from '@/components/admin/ProviderVerificationChecklist';
 
 interface Prestador {
@@ -112,11 +112,7 @@ const PrestadorManagement = () => {
       setPrestadores(transformedData);
     } catch (error) {
       console.error('Error loading prestadores:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível carregar os prestadores.",
-        variant: "destructive"
-      });
+      toast.error(`Erro ao carregar prestadores: ${error.message || 'Tente novamente mais tarde.'}`);
     } finally {
       setLoading(false);
     }
@@ -177,11 +173,7 @@ const PrestadorManagement = () => {
       setPendingVerifs(merged);
     } catch (error) {
       console.error('Error loading pending verifications:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível carregar solicitações pendentes.",
-        variant: "destructive"
-      });
+      toast.error("Não foi possível carregar solicitações pendentes.");
     } finally {
       setLoadingPending(false);
     }
@@ -205,17 +197,10 @@ const PrestadorManagement = () => {
         )
       );
 
-      toast({
-        title: "Sucesso",
-        description: `Status do prestador ${value ? 'ativado' : 'desativado'} com sucesso.`
-      });
+      toast.success(`Status do prestador ${value ? 'ativado' : 'desativado'} com sucesso.`);
     } catch (error) {
       console.error('Error updating status:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível atualizar o status.",
-        variant: "destructive"
-      });
+      toast.error("Não foi possível atualizar o status.");
     }
   };
 
@@ -228,11 +213,7 @@ const PrestadorManagement = () => {
 
     if (error) {
       console.error('Error creating signed URL', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível gerar link do arquivo.",
-        variant: "destructive"
-      });
+        toast.error("Não foi possível gerar link do arquivo.");
       return null;
     }
     return data.signedUrl;
@@ -270,21 +251,14 @@ const PrestadorManagement = () => {
         console.log('Backup result:', backupRes);
       }
 
-      toast({
-        title: "Prestador aprovado",
-        description: "O prestador foi aprovado e seus dados foram salvos em backup."
-      });
+      toast.success("Prestador aprovado - O prestador foi aprovado e seus dados foram salvos em backup.");
 
       // Atualiza listas
       await loadPrestadores();
       await loadPendingVerifications();
     } catch (e) {
       console.error('Error approving provider:', e);
-      toast({
-        title: "Erro",
-        description: "Não foi possível aprovar o prestador.",
-        variant: "destructive"
-      });
+      toast.error("Não foi possível aprovar o prestador.");
     }
   };
 
@@ -300,19 +274,12 @@ const PrestadorManagement = () => {
 
       if (error) throw error;
 
-      toast({
-        title: "Solicitação recusada",
-        description: "O prestador foi marcado como recusado."
-      });
+      toast.success("Solicitação recusada - O prestador foi marcado como recusado.");
 
       await loadPendingVerifications();
     } catch (e) {
       console.error('Error rejecting provider:', e);
-      toast({
-        title: "Erro",
-        description: "Não foi possível recusar o prestador.",
-        variant: "destructive"
-      });
+      toast.error("Não foi possível recusar o prestador.");
     }
   };
 

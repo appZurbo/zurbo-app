@@ -19,11 +19,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useMobile } from '@/hooks/useMobile';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 const Moderacao = () => {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
+  const isMobile = useMobile();
 
   // Mock data para demonstração
   const [reports] = useState([
@@ -60,17 +61,11 @@ const Moderacao = () => {
   ]);
 
   const handleApproveReport = (reportId: string) => {
-    toast({
-      title: "Denúncia aprovada",
-      description: "Ação disciplinar será tomada contra o usuário reportado."
-    });
+    toast.success("Denúncia aprovada - Ação disciplinar será tomada contra o usuário reportado.");
   };
 
   const handleRejectReport = (reportId: string) => {
-    toast({
-      title: "Denúncia rejeitada",
-      description: "A denúncia foi considerada improcedente."
-    });
+    toast.success("Denúncia rejeitada - A denúncia foi considerada improcedente.");
   };
 
   const pendingReports = reports.filter(r => r.status === 'pending');

@@ -1,8 +1,9 @@
-// ULTIMATE CACHE BREAKER - Properly typed toast wrapper
+// Hook-free toast wrapper
 import { toast as sonnerToast } from 'sonner';
 
 interface ToastInterface {
-  (options: any): void;
+  (message: string): void;
+  (options: { title?: string; description?: string; variant?: 'destructive' | 'default' }): void;
   success: typeof sonnerToast.success;
   error: typeof sonnerToast.error;
   info: typeof sonnerToast.info;
@@ -32,7 +33,5 @@ toast.warning = sonnerToast.warning;
 
 export { toast };
 
-// Simple function that returns compatible toast API
+// Hook-free function that returns compatible toast API
 export const useToast = () => ({ toast });
-
-console.log('🚀 ULTIMATE CACHE BREAKER: Properly typed toast wrapper v17.0');
