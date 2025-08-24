@@ -1,117 +1,95 @@
 
-import { useState, useEffect } from 'react';
-import { Heart } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { Heart } from 'lucide-react';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { 
-  adicionarFavorito, 
-  removerFavorito, 
-  verificarFavorito 
-} from '@/utils/database/favoritos';
 
 interface BotaoFavoritoProps {
   prestadorId: string;
-  size?: 'sm' | 'md' | 'lg';
-  variant?: 'default' | 'ghost' | 'outline';
 }
 
-const BotaoFavorito = ({ 
-  prestadorId, 
-  size = 'md',
-  variant = 'ghost' 
-}: BotaoFavoritoProps) => {
+export const BotaoFavorito: React.FC<BotaoFavoritoProps> = ({ prestadorId }) => {
+  const { profile } = useAuth();
   const [isFavorito, setIsFavorito] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      checkFavorito();
-    }
-  }, [prestadorId, isAuthenticated]);
+    checkFavoriteStatus();
+  }, [prestadorId, profile]);
 
-  const checkFavorito = async () => {
+  const checkFavoriteStatus = async () => {
+    if (!profile) return;
+
     try {
-      const favorito = await verificarFavorito(prestadorId);
-      setIsFavorito(favorito);
+      const { data, error } = await supabase
+        .from('favoritos')
+        .select('id')
+        .eq('cliente_id', profile.id)
+        .eq('prestador_id', prestadorId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Erro ao verificar favorito:', error);
+        return;
+      }
+
+      setIsFavorito(!!data);
     } catch (error) {
       console.error('Erro ao verificar favorito:', error);
     }
   };
 
-  const handleToggleFavorito = async () => {
-    if (!isAuthenticated) {
-      toast({
-        title: "Login necessário",
-        description: "Faça login para salvar prestadores nos favoritos",
-        variant: "destructive",
-      });
+  const toggleFavorito = async () => {
+    if (!profile) {
+      toast.error('Faça login para adicionar favoritos');
       return;
     }
 
     setLoading(true);
     try {
       if (isFavorito) {
-        const sucesso = await removerFavorito(prestadorId);
-        if (sucesso) {
-          setIsFavorito(false);
-          toast({
-            title: "Removido dos favoritos",
-            description: "Prestador removido dos seus favoritos",
-          });
-        } else {
-          throw new Error('Falha ao remover dos favoritos');
-        }
+        const { error } = await supabase
+          .from('favoritos')
+          .delete()
+          .eq('cliente_id', profile.id)
+          .eq('prestador_id', prestadorId);
+
+        if (error) throw error;
+
+        setIsFavorito(false);
+        toast.success('Removido dos favoritos');
       } else {
-        const sucesso = await adicionarFavorito(prestadorId);
-        if (sucesso) {
-          setIsFavorito(true);
-          toast({
-            title: "Adicionado aos favoritos",
-            description: "Prestador salvo nos seus favoritos",
-          });
-        } else {
-          throw new Error('Falha ao adicionar aos favoritos');
-        }
+        const { error } = await supabase
+          .from('favoritos')
+          .insert([{
+            cliente_id: profile.id,
+            prestador_id: prestadorId
+          }]);
+
+        if (error) throw error;
+
+        setIsFavorito(true);
+        toast.success('Adicionado aos favoritos');
       }
-    } catch (error) {
-      toast({
-        title: "Erro",
-        description: "Erro ao atualizar favoritos. Tente novamente.",
-        variant: "destructive",
-      });
+    } catch (error: any) {
+      console.error('Erro ao alterar favorito:', error);
+      toast.error('Erro ao alterar favorito');
     } finally {
       setLoading(false);
     }
   };
 
-  const sizeClasses = {
-    sm: 'h-8 w-8',
-    md: 'h-10 w-10', 
-    lg: 'h-12 w-12'
-  };
-
-  const iconSizes = {
-    sm: 'h-4 w-4',
-    md: 'h-5 w-5',
-    lg: 'h-6 w-6'
-  };
-
   return (
     <Button
-      variant={variant}
-      size="icon"
-      onClick={handleToggleFavorito}
+      variant="outline"
+      size="sm"
+      onClick={toggleFavorito}
       disabled={loading}
-      className={`${sizeClasses[size]} ${isFavorito ? 'text-red-500 hover:text-red-600' : 'text-gray-400 hover:text-red-500'}`}
+      className={`transition-all ${isFavorito ? 'bg-red-50 border-red-200 hover:bg-red-100' : ''}`}
     >
-      <Heart 
-        className={`${iconSizes[size]} ${isFavorito ? 'fill-current' : ''}`} 
-      />
+      <Heart className={`h-4 w-4 ${isFavorito ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
     </Button>
   );
 };
-
-export default BotaoFavorito;
