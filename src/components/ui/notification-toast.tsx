@@ -1,8 +1,8 @@
-import { Toaster as SonnerToaster } from "sonner";
+import { Toaster } from "sonner";
 
-export function Toaster() {
+export function NotificationToast() {
   return (
-    <SonnerToaster
+    <Toaster
       position="top-right"
       expand={false}
       richColors
