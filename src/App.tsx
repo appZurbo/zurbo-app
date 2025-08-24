@@ -1,3 +1,4 @@
+
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -52,6 +53,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <Sonner />
         <BrowserRouter>
           <AuthProvider>
             <NotificationSound enabled={true} volume={0.3} />
