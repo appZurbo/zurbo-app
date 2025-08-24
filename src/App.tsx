@@ -8,6 +8,7 @@ import { NotificationSound } from "@/components/notifications/NotificationSound"
 import { PWAInstallPrompt } from "@/components/mobile/PWAInstallPrompt";
 import { initializeCapacitor } from "@/utils/capacitor";
 import { useEffect } from "react";
+import TestMinimal from "./pages/TestMinimal";
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
 import PrestadoresPage from "./pages/PrestadoresPage";
@@ -58,7 +59,7 @@ function App() {
             <NotificationSound enabled={true} volume={0.3} />
             <PWAInstallPrompt />
             <Routes>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<TestMinimal />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/prestadores" element={<PrestadoresPage />} />
               <Route path="/conversas" element={<Conversas />} />
