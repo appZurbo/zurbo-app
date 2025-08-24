@@ -1,5 +1,5 @@
 
-// Force cache refresh - toast system cleared v2
+// Complete cache break - v3 system restart
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
