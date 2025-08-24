@@ -18,10 +18,15 @@ import { PrestadorGrid } from '@/components/homepage/PrestadorGrid';
 import { EmptyState } from '@/components/homepage/EmptyState';
 
 const Index = () => {
+  console.log("🔍 Index component started");
   const [selectedPrestador, setSelectedPrestador] = useState<UserProfile | null>(null);
+  console.log("🔍 useState 1 completed");
   const [showProfileModal, setShowProfileModal] = useState(false);
+  console.log("🔍 useState 2 completed");
   const [showContactModal, setShowContactModal] = useState(false);
+  console.log("🔍 useState 3 completed");
   const navigate = useNavigate();
+  console.log("🔍 useNavigate completed, calling useHomepage...");
 
   const {
     prestadores,

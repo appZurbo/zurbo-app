@@ -14,10 +14,12 @@ interface UsePrestadoresFilters {
 }
 
 export const usePrestadores = () => {
+  console.log("🔍 usePrestadores hook called");
   const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  console.log("🔍 useToast called successfully in usePrestadores");
 
   const loadPrestadores = useCallback(async (filters: UsePrestadoresFilters = {}) => {
     setLoading(true);
