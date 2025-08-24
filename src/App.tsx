@@ -3,11 +3,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/hooks/useAuthHookFree";
+import { AuthProvider } from "@/hooks/useAuth";
 import { NotificationSound } from "@/components/notifications/NotificationSound";
 import { PWAInstallPrompt } from "@/components/mobile/PWAInstallPrompt";
 import { initializeCapacitor } from "@/utils/capacitor";
-import { useEffect } from "react";
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
 import PrestadoresPage from "./pages/PrestadoresPage";
@@ -44,12 +43,10 @@ import BannerImageManager from "./pages/admin/BannerImageManager";
 
 const queryClient = new QueryClient();
 
-function App() {
-  useEffect(() => {
-    // Initialize Capacitor after React is mounted
-    initializeCapacitor();
-  }, []);
+// Initialize Capacitor immediately
+initializeCapacitor();
 
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
