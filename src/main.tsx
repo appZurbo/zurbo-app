@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 
-console.log('🔥 TOAST SYSTEM FIXED - ALL useState ERRORS RESOLVED v6.5 - FINAL FIX');
+console.log('🚀 CORE IMPORT FIXED - AuthProvider path corrected v7.0');
 
 createRoot(document.getElementById("root")!).render(
   <App />
