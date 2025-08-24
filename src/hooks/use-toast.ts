@@ -1,37 +1,33 @@
-// Hook-free toast wrapper
+// Completely hook-free toast system
 import { toast as sonnerToast } from 'sonner';
 
-interface ToastInterface {
-  (message: string): void;
-  (options: { title?: string; description?: string; variant?: 'destructive' | 'default' }): void;
-  success: typeof sonnerToast.success;
-  error: typeof sonnerToast.error;
-  info: typeof sonnerToast.info;
-  warning: typeof sonnerToast.warning;
+interface ToastOptions {
+  title?: string;
+  description?: string;
+  variant?: 'destructive' | 'default';
 }
 
-// Create the main toast function
-function toastFunction(options: any): void {
-  if (typeof options === 'string') {
-    sonnerToast.success(options);
-  } else if (options && typeof options === 'object') {
-    const message = options.title || options.description || 'Notification';
-    if (options.variant === 'destructive') {
-      sonnerToast.error(message, { description: options.description !== options.title ? options.description : undefined });
+// Main toast function that can be called directly
+function createToast(message: string | ToastOptions) {
+  if (typeof message === 'string') {
+    return sonnerToast.success(message);
+  } else if (message && typeof message === 'object') {
+    const text = message.title || message.description || 'Notification';
+    if (message.variant === 'destructive') {
+      return sonnerToast.error(text, { description: message.description !== message.title ? message.description : undefined });
     } else {
-      sonnerToast.success(message, { description: options.description !== options.title ? options.description : undefined });
+      return sonnerToast.success(text, { description: message.description !== message.title ? message.description : undefined });
     }
   }
 }
 
-// Create the toast object with methods
-const toast = toastFunction as ToastInterface;
-toast.success = sonnerToast.success;
-toast.error = sonnerToast.error;
-toast.info = sonnerToast.info;
-toast.warning = sonnerToast.warning;
+// Create callable toast object with methods
+export const toast = Object.assign(createToast, {
+  success: (message: string) => sonnerToast.success(message),
+  error: (message: string) => sonnerToast.error(message),
+  info: (message: string) => sonnerToast.info(message),
+  warning: (message: string) => sonnerToast.warning(message),
+});
 
-export { toast };
-
-// Hook-free function that returns compatible toast API
+// Legacy compatibility function - no hooks used
 export const useToast = () => ({ toast });

@@ -1,4 +1,4 @@
-// Hook-free toaster component
+// Completely hook-free toaster component
 import { Toaster as SonnerToaster } from 'sonner';
 
 export function Toaster() {
