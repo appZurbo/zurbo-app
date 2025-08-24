@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 
-console.log('🎯 FINAL TOAST FIX v59.0 - HELPER FUNCTION ACTIVE');
+console.log('🚀 CACHE BREAK v60.0 - NEW COMPONENT NAME');
 
 createRoot(document.getElementById("root")!).render(
   <App />
