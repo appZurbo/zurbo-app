@@ -1,160 +1,95 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { usePrestadores } from './usePrestadores';
-import { useAuth } from './useAuth';
-import { toast } from 'sonner';
+import { useState, useEffect, useMemo } from 'react';
+import { usePrestadores } from '@/hooks/usePrestadores';
+import { UserProfile } from '@/utils/database/types';
 
-interface Filters {
-  cidade: string;
-  categoria: string;
-  notaMin: number;
-  servicos: string[];
-  precoMax: number;
-  distanciaMax: number;
-  disponibilidade: 'todos' | 'disponivel' | 'ocupado';
-  verificado: boolean;
-  emergencia: boolean;
-  ordenacao: 'relevancia' | 'preco' | 'avaliacao' | 'distancia';
+export interface Filters {
+  servico?: string;
+  cidade?: string;
+  bairro?: string;
+  priceRange?: {
+    min: number;
+    max: number;
+  };
+  rating?: number;
+  disponivel?: boolean;
 }
-
-const initialFilters: Filters = {
-  cidade: '',
-  categoria: '',
-  notaMin: 0,
-  servicos: [],
-  precoMax: 1000,
-  distanciaMax: 50,
-  disponibilidade: 'todos',
-  verificado: false,
-  emergencia: false,
-  ordenacao: 'relevancia'
-};
 
 export const useHomepage = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [filters, setFilters] = useState<Filters>(initialFilters);
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  
-  const { prestadores, loading, error, loadPrestadores } = usePrestadores();
-  const { isAuthenticated } = useAuth();
+  const [filters, setFilters] = useState<Filters>({});
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
-  // Load prestadores on mount and when filters change
-  useEffect(() => {
-    const filtersToApply = {
-      cidade: filters.cidade || undefined,
-      search: searchQuery || undefined
-    };
+  const { 
+    prestadores: allPrestadores, 
+    loading, 
+    error, 
+    refreshPrestadores 
+  } = usePrestadores({
+    servico: filters.servico,
+    cidade: filters.cidade,
+    bairro: filters.bairro,
+    disponivel: filters.disponivel
+  });
 
-    loadPrestadores(filtersToApply);
-  }, [filters.cidade, searchQuery, loadPrestadores]);
+  // Filter prestadores based on search and filters
+  const prestadores = useMemo(() => {
+    let filtered = allPrestadores;
 
-  // Show error toast when there's an error
-  useEffect(() => {
-    if (error) {
-      toast.error(`Erro ao carregar prestadores: ${error}`);
-    }
-  }, [error]);
-
-  const updateFilter = useCallback((key: keyof Filters, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  }, []);
-
-  const clearFilters = useCallback(() => {
-    setFilters(initialFilters);
-    setSearchQuery('');
-  }, []);
-
-  const getActiveFiltersCount = useCallback(() => {
-    let count = 0;
-    if (filters.cidade) count++;
-    if (filters.categoria) count++;
-    if (filters.servicos.length > 0) count++;
-    if (filters.notaMin > 0) count++;
-    if (filters.precoMax < 1000) count++;
-    if (filters.distanciaMax < 50) count++;
-    if (filters.disponibilidade !== 'todos') count++;
-    if (filters.verificado) count++;
-    if (filters.emergencia) count++;
-    if (searchQuery) count++;
-    return count;
-  }, [filters, searchQuery]);
-
-  // Apply advanced filters to prestadores
-  const filteredPrestadores = prestadores.filter(prestador => {
-    // Advanced filters - using safe property access since these properties might not exist
-    if (filters.notaMin > 0 && (prestador.nota_media || 0) < filters.notaMin) {
-      return false;
-    }
-    
-    if (filters.verificado && !(prestador as any).verificado) {
-      return false;
-    }
-    
-    if (filters.emergencia && !(prestador as any).disponivel_emergencia) {
-      return false;
-    }
-    
-    if (filters.disponibilidade === 'disponivel' && !(prestador as any).em_servico) {
-      return false;
-    }
-    
-    if (filters.disponibilidade === 'ocupado' && (prestador as any).em_servico) {
-      return false;
-    }
-    
-    // Service filter - using safe property access
-    if (filters.servicos.length > 0) {
-      const prestadorServices = (prestador as any).servicos || [];
-      const hasMatchingService = filters.servicos.some(selectedService =>
-        prestadorServices.some((service: any) => 
-          service.nome?.toLowerCase().includes(selectedService.toLowerCase())
-        )
+    // Apply search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(prestador => 
+        prestador.nome?.toLowerCase().includes(query) ||
+        prestador.servico?.toLowerCase().includes(query) ||
+        prestador.endereco_cidade?.toLowerCase().includes(query) ||
+        prestador.endereco_bairro?.toLowerCase().includes(query)
       );
-      if (!hasMatchingService) return false;
     }
-    
-    return true;
-  });
 
-  // Sort prestadores - using safe property access
-  const sortedPrestadores = [...filteredPrestadores].sort((a, b) => {
-    switch (filters.ordenacao) {
-      case 'avaliacao':
-        return (b.nota_media || 0) - (a.nota_media || 0);
-      case 'preco':
-        return ((a as any).preco_medio || 0) - ((b as any).preco_medio || 0);
-      case 'distancia':
-        return ((a as any).distancia || 0) - ((b as any).distancia || 0);
-      default:
-        return 0; // relevancia - maintain original order
+    // Apply rating filter
+    if (filters.rating && filters.rating > 0) {
+      filtered = filtered.filter(prestador => 
+        (prestador.avaliacao_media || 0) >= filters.rating!
+      );
     }
-  });
+
+    // Apply price range filter
+    if (filters.priceRange) {
+      filtered = filtered.filter(prestador => {
+        if (!prestador.preco_servico) return true;
+        return prestador.preco_servico >= filters.priceRange!.min && 
+               prestador.preco_servico <= filters.priceRange!.max;
+      });
+    }
+
+    return filtered;
+  }, [allPrestadores, searchQuery, filters]);
+
+  const handleFiltersChange = (newFilters: Partial<Filters>) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+  };
+
+  const toggleFavoritesOnly = () => {
+    setShowFavoritesOnly(prev => !prev);
+  };
+
+  const retry = () => {
+    refreshPrestadores();
+  };
 
   return {
-    // Data
-    prestadores: sortedPrestadores,
+    prestadores,
     loading,
     error,
-    
-    // Search
     searchQuery,
     setSearchQuery,
-    
-    // Filters
     filters,
-    updateFilter,
-    clearFilters,
-    showAdvancedFilters,
-    setShowAdvancedFilters,
-    getActiveFiltersCount,
-    
-    // Auth
-    isAuthenticated,
-    
-    // Actions
-    refreshPrestadores: () => loadPrestadores({
-      cidade: filters.cidade || undefined,
-      search: searchQuery || undefined
-    })
+    setFilters,
+    showFavoritesOnly,
+    handleFiltersChange,
+    toggleFavoritesOnly,
+    retry,
+    refreshPrestadores
   };
 };

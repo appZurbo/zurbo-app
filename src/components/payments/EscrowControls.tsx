@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { CheckCircle, AlertTriangle, Upload } from 'lucide-react';
 import { useEscrowPayment } from '@/hooks/useEscrowPayment';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface EscrowControlsProps {
   escrowPaymentId: string;
@@ -25,15 +25,13 @@ export const EscrowControls: React.FC<EscrowControlsProps> = ({
   const [disputeReason, setDisputeReason] = useState('');
   const [loading, setLoading] = useState(false);
   const { releasePayment } = useEscrowPayment();
-  const { toast } = useToast();
 
   const handleConfirmCompletion = async () => {
     setLoading(true);
     try {
       await releasePayment(escrowPaymentId);
-      toast({
-        title: "Pagamento Liberado",
-        description: "O pagamento foi liberado para o prestador.",
+      toast.success("Pagamento Liberado", {
+        description: "O pagamento foi liberado para o prestador."
       });
     } catch (error) {
       console.error('Error releasing payment:', error);
@@ -44,10 +42,8 @@ export const EscrowControls: React.FC<EscrowControlsProps> = ({
 
   const handleDispute = async () => {
     if (!disputeReason.trim()) {
-      toast({
-        title: "Erro",
-        description: "Por favor, descreva o motivo da disputa.",
-        variant: "destructive"
+      toast.error("Erro", {
+        description: "Por favor, descreva o motivo da disputa."
       });
       return;
     }
@@ -55,9 +51,8 @@ export const EscrowControls: React.FC<EscrowControlsProps> = ({
     setLoading(true);
     try {
       // Aqui seria chamada a função para criar disputa
-      toast({
-        title: "Disputa Criada",
-        description: "Sua disputa foi registrada e será analisada em breve.",
+      toast.success("Disputa Criada", {
+        description: "Sua disputa foi registrada e será analisada em breve."
       });
       setDisputeReason('');
     } catch (error) {

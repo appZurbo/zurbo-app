@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { CreditCard, Shield, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || 'pk_test_...');
 
@@ -29,7 +29,6 @@ const PaymentForm: React.FC<PaymentCardProps> = ({
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
 
   const zurboFee = totalPrice * 0.08;
   const providerAmount = totalPrice - zurboFee;
@@ -67,18 +66,15 @@ const PaymentForm: React.FC<PaymentCardProps> = ({
         throw new Error(confirmError.message);
       }
 
-      toast({
-        title: "Pagamento Realizado!",
-        description: "O pagamento foi processado e está em retenção até a conclusão do serviço.",
+      toast.success("Pagamento Realizado!", {
+        description: "O pagamento foi processado e está em retenção até a conclusão do serviço."
       });
 
       onPaymentSuccess();
     } catch (error) {
       console.error('Payment error:', error);
-      toast({
-        title: "Erro no Pagamento",
-        description: error instanceof Error ? error.message : "Ocorreu um erro ao processar o pagamento.",
-        variant: "destructive"
+      toast.error("Erro no Pagamento", {
+        description: error instanceof Error ? error.message : "Ocorreu um erro ao processar o pagamento."
       });
     } finally {
       setLoading(false);

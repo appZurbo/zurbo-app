@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,30 +38,24 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 
     // Verificar limite diário
     if (imageUploadInfo.remaining <= 0) {
-      toast({
-        title: "Limite atingido",
-        description: "Você atingiu o limite de 5 imagens por dia.",
-        variant: "destructive"
+      toast.error("Limite atingido", {
+        description: "Você atingiu o limite de 5 imagens por dia."
       });
       return;
     }
 
     // Verificar tipo de arquivo
     if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Arquivo inválido",
-        description: "Por favor, selecione apenas arquivos de imagem.",
-        variant: "destructive"
+      toast.error("Arquivo inválido", {
+        description: "Por favor, selecione apenas arquivos de imagem."
       });
       return;
     }
 
     // Verificar tamanho (5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: "Arquivo muito grande",
-        description: "O arquivo deve ter no máximo 5MB.",
-        variant: "destructive"
+      toast.error("Arquivo muito grande", {
+        description: "O arquivo deve ter no máximo 5MB."
       });
       return;
     }
