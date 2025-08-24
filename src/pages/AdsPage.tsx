@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/toast-system";
 import { useMobile } from '@/hooks/useMobile';
 import { useAuth } from '@/hooks/useAuth';
 import { 

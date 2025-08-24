@@ -15,7 +15,7 @@ import WatermarkSection from '@/components/sections/WatermarkSection';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { getPrestadores } from '@/utils/database/prestadores';
 import { UserProfile } from '@/utils/database/types';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/hooks/toast-system';
 import { useMobile } from '@/hooks/useMobile';
 import { useAuth } from '@/hooks/useAuth';
 

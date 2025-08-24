@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/toast-system";
 import { securityLogger } from '@/utils/securityLogger';
 import { useAuth } from '@/hooks/useAuth';
 

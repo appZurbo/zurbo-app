@@ -1,7 +1,7 @@
 
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/toast-system";
 import { Camera, Upload, AlertTriangle, Shield } from 'lucide-react';
 import { FileValidator } from '@/utils/fileValidator';
 import { securityLogger } from '@/utils/securityLogger';

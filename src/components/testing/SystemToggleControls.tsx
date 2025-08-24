@@ -5,7 +5,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Settings, Shield, Bell, Database } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/toast-system";
 
 export const SystemToggleControls = () => {
   const [settings, setSettings] = useState({

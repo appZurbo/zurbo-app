@@ -19,7 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useMobile } from '@/hooks/useMobile';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/hooks/toast-system';
 
 const Moderacao = () => {
   const navigate = useNavigate();

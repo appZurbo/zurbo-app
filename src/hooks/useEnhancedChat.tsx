@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from './useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/toast-system";
 import { ChatConversation, ChatMessage } from '@/types';
 
 export interface ImageUploadInfo {

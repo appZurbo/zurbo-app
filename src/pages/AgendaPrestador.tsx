@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { useMobile } from '@/hooks/useMobile';
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/toast-system";
 import { supabase } from '@/integrations/supabase/client';
 import AuthButton from '@/components/auth/AuthModalHelper';
 import { 

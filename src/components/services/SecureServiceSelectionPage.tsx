@@ -6,7 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/toast-system";
 import { useAuth } from '@/hooks/useAuth';
 import { Wrench, Heart, Bolt, Brush, Shield, AlertCircle } from 'lucide-react';
 
