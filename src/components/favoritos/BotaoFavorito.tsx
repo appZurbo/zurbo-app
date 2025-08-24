@@ -13,15 +13,13 @@ interface BotaoFavoritoProps {
 
 export const BotaoFavorito: React.FC<BotaoFavoritoProps> = ({
   prestadorId,
-  isFavorito: initialFavorito,
+  isFavorito: initialFavorito = false,
   onToggle,
 }) => {
-  const [isFavorito, setIsFavorito] = useState(initialFavorito || false);
+  const [isFavorito, setIsFavorito] = useState(initialFavorito);
 
   useEffect(() => {
-    if (initialFavorito !== undefined) {
-      setIsFavorito(initialFavorito);
-    }
+    setIsFavorito(initialFavorito);
   }, [initialFavorito]);
 
   const handleToggleFavorito = async () => {
@@ -35,22 +33,26 @@ export const BotaoFavorito: React.FC<BotaoFavoritoProps> = ({
 
       if (isFavorito) {
         // Remove from favorites
-        await supabase
+        const { error } = await supabase
           .from('favoritos')
           .delete()
           .eq('cliente_id', user.id)
           .eq('prestador_id', prestadorId);
         
+        if (error) throw error;
+        
         toast.success('Removido dos favoritos');
         setIsFavorito(false);
       } else {
         // Add to favorites
-        await supabase
+        const { error } = await supabase
           .from('favoritos')
           .insert({
             cliente_id: user.id,
             prestador_id: prestadorId,
           });
+        
+        if (error) throw error;
         
         toast.success('Adicionado aos favoritos');
         setIsFavorito(true);

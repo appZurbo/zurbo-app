@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { usePrestadores } from '@/hooks/usePrestadores';
 import { UserProfile } from '@/utils/database/types';
+import { useAuth } from '@/hooks/useAuth';
 
 export interface Filters {
   servico?: string;
@@ -13,24 +14,33 @@ export interface Filters {
   };
   rating?: number;
   disponivel?: boolean;
+  servicos?: string[];
 }
 
 export const useHomepage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<Filters>({});
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const { profile } = useAuth();
 
   const { 
     prestadores: allPrestadores, 
     loading, 
     error, 
-    refreshPrestadores 
-  } = usePrestadores({
-    servico: filters.servico,
-    cidade: filters.cidade,
-    bairro: filters.bairro,
-    disponivel: filters.disponivel
-  });
+    loadPrestadores,
+    retry: originalRetry
+  } = usePrestadores();
+
+  useEffect(() => {
+    loadPrestadores({
+      cidade: filters.cidade,
+      servicos: filters.servicos,
+      precoMin: filters.priceRange?.min,
+      precoMax: filters.priceRange?.max,
+      notaMin: filters.rating,
+      apenasPremium: false
+    });
+  }, [filters, loadPrestadores]);
 
   // Filter prestadores based on search and filters
   const prestadores = useMemo(() => {
@@ -41,7 +51,6 @@ export const useHomepage = () => {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(prestador => 
         prestador.nome?.toLowerCase().includes(query) ||
-        prestador.servico?.toLowerCase().includes(query) ||
         prestador.endereco_cidade?.toLowerCase().includes(query) ||
         prestador.endereco_bairro?.toLowerCase().includes(query)
       );
@@ -50,18 +59,17 @@ export const useHomepage = () => {
     // Apply rating filter
     if (filters.rating && filters.rating > 0) {
       filtered = filtered.filter(prestador => 
-        (prestador.avaliacao_media || 0) >= filters.rating!
+        (prestador.nota_media || 0) >= filters.rating!
       );
     }
 
-    // Apply price range filter
-    if (filters.priceRange) {
-      filtered = filtered.filter(prestador => {
-        if (!prestador.preco_servico) return true;
-        return prestador.preco_servico >= filters.priceRange!.min && 
-               prestador.preco_servico <= filters.priceRange!.max;
-      });
-    }
+    // Apply price range filter (skip for now as UserProfile doesn't have pricing)
+    // if (filters.priceRange) {
+    //   filtered = filtered.filter(prestador => {
+    //     // Price filtering logic would go here when pricing data is available
+    //     return true;
+    //   });
+    // }
 
     return filtered;
   }, [allPrestadores, searchQuery, filters]);
@@ -75,8 +83,21 @@ export const useHomepage = () => {
   };
 
   const retry = () => {
-    refreshPrestadores();
+    originalRetry();
   };
+
+  const refreshPrestadores = () => {
+    return loadPrestadores({
+      cidade: filters.cidade,
+      servicos: filters.servicos,
+      precoMin: filters.priceRange?.min,
+      precoMax: filters.priceRange?.max,
+      notaMin: filters.rating,
+      apenasPremium: false
+    });
+  };
+
+  const isAuthenticated = !!profile;
 
   return {
     prestadores,
@@ -87,6 +108,7 @@ export const useHomepage = () => {
     filters,
     setFilters,
     showFavoritesOnly,
+    isAuthenticated,
     handleFiltersChange,
     toggleFavoritesOnly,
     retry,

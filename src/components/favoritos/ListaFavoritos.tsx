@@ -4,12 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Star, MapPin, Phone, Trash2 } from 'lucide-react';
+import { Heart, Star, MapPin, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
-interface Favorito {
+interface FavoritoItem {
   id: string;
   prestador_id: string;
   prestador: {
@@ -26,7 +26,7 @@ interface Favorito {
 
 export const ListaFavoritos: React.FC = () => {
   const { profile } = useAuth();
-  const [favoritos, setFavoritos] = useState<Favorito[]>([]);
+  const [favoritos, setFavoritos] = useState<FavoritoItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

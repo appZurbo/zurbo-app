@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
@@ -54,7 +53,7 @@ const Index = () => {
     console.log('📂 Services selected:', serviceIds);
     handleFiltersChange({
       ...filters,
-      servicos: serviceIds
+      servico: serviceIds[0] // Use first selected service
     });
   };
 
@@ -91,10 +90,9 @@ const Index = () => {
                   onRetry={retry}
                   onClearFilters={() => handleFiltersChange({
                     cidade: '',
-                    servicos: [],
-                    precoMin: undefined,
-                    precoMax: undefined,
-                    notaMin: undefined
+                    servico: '',
+                    priceRange: undefined,
+                    rating: undefined
                   })}
                   onShowAll={() => toggleFavoritesOnly()}
                 />
