@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export interface RealtimeMessage {
   id: string;
@@ -25,7 +25,6 @@ export interface RealtimeConversation {
 
 export const useRealtimeChat = () => {
   const { profile } = useAuth();
-  const { toast } = useToast();
   const [messages, setMessages] = useState<RealtimeMessage[]>([]);
   const [conversations, setConversations] = useState<RealtimeConversation[]>([]);
   const [isConnected, setIsConnected] = useState(false);
@@ -98,12 +97,8 @@ export const useRealtimeChat = () => {
               });
             }
             
-            // Toast notification
-            toast({
-              title: "💬 Nova mensagem",
-              description: newMessage.content?.substring(0, 50) + (newMessage.content?.length > 50 ? '...' : ''),
-              duration: 4000,
-            });
+            // Toast notification without duration property
+            toast.success(`💬 Nova mensagem: ${newMessage.content?.substring(0, 50) + (newMessage.content?.length > 50 ? '...' : '')}`);
             
             // Clear notification after 5 seconds
             setTimeout(() => {

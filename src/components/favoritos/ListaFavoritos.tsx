@@ -38,27 +38,58 @@ export const ListaFavoritos: React.FC = () => {
     if (!profile) return;
 
     try {
-      const { data, error } = await supabase
+      // First get the favoritos
+      const { data: favoritosData, error: favoritosError } = await supabase
         .from('favoritos')
+        .select('id, prestador_id')
+        .eq('usuario_id', profile.id);
+
+      if (favoritosError) throw favoritosError;
+
+      if (!favoritosData || favoritosData.length === 0) {
+        setFavoritos([]);
+        setLoading(false);
+        return;
+      }
+
+      // Then get the prestadores data
+      const prestadorIds = favoritosData.map(f => f.prestador_id);
+      const { data: prestadoresData, error: prestadoresError } = await supabase
+        .from('users')
         .select(`
           id,
-          prestador_id,
-          prestador:prestador_id (
-            id,
-            nome,
-            foto_url,
-            bio,
-            endereco_cidade,
-            endereco_bairro,
-            nota_media,
-            premium
-          )
+          nome,
+          foto_url,
+          bio,
+          endereco_cidade,
+          endereco_bairro,
+          nota_media,
+          premium
         `)
-        .eq('cliente_id', profile.id);
+        .in('id', prestadorIds);
 
-      if (error) throw error;
+      if (prestadoresError) throw prestadoresError;
 
-      setFavoritos(data || []);
+      // Combine the data
+      const favoritosCompletos: FavoritoItem[] = favoritosData.map(favorito => {
+        const prestador = prestadoresData?.find(p => p.id === favorito.prestador_id);
+        return {
+          id: favorito.id,
+          prestador_id: favorito.prestador_id,
+          prestador: prestador || {
+            id: favorito.prestador_id,
+            nome: 'Prestador não encontrado',
+            foto_url: undefined,
+            bio: undefined,
+            endereco_cidade: undefined,
+            endereco_bairro: undefined,
+            nota_media: undefined,
+            premium: false
+          }
+        };
+      });
+
+      setFavoritos(favoritosCompletos);
     } catch (error) {
       console.error('Erro ao carregar favoritos:', error);
       toast.error('Erro ao carregar favoritos');
