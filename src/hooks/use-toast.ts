@@ -169,6 +169,16 @@ function toast({ ...props }: Toast) {
 }
 
 function useToast() {
+  // Verificação de segurança para garantir que React existe
+  if (typeof React === 'undefined' || !React.useState) {
+    console.warn('React hooks not available, returning fallback toast state');
+    return {
+      toasts: [],
+      toast,
+      dismiss: () => {},
+    };
+  }
+
   const [state, setState] = React.useState<State>(memoryState)
 
   React.useEffect(() => {
@@ -179,7 +189,7 @@ function useToast() {
         listeners.splice(index, 1)
       }
     }
-  }, [state])
+  }, [])
 
   return {
     ...state,

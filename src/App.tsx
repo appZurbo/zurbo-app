@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { NotificationSound } from "@/components/notifications/NotificationSound";
 import { PWAInstallPrompt } from "@/components/mobile/PWAInstallPrompt";
+import { initializeCapacitor } from "@/utils/capacitor";
+import { useEffect } from "react";
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
 import PrestadoresPage from "./pages/PrestadoresPage";
@@ -44,6 +46,11 @@ import BannerImageManager from "./pages/admin/BannerImageManager";
 const queryClient = new QueryClient();
 
 function App() {
+  useEffect(() => {
+    // Initialize Capacitor after React is mounted
+    initializeCapacitor();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -51,8 +58,6 @@ function App() {
           <AuthProvider>
             <NotificationSound enabled={true} volume={0.3} />
             <PWAInstallPrompt />
-            <Toaster />
-            <Sonner />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<AuthPage />} />
@@ -87,6 +92,8 @@ function App() {
               <Route path="/informacoes" element={<InformacoesUnificada />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <Toaster />
+            <Sonner />
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
