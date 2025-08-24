@@ -1,4 +1,4 @@
-// Completely hook-free toast system
+// CACHE BUSTER v55 - Zero hooks toast system
 import { toast as sonnerToast } from 'sonner';
 
 interface ToastOptions {

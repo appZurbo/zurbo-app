@@ -1,4 +1,4 @@
-// Completely hook-free toaster - NO REACT HOOKS AT ALL
+// CACHE BUSTER v55 - Pure Sonner toaster
 import { Toaster as SonnerToaster } from 'sonner';
 
 export function Toaster() {
