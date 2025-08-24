@@ -1,20 +1,18 @@
-// TEMPORARY PLACEHOLDER - This file was deleted but browser cache still references it
-// This placeholder prevents the "Cannot read properties of null" error
+// CACHE-BREAKING PLACEHOLDER - NO HOOKS VERSION
+// This file prevents browser cache errors without using any React hooks
 import { toast } from 'sonner';
 
-// Re-export toast for backward compatibility during transition
+// Simple re-export without hooks
 export { toast };
 
-// Placeholder hook for cached references
+// Hook-free function that returns static object
 export const useToast = () => {
+  console.log('🔧 HOOK-FREE PLACEHOLDER: useToast called');
+  
+  // Return static object without useState - prevents React hook errors
   return { 
-    toast: {
-      success: toast.success,
-      error: toast.error,
-      info: toast.info,
-      warning: toast.warning
-    }
+    toast: toast
   };
 };
 
-console.log('🔧 TEMPORARY PLACEHOLDER: use-toast.ts loaded to prevent cache errors');
+console.log('🔧 HOOK-FREE PLACEHOLDER: use-toast.ts loaded without React hooks');
