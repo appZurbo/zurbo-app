@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,7 +19,6 @@ export const EmergencyButton = () => {
     descricao: '',
     orcamento_maximo: ''
   });
-  const { toast } = useToast();
 
   const servicos = [
     'Eletricista',
@@ -34,19 +34,12 @@ export const EmergencyButton = () => {
 
   const handleSubmit = () => {
     if (!formData.servico || !formData.localizacao) {
-      toast({
-        title: "Campos obrigatórios",
-        description: "Por favor, preencha o serviço e localização.",
-        variant: "destructive"
-      });
+      toast.error('Por favor, preencha o serviço e localização.');
       return;
     }
 
     // Simular envio para prestadores em serviço
-    toast({
-      title: "SOS Enviado!",
-      description: "Sua solicitação foi enviada para prestadores disponíveis na sua região.",
-    });
+    toast.success('Sua solicitação foi enviada para prestadores disponíveis na sua região.');
 
     setIsOpen(false);
     setFormData({

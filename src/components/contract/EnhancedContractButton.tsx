@@ -4,9 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { CheckCircle, Clock, DollarSign, FileText, Shield, AlertTriangle } from 'lucide-react';
+import { CheckCircle, DollarSign, FileText, Shield, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
 interface EnhancedContractButtonProps {
@@ -36,23 +35,9 @@ export const EnhancedContractButton: React.FC<EnhancedContractButtonProps> = ({
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('contratos')
-        .insert([{
-          cliente_id: profile.id,
-          prestador_id: prestadorId,
-          servico_nome: servicoNome,
-          preco_acordado: precoAcordado,
-          descricao: descricao,
-          status: 'pendente'
-        }])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      toast.success('Contrato criado com sucesso!');
-      onContractCreated?.(data.id);
+      // Temporarily disable contract creation - table not in database schema
+      toast.error('Funcionalidade de contratos temporariamente indisponível.');
+      console.log('Contract functionality disabled - table not in database schema');
       setShowDetails(false);
     } catch (error: any) {
       console.error('Erro ao criar contrato:', error);

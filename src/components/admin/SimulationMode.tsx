@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -25,19 +26,13 @@ export const SimulationMode = ({ onSimulationChange }: SimulationModeProps) => {
     setIsSimulating(true);
     onSimulationChange(true, simulatedRole);
     setIsOpen(false);
-    toast({
-      title: "Modo simulação ativado",
-      description: `Agora você está vendo a plataforma como ${roleOptions.find(r => r.value === simulatedRole)?.label}`,
-    });
+    toast.success(`Modo simulação ativado - ${roleOptions.find(r => r.value === simulatedRole)?.label}`);
   };
 
   const handleStopSimulation = () => {
     setIsSimulating(false);
     onSimulationChange(false);
-    toast({
-      title: "Modo simulação desativado",
-      description: "Voltou à visualização de administrador",
-    });
+    toast.success("Modo simulação desativado - Voltou à visualização de administrador");
   };
 
   if (isSimulating) {

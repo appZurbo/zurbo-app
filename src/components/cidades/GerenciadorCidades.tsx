@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +7,6 @@ import { Trash2, Plus, Edit2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
 
 interface Cidade {
   id: string;
@@ -22,28 +22,11 @@ const GerenciadorCidades = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchCidades();
+    // Temporarily disable cities management - table not in database schema
+    console.log('Cidades functionality disabled - table not in database schema');
+    setCidades([]);
+    toast.error('Funcionalidade de cidades temporariamente indisponível.');
   }, []);
-
-  const fetchCidades = async () => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('cidades')
-        .select('*')
-        .order('nome', { ascending: true });
-
-      if (error) {
-        console.error('Erro ao buscar cidades:', error);
-        toast.error('Erro ao buscar cidades.');
-        return;
-      }
-
-      setCidades(data || []);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleAdicionarCidade = async () => {
     if (!novaCidade.trim()) {
@@ -51,24 +34,7 @@ const GerenciadorCidades = () => {
       return;
     }
 
-    try {
-      const { error } = await supabase
-        .from('cidades')
-        .insert([{ nome: novaCidade.trim() }]);
-
-      if (error) {
-        console.error('Erro ao adicionar cidade:', error);
-        toast.error('Erro ao adicionar cidade.');
-        return;
-      }
-
-      toast.success('Cidade adicionada com sucesso!');
-      setNovaCidade('');
-      fetchCidades();
-    } catch (error) {
-      console.error('Erro ao adicionar cidade:', error);
-      toast.error('Erro ao adicionar cidade.');
-    }
+    toast.error('Funcionalidade temporariamente indisponível.');
   };
 
   const handleEditarCidade = (cidade: Cidade) => {
@@ -82,26 +48,7 @@ const GerenciadorCidades = () => {
       return;
     }
 
-    try {
-      const { error } = await supabase
-        .from('cidades')
-        .update({ nome: cidadeEditada.trim() })
-        .eq('id', editandoId);
-
-      if (error) {
-        console.error('Erro ao atualizar cidade:', error);
-        toast.error('Erro ao atualizar cidade.');
-        return;
-      }
-
-      toast.success('Cidade atualizada com sucesso!');
-      setEditandoId(null);
-      setCidadeEditada('');
-      fetchCidades();
-    } catch (error) {
-      console.error('Erro ao atualizar cidade:', error);
-      toast.error('Erro ao atualizar cidade.');
-    }
+    toast.error('Funcionalidade temporariamente indisponível.');
   };
 
   const handleCancelarEdicao = () => {
@@ -110,24 +57,7 @@ const GerenciadorCidades = () => {
   };
 
   const handleRemoverCidade = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('cidades')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        console.error('Erro ao remover cidade:', error);
-        toast.error('Erro ao remover cidade.');
-        return;
-      }
-
-      toast.success('Cidade removida com sucesso!');
-      fetchCidades();
-    } catch (error) {
-      console.error('Erro ao remover cidade:', error);
-      toast.error('Erro ao remover cidade.');
-    }
+    toast.error('Funcionalidade temporariamente indisponível.');
   };
 
   return (
@@ -145,8 +75,9 @@ const GerenciadorCidades = () => {
               placeholder="Nome da cidade"
               value={novaCidade}
               onChange={(e) => setNovaCidade(e.target.value)}
+              disabled
             />
-            <Button onClick={handleAdicionarCidade}>
+            <Button onClick={handleAdicionarCidade} disabled>
               <Plus className="mr-2 h-4 w-4" />
               Adicionar
             </Button>
@@ -157,51 +88,16 @@ const GerenciadorCidades = () => {
           <p>Carregando cidades...</p>
         ) : (
           <div className="space-y-2">
-            {cidades.map((cidade) => (
-              <div key={cidade.id} className="flex items-center justify-between">
-                {editandoId === cidade.id ? (
-                  <div className="flex gap-2 w-full">
-                    <Input
-                      type="text"
-                      value={cidadeEditada}
-                      onChange={(e) => setCidadeEditada(e.target.value)}
-                    />
-                    <Button onClick={handleSalvarEdicao} size="sm">
-                      Salvar
-                    </Button>
-                    <Button variant="ghost" onClick={handleCancelarEdicao} size="sm">
-                      Cancelar
-                    </Button>
-                  </div>
-                ) : (
-                  <>
-                    <span>{cidade.nome}</span>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => handleEditarCidade(cidade)}
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        onClick={() => handleRemoverCidade(cidade.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </>
-                )}
-              </div>
-            ))}
+            <div className="text-center py-8 text-gray-500">
+              <p>Funcionalidade de cidades temporariamente indisponível.</p>
+              <p className="text-sm">A tabela de cidades precisa ser criada no banco de dados.</p>
+            </div>
           </div>
         )}
 
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button variant="outline" className="mt-4">
+            <Button variant="outline" className="mt-4" disabled>
               <Plus className="mr-2 h-4 w-4" />
               Adicionar em lote
             </Button>

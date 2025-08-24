@@ -45,7 +45,7 @@ export const SecureRegisterForm: React.FC<SecureRegisterFormProps> = ({ onSucces
       });
 
       if (result?.error) {
-        toast.error(result.error.message);
+        toast.error(result.error);
       } else {
         toast.success('Registro realizado! Confirme seu email para ativar sua conta.');
         onSuccess?.();

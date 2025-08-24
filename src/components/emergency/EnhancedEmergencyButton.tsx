@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -11,15 +12,10 @@ export const EnhancedEmergencyButton = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const { sosUsage, loading, canUseSOS, useSOS } = useSOSLimits();
   const { profile } = useAuth();
-  const { toast } = useToast();
 
   const handleEmergencyCall = async () => {
     if (!canUseSOS()) {
-      toast({
-        title: "Limite atingido",
-        description: "Você atingiu o limite mensal de chamadas SOS.",
-        variant: "destructive"
-      });
+      toast.error("Você atingiu o limite mensal de chamadas SOS.");
       return;
     }
 
@@ -28,10 +24,7 @@ export const EnhancedEmergencyButton = () => {
       setShowConfirm(false);
       
       // Simulate emergency call
-      toast({
-        title: "SOS Ativado",
-        description: "Sua solicitação de emergência foi enviada!",
-      });
+      toast.success("Sua solicitação de emergência foi enviada!");
       
       // Here you would integrate with actual emergency services
       console.log('Emergency SOS activated for user:', profile?.id);
