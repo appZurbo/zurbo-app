@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { CreateTestData } from '@/components/admin/CreateTestData';
 
@@ -15,7 +15,6 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const { profile, isAdmin } = useAuth();
   const isMobile = useMobile();
-  const { toast } = useToast();
 
   const [userCount, setUserCount] = useState(0);
   const [prestadorCount, setPrestadorCount] = useState(0);
@@ -60,11 +59,7 @@ const AdminDashboard = () => {
 
     } catch (error) {
       console.error('Error loading stats:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível carregar as estatísticas.",
-        variant: "destructive"
-      });
+      toast.error("Não foi possível carregar as estatísticas.");
     }
   };
 

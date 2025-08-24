@@ -19,13 +19,11 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useMobile } from '@/hooks/useMobile';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 const Moderacao = () => {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
-  const isMobile = useMobile();
-  const { toast } = useToast();
 
   // Mock data para demonstração
   const [reports] = useState([

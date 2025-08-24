@@ -9,17 +9,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 const Planos = () => {
   const navigate = useNavigate();
   const {
     profile,
     isPrestador
   } = useAuth();
-  const isMobile = useMobile();
-  const {
-    toast
-  } = useToast();
   const [billingCycle, setBillingCycle] = useState('monthly');
   const [userType, setUserType] = useState<'cliente' | 'prestador'>(isPrestador ? 'prestador' : 'cliente');
   const isPremium = profile?.premium || false;

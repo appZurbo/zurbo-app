@@ -15,13 +15,12 @@ import WatermarkSection from '@/components/sections/WatermarkSection';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { getPrestadores } from '@/utils/database/prestadores';
 import { UserProfile } from '@/utils/database/types';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useMobile } from '@/hooks/useMobile';
 import { useAuth } from '@/hooks/useAuth';
 
 const PrestadoresPage = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const isMobile = useMobile();
   const { isAuthenticated } = useAuth();
 

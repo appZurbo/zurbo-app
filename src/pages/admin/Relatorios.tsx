@@ -12,13 +12,11 @@ import { useMobile } from '@/hooks/useMobile';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart as RechartsPieChart, Cell, Pie } from 'recharts';
 import { CreateTestData } from '@/components/admin/CreateTestData';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 const Relatorios = () => {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
-  const isMobile = useMobile();
-  const { toast } = useToast();
   const [timeRange, setTimeRange] = useState('30');
 
   const [stats, setStats] = useState({

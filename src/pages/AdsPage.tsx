@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useMobile } from '@/hooks/useMobile';
 import { useAuth } from '@/hooks/useAuth';
 import { 
@@ -31,7 +31,6 @@ import {
 const AdsPage = () => {
   const isMobile = useMobile();
   const { user, profile } = useAuth();
-  const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAd, setSelectedAd] = useState(null);

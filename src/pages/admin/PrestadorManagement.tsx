@@ -22,7 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { ProviderVerificationChecklist } from '@/components/admin/ProviderVerificationChecklist';
 
 interface Prestador {
@@ -58,7 +58,6 @@ type PendingVerification = VerificationRow & { user: Prestador };
 const PrestadorManagement = () => {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
-  const { toast } = useToast();
   
   const [prestadores, setPrestadores] = useState<Prestador[]>([]);
   const [pendingVerifs, setPendingVerifs] = useState<PendingVerification[]>([]);

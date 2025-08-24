@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { useMobile } from '@/hooks/useMobile';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import AuthButton from '@/components/auth/AuthModalHelper';
 import { 
@@ -55,7 +55,6 @@ const AgendaPrestador = () => {
   const navigate = useNavigate();
   const { profile, loading: authLoading } = useAuth();
   const isMobile = useMobile();
-  const { toast } = useToast();
   
   const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
   const [loading, setLoading] = useState(true);

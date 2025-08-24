@@ -20,14 +20,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useMobile } from '@/hooks/useMobile';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { UserProfile } from '@/types';
 
 const UserManagement = () => {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
-  const isMobile = useMobile();
-  const { toast } = useToast();
   
   const [usuarios, setUsuarios] = useState<UserProfile[]>([]);
   const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
