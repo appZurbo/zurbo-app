@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,7 +30,7 @@ export const EnhancedLoginForm: React.FC<EnhancedLoginFormProps> = ({ onSuccess 
 
     setLoading(true);
     try {
-      const result = await signIn({ email, password });
+      const result = await signIn(email, password);
 
       if (result?.error) {
         toast.error(result.error.message || 'Erro ao fazer login.');

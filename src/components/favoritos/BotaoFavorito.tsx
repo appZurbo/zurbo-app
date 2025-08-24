@@ -1,95 +1,71 @@
 
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import React from 'react';
 import { Heart } from 'lucide-react';
-import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 interface BotaoFavoritoProps {
   prestadorId: string;
+  isFavorito: boolean;
+  onToggle: () => void;
 }
 
-export const BotaoFavorito: React.FC<BotaoFavoritoProps> = ({ prestadorId }) => {
-  const { profile } = useAuth();
-  const [isFavorito, setIsFavorito] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    checkFavoriteStatus();
-  }, [prestadorId, profile]);
-
-  const checkFavoriteStatus = async () => {
-    if (!profile) return;
-
+export const BotaoFavorito: React.FC<BotaoFavoritoProps> = ({
+  prestadorId,
+  isFavorito,
+  onToggle,
+}) => {
+  const handleToggleFavorito = async () => {
     try {
-      const { data, error } = await supabase
-        .from('favoritos')
-        .select('id')
-        .eq('cliente_id', profile.id)
-        .eq('prestador_id', prestadorId)
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('Erro ao verificar favorito:', error);
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error('Você precisa estar logado para favoritar.');
         return;
       }
 
-      setIsFavorito(!!data);
-    } catch (error) {
-      console.error('Erro ao verificar favorito:', error);
-    }
-  };
-
-  const toggleFavorito = async () => {
-    if (!profile) {
-      toast.error('Faça login para adicionar favoritos');
-      return;
-    }
-
-    setLoading(true);
-    try {
       if (isFavorito) {
-        const { error } = await supabase
+        // Remove from favorites
+        await supabase
           .from('favoritos')
           .delete()
-          .eq('cliente_id', profile.id)
+          .eq('cliente_id', user.id)
           .eq('prestador_id', prestadorId);
-
-        if (error) throw error;
-
-        setIsFavorito(false);
+        
         toast.success('Removido dos favoritos');
       } else {
-        const { error } = await supabase
+        // Add to favorites
+        await supabase
           .from('favoritos')
-          .insert([{
-            cliente_id: profile.id,
-            prestador_id: prestadorId
-          }]);
-
-        if (error) throw error;
-
-        setIsFavorito(true);
+          .insert({
+            cliente_id: user.id,
+            prestador_id: prestadorId,
+          });
+        
         toast.success('Adicionado aos favoritos');
       }
-    } catch (error: any) {
-      console.error('Erro ao alterar favorito:', error);
-      toast.error('Erro ao alterar favorito');
-    } finally {
-      setLoading(false);
+      
+      onToggle();
+    } catch (error) {
+      console.error('Erro ao gerenciar favorito:', error);
+      toast.error('Erro ao gerenciar favorito');
     }
   };
 
   return (
     <Button
-      variant="outline"
+      variant="ghost"
       size="sm"
-      onClick={toggleFavorito}
-      disabled={loading}
-      className={`transition-all ${isFavorito ? 'bg-red-50 border-red-200 hover:bg-red-100' : ''}`}
+      onClick={handleToggleFavorito}
+      className={`p-2 ${isFavorito ? 'text-red-500' : 'text-gray-400'}`}
     >
-      <Heart className={`h-4 w-4 ${isFavorito ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+      <Heart
+        className={`h-4 w-4 ${isFavorito ? 'fill-current' : ''}`}
+      />
     </Button>
   );
 };
+
+// Add default export
+export default BotaoFavorito;

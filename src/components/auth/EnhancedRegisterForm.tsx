@@ -34,11 +34,7 @@ export const EnhancedRegisterForm: React.FC<EnhancedRegisterFormProps> = ({ onSu
     event.preventDefault();
 
     if (!termosAceitos) {
-      toast({
-        title: "Termos não aceitos",
-        description: "Você precisa aceitar os termos de uso para se cadastrar.",
-        variant: "destructive",
-      });
+      toast.error('Você precisa aceitar os termos de uso para se cadastrar.');
       return;
     }
 
@@ -46,31 +42,19 @@ export const EnhancedRegisterForm: React.FC<EnhancedRegisterFormProps> = ({ onSu
     try {
       const result = await signUp(email, password, {
         nome,
-        telefone,
-        cidade,
-        bairro,
-        endereco
+        endereco_cidade: cidade,
+        endereco_bairro: bairro,
+        bio: endereco
       });
 
       if (result.error) {
-        toast({
-          title: "Erro ao cadastrar",
-          description: result.error.message,
-          variant: "destructive",
-        });
+        toast.error(result.error.message);
       } else {
-        toast({
-          title: "Cadastro realizado!",
-          description: "Confirme seu email para ativar sua conta.",
-        });
+        toast.success('Cadastro realizado! Confirme seu email para ativar sua conta.');
         onSuccess?.();
       }
     } catch (error: any) {
-      toast({
-        title: "Erro inesperado",
-        description: error.message || "Ocorreu um erro ao cadastrar.",
-        variant: "destructive",
-      });
+      toast.error(error.message || 'Ocorreu um erro ao cadastrar.');
     } finally {
       setLoading(false);
     }
@@ -185,7 +169,7 @@ export const EnhancedRegisterForm: React.FC<EnhancedRegisterFormProps> = ({ onSu
           <Checkbox
             id="terms"
             checked={termosAceitos}
-            onCheckedChange={(checked) => setTermosAceitos(!!checked)}
+            onCheckedChange={(checked) => setTermosAceitos(checked === true)}
           />
           <Label htmlFor="terms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed">
             Aceito os <a href="/terms" className="underline">termos de uso</a>
