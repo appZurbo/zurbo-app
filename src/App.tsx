@@ -1,5 +1,5 @@
 
-import { NotificationToast } from "@/components/ui/notification-toast";
+import { SimpleToaster } from "@/components/ui/simple-toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -53,7 +53,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <NotificationToast />
+        <SimpleToaster />
         <BrowserRouter>
           <AuthProvider>
             <NotificationSound enabled={true} volume={0.3} />
