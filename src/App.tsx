@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { NotificationSound } from "@/components/notifications/NotificationSound";
+import { PWAInstallPrompt } from "@/components/mobile/PWAInstallPrompt";
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
 import PrestadoresPage from "./pages/PrestadoresPage";
@@ -48,6 +49,7 @@ function App() {
       <TooltipProvider>
         <AuthProvider>
           <NotificationSound enabled={true} volume={0.3} />
+          <PWAInstallPrompt />
           <Toaster />
           <Sonner />
           <BrowserRouter>
