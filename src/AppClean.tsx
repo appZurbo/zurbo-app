@@ -46,7 +46,7 @@ const queryClient = new QueryClient();
 // Initialize Capacitor immediately
 initializeCapacitor();
 
-function App() {
+function AppClean() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -96,4 +96,4 @@ function App() {
   );
 }
 
-export default App;
+export default AppClean;
