@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -44,7 +43,7 @@ export const ListaFavoritos: React.FC = () => {
         .select(`
           id,
           prestador_id,
-          prestador:users!favoritos_prestador_id_fkey (
+          prestador:prestador_id (
             id,
             nome,
             foto_url,
