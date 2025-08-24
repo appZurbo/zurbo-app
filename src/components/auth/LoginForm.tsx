@@ -94,3 +94,5 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
     </Card>
   );
 };
+
+export default LoginForm;
