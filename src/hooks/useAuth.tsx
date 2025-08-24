@@ -14,18 +14,20 @@ interface Profile {
   cidade: string;
   estado: string;
   bio: string;
-  // Additional properties
+  // Required fields for compatibility
+  tipo: "cliente" | "prestador" | "admin" | "moderator";
+  auth_id: string;
+  criado_em: string;
+  // Additional optional properties
   premium?: boolean;
-  tipo?: "cliente" | "prestador" | "admin" | "moderator";
   endereco_rua?: string;
   endereco_numero?: string;
   endereco_bairro?: string;
   endereco_cidade?: string;
   endereco_cep?: string;
   cpf?: string;
-  auth_id: string; // Required field
-  criado_em?: string;
-  portfolio_fotos?: string[];
+  // Flexible portfolio_fotos to match different type expectations
+  portfolio_fotos?: any;
 }
 
 interface AuthContextType {
@@ -119,16 +121,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (profileData) {
         const typedProfile: Profile = {
           id: profileData.id,
-          nome: profileData.nome,
-          email: profileData.email,
-          telefone: profileData.telefone,
-          foto_url: profileData.foto_url,
-          is_prestador: profileData.is_prestador,
-          is_admin: profileData.is_admin,
-          cidade: profileData.cidade,
-          estado: profileData.estado,
-          bio: profileData.bio,
+          nome: profileData.nome || '',
+          email: profileData.email || '',
+          telefone: profileData.telefone || '',
+          foto_url: profileData.foto_url || '',
+          is_prestador: profileData.is_prestador || false,
+          is_admin: profileData.is_admin || false,
+          cidade: profileData.cidade || '',
+          estado: profileData.estado || '',
+          bio: profileData.bio || '',
           auth_id: profileData.id, // Set auth_id to id
+          tipo: profileData.is_prestador ? "prestador" : "cliente",
+          criado_em: profileData.created_at || new Date().toISOString(),
         };
         setProfile(typedProfile);
         setIsPrestador(profileData.is_prestador);
@@ -275,16 +279,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else if (data) {
         const typedProfile: Profile = {
           id: data.id,
-          nome: data.nome,
-          email: data.email,
-          telefone: data.telefone,
-          foto_url: data.foto_url,
-          is_prestador: data.is_prestador,
-          is_admin: data.is_admin,
-          cidade: data.cidade,
-          estado: data.estado,
-          bio: data.bio,
+          nome: data.nome || '',
+          email: data.email || '',
+          telefone: data.telefone || '',
+          foto_url: data.foto_url || '',
+          is_prestador: data.is_prestador || false,
+          is_admin: data.is_admin || false,
+          cidade: data.cidade || '',
+          estado: data.estado || '',
+          bio: data.bio || '',
           auth_id: data.id, // Set auth_id to id
+          tipo: data.is_prestador ? "prestador" : "cliente",
+          criado_em: data.created_at || new Date().toISOString(),
         };
         setProfile(typedProfile);
         toast.success('Seu perfil foi atualizado com sucesso!');

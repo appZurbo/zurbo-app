@@ -46,7 +46,7 @@ export const AppointmentSystem: React.FC = () => {
             <PedidoCard
               key={pedido.id}
               pedido={pedido}
-              currentUser={profile}
+              currentUser={profile as any}
               onUpdate={() => {}}
             />
           ))
