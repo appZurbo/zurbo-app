@@ -1,9 +1,9 @@
-// ULTIMATE CACHE BREAKER - Renamed useAuth v4
+// CACHE BREAKER - Final hook-free system v5
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 
-console.log('🚀 FINAL HOOK-FREE APP v53.0 - useAuth RENAMED');
+console.log('🎯 FINAL FIX v54.0 - TOAST SYSTEM REBUILT');
 
 createRoot(document.getElementById("root")!).render(
   <App />
