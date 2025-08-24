@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { MessageList } from './MessageList';
 import { MessageInput } from './MessageInput';
@@ -7,7 +6,7 @@ import { CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface ChatInterfaceProps {
   conversation: any;
@@ -31,7 +30,6 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   onReportUser
 }) => {
   const { profile } = useAuth();
-  const { toast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [sending, setSending] = useState(false);
 
@@ -86,18 +84,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       await onSendMessage(message);
       
       // Show delivery notification
-      toast({
-        title: "Mensagem enviada",
-        description: "Sua mensagem foi entregue com sucesso.",
-        duration: 2000,
-      });
+      toast.success("Sua mensagem foi entregue com sucesso.");
     } catch (error) {
-      toast({
-        title: "Erro ao enviar",
-        description: "Falha no envio da mensagem. Tente novamente.",
-        variant: "destructive",
-        duration: 3000,
-      });
+      toast.error("Falha no envio da mensagem. Tente novamente.");
     } finally {
       setSending(false);
     }

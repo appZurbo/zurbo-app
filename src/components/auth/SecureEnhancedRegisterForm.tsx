@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +11,15 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Eye, EyeOff, User, Mail, Lock, Phone, MapPin, Shield } from 'lucide-react';
 import { useAuthSecurity } from '@/hooks/useAuthSecurity';
 
-export const SecureEnhancedRegisterForm: React.FC = () => {
+interface SecureEnhancedRegisterFormProps {
+  onSuccess?: () => void;
+  onSwitchToLogin?: () => void;
+}
+
+export const SecureEnhancedRegisterForm: React.FC<SecureEnhancedRegisterFormProps> = ({ 
+  onSuccess, 
+  onSwitchToLogin 
+}) => {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,7 +33,7 @@ export const SecureEnhancedRegisterForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { registerWithEmailAndPassword } = useAuthSecurity();
+  const { secureSignUp } = useAuthSecurity();
 
   const cidades = ['Sinop', 'Sorriso', 'Lucas do Rio Verde'];
   const bairros = ['Setor Industrial', 'Jardim Botânico', 'Residencial Aquarela'];
@@ -33,26 +42,18 @@ export const SecureEnhancedRegisterForm: React.FC = () => {
     e.preventDefault();
 
     if (!nome || !email || !password || !confirmPassword || !telefone || !cidade || !bairro || !endereco || !termosAceitos) {
-      toast({
-        title: "Campos obrigatórios",
-        description: "Preencha todos os campos obrigatórios.",
-        variant: "destructive",
-      });
+      toast.error("Preencha todos os campos obrigatórios.");
       return;
     }
 
     if (password !== confirmPassword) {
-      toast({
-        title: "Senhas não conferem",
-        description: "As senhas devem ser iguais.",
-        variant: "destructive",
-      });
+      toast.error("As senhas devem ser iguais.");
       return;
     }
 
     setLoading(true);
     try {
-      const result = await registerWithEmailAndPassword(email, password, {
+      const result = await secureSignUp(email, password, {
         nome,
         telefone,
         cidade,
@@ -62,16 +63,10 @@ export const SecureEnhancedRegisterForm: React.FC = () => {
       });
 
       if (result.success) {
-        toast({
-          title: "Cadastro realizado",
-          description: "Sua conta foi criada com sucesso! Verifique seu email para confirmação.",
-        });
+        toast.success("Sua conta foi criada com sucesso! Verifique seu email para confirmação.");
+        onSuccess?.();
       } else {
-        toast({
-          title: "Erro ao cadastrar",
-          description: result.error || "Ocorreu um erro ao criar sua conta. Tente novamente.",
-          variant: "destructive",
-        });
+        toast.error(result.error || "Ocorreu um erro ao criar sua conta. Tente novamente.");
       }
     } finally {
       setLoading(false);
@@ -218,7 +213,7 @@ export const SecureEnhancedRegisterForm: React.FC = () => {
                 <Checkbox
                   id="termos"
                   checked={termosAceitos}
-                  onCheckedChange={setTermosAceitos}
+                  onCheckedChange={(checked) => setTermosAceitos(!!checked)}
                 />
                 <span className="ml-2">Aceito os termos de uso e política de privacidade</span>
               </div>
@@ -232,6 +227,18 @@ export const SecureEnhancedRegisterForm: React.FC = () => {
             )}
           </Button>
         </form>
+        
+        {onSwitchToLogin && (
+          <div className="text-center">
+            <Button 
+              variant="link" 
+              onClick={onSwitchToLogin}
+              className="text-sm"
+            >
+              Já tem uma conta? Faça login
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

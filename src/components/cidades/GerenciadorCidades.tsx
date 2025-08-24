@@ -1,211 +1,220 @@
-
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, Plus, Trash2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Trash2, Plus, Edit2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
-export interface CidadeAtendida {
+interface Cidade {
   id: string;
-  prestador_id: string;
-  cidade: string;
+  nome: string;
 }
 
-export const CIDADES_REGIAO = [
-  'Sinop, Mato Grosso',
-  'Sorriso, Mato Grosso',
-  'Lucas do Rio Verde, Mato Grosso',
-  'Nova Mutum, Mato Grosso',
-  'Vera, Mato Grosso',
-  'Itanhangá, Mato Grosso'
-];
-
 const GerenciadorCidades = () => {
-  const [cidadesAtendidas, setCidadesAtendidas] = useState<CidadeAtendida[]>([]);
-  const [cidadeSelecionada, setCidadeSelecionada] = useState('');
+  const [cidades, setCidades] = useState<Cidade[]>([]);
+  const [novaCidade, setNovaCidade] = useState('');
+  const [editandoId, setEditandoId] = useState<string | null>(null);
+  const [cidadeEditada, setCidadeEditada] = useState('');
+  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
 
   useEffect(() => {
-    carregarCidades();
+    fetchCidades();
   }, []);
 
-  const carregarCidades = async () => {
+  const fetchCidades = async () => {
+    setLoading(true);
     try {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) return;
-
-      const { data: profile } = await supabase
-        .from('users')
-        .select('id')
-        .eq('auth_id', user.user.id)
-        .single();
-
-      if (!profile) return;
-
       const { data, error } = await supabase
-        .from('cidades_atendidas')
+        .from('cidades')
         .select('*')
-        .eq('prestador_id', profile.id);
+        .order('nome', { ascending: true });
 
       if (error) {
-        console.error('Erro ao carregar cidades:', error);
+        console.error('Erro ao buscar cidades:', error);
+        toast.error('Erro ao buscar cidades.');
         return;
       }
 
-      setCidadesAtendidas(data || []);
-    } catch (error) {
-      console.error('Erro ao carregar cidades:', error);
-    }
-  };
-
-  const handleAdicionarCidade = async () => {
-    if (!cidadeSelecionada) return;
-
-    setLoading(true);
-    try {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) return;
-
-      const { data: profile } = await supabase
-        .from('users')
-        .select('id')
-        .eq('auth_id', user.user.id)
-        .single();
-
-      if (!profile) return;
-
-      const { error } = await supabase
-        .from('cidades_atendidas')
-        .insert({
-          prestador_id: profile.id,
-          cidade: cidadeSelecionada
-        });
-
-      if (error) throw error;
-
-      await carregarCidades();
-      setCidadeSelecionada('');
-      toast({
-        title: "Cidade adicionada",
-        description: `${cidadeSelecionada} foi adicionada às suas cidades atendidas`,
-      });
-    } catch (error) {
-      toast({
-        title: "Erro",
-        description: "Erro ao adicionar cidade. Tente novamente.",
-        variant: "destructive",
-      });
+      setCidades(data || []);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleRemoverCidade = async (cidadeId: string, nomeCidade: string) => {
+  const handleAdicionarCidade = async () => {
+    if (!novaCidade.trim()) {
+      toast.error('Por favor, insira um nome para a cidade.');
+      return;
+    }
+
     try {
       const { error } = await supabase
-        .from('cidades_atendidas')
-        .delete()
-        .eq('id', cidadeId);
+        .from('cidades')
+        .insert([{ nome: novaCidade.trim() }]);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao adicionar cidade:', error);
+        toast.error('Erro ao adicionar cidade.');
+        return;
+      }
 
-      setCidadesAtendidas(prev => prev.filter(c => c.id !== cidadeId));
-      toast({
-        title: "Cidade removida",
-        description: `${nomeCidade} foi removida das suas cidades atendidas`,
-      });
+      toast.success('Cidade adicionada com sucesso!');
+      setNovaCidade('');
+      fetchCidades();
     } catch (error) {
-      toast({
-        title: "Erro",
-        description: "Erro ao remover cidade. Tente novamente.",
-        variant: "destructive",
-      });
+      console.error('Erro ao adicionar cidade:', error);
+      toast.error('Erro ao adicionar cidade.');
     }
   };
 
-  const cidadesDisponiveis = CIDADES_REGIAO.filter(
-    cidade => !cidadesAtendidas.some(ca => ca.cidade === cidade)
-  );
+  const handleEditarCidade = (cidade: Cidade) => {
+    setEditandoId(cidade.id);
+    setCidadeEditada(cidade.nome);
+  };
+
+  const handleSalvarEdicao = async () => {
+    if (!cidadeEditada.trim()) {
+      toast.error('Por favor, insira um nome para a cidade.');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('cidades')
+        .update({ nome: cidadeEditada.trim() })
+        .eq('id', editandoId);
+
+      if (error) {
+        console.error('Erro ao atualizar cidade:', error);
+        toast.error('Erro ao atualizar cidade.');
+        return;
+      }
+
+      toast.success('Cidade atualizada com sucesso!');
+      setEditandoId(null);
+      setCidadeEditada('');
+      fetchCidades();
+    } catch (error) {
+      console.error('Erro ao atualizar cidade:', error);
+      toast.error('Erro ao atualizar cidade.');
+    }
+  };
+
+  const handleCancelarEdicao = () => {
+    setEditandoId(null);
+    setCidadeEditada('');
+  };
+
+  const handleRemoverCidade = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('cidades')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Erro ao remover cidade:', error);
+        toast.error('Erro ao remover cidade.');
+        return;
+      }
+
+      toast.success('Cidade removida com sucesso!');
+      fetchCidades();
+    } catch (error) {
+      console.error('Erro ao remover cidade:', error);
+      toast.error('Erro ao remover cidade.');
+    }
+  };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <MapPin className="h-5 w-5" />
-          Áreas de Atendimento
-        </CardTitle>
+        <CardTitle>Gerenciar Cidades</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Adicionar nova cidade */}
-        <div className="flex gap-2">
-          <Select
-            value={cidadeSelecionada}
-            onValueChange={setCidadeSelecionada}
-          >
-            <SelectTrigger className="flex-1">
-              <SelectValue placeholder="Selecione uma cidade para adicionar" />
-            </SelectTrigger>
-            <SelectContent>
-              {cidadesDisponiveis.map((cidade) => (
-                <SelectItem key={cidade} value={cidade}>
-                  {cidade}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button
-            onClick={handleAdicionarCidade}
-            disabled={!cidadeSelecionada || loading}
-            size="icon"
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
+      <CardContent>
+        <div className="mb-4">
+          <Label htmlFor="novaCidade">Nova Cidade</Label>
+          <div className="flex gap-2">
+            <Input
+              type="text"
+              id="novaCidade"
+              placeholder="Nome da cidade"
+              value={novaCidade}
+              onChange={(e) => setNovaCidade(e.target.value)}
+            />
+            <Button onClick={handleAdicionarCidade}>
+              <Plus className="mr-2 h-4 w-4" />
+              Adicionar
+            </Button>
+          </div>
         </div>
 
-        {/* Lista de cidades atendidas */}
-        {cidadesAtendidas.length > 0 ? (
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium text-gray-700">
-              Suas áreas de atendimento ({cidadesAtendidas.length})
-            </h4>
-            <div className="space-y-2">
-              {cidadesAtendidas.map((cidade) => (
-                <div 
-                  key={cidade.id}
-                  className="flex items-center justify-between p-2 border rounded-lg"
-                >
-                  <Badge variant="secondary">
-                    {cidade.cidade}
-                  </Badge>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleRemoverCidade(cidade.id, cidade.cidade)}
-                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
+        {loading ? (
+          <p>Carregando cidades...</p>
         ) : (
-          <div className="text-center py-6 border-2 border-dashed border-gray-200 rounded-lg">
-            <MapPin className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-            <p className="text-gray-500">Nenhuma cidade adicionada ainda</p>
-            <p className="text-sm text-gray-400">
-              Adicione as cidades onde você atende para aparecer nas buscas
-            </p>
+          <div className="space-y-2">
+            {cidades.map((cidade) => (
+              <div key={cidade.id} className="flex items-center justify-between">
+                {editandoId === cidade.id ? (
+                  <div className="flex gap-2 w-full">
+                    <Input
+                      type="text"
+                      value={cidadeEditada}
+                      onChange={(e) => setCidadeEditada(e.target.value)}
+                    />
+                    <Button onClick={handleSalvarEdicao} size="sm">
+                      Salvar
+                    </Button>
+                    <Button variant="ghost" onClick={handleCancelarEdicao} size="sm">
+                      Cancelar
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <span>{cidade.nome}</span>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleEditarCidade(cidade)}
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => handleRemoverCidade(cidade.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
           </div>
         )}
 
-        <div className="text-xs text-gray-500 mt-4">
-          💡 Dica: Adicione as cidades onde você oferece seus serviços para ser encontrado mais facilmente pelos clientes da região.
-        </div>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="mt-4">
+              <Plus className="mr-2 h-4 w-4" />
+              Adicionar em lote
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Adicionar Cidades em Lote</DialogTitle>
+            </DialogHeader>
+            <div>
+              Em construção...
+            </div>
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );

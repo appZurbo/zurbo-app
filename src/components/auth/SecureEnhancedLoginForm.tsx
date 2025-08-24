@@ -1,17 +1,22 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Eye, EyeOff, Mail, Lock, Shield } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthSecurity } from '@/hooks/useAuthSecurity';
 
 interface SecureEnhancedLoginFormProps {
   onSuccess?: () => void;
+  onSwitchToRegister?: () => void;
 }
 
-export const SecureEnhancedLoginForm: React.FC<SecureEnhancedLoginFormProps> = ({ onSuccess }) => {
+export const SecureEnhancedLoginForm: React.FC<SecureEnhancedLoginFormProps> = ({ 
+  onSuccess, 
+  onSwitchToRegister 
+}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -22,11 +27,7 @@ export const SecureEnhancedLoginForm: React.FC<SecureEnhancedLoginFormProps> = (
     e.preventDefault();
 
     if (!email || !password) {
-      toast({
-        title: "Campos obrigatórios",
-        description: "Por favor, preencha todos os campos.",
-        variant: "destructive",
-      });
+      toast.error("Preencha todos os campos.");
       return;
     }
 
@@ -35,17 +36,10 @@ export const SecureEnhancedLoginForm: React.FC<SecureEnhancedLoginFormProps> = (
       const result = await secureSignIn(email, password);
 
       if (result.success) {
-        toast({
-          title: "Login realizado",
-          description: "Login realizado com sucesso!",
-        });
+        toast.success("Login realizado com sucesso!");
         onSuccess?.();
       } else {
-        toast({
-          title: "Erro ao realizar login",
-          description: result.error || "Credenciais inválidas. Tente novamente.",
-          variant: "destructive",
-        });
+        toast.error(result.error || "Email ou senha incorretos.");
       }
     } finally {
       setLoading(false);
@@ -54,54 +48,58 @@ export const SecureEnhancedLoginForm: React.FC<SecureEnhancedLoginFormProps> = (
 
   return (
     <Card>
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-xl flex items-center gap-2">
-          <Shield className="h-5 w-5 text-green-500" />
-          Login Seguro
-        </CardTitle>
+      <CardHeader>
+        <CardTitle>Fazer Login</CardTitle>
       </CardHeader>
-      <CardContent className="grid gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            placeholder="seu@email.com"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={loading}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="password">Senha</Label>
-          <div className="relative">
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="email">Email</Label>
             <Input
-              id="password"
-              placeholder="Senha"
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={loading}
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="seu@email.com"
             />
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-2 top-1/2 -translate-y-1/2"
+          </div>
+          <div>
+            <Label htmlFor="password">Senha</Label>
+            <div className="relative">
+              <Input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Sua senha"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-2 top-1/2 -translate-y-1/2"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
+            </div>
+          </div>
+          <Button disabled={loading} className="w-full">
+            {loading ? "Entrando..." : "Entrar"}
+          </Button>
+        </form>
+        
+        {onSwitchToRegister && (
+          <div className="text-center mt-4">
+            <Button 
+              variant="link" 
+              onClick={onSwitchToRegister}
+              className="text-sm"
             >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              <span className="sr-only">Mostrar senha</span>
+              Não tem uma conta? Cadastre-se
             </Button>
           </div>
-        </div>
-        <Button onClick={handleSubmit} disabled={loading}>
-          {loading ? (
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-          ) : (
-            'Entrar'
-          )}
-        </Button>
+        )}
       </CardContent>
     </Card>
   );

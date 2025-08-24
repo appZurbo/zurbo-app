@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,7 @@ import { MessageCircle, Send } from 'lucide-react';
 import { UserProfile } from '@/utils/database/types';
 import { useAuth } from '@/hooks/useAuth';
 import { useEnhancedChat } from '@/hooks/useEnhancedChat';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
 interface ContactModalProps {
@@ -29,27 +28,18 @@ export const ContactModal: React.FC<ContactModalProps> = ({
   const [loading, setLoading] = useState(false);
   const { profile, isAuthenticated } = useAuth();
   const { createConversation, sendMessage } = useEnhancedChat();
-  const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!isAuthenticated || !profile) {
-      toast({
-        title: "Login necessário",
-        description: "Você precisa estar logado para enviar mensagens.",
-        variant: "destructive"
-      });
+      toast.error("Você precisa estar logado para enviar mensagens.");
       return;
     }
 
     if (!servico.trim() || !mensagem.trim()) {
-      toast({
-        title: "Campos obrigatórios",
-        description: "Por favor, preencha o tipo de serviço e a mensagem.",
-        variant: "destructive"
-      });
+      toast.error("Por favor, preencha o tipo de serviço e a mensagem.");
       return;
     }
 
@@ -65,10 +55,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
       // Enviar mensagem inicial
       await sendMessage(conversation.id, mensagem.trim());
 
-      toast({
-        title: "Mensagem enviada!",
-        description: "Sua mensagem foi enviada com sucesso.",
-      });
+      toast.success("Sua mensagem foi enviada com sucesso.");
 
       // Limpar formulário e fechar modal
       setServico('');
@@ -80,11 +67,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({
 
     } catch (error) {
       console.error('Error sending message:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível enviar a mensagem. Tente novamente.",
-        variant: "destructive"
-      });
+      toast.error("Não foi possível enviar a mensagem. Tente novamente.");
     } finally {
       setLoading(false);
     }
