@@ -1,5 +1,4 @@
-
-// Toast implementation using sonner
+// Simple toast implementation without React hooks
 import { toast as sonnerToast } from 'sonner';
 
 interface ToastProps {
@@ -8,6 +7,7 @@ interface ToastProps {
   variant?: 'default' | 'destructive';
 }
 
+// Simple function without hooks
 export const useToast = () => {
   const toast = ({ title, description, variant }: ToastProps) => {
     const message = title || description || '';
@@ -22,6 +22,7 @@ export const useToast = () => {
   return { toast };
 };
 
+// Direct toast function
 export const toast = (props: ToastProps) => {
   const message = props.title || props.description || '';
   
