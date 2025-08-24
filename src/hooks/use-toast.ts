@@ -1,4 +1,5 @@
 // Ultra-simple toast system - NO React hooks at all
+// Updated to fix persistent cache issues
 
 interface SimpleToastOptions {
   title?: string;
