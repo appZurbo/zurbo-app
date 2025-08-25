@@ -1,162 +1,168 @@
 
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trash2, Plus, Edit2 } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { MapPin, Plus, Trash2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { 
+  listarBairrosAtendidos, 
+  adicionarBairroAtendido, 
+  removerBairroAtendido,
+  BAIRROS_SINOP,
+  type BairroAtendido 
+} from '@/utils/database/bairros';
 
-interface Bairro {
-  id: string;
-  nome: string;
-  cidade_id: string;
-  criado_em: string;
-}
-
-interface GerenciadorBairrosProps {
-  cidadeId: string;
-}
-
-export const GerenciadorBairros: React.FC<GerenciadorBairrosProps> = ({ cidadeId }) => {
-  const [bairros, setBairros] = useState<Bairro[]>([]);
-  const [nomeBairro, setNomeBairro] = useState('');
-  const [openModal, setOpenModal] = useState(false);
-  const [selectedBairro, setSelectedBairro] = useState<Bairro | null>(null);
-  const [loading, setLoading] = useState(true);
+const GerenciadorBairros = () => {
+  const [bairrosAtendidos, setBairrosAtendidos] = useState<BairroAtendido[]>([]);
+  const [bairroSelecionado, setBairroSelecionado] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
-    loadBairros();
-  }, [cidadeId]);
+    carregarBairros();
+  }, []);
 
-  const loadBairros = async () => {
+  const carregarBairros = async () => {
+    try {
+      const bairros = await listarBairrosAtendidos();
+      setBairrosAtendidos(bairros);
+    } catch (error) {
+      console.error('Erro ao carregar bairros:', error);
+    }
+  };
+
+  const handleAdicionarBairro = async () => {
+    if (!bairroSelecionado) return;
+
     setLoading(true);
     try {
-      // TODO: Implement bairros table in database
-      // For now, we'll use mock data or disable this functionality
-      console.log('Bairros functionality disabled - table not in database schema');
-      setBairros([]);
-      toast.error('Funcionalidade de bairros temporariamente indisponível.');
+      const sucesso = await adicionarBairroAtendido(bairroSelecionado);
+      if (sucesso) {
+        await carregarBairros();
+        setBairroSelecionado('');
+        toast({
+          title: "Bairro adicionado",
+          description: `${bairroSelecionado} foi adicionado aos seus bairros atendidos`,
+        });
+      } else {
+        throw new Error('Falha ao adicionar bairro');
+      }
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Erro ao adicionar bairro. Tente novamente.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCreateBairro = async () => {
-    if (!nomeBairro.trim()) {
-      toast.error('Nome do bairro é obrigatório.');
-      return;
-    }
-
+  const handleRemoverBairro = async (bairroId: string, nomeBairro: string) => {
     try {
-      // TODO: Implement bairros table in database
-      toast.error('Funcionalidade temporariamente indisponível.');
+      const sucesso = await removerBairroAtendido(bairroId);
+      if (sucesso) {
+        setBairrosAtendidos(prev => prev.filter(b => b.id !== bairroId));
+        toast({
+          title: "Bairro removido",
+          description: `${nomeBairro} foi removido dos seus bairros atendidos`,
+        });
+      } else {
+        throw new Error('Falha ao remover bairro');
+      }
     } catch (error) {
-      toast.error('Erro ao criar bairro.');
+      toast({
+        title: "Erro",
+        description: "Erro ao remover bairro. Tente novamente.",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleUpdateBairro = async () => {
-    if (!selectedBairro) return;
-
-    try {
-      // TODO: Implement bairros table in database
-      toast.error('Funcionalidade temporariamente indisponível.');
-    } catch (error) {
-      toast.error('Erro ao atualizar bairro.');
-    }
-  };
-
-  const handleDeleteBairro = async (bairroId: string) => {
-    try {
-      // TODO: Implement bairros table in database
-      toast.error('Funcionalidade temporariamente indisponível.');
-    } catch (error) {
-      toast.error('Erro ao excluir bairro.');
-    }
-  };
-
-  const handleOpenEditModal = (bairro: Bairro) => {
-    setSelectedBairro(bairro);
-    setNomeBairro(bairro.nome);
-    setOpenModal(true);
-  };
+  const bairrosDisponiveis = BAIRROS_SINOP.filter(
+    bairro => !bairrosAtendidos.some(ba => ba.bairro === bairro)
+  );
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Gerenciar Bairros</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <MapPin className="h-5 w-5" />
+          Bairros Atendidos
+        </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="mb-4">
-          <Dialog open={openModal} onOpenChange={setOpenModal}>
-            <DialogTrigger asChild>
-              <Button onClick={() => { setSelectedBairro(null); setNomeBairro(''); setOpenModal(true); }}>
-                <Plus className="mr-2 h-4 w-4" />
-                Adicionar Bairro
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{selectedBairro ? 'Editar Bairro' : 'Adicionar Bairro'}</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="nome" className="text-right">
-                    Nome
-                  </Label>
-                  <Input
-                    id="nome"
-                    value={nomeBairro}
-                    onChange={(e) => setNomeBairro(e.target.value)}
-                    className="col-span-3"
-                  />
-                </div>
-              </div>
-              <Button onClick={selectedBairro ? handleUpdateBairro : handleCreateBairro}>
-                {selectedBairro ? 'Atualizar' : 'Criar'}
-              </Button>
-            </DialogContent>
-          </Dialog>
+      <CardContent className="space-y-4">
+        {/* Adicionar novo bairro */}
+        <div className="flex gap-2">
+          <Select
+            value={bairroSelecionado}
+            onValueChange={setBairroSelecionado}
+          >
+            <SelectTrigger className="flex-1">
+              <SelectValue placeholder="Selecione um bairro para adicionar" />
+            </SelectTrigger>
+            <SelectContent>
+              {bairrosDisponiveis.map((bairro) => (
+                <SelectItem key={bairro} value={bairro}>
+                  {bairro}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            onClick={handleAdicionarBairro}
+            disabled={!bairroSelecionado || loading}
+            size="icon"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
         </div>
 
-        {loading ? (
-          <p>Carregando bairros...</p>
-        ) : (
-          <div className="divide-y divide-gray-200">
-            {bairros.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <p>Funcionalidade de bairros temporariamente indisponível.</p>
-                <p className="text-sm">A tabela de bairros precisa ser criada no banco de dados.</p>
-              </div>
-            ) : (
-              bairros.map((bairro) => (
-                <div key={bairro.id} className="py-2 flex items-center justify-between">
-                  <span>{bairro.nome}</span>
-                  <div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleOpenEditModal(bairro)}
-                    >
-                      <Edit2 className="h-4 w-4 mr-2" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-red-500 hover:text-red-600"
-                      onClick={() => handleDeleteBairro(bairro.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+        {/* Lista de bairros atendidos */}
+        {bairrosAtendidos.length > 0 ? (
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-gray-700">
+              Seus bairros atendidos ({bairrosAtendidos.length})
+            </h4>
+            <div className="space-y-2">
+              {bairrosAtendidos.map((bairro) => (
+                <div 
+                  key={bairro.id}
+                  className="flex items-center justify-between p-2 border rounded-lg"
+                >
+                  <Badge variant="secondary">
+                    {bairro.bairro}
+                  </Badge>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleRemoverBairro(bairro.id, bairro.bairro)}
+                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
-              ))
-            )}
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="text-center py-6 border-2 border-dashed border-gray-200 rounded-lg">
+            <MapPin className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+            <p className="text-gray-500">Nenhum bairro adicionado ainda</p>
+            <p className="text-sm text-gray-400">
+              Adicione os bairros onde você atende para aparecer nas buscas
+            </p>
           </div>
         )}
+
+        <div className="text-xs text-gray-500 mt-4">
+          💡 Dica: Adicione os bairros onde você oferece seus serviços para ser encontrado mais facilmente pelos clientes da região.
+        </div>
       </CardContent>
     </Card>
   );
 };
+
+export default GerenciadorBairros;

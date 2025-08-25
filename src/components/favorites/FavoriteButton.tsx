@@ -1,75 +1,96 @@
 
-import { useState } from 'react';
-import { Heart } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import { Heart } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 interface FavoriteButtonProps {
   prestadorId: string;
-  isFavorite?: boolean;
-  onToggle?: (isFavorite: boolean) => void;
+  size?: 'sm' | 'md' | 'lg';
 }
 
-export const FavoriteButton = ({ prestadorId, isFavorite: initialFavorite = false, onToggle }: FavoriteButtonProps) => {
-  const [isFavorite, setIsFavorite] = useState(initialFavorite);
-  const [isLoading, setIsLoading] = useState(false);
-  const { profile } = useAuth();
+export const FavoriteButton: React.FC<FavoriteButtonProps> = ({ 
+  prestadorId, 
+  size = 'md' 
+}) => {
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { profile, isAuthenticated } = useAuth();
+  const { toast } = useToast();
 
-  const handleToggleFavorite = async () => {
-    if (!profile) {
-      toast.error('Faça login para adicionar favoritos');
+  useEffect(() => {
+    // Simular verificação se é favorito
+    const favorites = JSON.parse(localStorage.getItem('user_favorites') || '[]');
+    setIsFavorite(favorites.includes(prestadorId));
+  }, [prestadorId]);
+
+  const toggleFavorite = async () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Login necessário",
+        description: "Faça login para favoritar prestadores.",
+        variant: "destructive"
+      });
       return;
     }
 
-    setIsLoading(true);
+    setLoading(true);
+    
     try {
+      const favorites = JSON.parse(localStorage.getItem('user_favorites') || '[]');
+      
       if (isFavorite) {
-        // Remove from favorites
-        const { error } = await supabase
-          .from('favoritos')
-          .delete()
-          .eq('usuario_id', profile.id)
-          .eq('prestador_id', prestadorId);
-
-        if (error) throw error;
-
+        const newFavorites = favorites.filter((id: string) => id !== prestadorId);
+        localStorage.setItem('user_favorites', JSON.stringify(newFavorites));
         setIsFavorite(false);
-        onToggle?.(false);
-        toast.success('Removido dos favoritos!');
+        toast({
+          title: "Removido dos favoritos",
+          description: "Prestador removido da sua lista de favoritos."
+        });
       } else {
-        // Add to favorites
-        const { error } = await supabase
-          .from('favoritos')
-          .insert({
-            usuario_id: profile.id,
-            prestador_id: prestadorId
-          });
-
-        if (error) throw error;
-
+        const newFavorites = [...favorites, prestadorId];
+        localStorage.setItem('user_favorites', JSON.stringify(newFavorites));
         setIsFavorite(true);
-        onToggle?.(true);
-        toast.success('Adicionado aos favoritos!');
+        toast({
+          title: "Adicionado aos favoritos",
+          description: "Prestador adicionado à sua lista de favoritos."
+        });
       }
     } catch (error) {
-      console.error('Error toggling favorite:', error);
-      toast.error('Erro ao atualizar favoritos');
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar favoritos.",
+        variant: "destructive"
+      });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
+  };
+
+  const sizeClasses = {
+    sm: 'h-8 w-8',
+    md: 'h-10 w-10',
+    lg: 'h-12 w-12'
+  };
+
+  const iconSizes = {
+    sm: 'h-4 w-4',
+    md: 'h-5 w-5',
+    lg: 'h-6 w-6'
   };
 
   return (
     <Button
-      variant="ghost"
+      variant="outline"
       size="icon"
-      onClick={handleToggleFavorite}
-      disabled={isLoading}
-      className={`${isFavorite ? 'text-red-500' : 'text-gray-400'} hover:text-red-500`}
+      className={`${sizeClasses[size]} ${isFavorite ? 'text-red-500 border-red-200 bg-red-50' : ''}`}
+      onClick={toggleFavorite}
+      disabled={loading}
     >
-      <Heart className={`h-5 w-5 ${isFavorite ? 'fill-current' : ''}`} />
+      <Heart 
+        className={`${iconSizes[size]} ${isFavorite ? 'fill-current' : ''}`} 
+      />
     </Button>
   );
 };

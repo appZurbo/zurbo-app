@@ -10,7 +10,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, CreditCard, Lock } from 'lucide-react';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 
 const stripePromise = loadStripe('pk_test_51RgcAS04BC4Rs3cN4wgSUBWK7AY9ODRrarFjB9tsBJTSjUTciHaGttkkxXL49Ugq1mNiFjYUGP0QTgLVdvsl');
 
@@ -47,7 +47,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   const stripe = useStripe();
   const elements = useElements();
   const [processing, setProcessing] = useState(false);
-  
+  const { toast } = useToast();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -73,10 +73,17 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       if (error) {
         console.error('Payment error:', error);
         onError(error.message || 'Erro no pagamento');
-        toast.error(error.message || 'Não foi possível processar o pagamento.');
+        toast({
+          title: "Erro no Pagamento",
+          description: error.message || 'Não foi possível processar o pagamento.',
+          variant: "destructive"
+        });
       } else if (paymentIntent?.status === 'requires_capture') {
         // Pagamento autorizado mas não capturado (escrow)
-        toast.success('Seu pagamento foi autorizado e será retido até a conclusão do serviço.');
+        toast({
+          title: "Pagamento Autorizado",
+          description: "Seu pagamento foi autorizado e será retido até a conclusão do serviço.",
+        });
         onSuccess();
       }
     } catch (err) {

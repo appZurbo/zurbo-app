@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertTriangle, MapPin } from 'lucide-react';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import { StarBorder } from '@/components/ui/star-border';
 
 export const EmergencyButton = () => {
@@ -19,6 +19,7 @@ export const EmergencyButton = () => {
     descricao: '',
     orcamento_maximo: ''
   });
+  const { toast } = useToast();
 
   const servicos = [
     'Eletricista',
@@ -34,12 +35,19 @@ export const EmergencyButton = () => {
 
   const handleSubmit = () => {
     if (!formData.servico || !formData.localizacao) {
-      toast.error('Por favor, preencha o serviço e localização.');
+      toast({
+        title: "Campos obrigatórios",
+        description: "Por favor, preencha o serviço e localização.",
+        variant: "destructive"
+      });
       return;
     }
 
     // Simular envio para prestadores em serviço
-    toast.success('Sua solicitação foi enviada para prestadores disponíveis na sua região.');
+    toast({
+      title: "SOS Enviado!",
+      description: "Sua solicitação foi enviada para prestadores disponíveis na sua região.",
+    });
 
     setIsOpen(false);
     setFormData({

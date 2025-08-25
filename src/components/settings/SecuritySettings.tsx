@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Shield, Key, Eye, Download, Trash2, AlertCircle, User, MapPin, Phone, Mail } from 'lucide-react';
 import { securityLogger } from '@/utils/securityLogger';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from "@/utils/toast";
+import { useToast } from '@/hooks/use-toast';
 import { useMobile } from '@/hooks/useMobile';
 
 const SecuritySettings = () => {
@@ -18,6 +18,7 @@ const SecuritySettings = () => {
   const [sessionTimeout, setSessionTimeout] = useState(30); // minutos
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const { profile, isPrestador } = useAuth();
+  const { toast } = useToast();
   const isMobile = useMobile();
 
   useEffect(() => {

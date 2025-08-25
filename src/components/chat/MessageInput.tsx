@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Send, Paperclip, X } from 'lucide-react';
 import { ImageUploadInfo } from '@/hooks/useEnhancedChat';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 
 interface MessageInputProps {
   onSendMessage: (content: string) => void;
@@ -23,6 +23,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 }) => {
   const [message, setMessage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,24 +39,30 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 
     // Verificar limite diário
     if (imageUploadInfo.remaining <= 0) {
-      toast.error("Limite atingido", {
-        description: "Você atingiu o limite de 5 imagens por dia."
+      toast({
+        title: "Limite atingido",
+        description: "Você atingiu o limite de 5 imagens por dia.",
+        variant: "destructive"
       });
       return;
     }
 
     // Verificar tipo de arquivo
     if (!file.type.startsWith('image/')) {
-      toast.error("Arquivo inválido", {
-        description: "Por favor, selecione apenas arquivos de imagem."
+      toast({
+        title: "Arquivo inválido",
+        description: "Por favor, selecione apenas arquivos de imagem.",
+        variant: "destructive"
       });
       return;
     }
 
     // Verificar tamanho (5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("Arquivo muito grande", {
-        description: "O arquivo deve ter no máximo 5MB."
+      toast({
+        title: "Arquivo muito grande",
+        description: "O arquivo deve ter no máximo 5MB.",
+        variant: "destructive"
       });
       return;
     }

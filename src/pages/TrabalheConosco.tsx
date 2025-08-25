@@ -3,9 +3,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Users, MapPin, Clock, Star, Wrench, ArrowRight, Smartphone, Calendar, CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
+import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import WatermarkSection from '@/components/sections/WatermarkSection';
-import AuthButton from '@/components/auth/AuthModalHelper';
 
 const TrabalheConosco = () => {
   const navigate = useNavigate();
@@ -61,7 +60,8 @@ const TrabalheConosco = () => {
   const servicos = ["Limpeza", "Jardinagem", "Pintura", "Elétrica", "Encanamento", "Construção", "Beleza", "Informática", "Educação", "Saúde", "Transporte", "Eventos"];
 
   return (
-    <UnifiedLayout>
+    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white">
+      <UnifiedHeader />
       
       {/* Hero Section */}
       <section className="py-20 px-4">
@@ -80,11 +80,11 @@ const TrabalheConosco = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <AuthButton size="lg" className="bg-orange-500 hover:bg-orange-600 text-lg px-8 py-6">
+            <Button size="lg" onClick={() => navigate('/auth')} className="bg-orange-500 hover:bg-orange-600 text-lg px-8 py-6">
               <Wrench className="mr-2 h-5 w-5" />
               Cadastrar-se agora como Prestador
               <ArrowRight className="ml-2 h-5 w-5" />
-            </AuthButton>
+            </Button>
           </div>
         </div>
       </section>
@@ -152,16 +152,16 @@ const TrabalheConosco = () => {
             Junte-se a centenas de prestadores que já confiam no Zurbo para fazer seus negócios crescerem.
           </p>
           
-          <AuthButton size="lg" className="bg-white text-orange-600 hover:bg-gray-50 py-[10px] text-left text-sm px-[11px]">
+          <Button size="lg" onClick={() => navigate('/auth')} className="bg-white text-orange-600 hover:bg-gray-50 py-[10px] text-left text-sm px-[11px]">
             <Wrench className="mr-2 h-5 w-5" />
             Cadastrar-se agora como Prestador
             <ArrowRight className="ml-2 h-5 w-5" />
-          </AuthButton>
+          </Button>
         </div>
       </section>
 
       <WatermarkSection />
-    </UnifiedLayout>
+    </div>
   );
 };
 

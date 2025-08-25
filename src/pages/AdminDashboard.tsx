@@ -2,12 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Users, CheckCircle, AlertTriangle, MessageCircle, ShoppingBag, Wrench, Settings, Image, ImageIcon } from 'lucide-react';
+import { ArrowLeft, Users, CheckCircle, AlertTriangle, MessageCircle, ShoppingBag, Wrench, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { CreateTestData } from '@/components/admin/CreateTestData';
 
@@ -15,6 +15,7 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const { profile, isAdmin } = useAuth();
   const isMobile = useMobile();
+  const { toast } = useToast();
 
   const [userCount, setUserCount] = useState(0);
   const [prestadorCount, setPrestadorCount] = useState(0);
@@ -59,7 +60,11 @@ const AdminDashboard = () => {
 
     } catch (error) {
       console.error('Error loading stats:', error);
-      toast.error("Não foi possível carregar as estatísticas.");
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar as estatísticas.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -219,14 +224,14 @@ const AdminDashboard = () => {
           </div>
 
           {/* Quick Actions */}
-          <Card className="mb-6">
+          <Card>
             <CardHeader>
               <CardTitle>Ações Rápidas</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Button
-                  onClick={() => navigate('/admin/users')}
+                  onClick={() => navigate('/admin/usuarios')}
                   variant="outline"
                   className="justify-start"
                 >
@@ -256,50 +261,6 @@ const AdminDashboard = () => {
                 >
                   <CheckCircle className="h-4 w-4 mr-2" />
                   Atualizar Stats
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Content Management Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ImageIcon className="h-5 w-5" />
-                Gerenciamento de Conteúdo
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Button
-                  onClick={() => navigate('/admin/image-manager')}
-                  variant="outline"
-                  className="justify-start h-auto p-4"
-                >
-                  <div className="flex flex-col items-start">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Image className="h-4 w-4" />
-                      <span className="font-medium">Imagens de Categorias</span>
-                    </div>
-                    <span className="text-xs text-muted-foreground text-left">
-                      Gerenciar imagens das categorias de serviços
-                    </span>
-                  </div>
-                </Button>
-                <Button
-                  onClick={() => navigate('/admin/banner-image-manager')}
-                  variant="outline"
-                  className="justify-start h-auto p-4"
-                >
-                  <div className="flex flex-col items-start">
-                    <div className="flex items-center gap-2 mb-1">
-                      <ImageIcon className="h-4 w-4" />
-                      <span className="font-medium">Imagens dos Banners</span>
-                    </div>
-                    <span className="text-xs text-muted-foreground text-left">
-                      Gerenciar imagens 3D dos banners da página inicial
-                    </span>
-                  </div>
                 </Button>
               </div>
             </CardContent>

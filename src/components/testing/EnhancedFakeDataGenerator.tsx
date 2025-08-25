@@ -3,11 +3,12 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from "@/utils/toast";
+import { useToast } from '@/hooks/use-toast';
 import { Users, Loader2, Database, Settings } from 'lucide-react';
 
 export const EnhancedFakeDataGenerator = () => {
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const generateCompleteTestData = async () => {
     setLoading(true);

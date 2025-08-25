@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Check, Clock, CreditCard } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import { Pedido, UserProfile } from '@/utils/database/types';
 
 interface ConfirmacaoServicoProps {
@@ -20,7 +20,7 @@ export const ConfirmacaoServico: React.FC<ConfirmacaoServicoProps> = ({
   onUpdate
 }) => {
   const [loading, setLoading] = useState(false);
-  
+  const { toast } = useToast();
 
   const isCliente = user.id === pedido.cliente_id;
   const isPrestador = user.id === pedido.prestador_id;
@@ -74,17 +74,27 @@ export const ConfirmacaoServico: React.FC<ConfirmacaoServicoProps> = ({
           if (releaseError) {
             console.error('Error releasing payment:', releaseError);
           } else {
-            toast.success("O pagamento foi liberado com sucesso para o prestador!");
+            toast({
+              title: "Pagamento Liberado",
+              description: "O pagamento foi liberado com sucesso para o prestador!",
+            });
           }
         }
       }
 
-      toast.success("Sua confirmação foi registrada com sucesso!");
+      toast({
+        title: "Confirmação Enviada",
+        description: "Sua confirmação foi registrada com sucesso!",
+      });
 
       onUpdate?.();
     } catch (error) {
       console.error('Error confirming service:', error);
-      toast.error("Não foi possível confirmar o serviço. Tente novamente.");
+      toast({
+        title: "Erro",
+        description: "Não foi possível confirmar o serviço. Tente novamente.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }

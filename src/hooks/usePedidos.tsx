@@ -2,11 +2,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getPedidos, updatePedido } from '@/utils/database/pedidos';
 import { Pedido, StatusType } from '@/types';
-import { toast } from "@/utils/toast";
+import { useToast } from '@/hooks/use-toast';
 
 export const usePedidos = (userId?: string) => {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   const loadPedidos = useCallback(async () => {
     if (!userId) return;

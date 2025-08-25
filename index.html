@@ -3,65 +3,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Zurbo</title>
-    <meta name="description" content="Plataforma de Serviços Rápidos - Conectando talentos locais" />
+    <meta name="description" content="Plataforma de Serviços Rápidos" />
     <meta name="author" content="Zurbo" />
-    <meta name="theme-color" content="#ea580c" />
-    <meta name="color-scheme" content="light dark" />
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json" />
-    
-    <!-- iOS Meta Tags -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Zurbo" />
-    <link rel="apple-touch-icon" href="/icon-192x192.png" />
-    <link rel="apple-touch-startup-image" href="/icon-512x512.png" />
-    
-    <!-- Prevent zoom on inputs -->
-    <meta name="format-detection" content="telephone=no" />
-    
-    <!-- Favicon -->
-    <link rel="icon" href="/icon-192x192.png" type="image/png" />
-    
-    <!-- Social Meta Tags -->
-    <meta property="og:title" content="Zurbo - Plataforma de Serviços" />
-    <meta property="og:description" content="Conectando talentos locais com quem precisa de serviços" />
+
+    <meta property="og:title" content="Zurbo" />
+    <meta property="og:description" content="Plataforma de Serviços Rápidos" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-    <meta property="og:url" content="https://zurbo.app" />
-    <meta property="og:site_name" content="Zurbo" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@zurbo_app" />
-    <meta name="twitter:creator" content="@zurbo_app" />
-    <meta name="twitter:title" content="Zurbo - Plataforma de Serviços" />
-    <meta name="twitter:description" content="Conectando talentos locais com quem precisa de serviços" />
+    <meta name="twitter:site" content="@lovable_dev" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-    
-    <!-- Preload critical resources -->
-    <link rel="preconnect" href="https://mbzxifrkabfnufliawzo.supabase.co" />
-    <link rel="dns-prefetch" href="https://mbzxifrkabfnufliawzo.supabase.co" />
   </head>
 
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/fresh-entry.tsx"></script>
-    
-    <!-- SERVICE WORKER DISABLED FOR CACHE DEBUGGING v67.0 -->
-    <script>
-      console.log('🚫 Service Worker DISABLED - Cache debugging v67.0');
-      // Unregister any existing service workers
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for(let registration of registrations) {
-            registration.unregister();
-            console.log('🗑️ Unregistered SW:', registration);
-          }
-        });
-      }
-    </script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

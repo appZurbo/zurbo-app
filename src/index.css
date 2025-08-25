@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -166,16 +167,6 @@
 
   .glass-dock {
     @apply bg-white/95 backdrop-blur-md border-t border-gray-200/80;
-  }
-
-  /* Hide scrollbar utility */
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
   }
 }
 
@@ -389,7 +380,6 @@
 
 .card-prestador-moderno .avatar {
   @apply w-16 h-16 rounded-full object-cover;
-  object-position: center top;
 }
 
 .card-prestador-moderno .info h3 {

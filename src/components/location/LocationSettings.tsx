@@ -1,36 +1,77 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { MapPin, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { useAuth } from '@/hooks/useAuth';
+import { Navigation, MapPin, Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 export const LocationSettings = () => {
   const { profile, updateLocalProfile } = useAuth();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    endereco_rua: profile?.endereco_rua || '',
-    endereco_numero: profile?.endereco_numero || '',
-    endereco_bairro: profile?.endereco_bairro || '',
-    endereco_cidade: profile?.endereco_cidade || '',
-    endereco_cep: profile?.endereco_cep || ''
+  const [locationData, setLocationData] = useState({
+    endereco_cidade: '',
+    endereco_rua: '',
+    endereco_numero: '',
+    endereco_bairro: '',
+    endereco_cep: '',
+    latitude: null as number | null,
+    longitude: null as number | null,
   });
 
   useEffect(() => {
     if (profile) {
-      setFormData({
+      setLocationData({
+        endereco_cidade: profile.endereco_cidade || '',
         endereco_rua: profile.endereco_rua || '',
         endereco_numero: profile.endereco_numero || '',
         endereco_bairro: profile.endereco_bairro || '',
-        endereco_cidade: profile.endereco_cidade || '',
-        endereco_cep: profile.endereco_cep || ''
+        endereco_cep: profile.endereco_cep || '',
+        latitude: profile.latitude || null,
+        longitude: profile.longitude || null,
       });
     }
   }, [profile]);
+
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast({
+        title: "Geolocalização não suportada",
+        description: "Seu navegador não suporta geolocalização.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocationData(prev => ({
+          ...prev,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        }));
+        setLoading(false);
+        toast({
+          title: "Localização obtida!",
+          description: "Coordenadas atualizadas com sucesso.",
+        });
+      },
+      (error) => {
+        setLoading(false);
+        toast({
+          title: "Erro ao obter localização",
+          description: "Não foi possível obter sua localização atual.",
+          variant: "destructive",
+        });
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 600000 }
+    );
+  };
 
   const handleSave = async () => {
     if (!profile) return;
@@ -39,54 +80,33 @@ export const LocationSettings = () => {
     try {
       const { error } = await supabase
         .from('users')
-        .update({
-          endereco_rua: formData.endereco_rua.trim(),
-          endereco_numero: formData.endereco_numero.trim(),
-          endereco_bairro: formData.endereco_bairro.trim(),
-          endereco_cidade: formData.endereco_cidade.trim(),
-          endereco_cep: formData.endereco_cep.trim(),
-        })
+        .update(locationData)
         .eq('id', profile.id);
 
       if (error) throw error;
 
-      updateLocalProfile(formData);
-      toast.success('Localização atualizada com sucesso!');
+      updateLocalProfile(locationData);
+      
+      toast({
+        title: "Localização salva!",
+        description: "Suas informações de localização foram atualizadas.",
+      });
     } catch (error: any) {
-      console.error('Erro ao atualizar localização:', error);
-      toast.error('Erro ao atualizar localização');
+      toast({
+        title: "Erro ao salvar",
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const getCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      toast.error('Geolocalização não é suportada pelo seu navegador');
-      return;
-    }
-
-    setLoading(true);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        
-        // Simular busca por endereço baseado nas coordenadas
-        // Em uma implementação real, você usaria uma API de geocodificação
-        toast.success(`Localização obtida: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
-        setLoading(false);
-      },
-      (error) => {
-        console.error('Erro ao obter localização:', error);
-        toast.error('Erro ao obter localização');
-        setLoading(false);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 60000
-      }
-    );
+  const handleInputChange = (field: string, value: string) => {
+    setLocationData(prev => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
   return (
@@ -99,90 +119,88 @@ export const LocationSettings = () => {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="rua">Rua</Label>
-            <Input
-              id="rua"
-              value={formData.endereco_rua}
-              onChange={(e) => setFormData({...formData, endereco_rua: e.target.value})}
-              placeholder="Nome da rua"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="numero">Número</Label>
-            <Input
-              id="numero"
-              value={formData.endereco_numero}
-              onChange={(e) => setFormData({...formData, endereco_numero: e.target.value})}
-              placeholder="Número"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="bairro">Bairro</Label>
-            <Input
-              id="bairro"
-              value={formData.endereco_bairro}
-              onChange={(e) => setFormData({...formData, endereco_bairro: e.target.value})}
-              placeholder="Bairro"
-            />
-          </div>
-
-          <div className="space-y-2">
+          <div>
             <Label htmlFor="cidade">Cidade</Label>
             <Input
               id="cidade"
-              value={formData.endereco_cidade}
-              onChange={(e) => setFormData({...formData, endereco_cidade: e.target.value})}
-              placeholder="Cidade"
+              value={locationData.endereco_cidade}
+              onChange={(e) => handleInputChange('endereco_cidade', e.target.value)}
+              placeholder="Ex: São Paulo"
             />
           </div>
-
-          <div className="space-y-2 md:col-span-2">
+          
+          <div>
             <Label htmlFor="cep">CEP</Label>
             <Input
               id="cep"
-              value={formData.endereco_cep}
-              onChange={(e) => setFormData({...formData, endereco_cep: e.target.value})}
-              placeholder="00000-000"
-              maxLength={9}
+              value={locationData.endereco_cep}
+              onChange={(e) => handleInputChange('endereco_cep', e.target.value)}
+              placeholder="Ex: 01234-567"
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="rua">Rua</Label>
+            <Input
+              id="rua"
+              value={locationData.endereco_rua}
+              onChange={(e) => handleInputChange('endereco_rua', e.target.value)}
+              placeholder="Ex: Rua das Flores"
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="numero">Número</Label>
+            <Input
+              id="numero"
+              value={locationData.endereco_numero}
+              onChange={(e) => handleInputChange('endereco_numero', e.target.value)}
+              placeholder="Ex: 123"
+            />
+          </div>
+          
+          <div className="md:col-span-2">
+            <Label htmlFor="bairro">Bairro</Label>
+            <Input
+              id="bairro"
+              value={locationData.endereco_bairro}
+              onChange={(e) => handleInputChange('endereco_bairro', e.target.value)}
+              placeholder="Ex: Vila Madalena"
             />
           </div>
         </div>
 
-        <div className="flex gap-2">
-          <Button
-            onClick={getCurrentLocation}
-            variant="outline"
-            disabled={loading}
-            className="flex-1"
-          >
-            {loading ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <MapPin className="h-4 w-4 mr-2" />
+        {profile?.tipo === 'prestador' && (
+          <div className="border-t pt-4">
+            <h4 className="font-medium mb-2">Localização GPS (Recomendado para Prestadores)</h4>
+            <p className="text-sm text-gray-600 mb-3">
+              Permitir localização GPS ajuda clientes a encontrarem você mais facilmente.
+            </p>
+            <Button
+              onClick={getCurrentLocation}
+              disabled={loading}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Navigation className="h-4 w-4" />
+              )}
+              Obter Localização Atual
+            </Button>
+            {locationData.latitude && locationData.longitude && (
+              <p className="text-sm text-green-600 mt-2">
+                ✓ Coordenadas: {locationData.latitude.toFixed(6)}, {locationData.longitude.toFixed(6)}
+              </p>
             )}
-            Obter Localização Atual
-          </Button>
+          </div>
+        )}
 
-          <Button
-            onClick={handleSave}
-            disabled={loading}
-            className="flex-1"
-          >
-            {loading ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : null}
-            Salvar
+        <div className="flex justify-end pt-4">
+          <Button onClick={handleSave} disabled={loading}>
+            {loading ? 'Salvando...' : 'Salvar Localização'}
           </Button>
-        </div>
-
-        <div className="text-sm text-gray-600">
-          <p>
-            Suas informações de localização são usadas para conectá-lo com prestadores próximos.
-            Mantenha seus dados atualizados para uma melhor experiência.
-          </p>
         </div>
       </CardContent>
     </Card>

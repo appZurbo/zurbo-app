@@ -2,22 +2,23 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getPrestadores } from '@/utils/database/prestadores';
 import { UserProfile } from '@/types';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 
 interface UsePrestadoresFilters {
   cidade?: string;
-  servicos?: string[];
+  servico?: string;
   precoMin?: number;
   precoMax?: number;
   notaMin?: number;
+  servicos?: string[];
   apenasPremium?: boolean;
 }
 
 export const usePrestadores = () => {
-  console.log("🔍 usePrestadores hook called");
   const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const loadPrestadores = useCallback(async (filters: UsePrestadoresFilters = {}) => {
     setLoading(true);
@@ -41,12 +42,16 @@ export const usePrestadores = () => {
       console.error('❌ Error loading prestadores:', error);
       const errorMessage = 'Não foi possível carregar os prestadores';
       setError(errorMessage);
-      toast.error(errorMessage + ". Tente novamente.");
+      toast({
+        title: "Erro",
+        description: errorMessage + ". Tente novamente.",
+        variant: "destructive"
+      });
       setPrestadores([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   const filterByFavorites = useCallback((favoriteIds: string[]) => {
     return prestadores.filter(prestador => favoriteIds.includes(prestador.id));

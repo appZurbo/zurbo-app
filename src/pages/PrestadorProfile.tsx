@@ -10,8 +10,7 @@ import WatermarkSection from '@/components/sections/WatermarkSection';
 import { getUserProfile, getAvaliacoes, getPortfolioFotos } from '@/utils/database';
 import { CommentsList } from '@/components/profile/CommentsList';
 import { AddCommentDialog } from '@/components/profile/AddCommentDialog';
-import { toast } from "@/utils/toast";
-import { useMobile } from '@/hooks/useMobile';
+import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { 
   ArrowLeft,
@@ -34,7 +33,7 @@ import {
 export default function PrestadorProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const isMobile = useMobile();
+  const { toast } = useToast();
   const { isAuthenticated, profile: currentUser } = useAuth();
   const [prestador, setPrestador] = useState<any>(null);
   const [avaliacoes, setAvaliacoes] = useState<any[]>([]);

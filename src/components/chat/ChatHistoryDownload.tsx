@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, FileText } from 'lucide-react';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import { Chat, Message } from '@/utils/database/types';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -13,6 +13,7 @@ interface ChatHistoryDownloadProps {
 
 export const ChatHistoryDownload = ({ chat, messages }: ChatHistoryDownloadProps) => {
   const [isDownloading, setIsDownloading] = useState(false);
+  const { toast } = useToast();
 
   const downloadChatHistory = async () => {
     setIsDownloading(true);
@@ -91,10 +92,17 @@ Para mais informações, visite: https://zurbo.app
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
 
-      toast.success("O histórico da conversa foi baixado com sucesso.");
+      toast({
+        title: "Download realizado",
+        description: "O histórico da conversa foi baixado com sucesso.",
+      });
     } catch (error) {
       console.error('Error downloading chat history:', error);
-      toast.error("Não foi possível baixar o histórico da conversa.");
+      toast({
+        title: "Erro no download",
+        description: "Não foi possível baixar o histórico da conversa.",
+        variant: "destructive"
+      });
     } finally {
       setIsDownloading(false);
     }

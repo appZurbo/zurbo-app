@@ -122,7 +122,7 @@ const PrestadorSettingsImproved = () => {
                     Para editar informações básicas do perfil, use a página de configurações principal.
                   </p>
                   <Button 
-                    onClick={() => navigate('/settings')}
+                    onClick={() => navigate('/prestador-settings')}
                     className="bg-orange-500 hover:bg-orange-600"
                   >
                     Ir para Configurações Básicas

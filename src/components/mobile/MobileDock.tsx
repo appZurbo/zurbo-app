@@ -42,7 +42,7 @@ const MobileDock = () => {
       icon: User,
       label: 'Perfil',
       path: isAuthenticated 
-        ? '/settings'
+        ? (isPrestador ? '/configuracoes' : '/configuracoes') 
         : '/auth'
     }
   ];

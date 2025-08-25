@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MapPin, User, Mail, FileText, Camera } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import { UserProfile } from '@/types';
 
 // Using centralized UserProfile type from @/types
@@ -17,7 +17,7 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState<Partial<UserProfile>>({});
-  
+  const { toast } = useToast();
 
   useEffect(() => {
     loadProfile();
@@ -45,7 +45,11 @@ const ProfilePage = () => {
       setProfile(profileData);
       setFormData(profileData);
     } catch (error: any) {
-      toast.error(error.message);
+      toast({
+        title: "Erro ao carregar perfil",
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -66,9 +70,16 @@ const ProfilePage = () => {
       setProfile({ ...profile, ...formData });
       setEditing(false);
       
-      toast.success("Suas informações foram salvas com sucesso.");
+      toast({
+        title: "Perfil atualizado!",
+        description: "Suas informações foram salvas com sucesso.",
+      });
     } catch (error: any) {
-      toast.error(error.message);
+      toast({
+        title: "Erro ao atualizar perfil",
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }

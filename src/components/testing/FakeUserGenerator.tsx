@@ -3,11 +3,12 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from "@/utils/toast";
+import { useToast } from '@/hooks/use-toast';
 import { Users, Loader2 } from 'lucide-react';
 
 export const FakeUserGenerator = () => {
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const fakeUsers = {
     clients: [

@@ -14,17 +14,20 @@ import { EmergencyButton } from '@/components/emergency/EmergencyButton';
 import WatermarkSection from '@/components/sections/WatermarkSection';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { getPrestadores } from '@/utils/database/prestadores';
+import { getServicos } from '@/utils/database/servicos';
 import { UserProfile } from '@/utils/database/types';
-import { toast } from "@/utils/toast";
+import { useToast } from '@/hooks/use-toast';
 import { useMobile } from '@/hooks/useMobile';
 import { useAuth } from '@/hooks/useAuth';
 
 const PrestadoresPage = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const isMobile = useMobile();
   const { isAuthenticated } = useAuth();
 
   const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
+  const [servicos, setServicos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -44,8 +47,21 @@ const PrestadoresPage = () => {
   const ITEMS_PER_PAGE = 5;
 
   useEffect(() => {
+    loadInitialData();
+  }, []);
+
+  useEffect(() => {
     loadPrestadores(true);
   }, [filters]);
+
+  const loadInitialData = async () => {
+    try {
+      const servicosData = await getServicos();
+      setServicos(servicosData);
+    } catch (error) {
+      console.error('Error loading initial data:', error);
+    }
+  };
 
   const loadPrestadores = async (reset = false) => {
     if (reset) {
@@ -77,7 +93,11 @@ const PrestadoresPage = () => {
       }
     } catch (error) {
       console.error('Error loading prestadores:', error);
-      toast.error("Não foi possível carregar os prestadores.");
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar os prestadores.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -104,20 +124,13 @@ const PrestadoresPage = () => {
     setFilters(newFilters);
   };
 
-  const handleCategorySelect = (serviceIds: string[]) => {
+  const handleServiceSelect = (servicoId: string) => {
     const currentServicos = filters.servicos;
+    const isSelected = currentServicos.includes(servicoId);
     
-    // Check if any of the category's services are already selected
-    const hasSelectedServices = serviceIds.some(id => currentServicos.includes(id));
-    
-    let newServicos: string[];
-    if (hasSelectedServices) {
-      // Remove all services from this category
-      newServicos = currentServicos.filter(id => !serviceIds.includes(id));
-    } else {
-      // Add all services from this category
-      newServicos = [...currentServicos, ...serviceIds];
-    }
+    const newServicos = isSelected 
+      ? currentServicos.filter(id => id !== servicoId)
+      : [...currentServicos, servicoId];
     
     setFilters(prev => ({
       ...prev,
@@ -127,10 +140,9 @@ const PrestadoresPage = () => {
 
   return (
     <UnifiedLayout>
-      {/* Centralized container matching header width */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-[16px]">
         {/* Header */}
-        <div className="flex items-center justify-between gap-4 mb-6 py-4">
+        <div className="flex items-center justify-between gap-4 mb-6 my-0 py-[13px]">
           <div className="flex-1">
             <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
               Prestadores de Serviços
@@ -155,15 +167,16 @@ const PrestadoresPage = () => {
           </div>
         )}
 
-        {/* Service Categories Section */}
+        {/* Service Shortcuts Section */}
         <ServiceShortcutsSection
-          onCategorySelect={handleCategorySelect}
+          servicos={servicos}
+          onServiceSelect={handleServiceSelect}
           selectedServices={filters.servicos}
         />
 
         {/* Filtros */}
         <div className="mb-8">
-          <ModernFilters onFiltersChange={handleFiltersChange} />
+          <ModernFilters onFiltersChange={handleFiltersChange} servicos={servicos} />
         </div>
 
         {/* Premium/Highlight Section */}

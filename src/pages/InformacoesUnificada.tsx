@@ -4,16 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Shield, FileText, Users, HelpCircle, Target, Heart, Lightbulb } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
+import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useMobile } from '@/hooks/useMobile';
-import AuthButton from '@/components/auth/AuthModalHelper';
+import { UnifiedDock } from '@/components/mobile/UnifiedDock';
 
 const InformacoesUnificada = () => {
   const navigate = useNavigate();
   const isMobile = useMobile();
 
   return (
-    <UnifiedLayout>
+    <div>
+      <UnifiedHeader />
+      <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
         <div className={`${isMobile ? 'px-4 py-4' : 'max-w-4xl mx-auto p-6'}`}>
           <div className="flex items-center gap-4 mb-6">
             <Button variant="ghost" onClick={() => navigate('/')} className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}>
@@ -137,12 +139,12 @@ const InformacoesUnificada = () => {
                     <div className="text-center">
                       <h3 className="text-xl font-semibold mb-4">Faça parte da nossa comunidade</h3>
                       <div className="flex gap-4 justify-center">
-                        <AuthButton className="bg-orange-500 hover:bg-orange-600">
+                        <Button onClick={() => navigate('/auth')} className="bg-orange-500 hover:bg-orange-600">
                           Cadastre-se como Cliente
-                        </AuthButton>
-                        <AuthButton variant="outline">
+                        </Button>
+                        <Button variant="outline" onClick={() => navigate('/auth')}>
                           Seja um Prestador
-                        </AuthButton>
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -305,7 +307,9 @@ const InformacoesUnificada = () => {
             </CardContent>
           </Card>
         </div>
-    </UnifiedLayout>
+      </div>
+      {isMobile && <UnifiedDock />}
+    </div>
   );
 };
 

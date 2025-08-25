@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from "@/utils/toast";
+import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 
 export interface StripeAccount {
@@ -15,6 +15,7 @@ export interface StripeAccount {
 
 export const useStripeConnect = () => {
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
   const { user } = useAuth();
 
   const createStripeAccount = useCallback(async () => {

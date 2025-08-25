@@ -9,11 +9,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
+import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useMobile } from '@/hooks/useMobile';
-import { toast } from "@/utils/toast";
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import AuthButton from '@/components/auth/AuthModalHelper';
 import { 
   ArrowLeft, 
   Calendar as CalendarIcon, 
@@ -55,6 +54,7 @@ const AgendaPrestador = () => {
   const navigate = useNavigate();
   const { profile, loading: authLoading } = useAuth();
   const isMobile = useMobile();
+  const { toast } = useToast();
   
   const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
   const [loading, setLoading] = useState(true);
@@ -225,7 +225,8 @@ const AgendaPrestador = () => {
 
   if (authLoading) {
     return (
-      <UnifiedLayout>
+      <div>
+        <UnifiedHeader />
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-orange-500 rounded-xl flex items-center justify-center animate-pulse">
@@ -234,13 +235,14 @@ const AgendaPrestador = () => {
             <p className="text-gray-600">Carregando agenda...</p>
           </div>
         </div>
-      </UnifiedLayout>
+      </div>
     );
   }
 
   if (!profile || profile.tipo !== 'prestador') {
     return (
-      <UnifiedLayout>
+      <div>
+        <UnifiedHeader />
         <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="w-full max-w-md">
             <CardContent className="p-6 text-center">
@@ -248,18 +250,19 @@ const AgendaPrestador = () => {
               <p className="text-gray-600 mb-4">
                 Apenas prestadores podem acessar a agenda.
               </p>
-              <AuthButton className="w-full">
+              <Button onClick={() => navigate('/auth')} className="w-full">
                 Fazer Login
-              </AuthButton>
+              </Button>
             </CardContent>
           </Card>
         </div>
-      </UnifiedLayout>
+      </div>
     );
   }
 
   return (
-    <UnifiedLayout>
+    <div>
+      <UnifiedHeader />
       <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
         <div className={`${isMobile ? 'px-4 py-4' : 'max-w-6xl mx-auto p-6'}`}>
           {/* Header */}
@@ -621,7 +624,7 @@ const AgendaPrestador = () => {
           )}
         </div>
       </div>
-    </UnifiedLayout>
+    </div>
   );
 };
 

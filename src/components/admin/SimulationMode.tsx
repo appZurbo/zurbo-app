@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, User, UserCheck, AlertTriangle } from 'lucide-react';
 
 interface SimulationModeProps {
@@ -16,6 +16,7 @@ export const SimulationMode = ({ onSimulationChange }: SimulationModeProps) => {
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulatedRole, setSimulatedRole] = useState('cliente');
   const [isOpen, setIsOpen] = useState(false);
+  const { toast } = useToast();
 
   const roleOptions = [
     { value: 'cliente', label: 'Cliente', icon: User },
@@ -26,13 +27,19 @@ export const SimulationMode = ({ onSimulationChange }: SimulationModeProps) => {
     setIsSimulating(true);
     onSimulationChange(true, simulatedRole);
     setIsOpen(false);
-    toast.success(`Modo simulação ativado - ${roleOptions.find(r => r.value === simulatedRole)?.label}`);
+    toast({
+      title: "Modo simulação ativado",
+      description: `Agora você está vendo a plataforma como ${roleOptions.find(r => r.value === simulatedRole)?.label}`,
+    });
   };
 
   const handleStopSimulation = () => {
     setIsSimulating(false);
     onSimulationChange(false);
-    toast.success("Modo simulação desativado - Voltou à visualização de administrador");
+    toast({
+      title: "Modo simulação desativado",
+      description: "Voltou à visualização de administrador",
+    });
   };
 
   if (isSimulating) {

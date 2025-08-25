@@ -12,12 +12,13 @@ import { useMobile } from '@/hooks/useMobile';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart as RechartsPieChart, Cell, Pie } from 'recharts';
 import { CreateTestData } from '@/components/admin/CreateTestData';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from "@/utils/toast";
+import { useToast } from '@/hooks/use-toast';
 
 const Relatorios = () => {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
   const isMobile = useMobile();
+  const { toast } = useToast();
   const [timeRange, setTimeRange] = useState('30');
 
   const [stats, setStats] = useState({
@@ -68,7 +69,11 @@ const Relatorios = () => {
 
     } catch (error) {
       console.error('Error loading stats:', error);
-      toast.error("Não foi possível carregar as estatísticas.");
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar as estatísticas.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -111,7 +116,7 @@ const Relatorios = () => {
   const handleKpiClick = (type: string) => {
     switch (type) {
       case 'users':
-        navigate('/admin/users');
+        navigate('/admin/usuarios');
         break;
       case 'providers':
         navigate('/admin/prestadores');
@@ -251,7 +256,7 @@ const Relatorios = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Button
-                  onClick={() => navigate('/admin/users')}
+                  onClick={() => navigate('/admin/usuarios')}
                   variant="outline"
                   className="justify-start h-12"
                 >

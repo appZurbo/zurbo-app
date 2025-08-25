@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Bell } from 'lucide-react';
@@ -29,7 +29,7 @@ export const NotificationSettings = () => {
   });
   const [loading, setLoading] = useState(false);
   const { profile } = useAuth();
-  
+  const { toast } = useToast();
 
   useEffect(() => {
     if (profile) {
@@ -79,10 +79,17 @@ export const NotificationSettings = () => {
 
       if (error) throw error;
 
-      toast.success("Suas configurações de notificação foram atualizadas.");
+      toast({
+        title: "Preferências salvas!",
+        description: "Suas configurações de notificação foram atualizadas.",
+      });
     } catch (error: any) {
       console.error('Error saving preferences:', error);
-      toast.error("Não foi possível salvar suas preferências.");
+      toast({
+        title: "Erro",
+        description: "Não foi possível salvar suas preferências.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }

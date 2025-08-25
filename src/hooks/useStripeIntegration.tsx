@@ -2,7 +2,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from "@/utils/toast";
+import { useToast } from '@/hooks/use-toast';
 
 export interface StripeSubscription {
   id: string;
@@ -16,6 +16,7 @@ export const useStripeIntegration = () => {
   const [loading, setLoading] = useState(false);
   const [subscription, setSubscription] = useState<StripeSubscription | null>(null);
   const { profile } = useAuth();
+  const { toast } = useToast();
 
   const createCheckoutSession = useCallback(async (priceId: string) => {
     if (!profile) {

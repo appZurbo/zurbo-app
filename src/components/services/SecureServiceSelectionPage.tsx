@@ -6,7 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from "@/utils/toast";
+import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { Wrench, Heart, Bolt, Brush, Shield, AlertCircle } from 'lucide-react';
 
@@ -25,6 +25,7 @@ const SecureServiceSelectionPage = ({ onComplete }: { onComplete: () => void }) 
   const [services, setServices] = useState<ServiceWithPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const { toast } = useToast();
   const { profile, isPrestador } = useAuth();
 
   useEffect(() => {

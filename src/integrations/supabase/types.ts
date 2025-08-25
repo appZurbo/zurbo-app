@@ -802,93 +802,6 @@ export type Database = {
           },
         ]
       }
-      legal_acceptances: {
-        Row: {
-          accepted_at: string
-          created_at: string
-          doc_id: string
-          doc_type: string
-          hash: string
-          id: string
-          ip_address: unknown | null
-          user_agent: string | null
-          user_id: string
-          version: string
-        }
-        Insert: {
-          accepted_at?: string
-          created_at?: string
-          doc_id: string
-          doc_type: string
-          hash: string
-          id?: string
-          ip_address?: unknown | null
-          user_agent?: string | null
-          user_id: string
-          version: string
-        }
-        Update: {
-          accepted_at?: string
-          created_at?: string
-          doc_id?: string
-          doc_type?: string
-          hash?: string
-          id?: string
-          ip_address?: unknown | null
-          user_agent?: string | null
-          user_id?: string
-          version?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "legal_acceptances_doc_id_fkey"
-            columns: ["doc_id"]
-            isOneToOne: false
-            referencedRelation: "legal_documents"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "legal_acceptances_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      legal_documents: {
-        Row: {
-          active: boolean
-          content: string
-          created_at: string
-          doc_type: string
-          id: string
-          summary: string
-          updated_at: string
-          version: string
-        }
-        Insert: {
-          active?: boolean
-          content: string
-          created_at?: string
-          doc_type: string
-          id?: string
-          summary: string
-          updated_at?: string
-          version: string
-        }
-        Update: {
-          active?: boolean
-          content?: string
-          created_at?: string
-          doc_type?: string
-          id?: string
-          summary?: string
-          updated_at?: string
-          version?: string
-        }
-        Relationships: []
-      }
       messages: {
         Row: {
           chat_id: string | null
@@ -1200,63 +1113,6 @@ export type Database = {
             columns: ["servico_id"]
             isOneToOne: false
             referencedRelation: "servicos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      provider_verifications: {
-        Row: {
-          bank_status: string
-          created_at: string
-          document_url: string | null
-          id: string
-          notes: string | null
-          reviewed_at: string | null
-          reviewed_by: string | null
-          selfie_url: string | null
-          status: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          bank_status?: string
-          created_at?: string
-          document_url?: string | null
-          id?: string
-          notes?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          selfie_url?: string | null
-          status?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          bank_status?: string
-          created_at?: string
-          document_url?: string | null
-          id?: string
-          notes?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          selfie_url?: string | null
-          status?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "provider_verifications_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "provider_verifications_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -1791,10 +1647,6 @@ export type Database = {
       get_current_user_id: {
         Args: Record<PropertyKey, never>
         Returns: string
-      }
-      is_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
       }
       is_email_allowed: {
         Args: { email_to_check: string }

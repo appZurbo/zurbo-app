@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Upload, X, Image } from 'lucide-react';
@@ -22,7 +22,7 @@ export const PortfolioUpload = () => {
   const [uploading, setUploading] = useState(false);
   const [editingImage, setEditingImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+  const { toast } = useToast();
   const { profile } = useAuth();
 
   useEffect(() => {
@@ -86,10 +86,17 @@ export const PortfolioUpload = () => {
         setImages(prev => [...prev, data]);
       }
 
-      toast.success("Suas fotos foram adicionadas ao portfólio.");
+      toast({
+        title: "Imagens enviadas!",
+        description: "Suas fotos foram adicionadas ao portfólio.",
+      });
     } catch (error: any) {
       console.error('Error uploading images:', error);
-      toast.error(error.message || "Erro no upload");
+      toast({
+        title: "Erro no upload",
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
       setUploading(false);
       if (fileInputRef.current) {
@@ -113,10 +120,17 @@ export const PortfolioUpload = () => {
         )
       );
 
-      toast.success("As informações da imagem foram salvas.");
+      toast({
+        title: "Informações atualizadas!",
+        description: "As informações da imagem foram salvas.",
+      });
     } catch (error: any) {
       console.error('Error updating image info:', error);
-      toast.error(error.message);
+      toast({
+        title: "Erro",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -131,10 +145,17 @@ export const PortfolioUpload = () => {
 
       setImages(prev => prev.filter(img => img.id !== id));
 
-      toast.success("A imagem foi removida do seu portfólio.");
+      toast({
+        title: "Imagem removida",
+        description: "A imagem foi removida do seu portfólio.",
+      });
     } catch (error: any) {
       console.error('Error deleting image:', error);
-      toast.error(error.message);
+      toast({
+        title: "Erro",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 

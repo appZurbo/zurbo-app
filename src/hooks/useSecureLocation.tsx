@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { toast } from "@/utils/toast";
+import { useToast } from '@/hooks/use-toast';
 
 interface LocationState {
   latitude: number | null;
@@ -16,6 +16,7 @@ export const useSecureLocation = () => {
     hasPermission: null,
     isLoading: false,
   });
+  const { toast } = useToast();
 
   const requestLocation = useCallback((onConsentGranted?: () => void) => {
     setLocationState(prev => ({ ...prev, isLoading: true }));

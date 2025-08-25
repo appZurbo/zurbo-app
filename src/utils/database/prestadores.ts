@@ -49,7 +49,7 @@ export const getPrestadores = async (filters?: {
     let query = supabase
       .from('users')
       .select(`
-        id, nome, tipo, foto_url, endereco_cidade, nota_media, premium, descricao_servico, criado_em,
+        *,
         prestador_servicos (
           servico_id,
           preco_min,
@@ -208,7 +208,7 @@ export const getPrestadoresPremiumDestaque = async (): Promise<UserProfile[]> =>
     const { data: premiumData, error: premiumError } = await supabase
       .from('users')
       .select(`
-        id, nome, tipo, foto_url, endereco_cidade, nota_media, premium, descricao_servico, criado_em,
+        *,
         prestador_servicos (
           servico_id,
           preco_min,
@@ -232,7 +232,7 @@ export const getPrestadoresPremiumDestaque = async (): Promise<UserProfile[]> =>
     const { data: topRatedData, error: topRatedError } = await supabase
       .from('users')
       .select(`
-        id, nome, tipo, foto_url, endereco_cidade, nota_media, premium, descricao_servico, criado_em,
+        *,
         prestador_servicos (
           servico_id,
           preco_min,

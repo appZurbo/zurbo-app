@@ -30,7 +30,6 @@ import { ptBR } from 'date-fns/locale';
 import { useOnDutyStatus } from '@/hooks/useOnDutyStatus';
 import { Switch } from '@/components/ui/switch';
 import { Activity } from 'lucide-react';
-import { FinancialSection } from '@/components/financial/FinancialSection';
 
 interface DashboardStats {
   pedidosAtivos: number;
@@ -473,11 +472,6 @@ const PrestadorDashboard = () => {
                 </div>
               </CardContent>
             </Card>
-          </div>
-
-          {/* Financial Section */}
-          <div className="mb-6">
-            <FinancialSection />
           </div>
 
           {/* Calendar Summary and Quick Actions */}

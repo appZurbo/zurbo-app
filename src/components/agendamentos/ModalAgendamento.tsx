@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, Clock } from 'lucide-react';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { criarAgendamento } from '@/utils/database/agendamentos';
 
@@ -34,6 +34,7 @@ const ModalAgendamento = ({
     dataAgendada: '',
     horaAgendada: ''
   });
+  const { toast } = useToast();
   const { isAuthenticated } = useAuth();
 
   const horariosDisponiveis = [
@@ -46,12 +47,20 @@ const ModalAgendamento = ({
     e.preventDefault();
     
     if (!isAuthenticated) {
-      toast.error("Faça login para agendar serviços");
+      toast({
+        title: "Login necessário",
+        description: "Faça login para agendar serviços",
+        variant: "destructive",
+      });
       return;
     }
 
     if (!formData.servicoId || !formData.dataAgendada || !formData.horaAgendada) {
-      toast.error("Preencha todos os campos obrigatórios");
+      toast({
+        title: "Dados incompletos",
+        description: "Preencha todos os campos obrigatórios",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -65,7 +74,10 @@ const ModalAgendamento = ({
       });
 
       if (agendamento) {
-        toast.success(`Agendamento criado! Solicitação enviada para ${prestadorNome}`);
+        toast({
+          title: "Agendamento criado!",
+          description: `Solicitação enviada para ${prestadorNome}`,
+        });
         setOpen(false);
         setFormData({
           servicoId: '',
@@ -76,7 +88,11 @@ const ModalAgendamento = ({
         throw new Error('Falha ao criar agendamento');
       }
     } catch (error) {
-      toast.error("Erro ao criar agendamento. Tente novamente.");
+      toast({
+        title: "Erro ao agendar",
+        description: "Erro ao criar agendamento. Tente novamente.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }

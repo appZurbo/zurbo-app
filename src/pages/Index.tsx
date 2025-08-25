@@ -17,21 +17,15 @@ import { PrestadorGrid } from '@/components/homepage/PrestadorGrid';
 import { EmptyState } from '@/components/homepage/EmptyState';
 
 const Index = () => {
-  console.log("🔍 Index component started");
   const [selectedPrestador, setSelectedPrestador] = useState<UserProfile | null>(null);
-  console.log("🔍 useState 1 completed");
   const [showProfileModal, setShowProfileModal] = useState(false);
-  console.log("🔍 useState 2 completed");
   const [showContactModal, setShowContactModal] = useState(false);
-  console.log("🔍 useState 3 completed");
   const navigate = useNavigate();
-  console.log("🔍 useNavigate completed, calling useHomepage...");
 
   const {
     prestadores,
     loading,
     error,
-    filters,
     showFavoritesOnly,
     isAuthenticated,
     handleFiltersChange,
@@ -49,12 +43,9 @@ const Index = () => {
     setShowProfileModal(true);
   };
 
-  const handleCategorySelect = (serviceIds: string[]) => {
-    console.log('📂 Services selected:', serviceIds);
-    handleFiltersChange({
-      ...filters,
-      servico: serviceIds[0] // Use first selected service
-    });
+  const handleCategorySelect = (categoryId: string) => {
+    console.log('📂 Category selected:', categoryId);
+    navigate(`/prestadores?servico=${categoryId}`);
   };
 
   return (
@@ -64,14 +55,13 @@ const Index = () => {
           <HeroDemo />
           
           <div className="max-w-7xl mx-auto px-[30px] py-[15px]">
-            {/* ServiceCategories now serves as the main interactive element replacing banners */}
             <ErrorBoundary>
               <ServiceCategories onCategorySelect={handleCategorySelect} />
             </ErrorBoundary>
             
             <div className="mt-12">
               <ErrorBoundary>
-                <ModernFilters onFiltersChange={handleFiltersChange} />
+                <ModernFilters onFiltersChange={handleFiltersChange} servicos={[]} />
               </ErrorBoundary>
             </div>
 
@@ -91,8 +81,9 @@ const Index = () => {
                   onClearFilters={() => handleFiltersChange({
                     cidade: '',
                     servico: '',
-                    priceRange: undefined,
-                    rating: undefined
+                    precoMin: undefined,
+                    precoMax: undefined,
+                    notaMin: undefined
                   })}
                   onShowAll={() => toggleFavoritesOnly()}
                 />

@@ -5,13 +5,13 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from "@/utils/toast";
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useMobile } from '@/hooks/useMobile';
 
 export const NotificationTab = () => {
   const { profile } = useAuth();
-  
+  const { toast } = useToast();
   const isMobile = useMobile();
   const [notificationSettings, setNotificationSettings] = useState({
     email_novos_pedidos: true,

@@ -6,16 +6,21 @@ import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, Phone, Crown } from 'lucide-react';
 import { useSOSLimits } from '@/hooks/useSOSLimits';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 
 export const EnhancedEmergencyButton = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const { sosUsage, loading, canUseSOS, useSOS } = useSOSLimits();
   const { profile } = useAuth();
+  const { toast } = useToast();
 
   const handleEmergencyCall = async () => {
     if (!canUseSOS()) {
-      toast.error("Você atingiu o limite mensal de chamadas SOS.");
+      toast({
+        title: "Limite atingido",
+        description: "Você atingiu o limite mensal de chamadas SOS.",
+        variant: "destructive"
+      });
       return;
     }
 
@@ -24,7 +29,10 @@ export const EnhancedEmergencyButton = () => {
       setShowConfirm(false);
       
       // Simulate emergency call
-      toast.success("Sua solicitação de emergência foi enviada!");
+      toast({
+        title: "SOS Ativado",
+        description: "Sua solicitação de emergência foi enviada!",
+      });
       
       // Here you would integrate with actual emergency services
       console.log('Emergency SOS activated for user:', profile?.id);

@@ -20,13 +20,14 @@ import { useAuth } from '@/hooks/useAuth';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useMobile } from '@/hooks/useMobile';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from "@/utils/toast";
+import { useToast } from '@/hooks/use-toast';
 import { UserProfile } from '@/types';
 
 const UserManagement = () => {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
   const isMobile = useMobile();
+  const { toast } = useToast();
   
   const [usuarios, setUsuarios] = useState<UserProfile[]>([]);
   const [prestadores, setPrestadores] = useState<UserProfile[]>([]);
@@ -50,7 +51,11 @@ const UserManagement = () => {
       setPrestadores(providers as UserProfile[] || []);
     } catch (error: any) {
       console.error('Erro ao carregar usuários:', error);
-      toast.error(`Erro ao carregar usuários: ${error.message}`);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar a lista de usuários.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
@@ -71,11 +76,18 @@ const UserManagement = () => {
 
       if (error) throw error;
 
-      toast.success("Usuário banido - O usuário foi banido com sucesso.");
+      toast({
+        title: "Usuário banido",
+        description: "O usuário foi banido com sucesso."
+      });
       
       loadUsers();
     } catch (error: any) {
-      toast.error("Não foi possível banir o usuário.");
+      toast({
+        title: "Erro",
+        description: "Não foi possível banir o usuário.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -88,11 +100,18 @@ const UserManagement = () => {
 
       if (error) throw error;
 
-      toast.success("Usuário reativado - O usuário foi reativado com sucesso.");
+      toast({
+        title: "Usuário reativado",
+        description: "O usuário foi reativado com sucesso."
+      });
       
       loadUsers();
     } catch (error: any) {
-      toast.error("Não foi possível reativar o usuário.");
+      toast({
+        title: "Erro",
+        description: "Não foi possível reativar o usuário.",
+        variant: "destructive"
+      });
     }
   };
 

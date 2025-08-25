@@ -25,8 +25,7 @@ import {
   FileText,
   Shield,
   Users,
-  Clock,
-  Star
+  Clock
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Badge } from '@/components/ui/badge';
@@ -193,13 +192,6 @@ export const UnifiedHeader = () => {
                     <span>Informações</span>
                   </DropdownMenuItem>
 
-                  {profile?.premium && (
-                    <DropdownMenuItem onClick={() => navigate('/premium-overview')}>
-                      <Star className="mr-2 h-4 w-4" />
-                      <span>Plano PRO</span>
-                    </DropdownMenuItem>
-                  )}
-
                   {isAdmin && (
                     <>
                       <DropdownMenuSeparator />
@@ -208,7 +200,7 @@ export const UnifiedHeader = () => {
                         <span>Painel Administrativo</span>
                       </DropdownMenuItem>
                       
-                      <DropdownMenuItem onClick={() => navigate('/admin/users')}>
+                      <DropdownMenuItem onClick={() => navigate('/admin/usuarios')}>
                         <Users className="mr-2 h-4 w-4" />
                         <span>Gerenciar Usuários</span>
                       </DropdownMenuItem>

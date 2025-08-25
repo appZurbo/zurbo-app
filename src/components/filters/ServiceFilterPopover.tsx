@@ -1,40 +1,23 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
-import { ChevronDown, X, Check } from 'lucide-react';
-import { getServiceIcon } from '@/config/serviceCategories';
-import { getServicos } from '@/utils/database/servicos';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ChevronDown, X } from 'lucide-react';
 
 interface ServiceFilterPopoverProps {
+  servicos: Array<{ id: string; nome: string; icone?: string }>;
   selectedServices: string[];
   onSelectionChange: (services: string[]) => void;
 }
 
 export const ServiceFilterPopover: React.FC<ServiceFilterPopoverProps> = ({
+  servicos,
   selectedServices,
   onSelectionChange
 }) => {
   const [open, setOpen] = useState(false);
-  const [servicos, setServicos] = useState<Array<{ id: string; nome: string; icone?: string }>>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadServicos();
-  }, []);
-
-  const loadServicos = async () => {
-    try {
-      console.log('🔄 ServiceFilterPopover: Loading services from database...');
-      const servicosData = await getServicos();
-      console.log(`✅ ServiceFilterPopover: Loaded ${servicosData.length} active services`);
-      setServicos(servicosData);
-    } catch (error) {
-      console.error('❌ ServiceFilterPopover: Error loading services:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleServiceToggle = (servicoId: string) => {
     const newSelection = selectedServices.includes(servicoId)
@@ -49,14 +32,6 @@ export const ServiceFilterPopover: React.FC<ServiceFilterPopoverProps> = ({
   };
 
   const selectedCount = selectedServices.length;
-
-  if (loading) {
-    return (
-      <Button variant="outline" size="sm" disabled>
-        Carregando...
-      </Button>
-    );
-  }
 
   return (
     <div className="flex items-center gap-2">
@@ -97,32 +72,22 @@ export const ServiceFilterPopover: React.FC<ServiceFilterPopoverProps> = ({
               )}
             </div>
             
-            <div className="space-y-2 max-h-60 overflow-y-auto">
-              {servicos.map((servico) => {
-                const iconConfig = getServiceIcon(servico.nome);
-                const IconComponent = iconConfig.icon;
-                const isSelected = selectedServices.includes(servico.id);
-                
-                return (
-                  <div
-                    key={servico.id}
-                    className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${
-                      isSelected 
-                        ? 'bg-orange-50 border border-orange-200' 
-                        : 'hover:bg-gray-50'
-                    }`}
-                    onClick={() => handleServiceToggle(servico.id)}
+            <div className="max-h-64 overflow-y-auto space-y-2">
+              {servicos.map((servico) => (
+                <div key={servico.id} className="flex items-center space-x-3">
+                  <Checkbox
+                    id={servico.id}
+                    checked={selectedServices.includes(servico.id)}
+                    onCheckedChange={() => handleServiceToggle(servico.id)}
+                  />
+                  <label
+                    htmlFor={servico.id}
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1"
                   >
-                    <div className={`w-8 h-8 rounded-lg ${iconConfig.bgColor} flex items-center justify-center`}>
-                      <IconComponent className={`w-4 h-4 ${iconConfig.color}`} />
-                    </div>
-                    <span className="flex-1 text-sm">{servico.nome}</span>
-                    {isSelected && (
-                      <Check className="w-4 h-4 text-orange-600" />
-                    )}
-                  </div>
-                );
-              })}
+                    {servico.nome}
+                  </label>
+                </div>
+              ))}
             </div>
 
             {selectedCount > 0 && (

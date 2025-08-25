@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Download, FileText, Database, FileSpreadsheet } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 
 interface ExportControlsProps {
   data: any[];
@@ -13,6 +13,7 @@ interface ExportControlsProps {
 
 export const ExportControls = ({ data, filename }: ExportControlsProps) => {
   const [exportFormat, setExportFormat] = useState('csv');
+  const { toast } = useToast();
 
   const downloadFile = (content: string, filename: string, type: string) => {
     const blob = new Blob([content], { type });
@@ -41,13 +42,13 @@ export const ExportControls = ({ data, filename }: ExportControlsProps) => {
     ].join('\n');
     
     downloadFile(csvContent, `${filename}.csv`, 'text/csv');
-    toast.success("Exportação concluída - Arquivo CSV baixado com sucesso");
+    toast({ title: "Exportação concluída", description: "Arquivo CSV baixado com sucesso" });
   };
 
   const exportJSON = () => {
     const jsonContent = JSON.stringify(data, null, 2);
     downloadFile(jsonContent, `${filename}.json`, 'application/json');
-    toast.success("Exportação concluída - Arquivo JSON baixado com sucesso");
+    toast({ title: "Exportação concluída", description: "Arquivo JSON baixado com sucesso" });
   };
 
   const exportExcel = () => {
@@ -63,7 +64,7 @@ export const ExportControls = ({ data, filename }: ExportControlsProps) => {
     ].join('\n');
     
     downloadFile(tsvContent, `${filename}.xls`, 'application/vnd.ms-excel');
-    toast.success("Exportação concluída - Arquivo Excel baixado com sucesso");
+    toast({ title: "Exportação concluída", description: "Arquivo Excel baixado com sucesso" });
   };
 
   const handleExport = () => {
