@@ -1,22 +1,17 @@
-const CACHE_NAME = 'zurbo-v1';
-const STATIC_CACHE_URLS = [
-  '/',
-  '/manifest.json',
-  '/placeholder.svg'
-];
+const CACHE_NAME = 'zurbo-v66-nocache';
 
-// Install event
+// Install event - FORCE CLEAR ALL CACHES
 self.addEventListener('install', (event) => {
-  console.log('Service Worker installing');
+  console.log('🚨 Service Worker v66 - CLEARING ALL CACHES');
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Caching static assets');
-        return cache.addAll(STATIC_CACHE_URLS);
-      })
-      .catch((error) => {
-        console.log('Cache installation failed:', error);
-      })
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          console.log('🗑️ FORCE DELETING CACHE:', cacheName);
+          return caches.delete(cacheName);
+        })
+      );
+    })
   );
   self.skipWaiting();
 });
@@ -39,55 +34,13 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch event - Network First strategy for API calls, Cache First for static assets
+// Fetch event - NO CACHING AT ALL
 self.addEventListener('fetch', (event) => {
-  const { request } = event;
-  const url = new URL(request.url);
-  
-  // Skip cross-origin requests
-  if (url.origin !== location.origin) {
-    return;
-  }
-  
-  // Network First for API calls
-  if (request.url.includes('/api/') || request.url.includes('supabase')) {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          // Clone response for cache
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, responseClone);
-          });
-          return response;
-        })
-        .catch(() => {
-          // Fallback to cache if network fails
-          return caches.match(request);
-        })
-    );
-    return;
-  }
-  
-  // Cache First for static assets
+  console.log('🚫 SW v66: NO CACHE - Direct network request for:', event.request.url);
+  // Always fetch from network, never cache
   event.respondWith(
-    caches.match(request)
-      .then((cachedResponse) => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-        
-        return fetch(request)
-          .then((response) => {
-            // Only cache successful responses
-            if (response.status === 200) {
-              const responseClone = response.clone();
-              caches.open(CACHE_NAME).then((cache) => {
-                cache.put(request, responseClone);
-              });
-            }
-            return response;
-          });
-      })
+    fetch(event.request).catch(() => {
+      return new Response('Network error', { status: 503 });
+    })
   );
 });
