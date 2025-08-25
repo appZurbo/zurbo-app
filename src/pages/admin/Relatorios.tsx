@@ -116,7 +116,7 @@ const Relatorios = () => {
   const handleKpiClick = (type: string) => {
     switch (type) {
       case 'users':
-        navigate('/admin/usuarios');
+        navigate('/admin/users');
         break;
       case 'providers':
         navigate('/admin/prestadores');
@@ -256,7 +256,7 @@ const Relatorios = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Button
-                  onClick={() => navigate('/admin/usuarios')}
+                  onClick={() => navigate('/admin/users')}
                   variant="outline"
                   className="justify-start h-12"
                 >

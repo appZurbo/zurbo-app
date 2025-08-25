@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,6 +11,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Eye, EyeOff, Mail, Lock, Phone, User, FileText } from 'lucide-react';
+import { fetchActiveLegalDocument, mapUserTipoToDocType, savePendingAcceptance, type LegalDocument } from '@/utils/legal';
 
 interface EnhancedRegisterFormProps {
   onSuccess: () => void;
@@ -33,26 +33,42 @@ export const EnhancedRegisterForm = ({ onSuccess, onSwitchToLogin }: EnhancedReg
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [showContract, setShowContract] = useState(false);
   const { toast } = useToast();
+  const [legalDoc, setLegalDoc] = useState<LegalDocument | null>(null);
 
-  const handleSocialRegister = async (provider: 'google' | 'facebook' | 'apple') => {
+  useEffect(() => {
+    const loadDoc = async () => {
+      const docType = mapUserTipoToDocType(formData.tipo);
+      const doc = await fetchActiveLegalDocument(docType);
+      setLegalDoc(doc);
+    };
+    loadDoc();
+  }, [formData.tipo]);
+
+  const handleGoogleRegister = async () => {
     setLoading(true);
     
     try {
       const { error } = await supabase.auth.signInWithOAuth({
-        provider,
+        provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/`,
           queryParams: {
-            registro: 'true'
+            access_type: 'offline',
+            prompt: 'consent',
           }
         }
       });
 
       if (error) throw error;
+      
+      toast({
+        title: "Redirecionando para Google...",
+        description: "Você será redirecionado para criar sua conta com Google.",
+      });
     } catch (error: any) {
       toast({
-        title: "Erro no cadastro social",
-        description: error.message || "Não foi possível fazer cadastro. Tente novamente.",
+        title: "Erro no cadastro com Google",
+        description: error.message || "Não foi possível fazer cadastro com Google. Tente novamente.",
         variant: "destructive",
       });
     } finally {
@@ -93,7 +109,7 @@ export const EnhancedRegisterForm = ({ onSuccess, onSwitchToLogin }: EnhancedReg
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -107,6 +123,29 @@ export const EnhancedRegisterForm = ({ onSuccess, onSwitchToLogin }: EnhancedReg
       });
 
       if (error) throw error;
+
+      // Garantir criação do perfil na tabela users para viabilizar aceite futuro
+      if (data.user) {
+        const { data: existing } = await supabase
+          .from('users')
+          .select('id')
+          .eq('auth_id', data.user.id)
+          .maybeSingle();
+
+        if (!existing) {
+          await supabase.from('users').insert({
+            auth_id: data.user.id,
+            email: formData.email,
+            nome: formData.nome,
+            tipo: formData.tipo,
+          });
+        }
+      }
+
+      // Salvar aceite pendente localmente (será consumido após o primeiro login)
+      if (legalDoc) {
+        savePendingAcceptance(legalDoc);
+      }
 
       toast({
         title: "Cadastro realizado com sucesso!",
@@ -132,6 +171,7 @@ export const EnhancedRegisterForm = ({ onSuccess, onSwitchToLogin }: EnhancedReg
   };
 
   const getContractContent = () => {
+    if (legalDoc?.content) return legalDoc.content;
     if (formData.tipo === 'cliente') {
       return `
 CONTRATO DE PRESTAÇÃO DE SERVIÇOS - ZURBO ↔ CLIENTE
@@ -211,13 +251,13 @@ Ao aceitar este contrato, você concorda com todos os termos acima.
 
   return (
     <div className="space-y-6">
-      {/* Social Register Options */}
+      {/* Google Register Option */}
       <div className="space-y-3">
         <Button
           type="button"
           variant="outline"
           className="w-full"
-          onClick={() => handleSocialRegister('google')}
+          onClick={handleGoogleRegister}
           disabled={loading}
         >
           <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -227,32 +267,6 @@ Ao aceitar este contrato, você concorda com todos os termos acima.
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
           </svg>
           Cadastrar com Google
-        </Button>
-
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          onClick={() => handleSocialRegister('facebook')}
-          disabled={loading}
-        >
-          <svg className="mr-2 h-4 w-4 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-          </svg>
-          Cadastrar com Facebook
-        </Button>
-
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          onClick={() => handleSocialRegister('apple')}
-          disabled={loading}
-        >
-          <svg className="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12.017 0C8.396 0 8.025.044 8.025.044c0 0-.396.048-.95.177C5.78.544 4.594 1.444 3.766 2.759c-.828 1.315-1.232 2.86-1.232 4.632 0 1.774.404 3.318 1.232 4.633.828 1.315 2.014 2.215 3.309 2.548.554.129.95.177.95.177s.371.044 3.992.044c3.62 0 3.991-.044 3.991-.044s.397-.048.951-.177c1.295-.333 2.481-1.233 3.309-2.548.828-1.315 1.232-2.859 1.232-4.633 0-1.772-.404-3.317-1.232-4.632C19.406 1.444 18.22.544 16.925.221 16.371.092 15.975.044 15.975.044S15.604 0 11.983 0h.034zm-.017 2.143c3.619 0 3.99.043 3.99.043s.347.041.842.15c1.026.263 1.886.924 2.461 1.888.575.964.855 2.09.855 3.374 0 1.284-.28 2.41-.855 3.374-.575.964-1.435 1.625-2.461 1.888-.495.109-.842.15-.842.15s-.371.043-3.99.043c-3.62 0-3.991-.043-3.991-.043s-.346-.041-.841-.15c-1.026-.263-1.887-.924-2.462-1.888C3.121 10.008 2.84 8.882 2.84 7.598c0-1.284.281-2.41.856-3.374.575-.964 1.436-1.625 2.462-1.888.495-.109.841-.15.841-.15s.371-.043 3.991-.043h.01z"/>
-          </svg>
-          Cadastrar com Apple
         </Button>
       </div>
 
@@ -418,11 +432,18 @@ Ao aceitar este contrato, você concorda com todos os termos acima.
                       </DialogTitle>
                     </DialogHeader>
                     <ScrollArea className="h-96 w-full rounded-md border p-4">
-                      <pre className="whitespace-pre-wrap text-sm">{getContractContent()}</pre>
+                      <pre className="whitespace-pre-wrap text-sm">
+                        {getContractContent()}
+                      </pre>
                     </ScrollArea>
                   </DialogContent>
                 </Dialog>
               </Label>
+              {legalDoc?.summary && (
+                <p className="text-xs text-muted-foreground mt-1 whitespace-pre-line">
+                  {legalDoc.summary}
+                </p>
+              )}
             </div>
           </div>
         </div>

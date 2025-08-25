@@ -49,15 +49,36 @@ serve(async (req) => {
     const zurboFee = amount * 0.08; // 8% fee
     const amountInCents = Math.round(amount * 100);
 
+    // Check if Stripe customer exists or create new one
+    let customerId: string;
+    const customers = await stripe.customers.list({
+      email: conversation.cliente.email,
+      limit: 1
+    });
+
+    if (customers.data.length > 0) {
+      customerId = customers.data[0].id;
+    } else {
+      const customer = await stripe.customers.create({
+        email: conversation.cliente.email,
+        name: conversation.cliente.nome,
+        metadata: {
+          user_id: conversation.cliente_id
+        }
+      });
+      customerId = customer.id;
+    }
+
     // Create Payment Intent
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amountInCents,
       currency: currency.toLowerCase(),
-      customer_email: conversation.cliente.email,
+      customer: customerId,
       metadata: {
         conversation_id: conversationId,
         provider_account_id: conversation.prestador.stripe_account_id || '',
         zurbo_fee: Math.round(zurboFee * 100).toString(),
+        customer_email: conversation.cliente.email, // Moved to metadata
       },
       description: `Serviço: ${conversation.servico_solicitado} - Prestador: ${conversation.prestador.nome}`,
     });

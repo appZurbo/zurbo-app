@@ -136,7 +136,7 @@ export const Header = () => {
                         <Calendar className="mr-2 h-4 w-4" />
                         <span>Agenda</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate('/prestador-settings')}>
+                      <DropdownMenuItem onClick={() => navigate('/settings')}>
                         <Settings className="mr-2 h-4 w-4 text-blue-600" />
                         <span>Config. Prestador</span>
                       </DropdownMenuItem>

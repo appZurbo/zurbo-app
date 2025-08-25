@@ -10,11 +10,10 @@ interface BasicFiltersProps {
     notaMin: number;
     servicos: string[];
   };
-  servicos: Array<{ id: string; nome: string; icone: string; cor?: string }>;
   onFilterUpdate: (key: string, value: any) => void;
 }
 
-export const BasicFilters = ({ filters, servicos, onFilterUpdate }: BasicFiltersProps) => {
+export const BasicFilters = ({ filters, onFilterUpdate }: BasicFiltersProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
       <CityFilter
@@ -25,7 +24,6 @@ export const BasicFilters = ({ filters, servicos, onFilterUpdate }: BasicFilters
       <div className="space-y-2">
         <label className="text-sm font-medium text-gray-700">Serviços</label>
         <ServiceFilterPopover
-          servicos={servicos}
           selectedServices={filters.servicos}
           onSelectionChange={(services) => onFilterUpdate('servicos', services)}
         />

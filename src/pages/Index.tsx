@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
@@ -26,6 +27,7 @@ const Index = () => {
     prestadores,
     loading,
     error,
+    filters,
     showFavoritesOnly,
     isAuthenticated,
     handleFiltersChange,
@@ -43,9 +45,12 @@ const Index = () => {
     setShowProfileModal(true);
   };
 
-  const handleCategorySelect = (categoryId: string) => {
-    console.log('📂 Category selected:', categoryId);
-    navigate(`/prestadores?servico=${categoryId}`);
+  const handleCategorySelect = (serviceIds: string[]) => {
+    console.log('📂 Services selected:', serviceIds);
+    handleFiltersChange({
+      ...filters,
+      servicos: serviceIds
+    });
   };
 
   return (
@@ -55,13 +60,14 @@ const Index = () => {
           <HeroDemo />
           
           <div className="max-w-7xl mx-auto px-[30px] py-[15px]">
+            {/* ServiceCategories now serves as the main interactive element replacing banners */}
             <ErrorBoundary>
               <ServiceCategories onCategorySelect={handleCategorySelect} />
             </ErrorBoundary>
             
             <div className="mt-12">
               <ErrorBoundary>
-                <ModernFilters onFiltersChange={handleFiltersChange} servicos={[]} />
+                <ModernFilters onFiltersChange={handleFiltersChange} />
               </ErrorBoundary>
             </div>
 
@@ -80,7 +86,7 @@ const Index = () => {
                   onRetry={retry}
                   onClearFilters={() => handleFiltersChange({
                     cidade: '',
-                    servico: '',
+                    servicos: [],
                     precoMin: undefined,
                     precoMax: undefined,
                     notaMin: undefined

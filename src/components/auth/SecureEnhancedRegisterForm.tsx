@@ -127,13 +127,15 @@ export const SecureEnhancedRegisterForm = ({ onSuccess, onSwitchToLogin }: Secur
     }
   };
 
-  const handleSocialSignUp = async (provider: 'google' | 'facebook' | 'apple') => {
+  const handleGoogleSignUp = async () => {
     setLoading(true);
     try {
+      const redirectUrl = `${window.location.origin}/`;
+      
       const { error } = await supabase.auth.signInWithOAuth({
-        provider,
+        provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -144,18 +146,18 @@ export const SecureEnhancedRegisterForm = ({ onSuccess, onSwitchToLogin }: Secur
       if (error) throw error;
       
       toast({
-        title: "Redirecionando...",
-        description: "Você será redirecionado para criar sua conta.",
+        title: "Redirecionando para Google...",
+        description: "Você será redirecionado para criar sua conta com Google.",
       });
     } catch (error: any) {
-      let errorMessage = "Verifique se o provedor está configurado corretamente.";
+      let errorMessage = "Erro ao conectar com Google. Tente novamente.";
       
       if (error.message?.includes('provider not found')) {
-        errorMessage = "Provedor de cadastro não configurado.";
+        errorMessage = "Cadastro com Google não está configurado.";
       }
       
       toast({
-        title: "Erro no cadastro social",
+        title: "Erro no cadastro com Google",
         description: errorMessage,
         variant: "destructive",
       });
@@ -178,13 +180,13 @@ export const SecureEnhancedRegisterForm = ({ onSuccess, onSwitchToLogin }: Secur
         <p className="text-muted-foreground">Crie sua conta com total proteção</p>
       </div>
 
-      {/* Social Sign Up Options */}
+      {/* Google Sign Up Option */}
       <div className="space-y-3">
         <Button
           type="button"
           variant="outline"
           className="w-full"
-          onClick={() => handleSocialSignUp('google')}
+          onClick={handleGoogleSignUp}
           disabled={loading || securityLoading}
         >
           <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -194,32 +196,6 @@ export const SecureEnhancedRegisterForm = ({ onSuccess, onSwitchToLogin }: Secur
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
           </svg>
           Cadastrar com Google
-        </Button>
-
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          onClick={() => handleSocialSignUp('facebook')}
-          disabled={loading || securityLoading}
-        >
-          <svg className="mr-2 h-4 w-4 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-          </svg>
-          Cadastrar com Facebook
-        </Button>
-
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          onClick={() => handleSocialSignUp('apple')}
-          disabled={loading || securityLoading}
-        >
-          <svg className="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/>
-          </svg>
-          Cadastrar com Apple
         </Button>
       </div>
 

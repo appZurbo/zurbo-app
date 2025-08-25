@@ -167,7 +167,7 @@ export const UserSubmenu = () => {
               Painel Administrativo
             </DropdownMenuItem>
             
-            <DropdownMenuItem onClick={() => navigate('/admin/usuarios')}>
+            <DropdownMenuItem onClick={() => navigate('/admin/users')}>
               <Users className="h-4 w-4 mr-2" />
               Gerenciar Usuários
             </DropdownMenuItem>
