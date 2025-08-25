@@ -60,14 +60,13 @@ export const UnifiedHeader = () => {
           <div className="flex items-center">
             <button
               onClick={() => navigate('/')}
-              className="flex items-center space-x-2"
+              className="flex items-center justify-center"
             >
               <img 
                 src="https://mbzxifrkabfnufliawzo.supabase.co/storage/v1/object/public/site-images/logotransparent.png"
                 alt="Zurbo Logo"
-                className="h-8 w-auto object-contain object-left"
+                className="h-12 w-auto object-contain"
               />
-              <span className="text-xl font-bold text-gray-900">Zurbo</span>
             </button>
           </div>
 
