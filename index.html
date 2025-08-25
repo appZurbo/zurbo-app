@@ -48,35 +48,20 @@
 
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="/src/fresh-entry.tsx"></script>
     
-    <!-- PWA Service Worker Registration -->
+    <!-- SERVICE WORKER DISABLED FOR CACHE DEBUGGING v67.0 -->
     <script>
+      console.log('🚫 Service Worker DISABLED - Cache debugging v67.0');
+      // Unregister any existing service workers
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then((registration) => {
-              console.log('SW registered: ', registration);
-            })
-            .catch((registrationError) => {
-              console.log('SW registration failed: ', registrationError);
-            });
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister();
+            console.log('🗑️ Unregistered SW:', registration);
+          }
         });
       }
-      
-      // PWA Install Prompt
-      let deferredPrompt;
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        // Show install banner or button
-        console.log('PWA install prompt available');
-      });
-      
-      // Handle PWA install
-      window.addEventListener('appinstalled', (evt) => {
-        console.log('PWA was installed');
-      });
     </script>
   </body>
 </html>
