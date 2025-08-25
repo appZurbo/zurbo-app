@@ -62,9 +62,11 @@ export const UnifiedHeader = () => {
               onClick={() => navigate('/')}
               className="flex items-center space-x-2"
             >
-              <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-lg">Z</span>
-              </div>
+              <img 
+                src="https://mbzxifrkabfnufliawzo.supabase.co/storage/v1/object/public/site-images/logotransparent.png"
+                alt="Zurbo Logo"
+                className="h-8 w-auto object-contain object-left"
+              />
               <span className="text-xl font-bold text-gray-900">Zurbo</span>
             </button>
           </div>
