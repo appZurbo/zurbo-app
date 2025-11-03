@@ -116,7 +116,7 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
           <div className="flex-1 p-4 flex items-center justify-center bg-background">
             <MorphingDialogTitle className="font-semibold text-foreground text-lg group-hover:text-primary transition-colors text-center">
               {category.name}
-              {!hasServices && <span className="text-xs block text-muted-foreground">Em breve</span>}
+              {!hasServices && category.id !== 'chaveiro' && <span className="text-xs block text-muted-foreground">Em breve</span>}
             </MorphingDialogTitle>
           </div>
           
@@ -143,7 +143,7 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
           <div className="flex-1 p-8">
             <MorphingDialogTitle className="text-3xl font-bold text-foreground mb-4">
               {category.name}
-              {!hasServices && <span className="text-sm block text-muted-foreground mt-1">Em breve</span>}
+              {!hasServices && category.id !== 'chaveiro' && <span className="text-sm block text-muted-foreground mt-1">Em breve</span>}
             </MorphingDialogTitle>
             
             <MorphingDialogDescription
@@ -199,7 +199,7 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
                 {hasServices ? 'Encontrar Profissionais' : 'Ver Todos os Prestadores'}
               </Button>
               
-              {!hasServices && (
+              {!hasServices && category.id !== 'chaveiro' && (
                 <p className="text-center text-sm text-muted-foreground">
                   Esta categoria será disponibilizada em breve!
                 </p>
