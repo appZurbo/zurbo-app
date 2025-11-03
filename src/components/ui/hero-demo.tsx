@@ -1,5 +1,5 @@
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { MoveRight, Wrench } from "lucide-react";
 import * as React from "react";
@@ -55,6 +55,8 @@ function Hero() {
   const [titleNumber, setTitleNumber] = useState(0);
   const navigate = useNavigate();
   const titles = useMemo(() => ["eletricista", "encanador", "pintor", "jardineiro", "diarista"], []);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoStarted, setVideoStarted] = useState(false);
   
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -66,6 +68,50 @@ function Hero() {
     }, 2000);
     return () => clearTimeout(timeoutId);
   }, [titleNumber, titles]);
+
+  // Controlar o vídeo: mostrar último frame e iniciar após 2 segundos
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleLoadedMetadata = () => {
+      // Ir para o último frame (praticamente o fim do vídeo)
+      video.currentTime = video.duration - 0.1;
+      video.pause();
+    };
+
+    const startVideoAfterDelay = setTimeout(() => {
+      if (video && !videoStarted) {
+        // Voltar para o início e iniciar reprodução
+        video.currentTime = 0;
+        video.play().catch(() => {
+          // Ignorar erros de autoplay se o navegador bloquear
+        });
+        setVideoStarted(true);
+      }
+    }, 2000);
+
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
+    
+    // Quando o vídeo terminar, manter no último frame
+    const handleEnded = () => {
+      video.currentTime = video.duration - 0.1;
+      video.pause();
+    };
+
+    video.addEventListener('ended', handleEnded);
+
+    // Se os metadados já foram carregados
+    if (video.readyState >= 2) {
+      handleLoadedMetadata();
+    }
+
+    return () => {
+      clearTimeout(startVideoAfterDelay);
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      video.removeEventListener('ended', handleEnded);
+    };
+  }, [videoStarted]);
   
   const handleContrateServicos = () => {
     navigate('/prestadores');
@@ -128,10 +174,10 @@ function Hero() {
           {/* Vídeo à direita */}
           <div className="flex items-center justify-center lg:justify-start">
             <video
-              autoPlay
-              loop
+              ref={videoRef}
               muted
               playsInline
+              preload="metadata"
               className="w-full max-w-sm lg:max-w-md h-auto object-contain rounded-lg shadow-lg"
             >
               <source src="/Logo_Animation_Request_For_Zurbo_App.mp4" type="video/mp4" />
