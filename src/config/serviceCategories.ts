@@ -83,7 +83,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Encanador',
     icon: Droplets,
     color: 'bg-blue-50 border-blue-200 hover:bg-blue-100',
-    image: 'lovable-uploads/encanador.png',
+    image: 'encanador.png',
     serviceIds: ['20c31e3d-3728-4822-8df3-a061d6c524e2'] // Encanador
   },
   {
@@ -91,7 +91,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Cozinha',
     icon: ChefHat,
     color: 'bg-orange-50 border-orange-200 hover:bg-orange-100',
-    image: 'lovable-uploads/cozinha.png',
+    image: 'cozinha.png',
     serviceIds: ['5fbb818e-a0ba-4be9-a81a-4fced06e6c5e'] // Cozinha
   },
   {
