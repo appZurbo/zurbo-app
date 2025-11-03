@@ -78,11 +78,12 @@ function Hero() {
   return (
     <div className="w-full">
       <div className="container mx-auto">
-        <div className="flex gap-8 py-20 items-center justify-center flex-col lg:py-[79px]">
-          <div className="flex gap-4 flex-col">
-            <h1 className="text-5xl md:text-7xl max-w-2xl tracking-tighter text-center font-regular">
+        <div className="grid lg:grid-cols-2 gap-8 py-20 items-center lg:py-[79px]">
+          {/* Conteúdo à esquerda */}
+          <div className="flex gap-4 flex-col items-center lg:items-start text-center lg:text-left">
+            <h1 className="text-5xl md:text-7xl max-w-2xl tracking-tighter font-regular">
               <span className="text-gray-900">Tá precisando de</span>
-              <span className="relative flex w-full justify-center overflow-hidden text-center md:pb-4 md:pt-1">
+              <span className="relative flex w-full justify-center lg:justify-start overflow-hidden md:pb-4 md:pt-1">
                 &nbsp;
                 {titles.map((title, index) => (
                   <motion.span 
@@ -110,18 +111,37 @@ function Hero() {
               </span>
             </h1>
 
-            <p className="text-lg md:text-xl leading-relaxed tracking-tight text-muted-foreground max-w-2xl text-center">
+            <p className="text-lg md:text-xl leading-relaxed tracking-tight text-muted-foreground max-w-2xl">
               Conecte-se com prestadores de serviços qualificados na sua região. Rápido, prático e de confiança.
             </p>
+            
+            <div className="flex flex-col gap-3 items-center lg:items-start mt-4">
+              <Button size="lg" className="gap-4" variant="outline" onClick={handleContrateServicos}>
+                Contrate Serviços <Wrench className="w-4 h-4" />
+              </Button>
+              <Button size="lg" className="gap-4 bg-orange-500 hover:bg-orange-600" onClick={handleTrabalheConosco}>
+                Trabalhe conosco <MoveRight className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
-          
-          <div className="flex flex-col gap-3 items-center">
-            <Button size="lg" className="gap-4" variant="outline" onClick={handleContrateServicos}>
-              Contrate Serviços <Wrench className="w-4 h-4" />
-            </Button>
-            <Button size="lg" className="gap-4 bg-orange-500 hover:bg-orange-600" onClick={handleTrabalheConosco}>
-              Trabalhe conosco <MoveRight className="w-4 h-4" />
-            </Button>
+
+          {/* Vídeo à direita */}
+          <div className="flex items-center justify-center lg:justify-end">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full max-w-md h-auto object-contain rounded-lg shadow-lg"
+            >
+              <source src="/Logo_Animation_Request_For_Zurbo_App.mp4" type="video/mp4" />
+              {/* Fallback para imagem caso o vídeo não carregue */}
+              <img 
+                src="/logoinv.png"
+                alt="Zurbo Logo"
+                className="w-full max-w-md h-auto object-contain"
+              />
+            </video>
           </div>
         </div>
       </div>
