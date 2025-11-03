@@ -201,12 +201,22 @@ export const ResponsiveHeader = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center justify-center -m-2 p-0 hover:opacity-80 transition-opacity">
-            <img 
-              src="/logoinv.png"
-              alt="Zurbo Logo"
-              className="h-20 w-auto object-cover object-center"
-              style={{ objectPosition: 'center' }}
-            />
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="h-20 w-auto object-contain pointer-events-none"
+              style={{ maxWidth: '200px' }}
+            >
+              <source src="/Logo_Animation_Request_For_Zurbo_App.mp4" type="video/mp4" />
+              {/* Fallback para imagem caso o vídeo não carregue */}
+              <img 
+                src="/logoinv.png"
+                alt="Zurbo Logo"
+                className="h-20 w-auto object-cover object-center"
+              />
+            </video>
           </Link>
 
           {/* Desktop Navigation */}
