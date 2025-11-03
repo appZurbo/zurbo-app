@@ -28,7 +28,7 @@ export const serviceCategories: ServiceCategory[] = [
     icon: Wrench,
     color: 'bg-orange-50 border-orange-200 hover:bg-orange-100',
     image: 'reparos.png',
-    serviceIds: ['ce1a57d6-df65-42e4-bc5e-1daf54ba5958', 'eed94aa8-4055-40ac-a7cf-18212dfc97e3'] // Montador de móveis, Pedreiro
+    serviceIds: ['ce1a57d6-df65-42e4-bc5e-1daf54ba5958', 'eed94aa8-4055-40ac-a7cf-18212dfc97e3', '20c31e3d-3728-4822-8df3-a061d6c524e2'] // Montador de móveis, Pedreiro, Encanador
   },
   {
     id: 'eletrica',
@@ -77,14 +77,6 @@ export const serviceCategories: ServiceCategory[] = [
     color: 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100',
     image: 'chaveiro.png',
     serviceIds: [] // Em breve
-  },
-  {
-    id: 'encanador',
-    name: 'Encanador',
-    icon: Droplets,
-    color: 'bg-blue-50 border-blue-200 hover:bg-blue-100',
-    image: 'encanador.png',
-    serviceIds: ['20c31e3d-3728-4822-8df3-a061d6c524e2'] // Encanador
   },
   {
     id: 'cozinha',
