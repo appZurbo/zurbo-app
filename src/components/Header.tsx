@@ -49,12 +49,14 @@ export const Header = () => {
           <div className="flex items-center">
             <button
               onClick={() => navigate('/')}
-              className="flex items-center space-x-2"
+              className="flex items-center justify-center -m-2 p-0 hover:opacity-80 transition-opacity"
             >
-              <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-lg">Z</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900">Zurbo</span>
+              <img 
+                src="/logotransparent.png"
+                alt="Zurbo Logo"
+                className="h-20 w-auto object-cover object-center"
+                style={{ objectPosition: 'center' }}
+              />
             </button>
           </div>
 

@@ -60,12 +60,13 @@ export const UnifiedHeader = () => {
           <div className="flex items-center">
             <button
               onClick={() => navigate('/')}
-              className="flex items-center justify-center"
+              className="flex items-center justify-center -m-2 p-0 hover:opacity-80 transition-opacity"
             >
               <img 
-                src="https://mbzxifrkabfnufliawzo.supabase.co/storage/v1/object/public/site-images/logotransparent.png"
+                src="/logotransparent.png"
                 alt="Zurbo Logo"
-                className="h-12 w-auto object-contain"
+                className="h-20 w-auto object-cover object-center"
+                style={{ objectPosition: 'center' }}
               />
             </button>
           </div>

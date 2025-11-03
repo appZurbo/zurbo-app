@@ -200,13 +200,13 @@ export const ResponsiveHeader = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center">
-            <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mr-3">
-              <span className="text-white font-bold text-lg">Z</span>
-            </div>
-            <span className={`font-bold text-gray-900 ${isMobile ? 'text-lg' : 'text-xl'}`}>
-              Zurbo
-            </span>
+          <Link to="/" className="flex items-center justify-center -m-2 p-0 hover:opacity-80 transition-opacity">
+            <img 
+              src="/logoinv.png"
+              alt="Zurbo Logo"
+              className="h-20 w-auto object-cover object-center"
+              style={{ objectPosition: 'center' }}
+            />
           </Link>
 
           {/* Desktop Navigation */}
