@@ -52,7 +52,7 @@ export const Header = () => {
               className="flex items-center justify-center -m-2 p-0 hover:opacity-80 transition-opacity"
             >
               <img 
-                src="/logotransparent.png"
+                src="/logoinv.png"
                 alt="Zurbo Logo"
                 className="h-20 w-auto object-cover object-center"
                 style={{ objectPosition: 'center' }}
