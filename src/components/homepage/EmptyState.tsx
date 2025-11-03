@@ -62,11 +62,6 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           <Button onClick={showFavoritesOnly ? onShowAll : onClearFilters}>
             {showFavoritesOnly ? 'Ver Todos Prestadores' : 'Limpar Filtros'}
           </Button>
-          {!showFavoritesOnly && (
-            <p className="text-sm text-gray-500 mt-2">
-              💡 Dica: Vá para <strong>/admin/relatorios</strong> e clique em "Criar Sistema Completo" para adicionar dados de teste
-            </p>
-          )}
         </div>
       </CardContent>
     </Card>
