@@ -78,7 +78,7 @@ function Hero() {
   return (
     <div className="w-full">
       <div className="container mx-auto">
-        <div className="grid lg:grid-cols-2 gap-8 py-20 items-center lg:py-[79px]">
+        <div className="grid lg:grid-cols-2 gap-4 lg:gap-6 py-20 items-center lg:py-[79px]">
           {/* Conteúdo à esquerda */}
           <div className="flex gap-4 flex-col items-center lg:items-start text-center lg:text-left">
             <h1 className="text-5xl md:text-7xl max-w-2xl tracking-tighter font-regular">
@@ -126,20 +126,20 @@ function Hero() {
           </div>
 
           {/* Vídeo à direita */}
-          <div className="flex items-center justify-center lg:justify-end">
+          <div className="flex items-center justify-center lg:justify-start">
             <video
               autoPlay
               loop
               muted
               playsInline
-              className="w-full max-w-md h-auto object-contain rounded-lg shadow-lg"
+              className="w-full max-w-sm lg:max-w-md h-auto object-contain rounded-lg shadow-lg"
             >
               <source src="/Logo_Animation_Request_For_Zurbo_App.mp4" type="video/mp4" />
               {/* Fallback para imagem caso o vídeo não carregue */}
               <img 
                 src="/logoinv.png"
                 alt="Zurbo Logo"
-                className="w-full max-w-md h-auto object-contain"
+                className="w-full max-w-sm lg:max-w-md h-auto object-contain"
               />
             </video>
           </div>
