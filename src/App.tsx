@@ -42,7 +42,11 @@ import BannerImageManager from "./pages/admin/BannerImageManager";
 
 const queryClient = new QueryClient();
 
+import { useNativeBridge } from "@/hooks/useNativeBridge";
+
 function App() {
+  const { isMobileApp } = useNativeBridge();
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -50,6 +54,23 @@ function App() {
           <NotificationSound enabled={true} volume={0.3} />
           <Toaster />
           <Sonner />
+          {/* Indicador de Debug para Mobile */}
+          {isMobileApp && (
+            <div style={{ 
+              position: 'fixed', 
+              top: 0, 
+              left: 0, 
+              right: 0, 
+              background: '#22c55e', 
+              color: 'white', 
+              textAlign: 'center', 
+              fontSize: '10px', 
+              padding: '2px', 
+              zIndex: 9999 
+            }}>
+              📱 Modo App Ativo
+            </div>
+          )}
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />

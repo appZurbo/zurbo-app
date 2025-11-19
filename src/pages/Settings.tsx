@@ -2,7 +2,7 @@ import { useAuth } from '@/hooks/useAuth';
 import WatermarkSection from '@/components/sections/WatermarkSection';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Settings as SettingsIcon, User, Wrench, Shield, FileText } from 'lucide-react';
+import { ArrowLeft, Settings as SettingsIcon, User, Wrench, Shield, FileText, Camera, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { UserSettings } from '@/components/settings/UserSettings';
 import SecuritySettings from '@/components/settings/SecuritySettings';
@@ -14,11 +14,32 @@ import { useMobile } from '@/hooks/useMobile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { LegalDocumentsTab } from '@/components/settings/LegalDocumentsTab';
+import { useNativeBridge } from "@/hooks/useNativeBridge";
 
 const Settings = () => {
   const navigate = useNavigate();
   const { profile, isPrestador, isAuthenticated, loading } = useAuth();
   const isMobile = useMobile();
+  const { isMobileApp, requestCamera, requestLocation } = useNativeBridge();
+
+  // Função de teste rápido para Mobile
+  const handleMobileTest = async (type: 'camera' | 'location') => {
+    if (type === 'camera') {
+      try {
+        const photo = await requestCamera();
+        alert('Foto capturada! ' + (photo.uri ? 'Sucesso' : 'Sem dados'));
+      } catch (e) {
+        alert('Erro câmera: ' + e);
+      }
+    } else {
+      try {
+        const loc = await requestLocation();
+        alert(`GPS: ${loc.latitude}, ${loc.longitude}`);
+      } catch (e) {
+        alert('Erro GPS: ' + e);
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -87,6 +108,26 @@ const Settings = () => {
               )}
             </p>
           </div>
+
+          {/* PAINEL DE TESTE MOBILE - SÓ APARECE NO APP */}
+          {isMobileApp && (
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg max-w-2xl mx-auto">
+              <h3 className="font-bold text-blue-800 mb-2 flex items-center gap-2">
+                📱 Teste de Funcionalidades Nativas
+              </h3>
+              <div className="flex gap-2">
+                <Button onClick={() => handleMobileTest('camera')} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
+                  <Camera className="mr-2 h-4 w-4" /> Testar Câmera
+                </Button>
+                <Button onClick={() => handleMobileTest('location')} className="flex-1 bg-green-600 hover:bg-green-700 text-white">
+                  <MapPin className="mr-2 h-4 w-4" /> Testar GPS
+                </Button>
+              </div>
+              <p className="text-xs text-blue-600 mt-2 text-center">
+                Use estes botões para verificar se a integração nativa está funcionando.
+              </p>
+            </div>
+          )}
 
           {/* Tabs organizadas centralmente */}
           <div className="max-w-2xl mx-auto">

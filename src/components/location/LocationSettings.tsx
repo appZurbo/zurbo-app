@@ -37,8 +37,42 @@ export const LocationSettings = () => {
     }
   }, [profile]);
 
-  const getCurrentLocation = () => {
+  const getCurrentLocation = async () => {
+    setLoading(true);
+
+    if (isMobileApp) {
+      try {
+        toast({
+          title: "Obtendo localização...",
+          description: "Aguarde enquanto acessamos o GPS do celular.",
+        });
+        
+        const location = await requestLocation();
+        
+        setLocationData(prev => ({
+          ...prev,
+          latitude: location.latitude,
+          longitude: location.longitude,
+        }));
+        
+        setLoading(false);
+        toast({
+          title: "Localização obtida!",
+          description: "Coordenadas atualizadas via GPS nativo.",
+        });
+      } catch (error) {
+        setLoading(false);
+        toast({
+          title: "Erro ao obter localização",
+          description: "Não foi possível obter sua localização pelo GPS.",
+          variant: "destructive",
+        });
+      }
+      return;
+    }
+
     if (!navigator.geolocation) {
+      setLoading(false);
       toast({
         title: "Geolocalização não suportada",
         description: "Seu navegador não suporta geolocalização.",
@@ -47,7 +81,6 @@ export const LocationSettings = () => {
       return;
     }
 
-    setLoading(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setLocationData(prev => ({

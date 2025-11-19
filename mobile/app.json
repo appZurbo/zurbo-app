@@ -1,0 +1,73 @@
+{
+  "expo": {
+    "name": "Zurbo",
+    "slug": "zurbo-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.zurbo.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "O Zurbo precisa acessar sua câmera para você tirar fotos de serviços e perfil.",
+        "NSLocationWhenInUseUsageDescription": "O Zurbo precisa da sua localização para encontrar prestadores de serviço próximos a você.",
+        "NSLocationAlwaysUsageDescription": "O Zurbo precisa da sua localização para encontrar prestadores de serviço próximos a você.",
+        "NSPhotoLibraryUsageDescription": "O Zurbo precisa acessar suas fotos para você compartilhar imagens de serviços."
+      }
+    },
+    "android": {
+      "package": "com.zurbo.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "RECEIVE_BOOT_COMPLETED"
+      ],
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "O Zurbo precisa da sua localização para encontrar prestadores de serviço próximos a você."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "O Zurbo precisa acessar sua câmera para você tirar fotos de serviços e perfil."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#ffffff",
+          "sounds": []
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id-here"
+      }
+    }
+  }
+}

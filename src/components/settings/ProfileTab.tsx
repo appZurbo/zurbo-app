@@ -11,11 +11,13 @@ import { useToast } from '@/hooks/use-toast';
 import { useProfilePicture } from '@/hooks/useProfilePicture';
 import { BecomeProviderButton } from '@/components/migration/BecomeProviderButton';
 import { supabase } from '@/integrations/supabase/client';
+import { useNativeBridge } from '@/hooks/useNativeBridge';
 
 export const ProfileTab = () => {
   const { profile, updateLocalProfile } = useAuth();
   const { toast } = useToast();
   const { uploadProfilePicture, uploading } = useProfilePicture();
+  const { isMobileApp, requestCamera } = useNativeBridge();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -52,6 +54,40 @@ export const ProfileTab = () => {
     }
 
     await uploadProfilePicture(file);
+  };
+
+  const handleNativeCamera = async () => {
+    try {
+      const photo = await requestCamera();
+      if (!photo) return;
+
+      // Converter base64/uri para File
+      const res = await fetch(photo.uri);
+      const blob = await res.blob();
+      const file = new File([blob], "profile_photo.jpg", { type: "image/jpeg" });
+      
+      await uploadProfilePicture(file);
+      
+      toast({
+        title: "Foto atualizada!",
+        description: "Sua foto de perfil foi alterada com sucesso.",
+      });
+    } catch (error) {
+      console.error('Erro na câmera nativa:', error);
+      toast({
+        title: "Erro na câmera",
+        description: "Não foi possível tirar a foto.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePhotoClick = () => {
+    if (isMobileApp) {
+      handleNativeCamera();
+    } else {
+      fileInputRef.current?.click();
+    }
   };
 
   const handleSave = async () => {
@@ -107,8 +143,8 @@ export const ProfileTab = () => {
     <div className="space-y-6">
       {/* Profile Picture Section */}
       <div className="flex flex-col items-center space-y-4">
-        <div className="relative">
-          <Avatar className="w-24 h-24">
+        <div className="relative group cursor-pointer" onClick={handlePhotoClick}>
+          <Avatar className="w-24 h-24 border-4 border-white shadow-lg">
             <AvatarImage src={profile.foto_url} alt={profile.nome} />
             <AvatarFallback className="text-xl bg-orange-100 text-orange-600">
               {profile.nome?.charAt(0)?.toUpperCase() || '?'}
@@ -118,7 +154,10 @@ export const ProfileTab = () => {
             size="sm"
             variant="outline"
             className="absolute -bottom-2 -right-2 rounded-full p-2 bg-white shadow-md"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={(e) => {
+              e.stopPropagation();
+              handlePhotoClick();
+            }}
             disabled={uploading}
           >
             <Camera className="h-3 w-3" />
