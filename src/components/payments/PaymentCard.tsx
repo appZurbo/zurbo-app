@@ -31,8 +31,9 @@ const PaymentForm: React.FC<PaymentCardProps> = ({
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const zurboFee = totalPrice * 0.08;
-  const providerAmount = totalPrice - zurboFee;
+  // MODELO DE ASSINATURA: O prestador recebe o valor integral.
+  // A plataforma monetiza via mensalidade (R$ 149,90/mês).
+  const providerAmount = totalPrice;
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -106,11 +107,7 @@ const PaymentForm: React.FC<PaymentCardProps> = ({
           <Separator />
           <div className="flex justify-between">
             <span>Valor do Serviço:</span>
-            <span>R$ {providerAmount.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>Taxa da Plataforma (8%):</span>
-            <span>R$ {zurboFee.toFixed(2)}</span>
+            <span>R$ {totalPrice.toFixed(2)}</span>
           </div>
           <Separator />
           <div className="flex justify-between font-bold">

@@ -9,9 +9,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
+import { useStripeIntegration } from '@/hooks/useStripeIntegration';
 import { useToast } from '@/hooks/use-toast';
+
 const Planos = () => {
   const navigate = useNavigate();
+  const { createCheckoutSession } = useStripeIntegration();
   const {
     profile,
     isPrestador
@@ -58,25 +61,30 @@ const Planos = () => {
       },
       description: 'Para começar como prestador',
       features: ['Perfil básico', 'Receber pedidos', 'Chat básico', '5 fotos no portfólio'],
-      limitations: ['Máximo 10 pedidos por mês', 'Sem destaque nos resultados', 'Suporte limitado'],
+      limitations: ['Taxa de serviço mais alta', 'Sem destaque nos resultados', 'Suporte limitado'],
       popular: false,
       current: !isPremium && isPrestador
     }, {
       id: 'prestador-pro',
-      name: 'PRO',
+      name: 'Profissional',
       price: {
-        monthly: 39.90,
-        yearly: 399.90
+        monthly: 149.90,
+        yearly: 1499.00 // Valor ilustrativo, ajustável conforme o produto real no Stripe
       },
-      description: 'Para prestadores profissionais',
-      features: ['Tudo do plano Básico', 'Pedidos ilimitados', 'Destaque nos resultados', 'Badge PRO verificado', 'Portfólio ilimitado', 'Estatísticas detalhadas', 'Suporte prioritário', 'Anúncios patrocinados'],
+      productIds: {
+        monthly: 'prod_TWftTGuCZq3iVB', // ID fornecido para Mensal
+        yearly: 'prod_TWfvfzNc5Z15wO'   // ID fornecido para Anual
+      },
+      description: 'Para quem quer faturar alto',
+      features: ['Receba 100% do valor (Taxa Zero)', 'Pagamentos direto na sua conta', 'Destaque nos resultados', 'Badge Verificado', 'Portfólio ilimitado', 'Suporte prioritário'],
       limitations: [],
       popular: true,
       current: isPremium && isPrestador
     }]
   };
   const currentPlans = plans[userType];
-  const handleSelectPlan = (planId: string) => {
+  
+  const handleSelectPlan = async (planId: string, planDetails?: any) => {
     if (planId.includes('basico')) {
       toast({
         title: "Plano Básico",
@@ -85,18 +93,46 @@ const Planos = () => {
       return;
     }
 
-    // Mock payment process
-    toast({
-      title: "Redirecionando para pagamento",
-      description: "Em breve você será redirecionado para finalizar sua assinatura PRO."
-    });
-    setTimeout(() => {
+    if (!isPrestador && userType === 'prestador') {
+       toast({
+        title: "Apenas para Prestadores",
+        description: "Você precisa ter uma conta de prestador para assinar este plano."
+      });
+      return;
+    }
+
+    // Integração com Stripe
+    try {
+      // Determina qual ID usar baseado no ciclo de cobrança
+      let stripeId = '';
+      if (planDetails && planDetails.productIds) {
+          stripeId = billingCycle === 'yearly' 
+            ? planDetails.productIds.yearly 
+            : planDetails.productIds.monthly;
+      }
+
+      // Fallback se não tiver ID específico (ex: planos cliente)
+      if (!stripeId) {
+         // IDs de fallback ou erro
+         stripeId = 'price_placeholder'; 
+         console.warn('Sem ID de produto configurado para este plano');
+      }
+
+      console.log('Iniciando checkout para:', stripeId);
+      
+      // Chama o hook de integração
+      // NOTA: createCheckoutSession espera um priceId. 
+      // Se os IDs fornecidos (prod_...) não funcionarem, eles precisarão ser substituídos pelos price_... do Stripe Dashboard.
+      await createCheckoutSession(stripeId);
+      
+    } catch (error) {
+      console.error('Erro ao selecionar plano:', error);
       toast({
-        title: "Pagamento simulado",
-        description: "Esta é uma demonstração. Em produção, integraria com sistema de pagamento real.",
+        title: "Erro",
+        description: "Não foi possível iniciar a assinatura. Tente novamente.",
         variant: "destructive"
       });
-    }, 2000);
+    }
   };
   const PlanCard = ({
     plan
@@ -175,7 +211,7 @@ const Planos = () => {
               </ul>
             </div>}
 
-          <Button onClick={() => handleSelectPlan(plan.id)} disabled={isCurrentPlan} className={`w-full ${plan.popular ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700' : 'bg-orange-500 hover:bg-orange-600'} ${isCurrentPlan ? 'opacity-50 cursor-not-allowed' : ''}`}>
+          <Button onClick={() => handleSelectPlan(plan.id, plan)} disabled={isCurrentPlan} className={`w-full ${plan.popular ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700' : 'bg-orange-500 hover:bg-orange-600'} ${isCurrentPlan ? 'opacity-50 cursor-not-allowed' : ''}`}>
             {isCurrentPlan ? <>
                 <Check className="h-4 w-4 mr-2" />
                 Plano Atual

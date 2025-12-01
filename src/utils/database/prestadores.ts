@@ -79,20 +79,40 @@ export const getPrestadores = async (filters?: {
 
     // City filtering with normalization
     if (filters?.cidade) {
+      // NOTE: In production, this logic should be more robust. 
+      // For now, if no city matches, we return empty, which triggers the mock fallback in the UI.
+      // However, for hybrid mode to work best, we might want to return ALL results if filtered by city returns nothing?
+      // No, that would be confusing.
+      // Let's keep strict DB filtering.
+      
       // First get prestadores who serve this city
       const { data: cidadesAtendidas } = await supabase
         .from('cidades_atendidas')
         .select('prestador_id')
-        .eq('cidade', filters.cidade);
+        .ilike('cidade', `%${filters.cidade.split(',')[0]}%`); // Relaxed DB city search
       
       const prestadorIds = cidadesAtendidas?.map(c => c.prestador_id) || [];
       
       if (prestadorIds.length === 0) {
-        return { prestadores: [], hasMore: false, total: 0 };
+        // If no exact city match in `cidades_atendidas`, try searching user's address directly
+         const { data: usersInCity } = await supabase
+            .from('users')
+            .select('id')
+            .eq('tipo', 'prestador')
+            .ilike('endereco_cidade', `%${filters.cidade.split(',')[0]}%`);
+            
+         const userIds = usersInCity?.map(u => u.id) || [];
+         
+         if (userIds.length === 0) {
+             return { prestadores: [], hasMore: false, total: 0 };
+         }
+         
+         // Use these IDs instead
+         query = query.in('id', userIds);
+      } else {
+          // Filter the query to only include those prestadores
+          query = query.in('id', prestadorIds);
       }
-      
-      // Filter the query to only include those prestadores
-      query = query.in('id', prestadorIds);
       
       const { data: allPrestadores, error: allError } = await query;
       
@@ -198,7 +218,7 @@ export const getPrestadores = async (filters?: {
 
   } catch (error) {
     console.error('Error fetching prestadores:', error);
-    return { prestadores: [], hasMore: false, total: 0 };
+    throw error;
   }
 };
 

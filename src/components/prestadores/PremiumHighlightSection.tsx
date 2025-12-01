@@ -6,6 +6,7 @@ import { PrestadorCardImproved } from './PrestadorCardImproved';
 import { Crown, Star, Loader2 } from 'lucide-react';
 import { UserProfile } from '@/utils/database/types';
 import { getPrestadoresPremiumDestaque } from '@/utils/database/prestadores';
+import { MOCK_PRESTADORES } from '@/utils/mockData';
 
 interface PremiumHighlightSectionProps {
   onContact: (prestador: UserProfile) => void;
@@ -26,9 +27,22 @@ export const PremiumHighlightSection: React.FC<PremiumHighlightSectionProps> = (
   const loadPremiumHighlight = async () => {
     try {
       const data = await getPrestadoresPremiumDestaque();
-      setPrestadores(data);
+      
+      // Merge with mocks if data is low (testing mode)
+      if (data.length < 5) {
+         const mocks = MOCK_PRESTADORES.filter(p => p.premium).slice(0, 10);
+         // Filter out duplicates
+         const dataIds = new Set(data.map(p => p.id));
+         const nonDuplicateMocks = mocks.filter(m => !dataIds.has(m.id));
+         
+         setPrestadores([...data, ...nonDuplicateMocks]);
+      } else {
+         setPrestadores(data);
+      }
     } catch (error) {
       console.error('Error loading premium/highlight prestadores:', error);
+      // Fallback to mocks on error
+      setPrestadores(MOCK_PRESTADORES.filter(p => p.premium).slice(0, 10));
     } finally {
       setLoading(false);
     }

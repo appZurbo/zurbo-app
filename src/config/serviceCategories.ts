@@ -76,7 +76,7 @@ export const serviceCategories: ServiceCategory[] = [
     icon: Key,
     color: 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100',
     image: 'chaveiro.png',
-    serviceIds: [] // Em breve
+    serviceIds: ['mock-chaveiro-id-1', 'mock-chaveiro-id-2'] 
   },
   {
     id: 'cozinha',
@@ -116,7 +116,7 @@ export const serviceCategories: ServiceCategory[] = [
     icon: Car,
     color: 'bg-gray-50 border-gray-200 hover:bg-gray-100',
     image: 'mecanicos.png',
-    serviceIds: [] // Em breve
+    serviceIds: ['mock-mecanico-id-1']
   }
 ];
 

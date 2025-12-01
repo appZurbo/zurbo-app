@@ -46,8 +46,12 @@ serve(async (req) => {
       throw new Error("Conversation not found");
     }
 
-    const zurboFee = amount * 0.08; // 8% fee
     const amountInCents = Math.round(amount * 100);
+    
+    // MODELO DE ASSINATURA: Taxa zero na transação (0%)
+    // O prestador paga mensalidade, então recebe 100% do valor do serviço.
+    const zurboFee = 0; 
+    const application_fee_amount = 0;
 
     // Check if Stripe customer exists or create new one
     let customerId: string;
