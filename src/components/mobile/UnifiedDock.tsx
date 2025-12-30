@@ -1,11 +1,11 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Home, Search, Calendar, User, MessageCircle, FileText } from 'lucide-react';
+import { Home, Search, Calendar, User, MessageCircle } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile, useTablet } from '@/hooks/useMobile';
+import { useRealtimeChat } from '@/hooks/useRealtimeChat';
 
 export const UnifiedDock = () => {
   const navigate = useNavigate();
@@ -13,6 +13,7 @@ export const UnifiedDock = () => {
   const { profile, isAuthenticated, isPrestador } = useAuth();
   const isMobile = useMobile();
   const isTablet = useTablet();
+  const { unreadCount: chatUnreadCount } = useRealtimeChat();
   
   // Show on mobile and tablet
   if (!isMobile && !isTablet) return null;
@@ -22,14 +23,14 @@ export const UnifiedDock = () => {
   const navigationItems = [
     {
       icon: Home,
-      label: 'Início',
+      label: 'Home',
       path: '/',
       isActive: isActive('/'),
       showAlways: true
     },
     {
       icon: Search,
-      label: 'Buscar',
+      label: 'Explorar',
       path: '/prestadores',
       isActive: isActive('/prestadores') || isActive('/servicos'),
       showAlways: true
@@ -39,14 +40,15 @@ export const UnifiedDock = () => {
       label: isPrestador ? 'Agenda' : 'Pedidos',
       path: isPrestador ? '/agenda' : '/pedidos',
       isActive: isActive('/agenda') || isActive('/pedidos'),
-      requiresAuth: true
+      requiresAuth: true,
+      isCenter: true
     },
     {
       icon: MessageCircle,
-      label: 'Conversas',
+      label: 'Chat',
       path: '/conversas',
       isActive: isActive('/conversas'),
-      badge: 2, // Mock notification count
+      badge: chatUnreadCount > 0 ? chatUnreadCount : undefined,
       requiresAuth: true
     },
     {
@@ -65,49 +67,58 @@ export const UnifiedDock = () => {
   );
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200/80 shadow-lg z-50 safe-area-padding-bottom">
-      <div className={`flex items-center h-20 px-4 py-2 ${
+    <div className="fixed bottom-0 left-0 right-0 bg-[#FBF7F2] border-t border-[#E6DDD5] shadow-lg z-50 safe-area-padding-bottom">
+      <div className={`flex items-center justify-around py-3 ${
         isTablet 
-          ? 'justify-center max-w-md mx-auto' 
-          : 'justify-between'
+          ? 'max-w-md mx-auto' 
+          : ''
       }`}>
         {visibleItems.map((item, index) => {
           const IconComponent = item.icon;
+          const isCenter = item.isCenter;
+          
+          if (isCenter) {
+            return (
+              <div key={index} className="relative -top-6">
+                <Button
+                  size="icon"
+                  className="h-14 w-14 bg-[#E05815] text-white rounded-full shadow-lg shadow-[#E05815]/30 flex items-center justify-center border-4 border-[#FBF7F2] hover:bg-[#E05815]/90 transition-all"
+                  onClick={() => navigate(item.path)}
+                >
+                  <IconComponent className="h-7 w-7" />
+                </Button>
+              </div>
+            );
+          }
           
           return (
             <Button
               key={index}
               variant="ghost"
-              size="dock"
               className={`
-                relative transition-all duration-200 rounded-lg flex-col
+                flex flex-col items-center gap-1 transition-colors
                 ${item.isActive 
-                  ? 'bg-orange-100 text-orange-600 border border-orange-200 shadow-sm' 
-                  : 'text-gray-600 hover:text-orange-600 hover:bg-orange-50'
+                  ? 'text-[#E05815]' 
+                  : 'text-[#8C7E72] hover:text-[#E05815]'
                 }
-                ${isTablet ? 'min-h-16 w-20 mx-2' : 'min-h-16 w-16'}
               `}
               onClick={() => navigate(item.path)}
             >
-              <div className="flex flex-col items-center justify-center w-full h-full">
-                <div className="relative">
-                  <IconComponent 
-                    className={`h-6 w-6 ${item.isActive ? 'text-orange-600' : ''}`} 
-                  />
-                  {item.badge && (
-                    <Badge 
-                      className="absolute -top-2 -right-2 h-5 w-5 p-0 text-xs bg-red-500 text-white border-2 border-white"
-                    >
-                      {item.badge}
-                    </Badge>
-                  )}
-                </div>
-                <span 
-                  className={`mt-1 font-medium leading-none text-xs ${item.isActive ? 'text-orange-600' : ''}`}
-                >
-                  {item.label}
-                </span>
+              <div className="relative">
+                <IconComponent className="h-6 w-6" />
+                {item.badge && item.badge > 0 && (
+                  <span 
+                    className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-[#E05815] text-white text-[10px] font-bold flex items-center justify-center border-2 border-[#FBF7F2]"
+                  >
+                    {item.badge > 99 ? '99+' : item.badge}
+                  </span>
+                )}
               </div>
+              <span 
+                className={`text-[10px] leading-none ${item.isActive ? 'font-bold' : 'font-medium'}`}
+              >
+                {item.label}
+              </span>
             </Button>
           );
         })}

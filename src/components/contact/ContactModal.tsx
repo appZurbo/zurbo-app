@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -90,9 +90,14 @@ export const ContactModal: React.FC<ContactModalProps> = ({
     }
   };
 
+  // Debug log
+  useEffect(() => {
+    console.log('📞 ContactModal render:', { open, prestador: prestador?.nome });
+  }, [open, prestador]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md z-[100]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <MessageCircle className="h-5 w-5" />

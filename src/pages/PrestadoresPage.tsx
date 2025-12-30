@@ -8,7 +8,6 @@ import { ModernFilters } from '@/components/filters/ModernFilters';
 import { PrestadorCardImproved } from '@/components/prestadores/PrestadorCardImproved';
 import { PremiumHighlightSection } from '@/components/prestadores/PremiumHighlightSection';
 import { ServiceShortcutsSection } from '@/components/prestadores/ServiceShortcutsSection';
-import { PrestadorMiniProfileModal } from '@/components/prestadores/PrestadorMiniProfileModal';
 import { ContactModal } from '@/components/contact/ContactModal';
 import { EmergencyButton } from '@/components/emergency/EmergencyButton';
 import WatermarkSection from '@/components/sections/WatermarkSection';
@@ -34,7 +33,6 @@ const PrestadoresPage = () => {
   const [hasMore, setHasMore] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedPrestador, setSelectedPrestador] = useState<UserProfile | null>(null);
-  const [showProfileModal, setShowProfileModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const [filters, setFilters] = useState({
     cidade: 'Sinop, Mato Grosso',
@@ -83,17 +81,21 @@ const PrestadoresPage = () => {
       
       if (shouldUseMocks) {
         let filteredMocks = MOCK_PRESTADORES.filter(p => {
-           if (filters.cidade) {
-             // Extract city name properly (e.g. "Sinop" from "Sinop, Mato Grosso")
+           // City filter - more lenient for mocks
+           if (filters.cidade && filters.cidade.trim()) {
              const filterCity = filters.cidade.split(',')[0].trim().toLowerCase();
-             
-             // Check if mock has city defined
              const mockCity = p.endereco_cidade ? p.endereco_cidade.toLowerCase() : '';
              
-             // Simple includes check is often safer for mocks than strict equality
-             if (!mockCity.includes(filterCity)) return false;
+             // If mock has no city or filter is empty, include it
+             if (!mockCity) return true; // Include mocks without city
+             
+             // Check if cities match (more lenient)
+             if (!mockCity.includes(filterCity) && !filterCity.includes(mockCity.split(',')[0].trim())) {
+               return false;
+             }
            }
 
+           // Service filter
            if (filters.servicos && filters.servicos.length > 0) {
              const allowedKeywords = new Set<string>();
              filters.servicos.forEach(filterS => {
@@ -118,8 +120,25 @@ const PrestadoresPage = () => {
              if (!hasService) return false;
            }
 
+           // Premium filter
            if (filters.apenasPremium && !p.premium) return false;
+           
+           // Rating filter
            if (filters.notaMin && (p.nota_media || 0) < filters.notaMin) return false;
+           
+           // Price filter
+           if (filters.precoMin !== undefined || filters.precoMax !== undefined) {
+             const precoMin = p.preco_min || (p.prestador_servicos && p.prestador_servicos.length > 0 
+               ? Math.min(...p.prestador_servicos.map((ps: any) => ps.preco_min || 0).filter((p: number) => p > 0))
+               : 0);
+             const precoMax = p.preco_max || (p.prestador_servicos && p.prestador_servicos.length > 0
+               ? Math.max(...p.prestador_servicos.map((ps: any) => ps.preco_max || 0).filter((p: number) => p > 0))
+               : 999999);
+             
+             if (filters.precoMin !== undefined && precoMax < filters.precoMin) return false;
+             if (filters.precoMax !== undefined && precoMin > filters.precoMax) return false;
+           }
+           
            return true;
         });
 
@@ -144,54 +163,40 @@ const PrestadoresPage = () => {
             // Combine DB + Mocks
             const combined = [...result.prestadores, ...nonDuplicateMocks];
             
-            // Initial Slice
+            // Initial Slice - show at least ITEMS_PER_PAGE items
             const initialSlice = combined.slice(0, ITEMS_PER_PAGE);
+            
+            console.log(`📊 Prestadores data:`, {
+              dbCount: result.prestadores.length,
+              mockCount: nonDuplicateMocks.length,
+              combinedCount: combined.length,
+              showingCount: initialSlice.length,
+              firstPrestador: initialSlice[0] ? { id: initialSlice[0].id, nome: initialSlice[0].nome } : null
+            });
+            
             setPrestadores(initialSlice);
             setHasMore(combined.length > ITEMS_PER_PAGE);
             
-            // We need to store the 'combined' list somewhere if we want consistent "Load More".
-            // But we can't in this stateless function without ref/state.
-            // HACK: We will just calculate the slice based on 'page' assuming the DB part is constant/small.
-            
-            if (combined.length > 0) {
-                 toast({
-                  title: "Modo de Demonstração",
-                  description: `Exibindo ${result.prestadores.length} reais e ${nonDuplicateMocks.length} fictícios.`,
-                  duration: 3000,
-                });
-            }
+            console.log(`✅ Loaded ${initialSlice.length} prestadores (${result.prestadores.length} DB + ${nonDuplicateMocks.length} Mocks, showing ${initialSlice.length})`);
         } else {
-             // Load More clicked. 
-             // Page has incremented.
-             // We need to fetch the next slice of Mocks.
-             // Offset = (page - 1) * ITEMS_PER_PAGE
+             // Load More clicked - load next page of mocks
+             const dbCount = result.prestadores.length;
+             const alreadyShown = prestadores.length;
              
-             // Since we don't persist the 'combined' list, we re-calculate.
-             // But 'result.prestadores' (from DB) might be empty for page 2.
+             // Calculate how many mocks we've already shown
+             const mocksAlreadyShown = Math.max(0, alreadyShown - dbCount);
              
-             const combined = [...result.prestadores, ...nonDuplicateMocks]; // This might duplicate DB results if we aren't careful, but paginated DB returns different results.
-             // Actually, if we are on Page 2, DB returns Page 2 results (likely empty).
-             // So 'combined' = [] + mocks.
-             
-             // We need to offset into the Mocks.
-             // But how many mocks did we show on Page 1?
-             // On Page 1 we showed: items 0 to 5.
-             // If DB had 1 item, we showed 1 DB + 4 Mocks.
-             // So we used 4 mocks.
-             // On Page 2, we need to start from Mock index 4.
-             
-             // Formula:
-             // MockOffset = (Page - 1) * ITEMS_PER_PAGE - (Total DB Items Before This Page)
-             // We don't know Total DB Items.
-             
-             // SIMPLER:
-             // Just ignore strict pagination correctness for the mixed mode.
-             // Just returning a slice of mocks based on page.
-             const mockOffset = (page - 1) * ITEMS_PER_PAGE;
+             // Get next slice of mocks
+             const mockOffset = mocksAlreadyShown;
              const mockSlice = nonDuplicateMocks.slice(mockOffset, mockOffset + ITEMS_PER_PAGE);
              
-             setPrestadores(prev => [...prev, ...result.prestadores, ...mockSlice]);
-             setHasMore(mockOffset + ITEMS_PER_PAGE < nonDuplicateMocks.length);
+             // Add new DB results (if any) and new mocks
+             setPrestadores(prev => {
+               const newList = [...prev, ...result.prestadores, ...mockSlice];
+               return newList;
+             });
+             
+             setHasMore(mockOffset + ITEMS_PER_PAGE < nonDuplicateMocks.length || result.prestadores.length > 0);
         }
 
       } else {
@@ -210,19 +215,46 @@ const PrestadoresPage = () => {
             console.log('⚠️ Critical DB error, falling back to pure mocks');
             let filteredMocks = MOCK_PRESTADORES.filter(p => {
                  // Apply filters logic again here for redundancy
-                 if (filters.cidade) {
+                 if (filters.cidade && filters.cidade.trim()) {
                     const filterCity = filters.cidade.split(',')[0].trim().toLowerCase();
                     const mockCity = p.endereco_cidade ? p.endereco_cidade.toLowerCase() : '';
-                    if (!mockCity.includes(filterCity)) return false;
+                    if (!mockCity && filters.cidade.trim()) return false; // If filter has city but mock doesn't, exclude
+                    if (mockCity && !mockCity.includes(filterCity) && !filterCity.includes(mockCity.split(',')[0].trim())) {
+                      return false;
+                    }
                  }
                  if (filters.servicos && filters.servicos.length > 0) {
-                   // Simplified check for critical fallback
-                   return true; // Show all services on error to be safe or re-implement detailed check if needed
+                   // Simplified check for critical fallback - show all if service filter fails
+                   const allowedKeywords = new Set<string>();
+                   filters.servicos.forEach(filterS => {
+                     const category = serviceCategories.find(cat => cat.serviceIds?.includes(filterS));
+                     if (category) {
+                       allowedKeywords.add(category.name.toLowerCase());
+                       allowedKeywords.add(category.id.toLowerCase());
+                       const specificNames = categoryServiceNames[category.id];
+                       if (specificNames) {
+                         specificNames.forEach(name => allowedKeywords.add(name.toLowerCase()));
+                       }
+                     } else {
+                       allowedKeywords.add(filterS.toLowerCase());
+                     }
+                   });
+                   const hasService = p.servicos_oferecidos?.some(s => 
+                     Array.from(allowedKeywords).some(keyword => 
+                       s.toLowerCase().includes(keyword) || 
+                       keyword.includes(s.toLowerCase())
+                     )
+                   );
+                   if (!hasService) return false;
                  }
+                 if (filters.apenasPremium && !p.premium) return false;
+                 if (filters.notaMin && (p.nota_media || 0) < filters.notaMin) return false;
                  return true;
             });
-            setPrestadores(filteredMocks.slice(0, ITEMS_PER_PAGE));
+            const initialSlice = filteredMocks.slice(0, ITEMS_PER_PAGE);
+            setPrestadores(initialSlice);
             setHasMore(filteredMocks.length > ITEMS_PER_PAGE);
+            console.log(`✅ Loaded ${initialSlice.length} prestadores from MOCK fallback (${filteredMocks.length} total available)`);
         }
     } finally {
       setLoading(false);
@@ -242,8 +274,8 @@ const PrestadoresPage = () => {
   };
 
   const handleViewProfile = (prestador: UserProfile) => {
-    setSelectedPrestador(prestador);
-    setShowProfileModal(true);
+    console.log('🚀 Navigating to prestador profile:', prestador.id);
+    navigate(`/prestador/${prestador.id}`);
   };
 
   const handleFiltersChange = (newFilters: any) => {
@@ -318,7 +350,7 @@ const PrestadoresPage = () => {
         {/* Lista Normal de Prestadores */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Todos os Prestadores
+            Todos os Prestadores ({prestadores.length})
           </h2>
           
           {loading ? (
@@ -348,16 +380,30 @@ const PrestadoresPage = () => {
             </Card>
           ) : (
             <>
-              <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
-                {prestadores.map(prestador => (
-                  <PrestadorCardImproved
-                    key={prestador.id}
-                    prestador={prestador}
-                    onContact={handleContact}
-                    onViewProfile={handleViewProfile}
-                  />
-                ))}
-              </div>
+              {prestadores.length > 0 && (
+                <div 
+                  className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}
+                  style={{ minHeight: '200px' }}
+                >
+                  {prestadores.map((prestador, index) => {
+                    console.log(`🎴 Rendering prestador ${index + 1}/${prestadores.length}:`, prestador.id, prestador.nome);
+                    return (
+                      <div key={prestador.id} style={{ minHeight: '150px' }}>
+                        <PrestadorCardImproved
+                          prestador={prestador}
+                          onContact={handleContact}
+                          onViewProfile={handleViewProfile}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {prestadores.length === 0 && !loading && (
+                <div className="text-center py-8 text-gray-500">
+                  <p>Nenhum prestador encontrado. Verifique os filtros.</p>
+                </div>
+              )}
 
               {/* Load More Button */}
               {(hasMore || loadingMore) && (
@@ -398,20 +444,11 @@ const PrestadoresPage = () => {
 
       {/* Modals */}
       {selectedPrestador && (
-        <>
-          <PrestadorMiniProfileModal
-            prestador={selectedPrestador}
-            isOpen={showProfileModal}
-            onClose={() => setShowProfileModal(false)}
-            onContact={handleContact}
-          />
-
-          <ContactModal
-            prestador={selectedPrestador}
-            open={showContactModal}
-            onOpenChange={setShowContactModal}
-          />
-        </>
+        <ContactModal
+          prestador={selectedPrestador}
+          open={showContactModal}
+          onOpenChange={setShowContactModal}
+        />
       )}
     </UnifiedLayout>
   );

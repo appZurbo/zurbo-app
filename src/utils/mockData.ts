@@ -18,6 +18,8 @@ const basePrestadores: UserProfile[] = [
     servicos_oferecidos: ['Limpeza', 'Diarista', 'Faxina'],
     foto_url: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=200&h=200&fit=crop&crop=face',
     criado_em: new Date().toISOString(),
+    preco_min: 120,
+    preco_max: 250,
     prestador_servicos: [{ servico: { nome: 'Limpeza' }, preco_min: 120, preco_max: 250 }] as any
   },
   {
@@ -35,6 +37,8 @@ const basePrestadores: UserProfile[] = [
     servicos_oferecidos: ['Limpeza', 'Diarista'],
     foto_url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=face',
     criado_em: new Date().toISOString(),
+    preco_min: 100,
+    preco_max: 180,
     prestador_servicos: [{ servico: { nome: 'Diarista' }, preco_min: 100, preco_max: 180 }] as any
   },
   {
@@ -52,6 +56,8 @@ const basePrestadores: UserProfile[] = [
     servicos_oferecidos: ['Limpeza', 'Comercial'],
     foto_url: 'https://images.unsplash.com/photo-1581578731117-104f2a863a30?w=200&h=200&fit=crop&crop=face',
     criado_em: new Date().toISOString(),
+    preco_min: 300,
+    preco_max: 1000,
     prestador_servicos: [{ servico: { nome: 'Limpeza Comercial' }, preco_min: 300, preco_max: 1000 }] as any
   },
 
@@ -522,10 +528,36 @@ const basePrestadores: UserProfile[] = [
   }
 ];
 
+// Helper function to extract preco_min and preco_max from prestador_servicos
+const addPrecoToPrestador = (prestador: UserProfile): UserProfile => {
+  if (prestador.preco_min && prestador.preco_max) {
+    return prestador; // Already has prices
+  }
+  
+  if (prestador.prestador_servicos && prestador.prestador_servicos.length > 0) {
+    const precos = prestador.prestador_servicos
+      .map((ps: any) => ({ min: ps.preco_min, max: ps.preco_max }))
+      .filter((p: any) => p.min || p.max);
+    
+    if (precos.length > 0) {
+      const allMins = precos.map((p: any) => p.min || 0).filter((m: number) => m > 0);
+      const allMaxs = precos.map((p: any) => p.max || 0).filter((m: number) => m > 0);
+      
+      return {
+        ...prestador,
+        preco_min: allMins.length > 0 ? Math.min(...allMins) : undefined,
+        preco_max: allMaxs.length > 0 ? Math.max(...allMaxs) : undefined
+      };
+    }
+  }
+  
+  return prestador;
+};
+
 // Duplicate some users to reach ~40 users for testing pagination/load more
 export const MOCK_PRESTADORES: UserProfile[] = [
-  ...basePrestadores,
-  ...basePrestadores.map(p => ({
+  ...basePrestadores.map(addPrecoToPrestador),
+  ...basePrestadores.map(p => addPrecoToPrestador({
     ...p,
     id: p.id + '-copy',
     auth_id: p.auth_id + '-copy',

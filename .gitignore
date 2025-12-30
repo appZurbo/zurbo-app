@@ -18,6 +18,9 @@ dist-ssr
 .env.production
 .env.development
 .env*.local
+twilio_inf.txt
+*.txt
+!README.txt
 
 # Editor directories and files
 .vscode/*

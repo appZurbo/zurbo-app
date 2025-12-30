@@ -1,6 +1,8 @@
 
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { UnifiedHeader } from './UnifiedHeader';
+import { ModernHeader } from './ModernHeader';
 import { UnifiedDock } from '@/components/mobile/UnifiedDock';
 import { useMobile } from '@/hooks/useMobile';
 import { useAuth } from '@/hooks/useAuth';
@@ -17,11 +19,13 @@ export const UnifiedLayout: React.FC<UnifiedLayoutProps> = ({
 }) => {
   const isMobile = useMobile();
   const { profile } = useAuth();
+  const location = useLocation();
   const isAdmin = profile?.tipo === 'admin';
+  const isPrestadoresPage = location.pathname === '/prestadores' || location.pathname.startsWith('/prestadores');
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <UnifiedHeader />
+    <div className="min-h-screen bg-[#FBF7F2]">
+      {isPrestadoresPage ? <ModernHeader /> : <UnifiedHeader />}
       
       {/* Admin View Toggle - only show for admins */}
       {isAdmin && (
@@ -32,7 +36,7 @@ export const UnifiedLayout: React.FC<UnifiedLayoutProps> = ({
         </div>
       )}
       
-      <main className={`${isMobile && showDock ? 'pb-20' : ''}`}>
+      <main className={`${isMobile && showDock ? 'pb-24' : ''}`}>
         {children}
       </main>
       

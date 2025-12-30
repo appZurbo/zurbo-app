@@ -6,7 +6,6 @@ import HeroDemo from '@/components/ui/hero-demo';
 import ServiceCategories from '@/components/ServiceCategories';
 import { ModernFilters } from '@/components/filters/ModernFilters';
 import { PrestadorCardImproved } from '@/components/prestadores/PrestadorCardImproved';
-import { PrestadorMiniProfileModal } from '@/components/prestadores/PrestadorMiniProfileModal';
 import { ContactModal } from '@/components/contact/ContactModal';
 import { UserProfile } from '@/types';
 import PartnersSection from '@/components/sections/PartnersSection';
@@ -19,7 +18,6 @@ import { EmptyState } from '@/components/homepage/EmptyState';
 
 const Index = () => {
   const [selectedPrestador, setSelectedPrestador] = useState<UserProfile | null>(null);
-  const [showProfileModal, setShowProfileModal] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const navigate = useNavigate();
 
@@ -41,8 +39,7 @@ const Index = () => {
   };
 
   const handleViewProfile = (prestador: UserProfile) => {
-    setSelectedPrestador(prestador);
-    setShowProfileModal(true);
+    navigate(`/prestador/${prestador.id}`);
   };
 
   const handleCategorySelect = (serviceIds: string[]) => {
@@ -113,13 +110,6 @@ const Index = () => {
 
           {selectedPrestador && (
             <ErrorBoundary>
-              <PrestadorMiniProfileModal
-                prestador={selectedPrestador}
-                isOpen={showProfileModal}
-                onClose={() => setShowProfileModal(false)}
-                onContact={handleContact}
-              />
-
               <ContactModal
                 prestador={selectedPrestador}
                 open={showContactModal}

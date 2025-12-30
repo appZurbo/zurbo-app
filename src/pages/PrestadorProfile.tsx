@@ -6,12 +6,15 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
+import { ModernProviderProfile } from '@/components/prestadores/ModernProviderProfile';
+import { ContactModal } from '@/components/contact/ContactModal';
 import WatermarkSection from '@/components/sections/WatermarkSection';
 import { getUserProfile, getAvaliacoes, getPortfolioFotos } from '@/utils/database';
 import { CommentsList } from '@/components/profile/CommentsList';
 import { AddCommentDialog } from '@/components/profile/AddCommentDialog';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { useMobile } from '@/hooks/useMobile';
 import { 
   ArrowLeft,
   Star, 
@@ -35,10 +38,12 @@ export default function PrestadorProfile() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { isAuthenticated, profile: currentUser } = useAuth();
+  const isMobile = useMobile();
   const [prestador, setPrestador] = useState<any>(null);
   const [avaliacoes, setAvaliacoes] = useState<any[]>([]);
   const [portfolio, setPortfolio] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showContactModal, setShowContactModal] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -48,16 +53,37 @@ export default function PrestadorProfile() {
 
   const loadPrestadorData = async () => {
     try {
-      const [prestadorData, avaliacoesData, portfolioData] = await Promise.all([
-        getUserProfile(id!),
-        getAvaliacoes(id!),
-        getPortfolioFotos(id!)
-      ]);
+      setLoading(true);
       
-      setPrestador(prestadorData);
-      setAvaliacoes(avaliacoesData);
-      setPortfolio(portfolioData);
+      // Check if this is a mock ID (starts with "mock-")
+      const isMockId = id?.startsWith('mock-');
+      
+      if (isMockId) {
+        // Load from mock data
+        const { MOCK_PRESTADORES } = await import('@/utils/mockData');
+        const mockPrestador = MOCK_PRESTADORES.find(p => p.id === id);
+        
+        if (mockPrestador) {
+          setPrestador(mockPrestador);
+          setAvaliacoes([]); // No mock reviews for now
+          setPortfolio([]); // No mock portfolio for now
+        } else {
+          throw new Error('Mock prestador not found');
+        }
+      } else {
+        // Load from database
+        const [prestadorData, avaliacoesData, portfolioData] = await Promise.all([
+          getUserProfile(id!),
+          getAvaliacoes(id!),
+          getPortfolioFotos(id!)
+        ]);
+        
+        setPrestador(prestadorData);
+        setAvaliacoes(avaliacoesData);
+        setPortfolio(portfolioData);
+      }
     } catch (error) {
+      console.error('Error loading prestador data:', error);
       toast({
         title: "Erro",
         description: "Não foi possível carregar os dados do prestador",
@@ -144,6 +170,47 @@ export default function PrestadorProfile() {
             </Button>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  const handleSchedule = () => {
+    console.log('🔔 handleSchedule called', { isAuthenticated, prestador: prestador?.id });
+    if (!isAuthenticated) {
+      toast({
+        title: "Login necessário",
+        description: "Você precisa fazer login para contratar um serviço",
+        variant: "destructive",
+      });
+      navigate('/auth');
+      return;
+    }
+    // Abrir modal de contato/combinação de serviço
+    console.log('✅ Opening contact modal');
+    setShowContactModal(true);
+  };
+
+  // Use modern profile on mobile
+  if (isMobile) {
+    console.log('📱 Mobile view - showContactModal:', showContactModal, 'prestador:', prestador?.id);
+    return (
+      <div className="relative">
+        <ModernProviderProfile
+          prestador={prestador}
+          avaliacoes={avaliacoes}
+          onContact={handleContact}
+          onSchedule={handleSchedule}
+        />
+        {prestador && (
+          <ContactModal
+            prestador={prestador}
+            open={showContactModal}
+            onOpenChange={(open) => {
+              console.log('🔄 ContactModal onOpenChange:', open);
+              setShowContactModal(open);
+            }}
+          />
+        )}
       </div>
     );
   }
@@ -505,6 +572,15 @@ export default function PrestadorProfile() {
       </div>
 
       <WatermarkSection />
+      
+      {/* Contact Modal */}
+      {prestador && (
+        <ContactModal
+          prestador={prestador}
+          open={showContactModal}
+          onOpenChange={setShowContactModal}
+        />
+      )}
     </div>
   );
 }
