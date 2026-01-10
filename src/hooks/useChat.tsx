@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from './useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Message } from '@/types';
+import { logger } from '@/utils/logger';
 
 // Chat interface with simplified user info for this hook
 interface ChatWithUsers {
@@ -33,7 +34,7 @@ export const useChat = () => {
   useEffect(() => {
     if (!currentChat) return;
 
-    console.log('Setting up realtime subscription for chat:', currentChat.id);
+    logger.log('Setting up realtime subscription for chat:', currentChat.id);
 
     const channel = supabase
       .channel('chat-messages')
@@ -46,17 +47,17 @@ export const useChat = () => {
           filter: `chat_id=eq.${currentChat.id}`
         },
         (payload) => {
-          console.log('New message received:', payload);
+          logger.log('New message received:', payload);
           const newMessage = payload.new as Message;
           setMessages(prev => [...prev, newMessage]);
         }
       )
       .subscribe((status) => {
-        console.log('Realtime subscription status:', status);
+        logger.log('Realtime subscription status:', status);
       });
 
     return () => {
-      console.log('Cleaning up realtime subscription');
+      logger.log('Cleaning up realtime subscription');
       supabase.removeChannel(channel);
     };
   }, [currentChat]);
@@ -66,7 +67,7 @@ export const useChat = () => {
     
     setLoading(true);
     try {
-      console.log('Loading chats for profile:', profile.id);
+      logger.log('Loading chats for profile:', profile.id);
       const { data, error } = await supabase
         .from('chats')
         .select(`
@@ -78,11 +79,11 @@ export const useChat = () => {
         .order('updated_at', { ascending: false });
 
       if (error) {
-        console.error('Error loading chats:', error);
+        logger.error('Error loading chats:', error);
         throw error;
       }
       
-      console.log('Loaded chats:', data);
+      logger.log('Loaded chats:', data);
       setChats(data || []);
     } catch (error) {
       console.error('Error loading chats:', error);
@@ -93,7 +94,7 @@ export const useChat = () => {
 
   const loadMessages = async (chatId: string) => {
     try {
-      console.log('Loading messages for chat:', chatId);
+      logger.log('Loading messages for chat:', chatId);
       const { data, error } = await supabase
         .from('messages')
         .select('*')
@@ -105,7 +106,7 @@ export const useChat = () => {
         throw error;
       }
       
-      console.log('Loaded messages:', data);
+      logger.log('Loaded messages:', data);
       setMessages(data || []);
     } catch (error) {
       console.error('Error loading messages:', error);
@@ -114,12 +115,12 @@ export const useChat = () => {
 
   const sendMessage = async (chat: ChatWithUsers, content: string) => {
     if (!profile || !content.trim()) {
-      console.log('Cannot send message - missing profile or content');
+      logger.log('Cannot send message - missing profile or content');
       return;
     }
 
     try {
-      console.log('Sending message:', { chatId: chat.id, content, senderId: profile.id });
+      logger.log('Sending message:', { chatId: chat.id, content, senderId: profile.id });
       
       const { data, error } = await supabase
         .from('messages')
@@ -136,7 +137,7 @@ export const useChat = () => {
         throw error;
       }
 
-      console.log('Message sent successfully:', data);
+      logger.log('Message sent successfully:', data);
     } catch (error) {
       console.error('Error sending message:', error);
     }
@@ -144,12 +145,12 @@ export const useChat = () => {
 
   const createChat = async (prestadorId: string) => {
     if (!profile) {
-      console.log('Cannot create chat - no profile');
+      logger.log('Cannot create chat - no profile');
       return null;
     }
 
     try {
-      console.log('Creating chat between:', profile.id, 'and', prestadorId);
+      logger.log('Creating chat between:', profile.id, 'and', prestadorId);
       
       // Verificar se já existe um chat entre estes usuários
       const { data: existingChat } = await supabase
@@ -159,7 +160,7 @@ export const useChat = () => {
         .maybeSingle();
 
       if (existingChat) {
-        console.log('Chat already exists:', existingChat);
+        logger.log('Chat already exists:', existingChat);
         return existingChat;
       }
 
@@ -177,7 +178,7 @@ export const useChat = () => {
         throw error;
       }
 
-      console.log('Chat created successfully:', data);
+      logger.log('Chat created successfully:', data);
       await loadChats();
       return data;
     } catch (error) {
