@@ -205,8 +205,8 @@ export const ProviderProfileSection = () => {
             <div className="flex flex-col items-center space-y-2">
               <div className="relative">
                 <Avatar className="w-24 h-24 border-4 border-orange-100">
-                  <AvatarImage src={profile.foto_url} alt={profile.nome} />
-                  <AvatarFallback className="text-xl bg-orange-100 text-orange-600">
+                  <AvatarImage src={profile.foto_url || 'https://placehold.co/96x96/E2E8F0/4A5568?text=Foto'} alt={profile.nome} />
+                  <AvatarFallback className="text-xl bg-orange-100 text-orange-600 font-semibold">
                     {profile.nome?.charAt(0)?.toUpperCase() || '?'}
                   </AvatarFallback>
                 </Avatar>

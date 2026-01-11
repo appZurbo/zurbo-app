@@ -164,10 +164,12 @@ const ProfilePage = () => {
           <div className="flex items-center gap-4">
             <div className="flex flex-col items-center space-y-2">
               <div className="relative">
-                <Avatar className="w-20 h-20">
-                  <AvatarImage src={profile.foto_url} />
-                  <AvatarFallback>{profile.nome?.charAt(0)}</AvatarFallback>
-                </Avatar>
+            <Avatar className="w-20 h-20">
+              <AvatarImage src={profile.foto_url || 'https://placehold.co/80x80/E2E8F0/4A5568?text=Foto'} />
+              <AvatarFallback className="bg-gray-100 text-gray-600 font-semibold text-lg">
+                {profile.nome?.charAt(0)?.toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
                 {editing && (
                   <Button
                     variant="outline"
