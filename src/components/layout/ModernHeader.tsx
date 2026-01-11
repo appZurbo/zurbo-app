@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   DropdownMenu, 
@@ -11,9 +10,8 @@ import {
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 import { 
-  MapPin, 
-  Search, 
-  Settings, 
+  MapPin,
+  Settings,
   SlidersHorizontal,
   User,
   LogOut,
@@ -28,6 +26,7 @@ import { useMobile } from '@/hooks/useMobile';
 import AuthModal from '@/components/AuthModal';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SearchDropdown } from '@/components/SearchDropdown';
 
 const CIDADES_DISPONIVEIS = [
   'Sinop, Mato Grosso',
@@ -45,7 +44,7 @@ export const ModernHeader = () => {
   const isMobile = useMobile();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [selectedCity, setSelectedCity] = useState('Sinop, Mato Grosso');
-  const [searchQuery, setSearchQuery] = useState('');
+
 
   const isPremium = profile?.premium || false;
 
@@ -54,12 +53,6 @@ export const ModernHeader = () => {
     navigate('/');
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/prestadores?search=${encodeURIComponent(searchQuery)}`);
-    }
-  };
 
   // Only show on prestadores page
   if (location.pathname !== '/prestadores' && !location.pathname.startsWith('/prestadores')) {
@@ -179,28 +172,18 @@ export const ModernHeader = () => {
 
           {/* Search Bar */}
           <div className="mb-4">
-            <form onSubmit={handleSearch} className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-[#8C7E72] group-focus-within:text-[#E05815] transition-colors" />
-              </div>
-              <Input
-                type="text"
-                placeholder="Buscar serviços..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-11 pr-12 py-4 bg-white rounded-2xl shadow-sm text-[#3D342B] placeholder:text-[#8C7E72] focus:outline-none focus:ring-2 focus:ring-[#E05815]/20 border-[#E6DDD5]"
-              />
-              <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="p-2 bg-[#FEE8D6] text-[#E05815] rounded-xl hover:bg-[#FEE8D6]/80"
-                >
-                  <SlidersHorizontal className="h-5 w-5" />
-                </Button>
-              </div>
-            </form>
+            <SearchDropdown
+              placeholder="Buscar serviços..."
+              onSearchSubmit={(query) => {
+                if (query.trim()) {
+                  navigate(`/prestadores?search=${encodeURIComponent(query)}`);
+                }
+              }}
+              onFiltersClick={() => {
+                // TODO: Implementar abertura dos filtros avançados
+                console.log('Abrir filtros avançados');
+              }}
+            />
           </div>
         </div>
       </header>

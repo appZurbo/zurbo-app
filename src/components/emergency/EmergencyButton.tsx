@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertTriangle, MapPin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { StarBorder } from '@/components/ui/star-border';
 
 export const EmergencyButton = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -61,18 +60,55 @@ export const EmergencyButton = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <StarBorder 
-          className="w-full cursor-pointer"
-          color="#ef4444"
-          speed="2s"
-        >
-          <div className="flex items-center justify-center gap-2 text-red-600">
-            <AlertTriangle className="h-5 w-5" />
-            SOS Emergência
-          </div>
-        </StarBorder>
-      </DialogTrigger>
+      <div className="flex flex-col items-center">
+        <DialogTrigger asChild>
+          <button
+            data-emergency-button
+            className="relative group cursor-pointer transform transition-all duration-200 hover:scale-105 active:scale-95"
+          >
+            {/* Halo branco */}
+            <div className="absolute inset-0 bg-white rounded-full"></div>
+
+            {/* Contorno preto fino ao redor do halo branco */}
+            <div className="absolute inset-0 border border-black rounded-full"></div>
+
+            {/* Borda interna vermelha */}
+            <div className="relative bg-red-500 border-2 border-red-600 rounded-full px-5 py-2 shadow-lg m-1">
+              <div className="flex items-center justify-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-white" />
+                <span
+                  className="text-white font-bold text-sm tracking-wide"
+                  style={{
+                    textShadow: `
+                      -1px -1px 0 #000,
+                      1px -1px 0 #000,
+                      -1px 1px 0 #000,
+                      1px 1px 0 #000,
+                      0px -1px 0 #000,
+                      0px 1px 0 #000,
+                      -1px 0px 0 #000,
+                      1px 0px 0 #000
+                    `
+                  }}
+                >
+                  SOS Emergência
+                </span>
+              </div>
+            </div>
+
+            {/* Efeito de desgaste/velho */}
+            <div className="absolute inset-1 bg-gradient-to-br from-transparent via-white/10 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+          </button>
+        </DialogTrigger>
+
+        {/* Texto descritivo */}
+        <div className="text-center mt-2">
+          <p className="text-xs text-gray-600 leading-tight">
+            Use para casos de extrema urgência<br />
+            <span className="text-orange-600 font-medium">*Valores maiores podem ser aplicados</span>
+          </p>
+        </div>
+      </div>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-red-600">

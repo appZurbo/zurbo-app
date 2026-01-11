@@ -308,7 +308,7 @@ const PrestadoresPage = () => {
       {/* Centralized container matching header width */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="flex items-center justify-between gap-4 mb-6 py-4">
+        <div className={`mb-6 py-4 ${isMobile ? '' : 'flex items-center justify-between gap-4'}`}>
           <div className="flex-1">
             <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
               Prestadores de Serviços
@@ -317,19 +317,43 @@ const PrestadoresPage = () => {
               Encontre o profissional ideal para suas necessidades
             </p>
           </div>
-          
-          {/* Emergency SOS Button - Desktop Right Position */}
-          {isAuthenticated && !isMobile && (
-            <div className="flex-shrink-0">
+
+          {/* SOS Image */}
+          {!isMobile && (
+            <div className="flex flex-col items-center gap-2">
+              <img
+                src="/sos button.png"
+                alt="Botão SOS"
+                className="w-40 h-40 object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
+                onClick={() => {
+                  // Encontra o botão EmergencyButton e clica nele
+                  const emergencyButton = document.querySelector('[data-emergency-button]');
+                  if (emergencyButton) {
+                    (emergencyButton as HTMLElement).click();
+                  }
+                }}
+              />
               <EmergencyButton />
             </div>
           )}
         </div>
 
-        {/* Emergency SOS Button - Mobile Full Width */}
-        {isAuthenticated && isMobile && (
-          <div className="mb-6">
+        {/* Mobile SOS Section */}
+        {isMobile && (
+          <div className="flex justify-end items-center gap-3 mb-6">
             <EmergencyButton />
+            <img
+              src="/sos button.png"
+              alt="Botão SOS"
+              className="w-40 h-40 object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
+              onClick={() => {
+                // Encontra o botão EmergencyButton e clica nele
+                const emergencyButton = document.querySelector('[data-emergency-button]');
+                if (emergencyButton) {
+                  (emergencyButton as HTMLElement).click();
+                }
+              }}
+            />
           </div>
         )}
 

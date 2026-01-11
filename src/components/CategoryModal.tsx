@@ -27,6 +27,28 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
   const imageUrl = `/${category.image}`;
   const hasServices = category.serviceIds && category.serviceIds.length > 0;
 
+  // Mapeamento das imagens do grid para usar PNGs da pasta icons/
+  const getGridImageUrl = (categoryId: string) => {
+    const gridImageMap: Record<string, string> = {
+      'limpeza': 'icons/limpeza.png',
+      'reparos': 'icons/reparos.png',
+      'eletrica': 'icons/eletricista.png',
+      'beleza': 'icons/beleza.png',
+      'construcao': 'icons/construcao.png',
+      'jardinagem': 'icons/jardineiro.png',
+      'fretes': 'icons/fretes.png',
+      'chaveiro': 'icons/chaveiro.png',
+      'cozinha': 'icons/cozinha.png',
+      'tecnologia': 'icons/tecnologia.png',
+      'cuidados': 'icons/cuidados (1).png',
+      'refrigeracao': 'icons/refrigeracao.png',
+      'mecanico': 'icons/mecanico.png'
+    };
+    return gridImageMap[categoryId] || category.image;
+  };
+
+  const gridImageUrl = `/${getGridImageUrl(category.id)}`;
+
   const handleFindProviders = () => {
     if (hasServices) {
       // Navigate to prestadores page with pre-applied filters
@@ -123,7 +145,7 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
           {/* Image section - 40% width, full height */}
           <div className={`w-[40%] h-full relative overflow-hidden ${getImageBackground()}`}>
             <MorphingDialogImage
-              src={imageUrl}
+              src={gridImageUrl}
               alt={category.name}
               className="absolute inset-0 w-full h-full group-hover:scale-[1.5] transition-transform duration-300"
               style={getImageStyles(category.id)}

@@ -80,33 +80,42 @@ const Settings = () => {
     <UnifiedLayout>
       <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
         <div className={`${isMobile ? 'px-4 py-4' : 'max-w-4xl mx-auto p-6'}`}>
-          {/* Header centralizado */}
-          <div className="text-center mb-8">
-            <Button variant="ghost" onClick={() => navigate('/')} className="absolute left-4 top-4">
+          {/* Header */}
+          <div className="flex items-center gap-4 mb-6">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/')}
+              className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}
+            >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar
+              {!isMobile && 'Voltar'}
             </Button>
-            
-            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-center rounded-sm">
-              <SettingsIcon className="h-8 w-8 text-white" />
+
+            <div className="flex-1">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
+                  <SettingsIcon className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
+                    Configurações
+                  </h1>
+                  <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''} flex items-center gap-2`}>
+                    {isPrestador ? (
+                      <>
+                        <Wrench className="h-4 w-4" />
+                        Painel do Prestador
+                      </>
+                    ) : (
+                      <>
+                        <User className="h-4 w-4" />
+                        Perfil do Cliente
+                      </>
+                    )}
+                  </p>
+                </div>
+              </div>
             </div>
-            
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Configurações
-            </h1>
-            <p className="text-gray-600 flex items-center justify-center gap-2">
-              {isPrestador ? (
-                <>
-                  <Wrench className="h-4 w-4" />
-                  Painel do Prestador
-                </>
-              ) : (
-                <>
-                  <User className="h-4 w-4" />
-                  Configurações do Cliente
-                </>
-              )}
-            </p>
           </div>
 
           {/* PAINEL DE TESTE MOBILE - SÓ APARECE NO APP */}

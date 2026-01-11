@@ -41,10 +41,11 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = 'login' }: AuthModal
             <X className="h-4 w-4" />
           </Button>
           <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-2xl">Z</span>
-            </div>
-            <DialogTitle className="text-2xl font-bold">ZURBO</DialogTitle>
+            <img
+              src="/logoinv.png"
+              alt="Zurbo Logo"
+              className="w-32 h-auto mx-auto mb-4"
+            />
             <p className="text-gray-600 mt-1">Conectando você aos melhores profissionais</p>
           </div>
         </DialogHeader>

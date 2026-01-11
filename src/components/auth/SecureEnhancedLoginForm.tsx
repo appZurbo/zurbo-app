@@ -232,14 +232,6 @@ export const SecureEnhancedLoginForm = ({ onSuccess, onSwitchToRegister }: Secur
         </Button>
       </div>
 
-      {/* Indicadores de segurança */}
-      <div className="text-xs text-center text-muted-foreground space-y-1">
-        <div className="flex items-center justify-center gap-2">
-          <Shield className="h-3 w-3" />
-          <span>Protegido por autenticação segura</span>
-        </div>
-        <p>• Rate limiting ativo • Emails temporários bloqueados • Logs de auditoria</p>
-      </div>
 
       <EmailConfirmationModal
         isOpen={showEmailConfirmation}

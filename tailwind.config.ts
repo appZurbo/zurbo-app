@@ -84,11 +84,29 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'star-movement-bottom': {
+					'0%': {
+						transform: 'translate(0%, 0%) rotateZ(0deg)'
+					},
+					'100%': {
+						transform: 'translate(-100%, -100%) rotateZ(360deg)'
+					}
+				},
+				'star-movement-top': {
+					'0%': {
+						transform: 'translate(0%, -100%) rotate(360deg)'
+					},
+					'100%': {
+						transform: 'translate(-100%, 0%) rotate(0deg)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'star-movement-bottom': 'star-movement-bottom linear infinite',
+				'star-movement-top': 'star-movement-top linear infinite'
 			}
 		}
 	},

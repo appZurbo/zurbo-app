@@ -350,10 +350,10 @@ const PrestadorManagement = () => {
               Voltar
             </Button>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
                 Gerenciar Prestadores
               </h1>
-              <p className="text-gray-600">
+              <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
                 Visualize, aprove e gerencie os prestadores de serviço
               </p>
             </div>
