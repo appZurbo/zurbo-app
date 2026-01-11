@@ -38,7 +38,7 @@ export const CategoryShortcutButton: React.FC<CategoryShortcutButtonProps> = ({
 
   const gridImageUrl = `/${getGridImageUrl(category.id)}`;
 
-  // Get image positioning based on category needs - center images with reduced scale
+  // Get image positioning based on category needs - optimized scale for better containment
   const getImageStyles = (categoryId: string) => {
     const baseStyles = {
       objectFit: 'cover' as const,
@@ -50,11 +50,11 @@ export const CategoryShortcutButton: React.FC<CategoryShortcutButtonProps> = ({
       case 'refrigeracao':
       case 'cuidados':
       case 'cozinha':
-        // Larger scale for specific categories (20% increase from 0.88)
+        // Slightly larger scale for specific categories (reduced from 1.056 to 0.95 for better containment)
         return {
           ...baseStyles,
           objectPosition: 'center',
-          transform: 'scale(1.056)'
+          transform: 'scale(0.95)'
         };
       case 'limpeza':
       case 'beleza':
@@ -64,17 +64,17 @@ export const CategoryShortcutButton: React.FC<CategoryShortcutButtonProps> = ({
       case 'tecnologia':
       case 'chaveiro':
       case 'mecanico':
-        // Center images with slightly larger scale
+        // Standard scale reduced from 0.88 to 0.8 for better containment
         return {
           ...baseStyles,
           objectPosition: 'center',
-          transform: 'scale(0.88)'
+          transform: 'scale(0.8)'
         };
       default:
         return {
           ...baseStyles,
           objectPosition: 'center',
-          transform: 'scale(0.88)'
+          transform: 'scale(0.8)'
         };
     }
   };
