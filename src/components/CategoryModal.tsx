@@ -66,34 +66,29 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
     return 'bg-white';
   };
 
-  // Dynamic positioning and sizing based on category needs
+  // Dynamic positioning and sizing based on category needs - optimized for new images
   const getImageStyles = (categoryId: string) => {
     const baseStyles = {
       objectFit: 'contain' as const,
+      objectPosition: 'center' as const,
+      transform: 'scale(0.9)' // Default scale for better centering
     };
 
     switch (categoryId) {
       case 'fretes':
-        // Special handling for fretes - reduce scale and use object-cover for edge cropping
+        // Fretes needs special handling - often has text/logos that need specific positioning
         return {
           ...baseStyles,
           objectFit: 'cover' as const,
-          objectPosition: 'center 75%',
-          transform: 'scale(1.2)' // Reduced from 1.4 to prevent cutting left character
-        };
-      case 'encanador':
-        // New encanador category positioning
-        return {
-          ...baseStyles,
-          objectPosition: 'center 20%',
-          transform: 'scale(1.5)'
+          objectPosition: 'center 70%',
+          transform: 'scale(0.8)' // Smaller scale for fretes
         };
       case 'cozinha':
-        // New cozinha category positioning
+        // Cozinha images often have better composition at center-top
         return {
           ...baseStyles,
-          objectPosition: 'center 25%',
-          transform: 'scale(1.4)'
+          objectPosition: 'center top',
+          transform: 'scale(0.85)'
         };
       case 'limpeza':
       case 'beleza':
@@ -102,19 +97,31 @@ export const CategoryModal = ({ category, index, onCategorySelect }: CategoryMod
       case 'construcao':
       case 'jardinagem':
       case 'refrigeracao':
-        // Categories that need to be enlarged and positioned at the very top to show faces clearly
+      case 'tecnologia':
+        // Most categories work well with slight top positioning for faces/details
         return {
           ...baseStyles,
-          objectPosition: 'center top', // Position at the very top to show faces
-          transform: 'scale(1.4)' // Slightly reduced scale to show more of the image
+          objectPosition: 'center top',
+          transform: 'scale(0.85)'
+        };
+      case 'cuidados':
+        // Cuidados often needs center positioning for better composition
+        return {
+          ...baseStyles,
+          objectPosition: 'center',
+          transform: 'scale(0.9)'
+        };
+      case 'chaveiro':
+      case 'mecanico':
+        // Technical categories work well centered
+        return {
+          ...baseStyles,
+          objectPosition: 'center',
+          transform: 'scale(0.85)'
         };
       default:
-        // Default positioning for other categories
-        return {
-          ...baseStyles,
-          objectPosition: 'center 70%',
-          transform: 'scale(1.4)'
-        };
+        // Default optimized centering for any new categories
+        return baseStyles;
     }
   };
 
