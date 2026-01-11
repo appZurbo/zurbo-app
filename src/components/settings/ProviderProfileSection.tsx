@@ -37,6 +37,57 @@ export const ProviderProfileSection = () => {
     return new Date(dateString).toLocaleDateString('pt-BR');
   };
 
+  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !profile) return;
+
+    try {
+      setLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Generate unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/avatar.${fileExt}`;
+
+      // Upload to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('profile-pictures')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('profile-pictures')
+        .getPublicUrl(fileName);
+
+      // Update user profile
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ foto_url: publicUrl })
+        .eq('auth_id', user.id);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Foto atualizada!",
+        description: "Sua foto de perfil foi alterada com sucesso.",
+      });
+
+      // Reload page to reflect changes
+      window.location.reload();
+    } catch (error: any) {
+      toast({
+        title: "Erro ao atualizar foto",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleEdit = () => {
     setEditData({
       nome: profile.nome || '',
@@ -151,18 +202,40 @@ export const ProviderProfileSection = () => {
       <CardContent className="space-y-6">
         {/* Profile Picture and Basic Info */}
         <div className="flex flex-col sm:flex-row items-center gap-6">
-          <div className="flex flex-col items-center space-y-2">
-            <Avatar className="w-24 h-24 border-4 border-orange-100">
-              <AvatarImage src={profile.foto_url} alt={profile.nome} />
-              <AvatarFallback className="text-xl bg-orange-100 text-orange-600">
-                {profile.nome?.charAt(0)?.toUpperCase() || '?'}
-              </AvatarFallback>
-            </Avatar>
-            <Badge variant="secondary" className="bg-orange-50 text-orange-700 border-orange-200">
-              <Wrench className="h-3 w-3 mr-1" />
-              Prestador Ativo
-            </Badge>
-          </div>
+            <div className="flex flex-col items-center space-y-2">
+              <div className="relative">
+                <Avatar className="w-24 h-24 border-4 border-orange-100">
+                  <AvatarImage src={profile.foto_url} alt={profile.nome} />
+                  <AvatarFallback className="text-xl bg-orange-100 text-orange-600">
+                    {profile.nome?.charAt(0)?.toUpperCase() || '?'}
+                  </AvatarFallback>
+                </Avatar>
+                {isEditing && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="absolute -top-2 -right-2 h-8 w-8 p-0 rounded-full bg-white border-2 border-orange-200 hover:bg-orange-50"
+                    onClick={() => document.getElementById('provider-photo-upload')?.click()}
+                    disabled={loading}
+                  >
+                    <Edit3 className="h-4 w-4 text-orange-600" />
+                  </Button>
+                )}
+                {isEditing && (
+                  <input
+                    id="provider-photo-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoUpload}
+                    className="hidden"
+                  />
+                )}
+              </div>
+              <Badge variant="secondary" className="bg-orange-50 text-orange-700 border-orange-200">
+                <Wrench className="h-3 w-3 mr-1" />
+                Prestador Ativo
+              </Badge>
+            </div>
           
           <div className="flex-1 space-y-3">
             <div>

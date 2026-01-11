@@ -16,6 +16,7 @@ const ProfilePage = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
+  const [photoEditing, setPhotoEditing] = useState(false);
   const [formData, setFormData] = useState<Partial<UserProfile>>({});
   const { toast } = useToast();
 
@@ -35,13 +36,13 @@ const ProfilePage = () => {
         .single();
 
       if (error) throw error;
-      
+
       // Ensure tipo is properly typed
       const profileData: UserProfile = {
         ...data,
         tipo: data.tipo as 'cliente' | 'prestador' | 'admin' | 'moderator'
       };
-      
+
       setProfile(profileData);
       setFormData(profileData);
     } catch (error: any) {
@@ -90,6 +91,58 @@ const ProfilePage = () => {
     return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '***.***.***-**');
   };
 
+  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !profile) return;
+
+    try {
+      setLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Generate unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/avatar.${fileExt}`;
+
+      // Upload to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('profile-pictures')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('profile-pictures')
+        .getPublicUrl(fileName);
+
+      // Update user profile
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ foto_url: publicUrl })
+        .eq('auth_id', user.id);
+
+      if (updateError) throw updateError;
+
+      // Update local state
+      setProfile({ ...profile, foto_url: publicUrl });
+
+      toast({
+        title: "Foto atualizada!",
+        description: "Sua foto de perfil foi alterada com sucesso.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao atualizar foto",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+      setPhotoEditing(false);
+    }
+  };
+
   if (loading) {
     return <div className="flex justify-center p-8">Carregando...</div>;
   }
@@ -109,17 +162,37 @@ const ProfilePage = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-center gap-4">
-            <Avatar className="w-20 h-20">
-              <AvatarImage src={profile.foto_url} />
-              <AvatarFallback>{profile.nome?.charAt(0)}</AvatarFallback>
-            </Avatar>
+            <div className="flex flex-col items-center space-y-2">
+              <div className="relative">
+                <Avatar className="w-20 h-20">
+                  <AvatarImage src={profile.foto_url} />
+                  <AvatarFallback>{profile.nome?.charAt(0)}</AvatarFallback>
+                </Avatar>
+                {editing && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="absolute -top-2 -right-2 h-8 w-8 p-0 rounded-full"
+                    onClick={() => document.getElementById('photo-upload')?.click()}
+                    disabled={loading}
+                  >
+                    <Camera className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              {editing && (
+                <input
+                  id="photo-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoUpload}
+                  className="hidden"
+                />
+              )}
+            </div>
             <div>
               <h3 className="text-xl font-semibold">{profile.nome}</h3>
               <p className="text-gray-600 capitalize">{profile.tipo}</p>
-              <Button variant="outline" size="sm" className="mt-2">
-                <Camera className="h-4 w-4 mr-2" />
-                Alterar Foto
-              </Button>
             </div>
           </div>
 
