@@ -2,8 +2,8 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Shield, FileText, Users, HelpCircle, Target, Heart, Lightbulb } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Shield, FileText, Users, HelpCircle, Target, Heart, Lightbulb, ExternalLink } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { useMobile } from '@/hooks/useMobile';
 import AuthButton from '@/components/auth/AuthModalHelper';
@@ -41,7 +41,7 @@ const InformacoesUnificada = () => {
           <Card>
             <CardContent className="p-0">
               <Tabs defaultValue="sobre" className="w-full">
-                <TabsList className="grid w-full grid-cols-5">
+                <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="sobre" className="flex items-center gap-2">
                     <Heart className="h-4 w-4" />
                     {!isMobile && 'Sobre'}
@@ -49,14 +49,6 @@ const InformacoesUnificada = () => {
                   <TabsTrigger value="regras" className="flex items-center gap-2">
                     <Shield className="h-4 w-4" />
                     {!isMobile && 'Regras'}
-                  </TabsTrigger>
-                  <TabsTrigger value="termos" className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    {!isMobile && 'Termos'}
-                  </TabsTrigger>
-                  <TabsTrigger value="privacidade" className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    {!isMobile && 'Privacidade'}
                   </TabsTrigger>
                   <TabsTrigger value="como-funciona" className="flex items-center gap-2">
                     <HelpCircle className="h-4 w-4" />
@@ -148,8 +140,8 @@ const InformacoesUnificada = () => {
                   </div>
                 </TabsContent>
 
+
                 <TabsContent value="regras" className="p-6">
-                  
                   <div className="space-y-6">
                     <div>
                       <h2 className="text-2xl font-bold mb-4">Regras da Comunidade</h2>
@@ -175,65 +167,42 @@ const InformacoesUnificada = () => {
                         </section>
                       </div>
                     </div>
-                  </div>
-                </TabsContent>
 
-                <TabsContent value="termos" className="p-6">
-                  
-                  <div className="space-y-6">
-                    <div>
-                      <h2 className="text-2xl font-bold mb-4">Termos de Uso</h2>
-                      <div className="space-y-4 text-gray-700">
-                        <section>
-                          <h3 className="text-lg font-semibold mb-2">1. Aceitação dos Termos</h3>
-                          <p>Ao usar a plataforma Zurbo, você concorda com estes termos de uso e nossa política de privacidade.</p>
-                        </section>
-                        
-                        <section>
-                          <h3 className="text-lg font-semibold mb-2">2. Responsabilidades do Usuário</h3>
-                          <p>Você é responsável por manter sua conta segura e por todas as atividades realizadas em sua conta.</p>
-                        </section>
-                        
-                        <section>
-                          <h3 className="text-lg font-semibold mb-2">3. Uso da Plataforma</h3>
-                          <p>A plataforma deve ser usada apenas para fins legítimos de contratação e prestação de serviços.</p>
-                        </section>
+                    {/* Links para páginas separadas */}
+                    <div className="mt-8 grid gap-4 md:grid-cols-2">
+                      <Link to="/termos-uso">
+                        <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+                          <CardContent className="p-6">
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                                <FileText className="h-6 w-6 text-orange-600" />
+                              </div>
+                              <div>
+                                <h3 className="text-lg font-semibold text-gray-900">Termos de Uso</h3>
+                                <p className="text-sm text-gray-600">Leia nossos termos completos</p>
+                              </div>
+                              <ExternalLink className="h-5 w-5 text-gray-400 ml-auto" />
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </Link>
 
-                        <section>
-                          <h3 className="text-lg font-semibold mb-2">4. Limitação de Responsabilidade</h3>
-                          <p>A Zurbo atua como intermediário entre clientes e prestadores. Não somos responsáveis pela qualidade ou execução dos serviços.</p>
-                        </section>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="privacidade" className="p-6">
-                  
-                  <div className="space-y-6">
-                    <div>
-                      <h2 className="text-2xl font-bold mb-4">Política de Privacidade</h2>
-                      <div className="space-y-4 text-gray-700">
-                        <section>
-                          <h3 className="text-lg font-semibold mb-2">1. Coleta de Dados</h3>
-                          <p>Coletamos apenas as informações necessárias para fornecer nossos serviços, como nome, email, localização e informações de perfil.</p>
-                        </section>
-                        
-                        <section>
-                          <h3 className="text-lg font-semibold mb-2">2. Uso dos Dados</h3>
-                          <p>Seus dados são usados para conectar clientes e prestadores, processar pagamentos e melhorar nossos serviços.</p>
-                        </section>
-                        
-                        <section>
-                          <h3 className="text-lg font-semibold mb-2">3. Compartilhamento</h3>
-                          <p>Não vendemos ou compartilhamos seus dados pessoais com terceiros, exceto quando necessário para fornecer nossos serviços.</p>
-                        </section>
-
-                        <section>
-                          <h3 className="text-lg font-semibold mb-2">4. Segurança</h3>
-                          <p>Implementamos medidas de segurança adequadas para proteger seus dados contra acesso não autorizado.</p>
-                        </section>
-                      </div>
+                      <Link to="/politica-privacidade">
+                        <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+                          <CardContent className="p-6">
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <Shield className="h-6 w-6 text-blue-600" />
+                              </div>
+                              <div>
+                                <h3 className="text-lg font-semibold text-gray-900">Política de Privacidade</h3>
+                                <p className="text-sm text-gray-600">Saiba como protegemos seus dados</p>
+                              </div>
+                              <ExternalLink className="h-5 w-5 text-gray-400 ml-auto" />
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </Link>
                     </div>
                   </div>
                 </TabsContent>
