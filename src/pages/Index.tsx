@@ -10,6 +10,7 @@ import { ContactModal } from '@/components/contact/ContactModal';
 import { UserProfile } from '@/types';
 import PartnersSection from '@/components/sections/PartnersSection';
 import WatermarkSection from '@/components/sections/WatermarkSection';
+import { ModernFooter } from '@/components/layout/ModernFooter';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { useHomepage } from '@/hooks/useHomepage';
 import { HomepageHeader } from '@/components/homepage/HomepageHeader';
@@ -106,6 +107,10 @@ const Index = () => {
 
           <ErrorBoundary>
             <WatermarkSection />
+          </ErrorBoundary>
+
+          <ErrorBoundary>
+            <ModernFooter />
           </ErrorBoundary>
 
           {selectedPrestador && (
