@@ -1,8 +1,10 @@
+import { createRoot } from 'react-dom/client';
+import App from './App.tsx';
+import './index.css';
+import { AuthProvider } from '@/hooks/useAuth';
+import { setupSecurityHeaders } from '@/utils/securityHeaders';
 
-import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
-import { AuthProvider } from '@/hooks/useAuth'
+setupSecurityHeaders();
 
 createRoot(document.getElementById("root")!).render(
   <AuthProvider>

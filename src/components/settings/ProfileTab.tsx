@@ -12,6 +12,7 @@ import { useProfilePicture } from '@/hooks/useProfilePicture';
 import { BecomeProviderButton } from '@/components/migration/BecomeProviderButton';
 import { supabase } from '@/integrations/supabase/client';
 import { useNativeBridge } from '@/hooks/useNativeBridge';
+import { sanitizeInput } from '@/utils/securityHeaders';
 
 export const ProfileTab = () => {
   const { profile, updateLocalProfile } = useAuth();
@@ -93,24 +94,26 @@ export const ProfileTab = () => {
   const handleSave = async () => {
     if (!profile) return;
 
+    const sanitized = {
+      nome: sanitizeInput(formData.nome.trim()),
+      endereco_cidade: sanitizeInput(formData.endereco_cidade.trim()),
+      endereco_rua: sanitizeInput(formData.endereco_rua.trim()),
+      endereco_numero: sanitizeInput(formData.endereco_numero.trim()),
+      endereco_bairro: sanitizeInput(formData.endereco_bairro.trim()),
+      endereco_cep: sanitizeInput(formData.endereco_cep.trim()),
+      bio: sanitizeInput(formData.bio.trim()),
+    };
+
     setIsSaving(true);
     try {
       const { error } = await supabase
         .from('users')
-        .update({
-          nome: formData.nome.trim(),
-          endereco_cidade: formData.endereco_cidade.trim(),
-          endereco_rua: formData.endereco_rua.trim(),
-          endereco_numero: formData.endereco_numero.trim(),
-          endereco_bairro: formData.endereco_bairro.trim(),
-          endereco_cep: formData.endereco_cep.trim(),
-          bio: formData.bio.trim(),
-        })
+        .update(sanitized)
         .eq('id', profile.id);
 
       if (error) throw error;
 
-      updateLocalProfile(formData);
+      updateLocalProfile(sanitized);
       setIsEditing(false);
       
       toast({

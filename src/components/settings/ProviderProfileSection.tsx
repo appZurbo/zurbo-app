@@ -126,14 +126,14 @@ export const ProviderProfileSection = () => {
     }
 
     setLoading(true);
-    
+
     try {
       const { error } = await supabase
         .from('users')
         .update({
-          nome: editData.nome.trim(),
+          nome: sanitizeInput(editData.nome.trim()),
           email: editData.email.trim(),
-          endereco_cidade: editData.endereco_cidade.trim(),
+          endereco_cidade: sanitizeInput(editData.endereco_cidade.trim()),
         })
         .eq('id', profile.id);
 

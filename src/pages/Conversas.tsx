@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Search, MessageCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
@@ -12,6 +12,7 @@ import { ConversationList } from '@/components/chat/ConversationList';
 import { ChatInterface } from '@/components/chat/ChatInterface';
 const Conversas = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     profile,
     loading: authLoading
@@ -32,6 +33,20 @@ const Conversas = () => {
     reportUser,
     loadMessages
   } = useEnhancedChat();
+
+  const openWithUserId = (location.state as { openWithUserId?: string })?.openWithUserId;
+  useEffect(() => {
+    if (!openWithUserId || !profile?.id || loading || conversations.length === 0) return;
+    const conv = conversations.find(
+      c => c.cliente_id === openWithUserId && c.prestador_id === profile.id
+    );
+    if (conv) {
+      setCurrentConversation(conv);
+      loadMessages(conv.id);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [openWithUserId, profile?.id, loading, conversations, setCurrentConversation, loadMessages, navigate, location.pathname]);
+
   const filteredConversations = conversations.filter(conv => {
     const isClient = conv.cliente_id === profile?.id;
     const otherUser = isClient ? conv.prestador : conv.cliente;

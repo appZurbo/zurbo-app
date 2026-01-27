@@ -17,6 +17,8 @@
 
     --primary: 22 100% 60%;
     --primary-foreground: 0 0% 100%;
+    --primary-pastel: 22 65% 93%;
+    --primary-pastel-foreground: 22 85% 28%;
 
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -58,6 +60,8 @@
 
     --primary: 22 100% 60%;
     --primary-foreground: 0 0% 100%;
+    --primary-pastel: 22 65% 93%;
+    --primary-pastel-foreground: 22 85% 28%;
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;

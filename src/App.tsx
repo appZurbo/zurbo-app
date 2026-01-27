@@ -5,8 +5,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
-import { AuthProvider } from "@/contexts/AuthContext";
 import { NotificationSound } from "@/components/notifications/NotificationSound";
+import { ProtectedRoute } from "@/components/security/ProtectedRoute";
 // Lazy load pages for better performance and code splitting
 const Index = lazy(() => import("./pages/Index"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
@@ -62,30 +62,29 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <AuthProvider>
-          <NotificationSound enabled={true} volume={0.3} />
-          <Toaster />
-          <Sonner />
-          {/* Indicador de Debug para Mobile */}
-          {isMobileApp && (
-            <div style={{ 
-              position: 'fixed', 
-              top: 0, 
-              left: 0, 
-              right: 0, 
-              background: '#22c55e', 
-              color: 'white', 
-              textAlign: 'center', 
-              fontSize: '10px', 
-              padding: '2px', 
-              zIndex: 9999 
-            }}>
-              📱 Modo App Ativo
-            </div>
-          )}
-          <BrowserRouter>
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
+        <NotificationSound enabled={true} volume={0.3} />
+        <Toaster />
+        <Sonner />
+        {/* Debug indicator for Mobile */}
+        {isMobileApp && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            background: '#22c55e',
+            color: 'white',
+            textAlign: 'center',
+            fontSize: '10px',
+            padding: '2px',
+            zIndex: 9999
+          }}>
+            📱 Modo App Ativo
+          </div>
+        )}
+        <BrowserRouter>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/prestadores" element={<PrestadoresPage />} />
@@ -93,19 +92,18 @@ function App() {
               <Route path="/settings" element={<Settings />} />
               <Route path="/prestador/:id" element={<PrestadorProfile />} />
               <Route path="/pedidos" element={<Pedidos />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/users" element={<UserManagement />} />
-              <Route path="/admin/prestadores" element={<PrestadorManagement />} />
-              <Route path="/admin/moderacao" element={<Moderacao />} />
-              <Route path="/admin/relatorios" element={<Relatorios />} />
-              <Route path="/admin/content-moderation" element={<AdminContentModeration />} />
-              <Route path="/admin/image-manager" element={<ImageManager />} />
-              <Route path="/admin/banner-image-manager" element={<BannerImageManager />} />
+              <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/admin/users" element={<ProtectedRoute requireAdmin><UserManagement /></ProtectedRoute>} />
+              <Route path="/admin/prestadores" element={<ProtectedRoute requireAdmin><PrestadorManagement /></ProtectedRoute>} />
+              <Route path="/admin/moderacao" element={<ProtectedRoute requireAdmin><Moderacao /></ProtectedRoute>} />
+              <Route path="/admin/relatorios" element={<ProtectedRoute requireAdmin><Relatorios /></ProtectedRoute>} />
+              <Route path="/admin/content-moderation" element={<ProtectedRoute requireAdmin><AdminContentModeration /></ProtectedRoute>} />
+              <Route path="/admin/image-manager" element={<ProtectedRoute requireAdmin><ImageManager /></ProtectedRoute>} />
+              <Route path="/admin/banner-image-manager" element={<ProtectedRoute requireAdmin><BannerImageManager /></ProtectedRoute>} />
               <Route path="/notificacoes" element={<NotificacoesPage />} />
               <Route path="/favoritos" element={<FavoritosPage />} />
-              <Route path="/agenda" element={<AgendaPrestador />} />
-              <Route path="/dashboard" element={<PrestadorDashboard />} />
-              
+              <Route path="/agenda" element={<ProtectedRoute requirePrestador><AgendaPrestador /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute requirePrestador><PrestadorDashboard /></ProtectedRoute>} />
               <Route path="/ads" element={<AdsPage />} />
               <Route path="/planos" element={<Planos />} />
               <Route path="/premium-overview" element={<PremiumOverview />} />
@@ -118,10 +116,9 @@ function App() {
               <Route path="/sobre-nos" element={<SobreNos />} />
               <Route path="/informacoes" element={<InformacoesUnificada />} />
               <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
-        </AuthProvider>
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
   );

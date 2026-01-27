@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { sanitizeInput } from '@/utils/securityHeaders';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -58,17 +59,25 @@ const ProfilePage = () => {
 
   const updateProfile = async () => {
     if (!profile) return;
-    
+
+    const payload = {
+      ...formData,
+      nome: formData.nome != null ? sanitizeInput(String(formData.nome)) : undefined,
+      bio: formData.bio != null ? sanitizeInput(String(formData.bio)) : undefined,
+      endereco_cidade: formData.endereco_cidade != null ? sanitizeInput(String(formData.endereco_cidade)) : undefined,
+      endereco_bairro: formData.endereco_bairro != null ? sanitizeInput(String(formData.endereco_bairro)) : undefined,
+    };
+
     setLoading(true);
     try {
       const { error } = await supabase
         .from('users')
-        .update(formData)
+        .update(payload)
         .eq('id', profile.id);
 
       if (error) throw error;
 
-      setProfile({ ...profile, ...formData });
+      setProfile({ ...profile, ...payload });
       setEditing(false);
       
       toast({

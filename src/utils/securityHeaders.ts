@@ -1,26 +1,23 @@
+const trustedDomains = ['lovableproject.com', 'lovable.dev', 'localhost'];
 
 export const setupSecurityHeaders = () => {
-  // Lista de domínios confiáveis onde o app pode ser embedado
-  const trustedDomains = [
-    'lovableproject.com',
-    'lovable.dev',
-    'localhost'
-  ];
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+  const connectSrc = supabaseUrl
+    ? `'self' ${supabaseUrl} ${supabaseUrl.replace('https://', 'wss://')}`
+    : "'self'";
 
-  // Content Security Policy mais flexível para desenvolvimento
   const csp = [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https:",
     "font-src 'self' data:",
-    "connect-src 'self' https://mbzxifrkabfnufliawzo.supabase.co wss://mbzxifrkabfnufliawzo.supabase.co",
+    `connect-src ${connectSrc}`,
     "frame-ancestors 'self' https://*.lovableproject.com https://*.lovable.dev",
     "base-uri 'self'",
     "form-action 'self'"
   ].join('; ');
 
-  // Criar meta tag para CSP se não existir
   if (!document.querySelector('meta[http-equiv="Content-Security-Policy"]')) {
     const meta = document.createElement('meta');
     meta.httpEquiv = 'Content-Security-Policy';
@@ -28,7 +25,6 @@ export const setupSecurityHeaders = () => {
     document.head.appendChild(meta);
   }
 
-  // Verificação de clickjacking mais inteligente
   if (window.self !== window.top) {
     const parentOrigin = document.referrer;
     const isTrustedDomain = trustedDomains.some(domain => 
@@ -36,14 +32,15 @@ export const setupSecurityHeaders = () => {
     );
 
     if (!isTrustedDomain && import.meta.env.PROD) {
-      // Apenas em produção e domínios não confiáveis
-      console.warn('Possível tentativa de clickjacking detectada');
+      if (typeof console !== 'undefined' && console.warn) {
+        console.warn('Possible clickjacking attempt detected');
+      }
       document.body.innerHTML = `
         <div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;">
-          <h2>Acesso Restrito</h2>
-          <p>Este aplicativo não pode ser executado neste contexto por motivos de segurança.</p>
+          <h2>Restricted Access</h2>
+          <p>This application cannot run in this context for security reasons.</p>
           <a href="${window.location.origin}" style="color: #f97316; text-decoration: none;">
-            Acessar aplicativo diretamente
+            Open application directly
           </a>
         </div>
       `;
@@ -51,7 +48,6 @@ export const setupSecurityHeaders = () => {
     }
   }
 
-  // Manter console apenas em desenvolvimento
   if (import.meta.env.PROD) {
     const originalConsole = {
       log: console.log,
@@ -63,7 +59,6 @@ export const setupSecurityHeaders = () => {
     console.warn = () => {};
     console.error = () => {};
     
-    // Manter apenas erros críticos
     window.addEventListener('error', (e) => {
       originalConsole.error('Critical error:', e.error);
     });
@@ -72,17 +67,16 @@ export const setupSecurityHeaders = () => {
 
 export const sanitizeInput = (input: string): string => {
   return input
-    .replace(/[<>]/g, '') // Remove < e >
-    .replace(/javascript:/gi, '') // Remove javascript:
-    .replace(/on\w+=/gi, '') // Remove event handlers
+    .replace(/[<>]/g, '')
+    .replace(/javascript:/gi, '')
+    .replace(/on\w+=/gi, '')
     .trim();
 };
 
-export const validateCSRF = () => {
-  // Verificar se a requisição veio do mesmo origin
+export const validateCSRF = (): boolean => {
   const referrer = document.referrer;
   const origin = window.location.origin;
-  
+
   if (referrer && !referrer.startsWith(origin)) {
     const trustedDomains = [
       'lovableproject.com',
@@ -95,10 +89,12 @@ export const validateCSRF = () => {
     );
     
     if (!isTrusted) {
-      console.warn('Possível ataque CSRF detectado');
+      if (typeof console !== 'undefined' && console.warn) {
+        console.warn('Possible CSRF attempt detected');
+      }
       return false;
     }
   }
-  
+
   return true;
 };

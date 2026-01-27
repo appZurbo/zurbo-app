@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Send, Paperclip, X } from 'lucide-react';
 import { ImageUploadInfo } from '@/hooks/useEnhancedChat';
 import { useToast } from '@/hooks/use-toast';
+import { sanitizeInput } from '@/utils/securityHeaders';
 
 interface MessageInputProps {
   onSendMessage: (content: string) => void;
@@ -29,7 +30,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     e.preventDefault();
     if (!message.trim() || disabled) return;
 
-    onSendMessage(message.trim());
+    onSendMessage(sanitizeInput(message.trim()));
     setMessage('');
   };
 

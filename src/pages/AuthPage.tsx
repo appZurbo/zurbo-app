@@ -1,13 +1,14 @@
-
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import LoginForm from '@/components/auth/LoginForm';
-import RegisterForm from '@/components/auth/RegisterForm';
+import { SecureEnhancedLoginForm } from '@/components/auth/SecureEnhancedLoginForm';
+import { SecureEnhancedRegisterForm } from '@/components/auth/SecureEnhancedRegisterForm';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 
 const AuthPage = () => {
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
+  const navigate = useNavigate();
 
   const handleSwitchToRegister = () => {
     setActiveTab('register');
@@ -17,8 +18,11 @@ const AuthPage = () => {
     setActiveTab('login');
   };
 
-  const handleRegisterSuccess = (userType: string) => {
-    // After successful registration, switch to login tab
+  const handleLoginSuccess = () => {
+    navigate('/', { replace: true });
+  };
+
+  const handleRegisterSuccess = () => {
     setActiveTab('login');
   };
 
@@ -37,13 +41,10 @@ const AuthPage = () => {
                   <TabsTrigger value="register">Cadastrar</TabsTrigger>
                 </TabsList>
                 <TabsContent value="login">
-                  <LoginForm onSwitchToRegister={handleSwitchToRegister} />
+                  <SecureEnhancedLoginForm onSuccess={handleLoginSuccess} onSwitchToRegister={handleSwitchToRegister} />
                 </TabsContent>
                 <TabsContent value="register">
-                  <RegisterForm 
-                    onSuccess={handleRegisterSuccess}
-                    onSwitchToLogin={handleSwitchToLogin}
-                  />
+                  <SecureEnhancedRegisterForm onSuccess={handleRegisterSuccess} onSwitchToLogin={handleSwitchToLogin} />
                 </TabsContent>
               </Tabs>
             </CardContent>
