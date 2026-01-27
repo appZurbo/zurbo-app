@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   DollarSign, 
-  Clock, 
   CheckCircle2, 
   AlertTriangle,
   TrendingUp,
@@ -175,22 +174,6 @@ export const FinancialSection = () => {
                 <p className="text-sm text-muted-foreground">Total Recebido</p>
                 <p className="text-2xl font-bold text-green-600">
                   R$ {financialData.totalReceived.toFixed(2)}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Clock className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Em Escrow</p>
-                <p className="text-2xl font-bold text-blue-600">
-                  R$ {financialData.totalInEscrow.toFixed(2)}
                 </p>
               </div>
             </div>

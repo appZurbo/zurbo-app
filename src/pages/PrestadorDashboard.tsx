@@ -9,14 +9,12 @@ import {
   Calendar, 
   MessageCircle, 
   Star, 
-  TrendingUp, 
   Users, 
   Eye, 
   Crown,
   DollarSign,
   Clock,
   CheckCircle,
-  AlertCircle,
   BarChart3,
   PiggyBank
 } from 'lucide-react';
@@ -35,12 +33,14 @@ import { FinancialSection } from '@/components/financial/FinancialSection';
 interface DashboardStats {
   pedidosAtivos: number;
   avaliacaoMedia: number;
-  faturamentoTotal: number;
+  totalAvaliacoes: number;
+  receitaEsteMes: number;
   dinheiroAReceber: number;
   visualizacoes: number;
-  servicosConcluidos: number;
+  servicosConcluidosEsteMes: number;
   agendamentosHoje: number;
   agendamentosAmanha: number;
+  mensagensAResponder: number;
 }
 
 interface Agendamento {
@@ -61,12 +61,14 @@ const PrestadorDashboard = () => {
   const [stats, setStats] = useState<DashboardStats>({
     pedidosAtivos: 0,
     avaliacaoMedia: 0,
-    faturamentoTotal: 0,
+    totalAvaliacoes: 0,
+    receitaEsteMes: 0,
     dinheiroAReceber: 0,
     visualizacoes: 0,
-    servicosConcluidos: 0,
+    servicosConcluidosEsteMes: 0,
     agendamentosHoje: 0,
-    agendamentosAmanha: 0
+    agendamentosAmanha: 0,
+    mensagensAResponder: 0
   });
   const [agendamentosRecentes, setAgendamentosRecentes] = useState<Agendamento[]>([]);
   const [periodFilter, setPeriodFilter] = useState('month');
@@ -108,6 +110,33 @@ const PrestadorDashboard = () => {
 
       if (avaliacoesError) throw avaliacoesError;
 
+      // Load conversas do prestador para "mensagens à responder"
+      const { data: conversasPrestador } = await supabase
+        .from('chat_conversations')
+        .select('id, cliente_id')
+        .eq('prestador_id', profile.id);
+
+      let mensagensAResponder = 0;
+      if (conversasPrestador && conversasPrestador.length > 0) {
+        const convIds = conversasPrestador.map((c: { id: string }) => c.id);
+        const { data: mensagens } = await supabase
+          .from('chat_messages')
+          .select('conversation_id, sender_id, created_at')
+          .in('conversation_id', convIds)
+          .order('created_at', { ascending: false });
+
+        const mapaConv = Object.fromEntries(conversasPrestador.map((c: { id: string; cliente_id: string | null }) => [c.id, c.cliente_id]));
+        const ultimaPorConv: Record<string, string | null> = {};
+        mensagens?.forEach((m: { conversation_id: string | null; sender_id: string | null }) => {
+          if (m.conversation_id && ultimaPorConv[m.conversation_id] === undefined) {
+            ultimaPorConv[m.conversation_id] = m.sender_id;
+          }
+        });
+        mensagensAResponder = Object.entries(ultimaPorConv).filter(
+          ([cid, senderId]) => senderId && mapaConv[cid] && senderId === mapaConv[cid]
+        ).length;
+      }
+
       // Process data
       const hoje = new Date();
       const amanha = new Date(hoje);
@@ -125,48 +154,43 @@ const PrestadorDashboard = () => {
         ['pendente', 'confirmado'].includes(p.status)
       ).length || 0;
 
-      const servicosConcluidos = pedidos?.filter(p => 
-        p.status === 'concluido'
+      const startOfCurrentMonth = startOfMonth(hoje);
+      const endOfCurrentMonth = endOfMonth(hoje);
+      const servicosConcluidosEsteMes = pedidos?.filter(p => 
+        p.status === 'concluido' && 
+        parseISO(p.created_at) >= startOfCurrentMonth && 
+        parseISO(p.created_at) <= endOfCurrentMonth
       ).length || 0;
 
+      const totalAvaliacoes = avaliacoes?.length || 0;
       const avaliacaoMedia = avaliacoes?.length ? 
         avaliacoes.reduce((acc, av) => acc + (av.nota || 0), 0) / avaliacoes.length : 0;
 
-      // Calculate revenue based on period
-      let faturamentoTotal = 0;
+      // Receita deste mês e valor a receber (pedidos pendentes/confirmados no período)
+      let receitaEsteMes = 0;
       let dinheiroAReceber = 0;
 
       if (pedidos) {
         const now = new Date();
-        let startDate, endDate;
-
-        switch (periodFilter) {
-          case 'day':
-            startDate = startOfDay(now);
-            endDate = endOfDay(now);
-            break;
-          case 'month':
-            startDate = startOfMonth(now);
-            endDate = endOfMonth(now);
-            break;
-          case 'year':
-            startDate = new Date(now.getFullYear(), 0, 1);
-            endDate = new Date(now.getFullYear(), 11, 31);
-            break;
-          default:
-            startDate = startOfMonth(now);
-            endDate = endOfMonth(now);
+        const inicioMes = startOfMonth(now);
+        const fimMes = endOfMonth(now);
+        let startPeriod = inicioMes;
+        let endPeriod = fimMes;
+        if (periodFilter === 'day') {
+          startPeriod = startOfDay(now);
+          endPeriod = endOfDay(now);
+        } else if (periodFilter === 'year') {
+          startPeriod = new Date(now.getFullYear(), 0, 1);
+          endPeriod = new Date(now.getFullYear(), 11, 31);
         }
 
         pedidos.forEach(pedido => {
           const pedidoDate = parseISO(pedido.created_at);
-          if (pedidoDate >= startDate && pedidoDate <= endDate) {
-            if (pedido.status === 'concluido' && pedido.preco_acordado) {
-              faturamentoTotal += pedido.preco_acordado;
-            }
-            if (['pendente', 'confirmado'].includes(pedido.status) && pedido.preco_acordado) {
-              dinheiroAReceber += pedido.preco_acordado;
-            }
+          if (pedidoDate >= inicioMes && pedidoDate <= fimMes && pedido.status === 'concluido' && pedido.preco_acordado) {
+            receitaEsteMes += pedido.preco_acordado;
+          }
+          if (pedidoDate >= startPeriod && pedidoDate <= endPeriod && ['pendente', 'confirmado'].includes(pedido.status) && pedido.preco_acordado) {
+            dinheiroAReceber += pedido.preco_acordado;
           }
         });
       }
@@ -174,12 +198,14 @@ const PrestadorDashboard = () => {
       setStats({
         pedidosAtivos,
         avaliacaoMedia: Number(avaliacaoMedia.toFixed(1)),
-        faturamentoTotal,
+        totalAvaliacoes,
+        receitaEsteMes,
         dinheiroAReceber,
-        visualizacoes: 1543, // Mock data
-        servicosConcluidos,
+        visualizacoes: 1543, // Mock data – contagem de visualizações do perfil
+        servicosConcluidosEsteMes,
         agendamentosHoje,
-        agendamentosAmanha
+        agendamentosAmanha,
+        mensagensAResponder
       });
 
       // Set recent appointments
@@ -350,47 +376,75 @@ const PrestadorDashboard = () => {
             </div>
           </div>
 
-          {/* Alert for upcoming appointments */}
-          {(stats.agendamentosHoje > 0 || stats.agendamentosAmanha > 0) && (
-            <Card className="mb-6 border-orange-200 bg-orange-50">
+          {/* Bloco 1 – Hoje e trabalho */}
+          <div className="grid gap-4 mb-6 grid-cols-2 lg:grid-cols-4">
+            <Card>
               <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <AlertCircle className="h-5 w-5 text-orange-600" />
+                <div className="flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-orange-500" />
                   <div>
-                    <p className="font-medium text-orange-800">
-                      {stats.agendamentosHoje > 0 && `${stats.agendamentosHoje} agendamento(s) hoje`}
-                      {stats.agendamentosHoje > 0 && stats.agendamentosAmanha > 0 && ' • '}
-                      {stats.agendamentosAmanha > 0 && `${stats.agendamentosAmanha} agendamento(s) amanhã`}
-                    </p>
-                    <p className="text-sm text-orange-600">Não esqueça de se preparar para seus compromissos</p>
+                    <p className="text-sm text-gray-600">Compromissos de Hoje</p>
+                    <p className="text-2xl font-bold">{loadingStats ? '...' : stats.agendamentosHoje}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          )}
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-blue-500" />
+                  <div>
+                    <p className="text-sm text-gray-600">Solicitações ativas</p>
+                    <p className="text-2xl font-bold">{loadingStats ? '...' : stats.pedidosAtivos}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <div>
+                    <p className="text-sm text-gray-600">Concluídos este mês</p>
+                    <p className="text-2xl font-bold">{loadingStats ? '...' : stats.servicosConcluidosEsteMes}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2">
+                  <MessageCircle className="h-5 w-5 text-violet-500" />
+                  <div>
+                    <p className="text-sm text-gray-600">Mensagens à responder</p>
+                    <p className="text-2xl font-bold">{loadingStats ? '...' : stats.mensagensAResponder}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-          {/* Revenue Statistics */}
-          <div className="grid gap-4 mb-6 md:grid-cols-2 lg:grid-cols-4">
+          {/* Bloco 2 – Dinheiro e reputação */}
+          <div className="grid gap-4 mb-6 grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
                   <DollarSign className="h-5 w-5 text-green-500" />
                   <div>
-                    <p className="text-sm text-gray-600">Faturamento {getPeriodLabel()}</p>
+                    <p className="text-sm text-gray-600">Este mês</p>
                     <p className="text-2xl font-bold text-green-600">
-                      R$ {loadingStats ? '...' : stats.faturamentoTotal.toFixed(2)}
+                      R$ {loadingStats ? '...' : stats.receitaEsteMes.toFixed(2)}
                     </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
                   <PiggyBank className="h-5 w-5 text-blue-500" />
                   <div>
-                    <p className="text-sm text-gray-600">A Receber</p>
+                    <p className="text-sm text-gray-600">A receber ({getPeriodLabel().toLowerCase()})</p>
                     <p className="text-2xl font-bold text-blue-600">
                       R$ {loadingStats ? '...' : stats.dinheiroAReceber.toFixed(2)}
                     </p>
@@ -398,76 +452,24 @@ const PrestadorDashboard = () => {
                 </div>
               </CardContent>
             </Card>
-
-            <Card>
-              <CardContent className="p-4">
+            <Card className="flex">
+              <CardContent className="p-4 flex flex-col justify-center">
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                  <div>
-                    <p className="text-sm text-gray-600">Serviços Concluídos</p>
-                    <p className="text-2xl font-bold">{loadingStats ? '...' : stats.servicosConcluidos}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <Star className="h-5 w-5 text-yellow-500" />
-                  <div>
-                    <p className="text-sm text-gray-600">Avaliação Média</p>
+                  <Star className="h-5 w-5 text-yellow-500 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-sm text-gray-600">Avaliação média</p>
                     <p className="text-2xl font-bold">{loadingStats ? '...' : stats.avaliacaoMedia}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{stats.totalAvaliacoes} avaliações</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </div>
-
-          {/* General Statistics */}
-          <div className={`grid gap-4 mb-6 ${isMobile ? 'grid-cols-2' : 'grid-cols-4'}`}>
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-orange-500" />
-                  <div>
-                    <p className="text-sm text-gray-600">Pedidos Ativos</p>
-                    <p className="text-2xl font-bold">{loadingStats ? '...' : stats.pedidosAtivos}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-blue-500" />
-                  <div>
-                    <p className="text-sm text-gray-600">Hoje</p>
-                    <p className="text-2xl font-bold">{loadingStats ? '...' : stats.agendamentosHoje}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-green-500" />
-                  <div>
-                    <p className="text-sm text-gray-600">Amanhã</p>
-                    <p className="text-lg font-bold">{loadingStats ? '...' : stats.agendamentosAmanha}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
                   <Eye className="h-5 w-5 text-blue-500" />
                   <div>
-                    <p className="text-sm text-gray-600">Visualizações</p>
+                    <p className="text-sm text-gray-600">Visualizações do perfil</p>
                     <p className="text-2xl font-bold">{stats.visualizacoes}</p>
                   </div>
                 </div>
