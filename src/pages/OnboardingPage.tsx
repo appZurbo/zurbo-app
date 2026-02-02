@@ -660,7 +660,7 @@ const OnboardingPage = () => {
 
   return (
     <div className="min-h-screen bg-[#FBF7F2] flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-[3.5rem] shadow-2xl border-[10px] border-gray-900 overflow-hidden relative flex flex-col max-h-[90vh]">
+      <div className="w-full max-w-md bg-white rounded-[3.5rem] shadow-2xl overflow-hidden relative flex flex-col max-h-[90vh]">
         
         {/* Header com Navegação e Barra de Progresso */}
         <div className="px-8 pt-4 pb-4 bg-white">
