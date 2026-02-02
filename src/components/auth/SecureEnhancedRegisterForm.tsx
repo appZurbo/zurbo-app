@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,6 +16,7 @@ interface SecureEnhancedRegisterFormProps {
 }
 
 export const SecureEnhancedRegisterForm = ({ onSuccess, onSwitchToLogin }: SecureEnhancedRegisterFormProps) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
@@ -90,31 +92,50 @@ export const SecureEnhancedRegisterForm = ({ onSuccess, onSwitchToLogin }: Secur
         }
       );
       
-      if (!result.success) {
-        if (result.isBlocked) {
+      // Se o usuário foi criado, permitir continuar mesmo com erro no email
+      if (result.success || result.userCreated) {
+        // Salvar dados do formulário no localStorage para usar no onboarding
+        localStorage.setItem('onboarding_form_data', JSON.stringify({
+          nome: formData.nome,
+          email: formData.email,
+          tipo: formData.tipo
+        }));
+
+        // Redirecionar para onboarding
+        if (result.userCreated && result.error) {
+          // Avisar sobre o erro no email mas permitir continuar
           toast({
-            title: "Registro bloqueado temporariamente",
-            description: result.error,
-            variant: "destructive",
+            title: "Conta criada com sucesso!",
+            description: "Complete seu perfil para começar. Nota: Houve um problema ao enviar o email de confirmação, mas você pode continuar.",
           });
         } else {
           toast({
-            title: "Erro no cadastro",
-            description: result.error || "Não foi possível criar sua conta.",
-            variant: "destructive",
+            title: "Conta criada com sucesso!",
+            description: "Complete seu perfil para começar.",
           });
         }
+
+        // Aguardar um pouco para o toast aparecer antes de redirecionar
+        setTimeout(() => {
+          navigate('/onboarding');
+        }, 500);
         return;
       }
 
-      // Mostrar modal de confirmação de email
-      setRegisteredEmail(formData.email);
-      setShowEmailConfirmation(true);
-      
-      toast({
-        title: "Conta criada com sucesso!",
-        description: "Verifique seu email para confirmar sua conta.",
-      });
+      // Se não foi criado e não foi bloqueado, mostrar erro
+      if (result.isBlocked) {
+        toast({
+          title: "Registro bloqueado temporariamente",
+          description: result.error,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Erro no cadastro",
+          description: result.error || "Não foi possível criar sua conta.",
+          variant: "destructive",
+        });
+      }
 
     } catch (error: any) {
       toast({
@@ -277,6 +298,7 @@ export const SecureEnhancedRegisterForm = ({ onSuccess, onSwitchToLogin }: Secur
               value={formData.password}
               onChange={(e) => updateFormData('password', e.target.value)}
               className="pl-10 pr-10"
+              autoComplete="new-password"
               required
             />
             <Button
@@ -331,6 +353,7 @@ export const SecureEnhancedRegisterForm = ({ onSuccess, onSwitchToLogin }: Secur
               value={formData.confirmPassword}
               onChange={(e) => updateFormData('confirmPassword', e.target.value)}
               className="pl-10 pr-10"
+              autoComplete="new-password"
               required
             />
             <Button

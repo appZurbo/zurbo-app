@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,6 +17,7 @@ interface SecureEnhancedLoginFormProps {
 }
 
 export const SecureEnhancedLoginForm = ({ onSuccess, onSwitchToRegister }: SecureEnhancedLoginFormProps) => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -197,6 +199,7 @@ export const SecureEnhancedLoginForm = ({ onSuccess, onSwitchToRegister }: Secur
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="pl-10 pr-10"
+              autoComplete="current-password"
               required
             />
             <Button
@@ -225,7 +228,7 @@ export const SecureEnhancedLoginForm = ({ onSuccess, onSwitchToRegister }: Secur
         <Button
           type="button"
           variant="link"
-          onClick={onSwitchToRegister}
+          onClick={() => navigate('/auth?tab=register')}
           className="text-sm"
         >
           Não tem uma conta? Cadastre-se

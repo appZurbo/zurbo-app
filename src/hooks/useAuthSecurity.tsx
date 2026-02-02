@@ -8,6 +8,7 @@ interface AuthSecurityResult {
   error?: string;
   isBlocked?: boolean;
   remainingAttempts?: number;
+  userCreated?: boolean;
 }
 
 export const useAuthSecurity = () => {
@@ -142,7 +143,18 @@ export const useAuthSecurity = () => {
         }
       });
 
+      // Verificar se o usuário foi criado mesmo quando há erro (ex: erro no envio de email)
       if (error) {
+        // Se o usuário foi criado mas há erro (provavelmente no envio de email), permitir continuar
+        if (data?.user) {
+          await logAuthAttempt(email, 'signup', true);
+          return {
+            success: true,
+            userCreated: true,
+            error: error.message // Avisar sobre o erro mas permitir continuar
+          };
+        }
+        
         await logAuthAttempt(email, 'signup', false, error.message);
         return {
           success: false,
@@ -153,7 +165,8 @@ export const useAuthSecurity = () => {
       await logAuthAttempt(email, 'signup', true);
       
       return {
-        success: true
+        success: true,
+        userCreated: true
       };
 
     } catch (error: any) {
