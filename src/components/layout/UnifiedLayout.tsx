@@ -24,9 +24,9 @@ export const UnifiedLayout: React.FC<UnifiedLayoutProps> = ({
   const isPrestadoresPage = location.pathname === '/prestadores' || location.pathname.startsWith('/prestadores');
 
   return (
-    <div className="min-h-screen bg-[#FBF7F2]">
+    <div className="min-h-screen bg-[#FDFDFD]">
       {isPrestadoresPage ? <ModernHeader /> : <UnifiedHeader />}
-      
+
       {/* Admin View Toggle - only show for admins */}
       {isAdmin && (
         <div className="sticky top-16 z-40 px-4 py-2 bg-gray-50 border-b">
@@ -35,11 +35,11 @@ export const UnifiedLayout: React.FC<UnifiedLayoutProps> = ({
           </div>
         </div>
       )}
-      
-      <main className={`${isMobile && showDock ? 'pb-24' : ''}`}>
+
+      <main className={`${isMobile && showDock && location.pathname !== "/" ? 'pb-24' : ''}`}>
         {children}
       </main>
-      
+
       {isMobile && showDock && <UnifiedDock />}
     </div>
   );
