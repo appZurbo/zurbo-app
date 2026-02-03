@@ -25,18 +25,30 @@ export const UnifiedLayout: React.FC<UnifiedLayoutProps> = ({
 
   return (
     <div className="min-h-screen bg-[#FDFDFD]">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        :root {
+          font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          background-color: #FDFDFD;
+        }
+      `}</style>
       {isPrestadoresPage ? <ModernHeader /> : <UnifiedHeader />}
 
       {/* Admin View Toggle - only show for admins */}
       {isAdmin && (
-        <div className="sticky top-16 z-40 px-4 py-2 bg-gray-50 border-b">
+        <div className={`sticky top-16 z-40 px-4 py-2 ${isPrestadoresPage ? 'bg-[#FBF7F2]' : 'bg-[#FDFDFD]'} border-b ${isPrestadoresPage ? 'border-[#E6DDD5]/30' : 'border-gray-100'} shadow-sm relative z-30`}>
           <div className="max-w-7xl mx-auto">
             <AdminViewToggle />
           </div>
         </div>
       )}
 
-      <main className={`${isMobile && showDock && location.pathname !== "/" ? 'pb-24' : ''}`}>
+      <main className={`bg-[#FDFDFD] ${isMobile && showDock && location.pathname !== "/" ? 'pb-24' : ''}`}>
         {children}
       </main>
 

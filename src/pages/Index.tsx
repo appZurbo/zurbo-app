@@ -11,20 +11,8 @@ const Index = () => {
   return (
     <ErrorBoundary>
       <UnifiedLayout>
-        <div className="min-h-screen bg-[#FDFDFD] font-sans text-[#1A1A1A] overflow-x-hidden">
-          {/* Link para a fonte Plus Jakarta Sans */}
-          <style>{`
-            @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-            
-            :root {
-              font-family: 'Plus Jakarta Sans', sans-serif;
-            }
+        <div className="font-sans text-[#1A1A1A] overflow-x-hidden">
 
-            body {
-              font-family: 'Plus Jakarta Sans', sans-serif;
-              background-color: #FDFDFD;
-            }
-          `}</style>
 
           <ErrorBoundary>
             <HeroDemo />

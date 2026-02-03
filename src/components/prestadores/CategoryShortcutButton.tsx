@@ -85,15 +85,11 @@ export const CategoryShortcutButton: React.FC<CategoryShortcutButtonProps> = ({
     <button
       onClick={onClick}
       className={cn(
-        "relative flex flex-col items-center justify-end p-3 rounded-xl transition-all duration-200 min-w-[100px] h-24 overflow-hidden group hover:overflow-visible",
-        isSelected
-          ? "shadow-md"
-          : "",
-        "hover:scale-105 hover:shadow-md"
+        "relative flex flex-col items-center justify-end p-3 rounded-xl transition-all duration-200 min-w-[100px] h-24 overflow-hidden group hover:scale-105 hover:shadow-md",
       )}
     >
       {/* Background image */}
-      <div className={cn("absolute inset-0", isSelected ? "bg-orange-500" : "bg-white")}>
+      <div className={cn("absolute inset-0 rounded-xl", isSelected ? "bg-orange-500" : "bg-white")}>
         <img
           src={gridImageUrl}
           alt={category.name}
@@ -101,7 +97,7 @@ export const CategoryShortcutButton: React.FC<CategoryShortcutButtonProps> = ({
           style={imageStyles}
         />
       </div>
-      
+
       {/* Category name */}
       <span
         className={cn(

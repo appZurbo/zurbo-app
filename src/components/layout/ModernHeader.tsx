@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
-import { 
+import {
   MapPin,
   Settings,
   SlidersHorizontal,
@@ -30,7 +30,7 @@ import { SearchDropdown } from '@/components/SearchDropdown';
 
 const CIDADES_DISPONIVEIS = [
   'Sinop, Mato Grosso',
-  'Sorriso, Mato Grosso', 
+  'Sorriso, Mato Grosso',
   'Lucas do Rio Verde, Mato Grosso',
   'Nova Mutum, Mato Grosso',
   'Vera, Mato Grosso',
@@ -85,7 +85,7 @@ export const ModernHeader = () => {
                 </Select>
               </div>
             </div>
-            
+
             {/* User Avatar */}
             {isAuthenticated ? (
               <div className="relative">
@@ -191,7 +191,7 @@ export const ModernHeader = () => {
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
-        onLogin={() => {}}
+        onLogin={() => { }}
       />
     </>
   );
