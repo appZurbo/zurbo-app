@@ -47,29 +47,38 @@ const BenefitsGrid = () => {
                 </div>
 
                 {/* Motivação */}
-                <div className="md:col-span-2 md:row-span-1 bg-[#FFF1ED] rounded-[40px] p-8 flex flex-col md:flex-row gap-8 overflow-hidden group text-left">
-                    <div className="flex-1 flex flex-col justify-center">
+                <div className="md:col-span-2 md:row-span-1 bg-[#FFF1ED] rounded-[40px] p-8 flex flex-col md:flex-row gap-8 overflow-hidden text-left relative">
+                    <div className="flex-1 flex flex-col justify-center relative z-10">
                         <h3 className="font-black text-2xl mb-2 tracking-tight">Motivação para <br />Melhorar</h3>
                         <p className="text-sm text-gray-600 font-medium">Seus talentos finalmente recebem o crédito que merecem.</p>
                     </div>
+
                     <div className="flex-1 relative">
-                        <motion.div
-                            whileHover={{ rotate: 0 }}
-                            initial={{ rotate: 3 }}
-                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-4 rounded-3xl shadow-xl w-48 border border-red-50"
-                        >
-                            <div className="flex items-center gap-2 mb-2">
-                                <div className="w-8 h-8 bg-blue-100 rounded-full overflow-hidden">
-                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sara" alt="User" />
-                                </div>
-                                <div className="flex-1 h-2 bg-gray-100 rounded-full"></div>
-                            </div>
-                            <p className="text-[10px] font-bold text-gray-900">"Trabalho incrível!"</p>
-                            <div className="flex gap-1 mt-1">
-                                {[1, 2, 3, 4, 5].map(i => <Star key={i} size={8} className="text-yellow-400 fill-yellow-400" />)}
-                            </div>
-                        </motion.div>
+                        {/* Espaçador para manter o layout grid */}
                     </div>
+
+                    <img
+                        src="/testehome.png"
+                        alt="Zurbo Benefits"
+                        className="absolute bottom-0 -right-8 w-[96%] h-full object-contain object-right-bottom"
+                    />
+
+                    <motion.div
+                        initial={{ rotate: 3 }}
+                        className="absolute bg-white p-3 rounded-3xl shadow-xl w-64 border border-red-50 z-20"
+                        style={{ bottom: '15%', right: '-96px' }}
+                    >
+                        <div className="flex items-center gap-2 mb-2">
+                            <div className="w-8 h-8 bg-blue-100 rounded-full overflow-hidden">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sara" alt="User" />
+                            </div>
+                            <div className="flex-1 h-2 bg-gray-100 rounded-full"></div>
+                        </div>
+                        <p className="text-[10px] font-bold text-gray-900">"Trabalho incrível!"</p>
+                        <div className="flex gap-1 mt-1">
+                            {[1, 2, 3, 4, 5].map(i => <Star key={i} size={8} className="text-yellow-400 fill-yellow-400" />)}
+                        </div>
+                    </motion.div>
                 </div>
 
                 {/* Serviço Recompensado */}

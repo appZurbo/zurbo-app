@@ -8,9 +8,8 @@ const ProblemSection = () => {
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-20">
                 <div className="flex-1 text-left">
                     <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight uppercase">
-                        antes da zurbo era difícil <br />
-                        encontrar profissionais. <br />
-                        <span className="text-orange-500">não é mais.</span>
+                        difícil encontrar profissionais? <br />
+                        <span className="text-orange-500">com a zurbo não é mais.</span>
                     </h2>
                     <motion.div
                         animate={{ y: [0, -10, 0] }}

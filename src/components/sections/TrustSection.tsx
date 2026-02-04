@@ -1,5 +1,6 @@
-
-import { Lock, ShieldCheck } from "lucide-react";
+import DieterRamsSwitch from "../ui/DieterRamsSwitch";
+import TactileLock from "../ui/TactileLock";
+import TactileVault from "../ui/TactileVault";
 
 const TrustSection = () => {
     return (
@@ -11,28 +12,33 @@ const TrustSection = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {/* Block 1: Connection Control */}
                     <div className="text-center flex flex-col items-center">
-                        <div className="w-40 h-40 bg-[#FFF1ED] rounded-[40px] flex items-center justify-center mb-6 border-b-8 border-orange-100 shadow-lg">
-                            <div className="bg-orange-500 text-white px-4 py-2 rounded-xl font-black text-lg shadow-md">ON</div>
-                        </div>
-                        <h4 className="font-black text-xl mb-2 uppercase">Controle Total</h4>
+                        <DieterRamsSwitch />
+                        <h4 className="font-black text-xl mt-4 mb-2 uppercase">Controle Total</h4>
                         <p className="text-sm text-gray-500 px-8">Você escolhe quando se conectar e quando atender. Sem pressão.</p>
                     </div>
 
+                    {/* Block 2: Privacy Control */}
                     <div className="text-center flex flex-col items-center">
-                        <div className="w-40 h-40 bg-[#F9F1FF] rounded-[40px] flex items-center justify-center mb-6 border-b-8 border-purple-100 shadow-lg">
-                            <Lock size={48} className="text-purple-500" />
+                        <div className="w-40 h-40 bg-[#F5F5F5] rounded-[40px] flex items-center justify-center mb-6 border-b-8 border-gray-200 shadow-lg relative overflow-hidden">
+                            <div className="scale-75 translate-y-6">
+                                <TactileLock />
+                            </div>
                         </div>
                         <h4 className="font-black text-xl mb-2 uppercase">Sua Privacidade</h4>
                         <p className="text-sm text-gray-500 px-8">Você controla quem vê seus dados e suas estatísticas de serviço.</p>
                     </div>
 
+                    {/* Block 3: Security / Vault */}
                     <div className="text-center flex flex-col items-center">
-                        <div className="w-40 h-40 bg-[#EEF2FF] rounded-[40px] flex items-center justify-center mb-6 border-b-8 border-blue-100 shadow-lg">
-                            <ShieldCheck size={48} className="text-blue-500" />
+                        <div className="w-40 h-40 bg-[#F5F5F5] rounded-[40px] flex items-center justify-center mb-6 border-b-8 border-gray-200 shadow-lg relative overflow-hidden">
+                            <div className="scale-75">
+                                <TactileVault />
+                            </div>
                         </div>
-                        <h4 className="font-black text-xl mb-2 uppercase">Sem Vendas</h4>
-                        <p className="text-sm text-gray-500 px-8">Nós não vendemos seus dados para terceiros. O foco é a sua segurança.</p>
+                        <h4 className="font-black text-xl mb-2 uppercase">SEGURANÇA</h4>
+                        <p className="text-sm text-gray-500 px-8">Para o Cliente e para o Prestador.</p>
                     </div>
                 </div>
             </div>
