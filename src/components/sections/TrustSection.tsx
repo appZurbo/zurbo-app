@@ -7,8 +7,8 @@ const TrustSection = () => {
         <section className="py-24 px-6 bg-white">
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-16">
-                    <h2 className="text-4xl font-black uppercase tracking-tighter mb-4">SEUS DADOS ESTÃO <br /> <span className="text-orange-500">EM SUAS MÃOS</span></h2>
-                    <p className="text-gray-500 max-w-lg mx-auto">Segurança e privacidade são nossa prioridade máxima.</p>
+                    <h2 className="text-4xl font-black uppercase tracking-tighter mb-4">Trabalhe do seu jeito, <br /> <span className="text-orange-500">com segurança</span></h2>
+                    <p className="text-gray-500 max-w-lg mx-auto">Gerencie sua agenda enquanto cuidamos da sua segurança</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

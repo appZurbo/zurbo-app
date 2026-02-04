@@ -181,7 +181,7 @@ export const ResponsiveHeader = () => {
                 <Button
                   className="w-full bg-orange-500 hover:bg-orange-600"
                   onClick={() => {
-                    setShowAuthModal(true);
+                    navigate('/auth?tab=register');
                     setMobileMenuOpen(false);
                   }}
                 >
@@ -314,7 +314,7 @@ export const ResponsiveHeader = () => {
                 </Button>
                 <Button
                   size={isMobile ? "touch" : "default"}
-                  onClick={() => setShowAuthModal(true)}
+                  onClick={() => navigate('/auth?tab=register')}
                   className="bg-orange-500 hover:bg-orange-600 text-white"
                 >
                   Cadastrar

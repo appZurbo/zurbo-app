@@ -32,6 +32,7 @@ const TermosUso = lazy(() => import("./pages/TermosUso"));
 const PoliticaPrivacidade = lazy(() => import("./pages/PoliticaPrivacidade"));
 const RegrasComunidade = lazy(() => import("./pages/RegrasComunidade"));
 const SobreNos = lazy(() => import("./pages/SobreNos"));
+const OnboardingPage = lazy(() => import("./pages/OnboardingPage"));
 
 import InformacoesUnificada from "./pages/InformacoesUnificada";
 import UserManagement from "./pages/admin/UserManagement";
@@ -48,6 +49,7 @@ const OpportunitiesMap = lazy(() => import("./pages/provider/OpportunitiesMap"))
 const queryClient = new QueryClient();
 
 import { useNativeBridge } from "@/hooks/useNativeBridge";
+import { OnboardingGuard } from "@/components/onboarding/OnboardingGuard";
 
 // Loading component for lazy loaded pages
 const PageLoader = () => (
@@ -86,10 +88,12 @@ function App() {
           </div>
         )}
         <BrowserRouter>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
+          <OnboardingGuard>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<AuthPage />} />
+              <Route path="/onboarding" element={<OnboardingPage />} />
               <Route path="/prestadores" element={<PrestadoresPage />} />
               <Route path="/conversas" element={<Conversas />} />
               <Route path="/settings" element={<Settings />} />
@@ -124,8 +128,9 @@ function App() {
               <Route path="/mapa-servicos" element={<OpportunitiesMap />} />
 
               <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
+              </Routes>
+            </Suspense>
+          </OnboardingGuard>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

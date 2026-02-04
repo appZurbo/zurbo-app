@@ -159,14 +159,14 @@ export const ModernHeader = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setShowAuthModal(true)}
+                  onClick={() => navigate('/auth?tab=register')}
                   className="text-[#3D342B] hover:text-[#E05815]"
                 >
                   Entrar
                 </Button>
                 <Button
                   size="sm"
-                  onClick={() => setShowAuthModal(true)}
+                  onClick={() => navigate('/auth?tab=register')}
                   className="bg-[#E05815] hover:bg-[#E05815]/90 text-white"
                 >
                   Cadastrar

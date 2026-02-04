@@ -25,6 +25,7 @@ interface LeafletMapComponentProps {
         description?: string;
         color?: string;
         id?: string;
+        iconUrl?: string;
     }>;
     onMarkerClick?: (marker: any) => void;
     showControls?: boolean;
@@ -135,17 +136,24 @@ export const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 30px;
-            height: 30px;
-            background-color: ${markerData.color || '#f97316'};
-            border: 2px solid white;
+            width: 44px;
+            height: 44px;
+            background-color: #ffffff;
+            border: 3px solid #f97316;
             border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
+            font-size: 18px;
             cursor: pointer;
-          ">👤</div>`,
-                    iconSize: [30, 30],
-                    iconAnchor: [15, 15]
+            overflow: hidden;
+            transition: all 0.2s;
+          ">
+            ${markerData.iconUrl
+                            ? `<img src="${markerData.iconUrl}" style="width: 100%; height: 100%; object-fit: contain; padding: 4px;" />`
+                            : '👤'
+                        }
+          </div>`,
+                    iconSize: [44, 44],
+                    iconAnchor: [22, 22]
                 })
             });
 

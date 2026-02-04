@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SecureEnhancedLoginForm } from '@/components/auth/SecureEnhancedLoginForm';
@@ -7,8 +7,17 @@ import { SecureEnhancedRegisterForm } from '@/components/auth/SecureEnhancedRegi
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 
 const AuthPage = () => {
+  const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   const navigate = useNavigate();
+
+  // Verificar se há parâmetro na URL para abrir na aba de cadastro
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'register') {
+      setActiveTab('register');
+    }
+  }, [searchParams]);
 
   const handleSwitchToRegister = () => {
     setActiveTab('register');

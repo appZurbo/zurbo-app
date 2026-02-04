@@ -17,8 +17,8 @@ const BenefitsGrid = () => {
                 {/* Histórico na Mão */}
                 <div className="md:col-span-1 md:row-span-2 bg-[#FFF9E6] rounded-[40px] p-8 flex flex-col justify-between overflow-hidden relative group text-left">
                     <div className="relative z-10">
-                        <h3 className="font-black text-2xl mb-2 tracking-tight">Histórico <br /> na Mão</h3>
-                        <p className="text-sm text-gray-600 font-medium">Sua confiança viaja com você em cada serviço.</p>
+                        <h3 className="font-black text-2xl mb-2 tracking-tight">Histórico <br /> sempre à mão</h3>
+                        <p className="text-sm text-gray-600 font-medium">Tenha o controle total de seus agendamentos, pagamentos e conversas.</p>
                     </div>
 
                     <div className="relative mt-8 group-hover:scale-105 transition-transform">
@@ -49,8 +49,8 @@ const BenefitsGrid = () => {
                 {/* Motivação */}
                 <div className="md:col-span-2 md:row-span-1 bg-[#FFF1ED] rounded-[40px] p-8 flex flex-col md:flex-row gap-8 overflow-hidden text-left relative">
                     <div className="flex-1 flex flex-col justify-center relative z-10">
-                        <h3 className="font-black text-2xl mb-2 tracking-tight">Motivação para <br />Melhorar</h3>
-                        <p className="text-sm text-gray-600 font-medium">Seus talentos finalmente recebem o crédito que merecem.</p>
+                        <h3 className="font-black text-2xl mb-2 tracking-tight">Reconhecimento <br /> que impulsiona</h3>
+                        <p className="text-sm text-gray-600 font-medium">Receba o feedback positivo que seu talento merece e conquiste mais clientes.</p>
                     </div>
 
                     <div className="flex-1 relative">
@@ -86,24 +86,24 @@ const BenefitsGrid = () => {
                     <div className="w-16 h-16 bg-purple-200 rounded-full flex items-center justify-center text-purple-600 mb-4 group-hover:rotate-12 transition-transform">
                         <Star size={32} />
                     </div>
-                    <h3 className="font-black text-xl mb-1 tracking-tight">Serviço <br />Recompensado</h3>
-                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-2">Badges e Conquistas</p>
+                    <h3 className="font-black text-xl mb-1 tracking-tight">Sua agenda, <br />suas regras</h3>
+                    <p className="text-sm text-gray-500 font-medium mt-2">Liberdade real para o seu dia a dia.</p>
                 </div>
 
-                {/* Novas Oportunidades */}
+                {/* Ajuda em um Toque */}
                 <div className="md:col-span-1 md:row-span-1 bg-[#EEF2FF] rounded-[40px] p-8 flex flex-col items-center text-center justify-center group">
                     <div className="w-16 h-16 bg-blue-200 rounded-full flex items-center justify-center text-blue-600 mb-4 group-hover:scale-110 transition-transform">
                         <CheckCircle2 size={32} />
                     </div>
-                    <h3 className="font-black text-xl mb-1 tracking-tight">Novas <br />Oportunidades</h3>
-                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-2">Cresça no App</p>
+                    <h3 className="font-black text-xl mb-1 tracking-tight">Ajuda <br />em um toque</h3>
+                    <p className="text-sm text-gray-500 font-medium mt-2">Suporte pronto para te ajudar em qualquer etapa do atendimento.</p>
                 </div>
 
                 {/* Você no Comando */}
                 <div className="md:col-span-2 md:row-span-1 bg-white border-2 border-gray-100 rounded-[40px] p-8 flex flex-col md:flex-row gap-8 items-center overflow-hidden text-left">
                     <div className="flex-1">
-                        <h3 className="font-black text-3xl mb-4 uppercase tracking-tighter">VOCÊ NO COMANDO <br /> DO SEU DESTINO</h3>
-                        <p className="text-sm text-gray-500 font-medium">A Zurbo torna seu trabalho visível e garante a reputação que você construiu com esforço.</p>
+                        <h3 className="font-black text-3xl mb-4 uppercase tracking-tighter">ORÇAMENTOS EM <br /> SEGUNDOS</h3>
+                        <p className="text-sm text-gray-500 font-medium">Responda chamados com um toque e feche negócios sem perder tempo.</p>
                     </div>
                     <div className="flex-1 relative flex justify-center">
                         <div className="w-48 h-48 bg-orange-500 rounded-full flex items-center justify-center text-white relative shadow-2xl shadow-orange-200">

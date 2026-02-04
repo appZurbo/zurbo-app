@@ -84,13 +84,13 @@ function Hero() {
   return (
     <section className="relative px-6 pt-12 pb-24 max-w-7xl mx-auto text-center overflow-hidden">
       {/* Headline Animado */}
-      <h1 className="text-5xl md:text-7xl tracking-tighter font-normal mb-10 flex flex-col items-center">
+      <h1 className="text-5xl md:text-7xl tracking-tighter font-black mb-10 flex flex-col items-center uppercase leading-tight">
         <span className="text-gray-900">Tá precisando de</span>
         <span className="relative flex w-full justify-center overflow-hidden h-[1.2em] md:pb-4 md:pt-1">
           <AnimatePresence mode="wait">
             <motion.span
               key={titleNumber}
-              className="absolute font-semibold text-orange-500 whitespace-nowrap"
+              className="absolute font-black text-orange-500 whitespace-nowrap"
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -100, opacity: 0 }}

@@ -327,10 +327,17 @@ const OnboardingPage = () => {
             <h2 className="text-2xl font-bold text-[#3D342B]">Perfil Básico</h2>
             <div className="flex flex-col items-center">
               <div className="relative">
-                <Avatar className="w-28 h-28">
-                  <AvatarImage src={profile?.foto_url} />
-                  <AvatarFallback className="bg-[#E6DDD5] text-[#3D342B] text-2xl">
-                    {formData.nome.charAt(0).toUpperCase() || 'U'}
+                <Avatar className="w-28 h-28 rounded-xl overflow-hidden border-2 border-[#E05815]/30">
+                  <AvatarImage 
+                    src={profile?.foto_url || '/reparos.png'} 
+                    className="rounded-xl object-cover" 
+                  />
+                  <AvatarFallback className="bg-[#E6DDD5] text-[#3D342B] text-2xl rounded-xl">
+                    <img 
+                      src="/reparos.png" 
+                      alt="Foto de perfil padrão" 
+                      className="w-full h-full object-cover rounded-xl"
+                    />
                   </AvatarFallback>
                 </Avatar>
                 <Button
@@ -731,10 +738,6 @@ const OnboardingPage = () => {
               <ChevronRight size={20} />
             </Button>
           )}
-          
-          <div className="flex justify-center">
-            <div className="h-1.5 w-32 bg-[#E6DDD5] rounded-full"></div>
-          </div>
         </div>
       </div>
 

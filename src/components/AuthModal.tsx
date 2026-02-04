@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SecureEnhancedLoginForm } from './auth/SecureEnhancedLoginForm';
@@ -15,6 +16,7 @@ interface AuthModalProps {
 }
 
 const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = 'login' }: AuthModalProps) => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(defaultTab);
 
   const handleSuccess = () => {
@@ -23,7 +25,11 @@ const AuthModal = ({ isOpen, onClose, onLogin, defaultTab = 'login' }: AuthModal
   };
 
   const handleTabChange = (value: string) => {
-    if (value === 'login' || value === 'register') {
+    if (value === 'register') {
+      // Quando clicar em "Cadastrar", redirecionar para /auth
+      onClose();
+      navigate('/auth?tab=register');
+    } else if (value === 'login') {
       setActiveTab(value);
     }
   };
