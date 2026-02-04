@@ -50,7 +50,7 @@ const BenefitsGrid = () => {
                 <div className="md:col-span-2 md:row-span-1 bg-[#FFF1ED] rounded-[40px] p-8 flex flex-col md:flex-row gap-8 overflow-hidden text-left relative">
                     <div className="flex-1 flex flex-col justify-center relative z-10">
                         <h3 className="font-black text-2xl mb-2 tracking-tight">Reconhecimento <br /> que impulsiona</h3>
-                        <p className="text-sm text-gray-600 font-medium">Receba o feedback positivo que seu talento merece e conquiste mais clientes.</p>
+                        <p className="text-sm text-gray-600 font-medium">Receba o feedback positivo <br /> que seu talento merece <br /> e conquiste mais clientes.</p>
                     </div>
 
                     <div className="flex-1 relative">
@@ -65,8 +65,7 @@ const BenefitsGrid = () => {
 
                     <motion.div
                         initial={{ rotate: 3 }}
-                        className="absolute bg-white p-3 rounded-3xl shadow-xl w-64 border border-red-50 z-20"
-                        style={{ bottom: '15%', right: '-96px' }}
+                        className="absolute bg-white p-3 rounded-2xl md:rounded-3xl shadow-xl w-40 md:w-64 border border-red-50 z-20 bottom-[15%] -right-10 md:-right-24"
                     >
                         <div className="flex items-center gap-2 mb-2">
                             <div className="w-8 h-8 bg-blue-100 rounded-full overflow-hidden">

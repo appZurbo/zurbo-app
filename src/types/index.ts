@@ -214,7 +214,11 @@ export interface ServiceRequest {
   user_id: string;
   category_id: string;
   description: string;
-  details?: any;
+  details?: {
+    additional_info?: string;
+    location_type?: 'house' | 'building';
+    [key: string]: any;
+  };
   photos?: string[];
   location_lat: number;
   location_lng: number;

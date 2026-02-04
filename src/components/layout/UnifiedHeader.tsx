@@ -27,7 +27,7 @@ import {
   Users,
   Clock,
   Star,
-  Map
+  Map as MapIcon
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Badge } from '@/components/ui/badge';
@@ -64,61 +64,25 @@ export const UnifiedHeader = () => {
               className="flex items-center justify-center -m-2 p-0 hover:opacity-80 transition-opacity"
             >
               <img
-                src="/logoinv.png"
+                src="/newlogo.png"
                 alt="Zurbo Logo"
-                className="h-20 w-auto object-contain object-center"
-                style={{ objectPosition: 'center' }}
+                className="h-12 w-auto object-contain"
               />
             </button>
           </div>
 
           <div className="flex items-center space-x-4">
             {!user && (
-              <>
-                <Button
-                  variant="ghost"
-                  onClick={() => navigate('/mapa-servicos')}
-                  className="text-gray-600 hover:text-gray-900 bg-white/10 hover:bg-white/20 backdrop-blur-sm"
-                >
-                  <Map className="h-4 w-4 mr-2" />
-                  Mapa
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => navigate('/informacoes')}
-                  className="text-gray-600 hover:text-gray-900 bg-white/10 hover:bg-white/20 backdrop-blur-sm"
-                >
-                  <Info className="h-4 w-4 mr-2" />
-                  Informações
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleAuthClick}
-                  className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-white/30"
-                >
-                  Entrar
-                </Button>
-                <Button
-                  onClick={handleAuthClick}
-                  className="bg-orange-500 hover:bg-orange-600 shadow-lg"
-                >
-                  Cadastrar
-                </Button>
-              </>
+              <Button
+                onClick={handleAuthClick}
+                className="bg-orange-500 hover:bg-orange-600 shadow-lg text-white font-bold px-6 py-2 rounded-xl transition-all"
+              >
+                Entrar
+              </Button>
             )}
 
             {user && (
               <>
-                <Button
-                  variant="ghost"
-                  onClick={() => navigate('/mapa-servicos')}
-                  className="hidden md:flex text-gray-600 hover:text-gray-900 mr-2"
-                >
-                  <Map className="h-5 w-5 mr-2" />
-                  Mapa
-                </Button>
-                <NotificationBell />
-
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -138,13 +102,8 @@ export const UnifiedHeader = () => {
                           </div>
                         )}
                         <div className="flex flex-col items-start">
-                          <span className="text-sm font-medium text-gray-900">
-                            {profile?.nome?.split(' ')[0] || 'Usuário'}
-                            {isPremium && <Crown className="inline h-3 w-3 text-yellow-500 ml-1" />}
-                          </span>
-                          <span className="text-xs text-gray-600 capitalize">
-                            {profile?.tipo || 'cliente'}
-                            {isPremium && ' Premium'}
+                          <span className="text-sm font-medium text-gray-900 leading-tight">
+                            {profile?.nome?.split(' ')[0] || 'Menu'}
                           </span>
                         </div>
                         <ChevronDown className="h-4 w-4 text-gray-400" />
@@ -203,7 +162,7 @@ export const UnifiedHeader = () => {
                     </DropdownMenuItem>
 
                     <DropdownMenuItem onClick={() => navigate('/mapa-servicos')}>
-                      <Map className="mr-2 h-4 w-4" />
+                      <MapIcon className="mr-2 h-4 w-4" />
                       <span>Mapa de Serviços</span>
                     </DropdownMenuItem>
 

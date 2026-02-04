@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Home, Search, Calendar, User, MessageCircle } from 'lucide-react';
+import { Home, Search, Calendar, User, MessageCircle, Map as MapIcon } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile, useTablet } from '@/hooks/useMobile';
@@ -42,6 +42,13 @@ export const UnifiedDock = () => {
       isActive: isActive('/agenda') || isActive('/pedidos'),
       requiresAuth: true,
       isCenter: true
+    },
+    {
+      icon: MapIcon,
+      label: 'Mapa',
+      path: '/mapa-servicos',
+      isActive: isActive('/mapa-servicos'),
+      showAlways: true
     },
     {
       icon: MessageCircle,

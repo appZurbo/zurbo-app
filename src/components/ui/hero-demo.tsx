@@ -141,7 +141,7 @@ function Hero() {
             initial={{ opacity: 0, x: -50, rotate: -10 }}
             animate={{ opacity: 1, x: 0, rotate: -3 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="hidden md:block w-64 bg-white p-4 rounded-3xl shadow-xl border border-gray-100 text-left"
+            className="md:block w-64 bg-white p-4 rounded-3xl shadow-xl border border-gray-100 text-left absolute md:relative bottom-40 -left-6 md:top-0 md:left-0 z-30 scale-90 md:scale-100"
           >
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
@@ -224,8 +224,8 @@ function Hero() {
           <motion.div
             initial={{ opacity: 0, x: 50, rotate: 10 }}
             animate={{ opacity: 1, x: 0, rotate: 3 }}
-            transition={{ delay: 0.7, duration: 0.8 }}
-            className="hidden md:block w-64 bg-white p-4 rounded-3xl shadow-xl border border-gray-100 text-left mt-12"
+            transition={{ delay: 2.0, duration: 0.8 }}
+            className="md:block w-64 bg-white p-4 rounded-3xl shadow-xl border border-gray-100 text-left md:mt-12 absolute md:relative bottom-8 -right-6 md:bottom-0 md:right-0 z-30 scale-90 md:scale-100"
           >
             <div className="flex items-center gap-2 mb-4">
               <Star className="text-yellow-400 fill-yellow-400" size={16} />

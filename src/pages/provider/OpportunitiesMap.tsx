@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ServiceRequest } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, MapPin, Locate, List, Map as MapIcon, Calendar, Clock, ChevronRight } from 'lucide-react';
+import { Loader2, MapPin, Locate, List, Map as MapIcon, Calendar, Clock, ChevronRight, Filter } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { serviceCategories } from '@/config/serviceCategories';
@@ -16,7 +16,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         user_id: 'user-1',
         category_id: 'Limpeza',
         description: 'Diarista para limpeza residencial completa',
-        details: { additional_info: 'Necessário foco em vidros e organização de armários.' },
+        details: { additional_info: 'Necessário foco em vidros e organização de armários.', location_type: 'house' },
         location_lat: -11.8542,
         location_lng: -55.5123,
         status: 'open',
@@ -29,7 +29,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         user_id: 'user-2',
         category_id: 'Reparos',
         description: 'Montagem de guarda-roupa 6 portas',
-        details: { additional_info: 'Móvel novo na caixa. Possuo as ferramentas básicas.' },
+        details: { additional_info: 'Móvel novo na caixa. Possuo as ferramentas básicas.', location_type: 'building' },
         location_lat: -11.8765,
         location_lng: -55.4987,
         status: 'open',
@@ -42,7 +42,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         user_id: 'user-3',
         category_id: 'Elétrica',
         description: 'Instalação de 3 ventiladores de teto',
-        details: { additional_info: 'Fiação já está no local, falta apenas a montagem e fixação.' },
+        details: { additional_info: 'Fiação já está no local, falta apenas a montagem e fixação.', location_type: 'house' },
         location_lat: -11.8621,
         location_lng: -55.5212,
         status: 'open',
@@ -55,7 +55,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         user_id: 'user-4',
         category_id: 'Beleza',
         description: 'Manicure e Pedicure em domicílio',
-        details: { additional_info: 'Preciso para hoje à tarde. Tenho meus próprios esmaltes.' },
+        details: { additional_info: 'Preciso para hoje à tarde. Tenho meus próprios esmaltes.', location_type: 'house' },
         location_lat: -11.8890,
         location_lng: -55.5050,
         status: 'open',
@@ -68,7 +68,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         user_id: 'user-5',
         category_id: 'Construção',
         description: 'Pintura de muro e portão',
-        details: { additional_info: 'Muro de aproximadamente 15 metros lineares.' },
+        details: { additional_info: 'Muro de aproximadamente 15 metros lineares.', location_type: 'house' },
         location_lat: -11.8710,
         location_lng: -55.4820,
         status: 'open',
@@ -81,7 +81,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         user_id: 'user-6',
         category_id: 'Jardinagem',
         description: 'Poda de grama e limpeza de canteiros',
-        details: { additional_info: 'Terreno de 250m². Grama esmeralda.' },
+        details: { additional_info: 'Terreno de 250m². Grama esmeralda.', location_type: 'house' },
         location_lat: -11.8420,
         location_lng: -55.4950,
         status: 'open',
@@ -94,7 +94,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         user_id: 'user-7',
         category_id: 'Fretes',
         description: 'Mudança pequena dentro do bairro',
-        details: { additional_info: 'Apenas uma geladeira, uma máquina de lavar e caixas.' },
+        details: { additional_info: 'Apenas uma geladeira, uma máquina de lavar e caixas.', location_type: 'building' },
         location_lat: -11.8950,
         location_lng: -55.5320,
         status: 'open',
@@ -107,7 +107,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         user_id: 'user-8',
         category_id: 'Chaveiro',
         description: 'Abertura de porta de apartamento',
-        details: { additional_info: 'Esqueci a chave dentro. Porta de madeira simples.' },
+        details: { additional_info: 'Esqueci a chave dentro. Porta de madeira simples.', location_type: 'building' },
         location_lat: -11.8650,
         location_lng: -55.5450,
         status: 'open',
@@ -120,7 +120,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         user_id: 'user-9',
         category_id: 'Cozinha',
         description: 'Cozinheira para evento familiar',
-        details: { additional_info: 'Almoço para 15 pessoas. Comida brasileira.' },
+        details: { additional_info: 'Almoço para 15 pessoas. Comida brasileira.', location_type: 'house' },
         location_lat: -11.8320,
         location_lng: -55.5150,
         status: 'open',
@@ -133,7 +133,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         user_id: 'user-10',
         category_id: 'Tecnologia',
         description: 'Configuração de rede Wi-Fi e roteador',
-        details: { additional_info: 'Sinal não chega no andar de cima. Tenho repetidor.' },
+        details: { additional_info: 'Sinal não chega no andar de cima. Tenho repetidor.', location_type: 'house' },
         location_lat: -11.8820,
         location_lng: -55.5550,
         status: 'open',
@@ -146,7 +146,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         user_id: 'user-11',
         category_id: 'Cuidados',
         description: 'Cuidador de idosos para período noturno',
-        details: { additional_info: 'Apenas acompanhamento e auxílio com medicação.' },
+        details: { additional_info: 'Apenas acompanhamento e auxílio com medicação.', location_type: 'house' },
         location_lat: -11.8480,
         location_lng: -55.4650,
         status: 'open',
@@ -159,7 +159,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         user_id: 'user-12',
         category_id: 'Refrigeração',
         description: 'Limpeza e recarga de gás ar-condicionado',
-        details: { additional_info: 'Aparelho Split 12.000 BTU. Parou de gelar.' },
+        details: { additional_info: 'Aparelho Split 12.000 BTU. Parou de gelar.', location_type: 'building' },
         location_lat: -11.9050,
         location_lng: -55.4950,
         status: 'open',
@@ -172,7 +172,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         user_id: 'user-13',
         category_id: 'Mecânico',
         description: 'Troca de pastilha de freio e óleo',
-        details: { additional_info: 'Carro popular. Posso levar na oficina local.' },
+        details: { additional_info: 'Carro popular. Posso levar na oficina local.', location_type: 'house' },
         location_lat: -11.8590,
         location_lng: -55.4750,
         status: 'open',
@@ -187,6 +187,7 @@ const OpportunitiesMap = () => {
     const [loading, setLoading] = useState(true);
     const [selectedRequest, setSelectedRequest] = useState<ServiceRequest | null>(null);
     const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
+    const [showFilters, setShowFilters] = useState(false);
 
     useEffect(() => {
         fetchRequests();
@@ -195,22 +196,25 @@ const OpportunitiesMap = () => {
     const fetchRequests = async () => {
         setLoading(true);
         try {
+            // Filter: Created within the last 7 days
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
             const { data, error } = await supabase
                 .from('service_requests')
-                .select('*, user:profiles(nome, foto_url)')
-                .eq('status', 'open');
+                .select(`
+                    *,
+                    user:profiles(nome, foto_url)
+                `)
+                .eq('status', 'open')
+                .gt('created_at', sevenDaysAgo.toISOString())
+                .order('created_at', { ascending: false });
 
             if (error) throw error;
-
-            // Combine real data with mocks
-            const combined = [...(data || []), ...MOCK_REQUESTS];
-            // Remove duplicates if any (by id)
-            const unique = combined.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
-
-            setRequests(unique);
+            setRequests([...MOCK_REQUESTS, ...(data || [])]);
         } catch (error) {
             console.error('Error fetching requests:', error);
-            setRequests(MOCK_REQUESTS); // Fallback to mocks on error
+            setRequests(MOCK_REQUESTS);
         } finally {
             setLoading(false);
         }
@@ -223,6 +227,19 @@ const OpportunitiesMap = () => {
             c.id.toLowerCase() === req.category_id.toLowerCase()
         );
 
+        // Default to service icons 3D if match, otherwise generic category icon
+        let iconUrl = category ? `/icons/${category.image}` : undefined;
+
+        if (req.category_id.toLowerCase() === 'reparos') {
+            iconUrl = '/icons/reparos_3d.png';
+        } else if (req.category_id.toLowerCase() === 'limpeza') {
+            iconUrl = '/icons/limpeza_3d.png';
+        } else if (req.category_id.toLowerCase() === 'mecânico') {
+            iconUrl = '/icons/mecanico_3d.png';
+        } else if (req.category_id.toLowerCase() === 'construção') {
+            iconUrl = '/icons/construcao_3d.png';
+        }
+
         return {
             lng: req.location_lng,
             lat: req.location_lat,
@@ -230,7 +247,7 @@ const OpportunitiesMap = () => {
             description: req.category_id,
             color: '#f97316',
             id: req.id,
-            iconUrl: category ? `/icons/${category.image}` : undefined
+            iconUrl
         };
     });
 
@@ -241,13 +258,23 @@ const OpportunitiesMap = () => {
         }
     };
 
-    const formatDate = (dateStr: string) => {
-        return new Date(dateStr).toLocaleDateString('pt-BR', {
-            day: '2-digit',
-            month: 'short',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+    const formatDate = (dateStr: string, details?: any) => {
+        // If it's a "real" request (has scheduled_date) or is not a mock ID, show real date
+        // Otherwise, show the literal placeholder if requested by user previously,
+        // but the user now said "quando for algo real, exiba a data de exibição".
+        if (details?.scheduled_date) {
+            const date = new Date(`${details.scheduled_date}T${details.scheduled_time || '00:00'}`);
+            const datePart = date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+            const timePart = details.scheduled_time || '--:--';
+            return `data ${datePart}, hora ${timePart}`;
+        }
+
+        // Literal placeholder for mocks as previously requested
+        return `data tal, hora tal`;
+    };
+
+    const toggleViewMode = () => {
+        setViewMode(prev => prev === 'map' ? 'list' : 'map');
     };
 
     return (
@@ -269,18 +296,11 @@ const OpportunitiesMap = () => {
                             <div className="mt-6 flex flex-col gap-3">
                                 <div className="flex gap-2">
                                     <Button
-                                        className={`flex-1 gap-2 font-bold transition-all ${viewMode === 'map' ? 'bg-orange-500 shadow-lg shadow-orange-200' : 'bg-white text-gray-600 border border-gray-100'}`}
-                                        onClick={() => setViewMode('map')}
+                                        className={`flex-1 gap-2 font-black uppercase text-[10px] tracking-widest transition-all h-10 rounded-xl ${viewMode === 'list' ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' : 'bg-white text-gray-400 border border-gray-100 hover:text-orange-500 hover:border-orange-100'}`}
+                                        onClick={toggleViewMode}
                                         size="sm"
                                     >
-                                        <MapIcon size={16} /> Mapa
-                                    </Button>
-                                    <Button
-                                        className={`flex-1 gap-2 font-bold transition-all ${viewMode === 'list' ? 'bg-orange-500 shadow-lg shadow-orange-200' : 'bg-white text-gray-600 border border-gray-100'}`}
-                                        onClick={() => setViewMode('list')}
-                                        size="sm"
-                                    >
-                                        <List size={16} /> Lista
+                                        <List size={16} /> VER LISTA
                                     </Button>
                                 </div>
 
@@ -293,6 +313,55 @@ const OpportunitiesMap = () => {
                                         {loading ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null}
                                         Atualizar
                                     </Button>
+                                </div>
+
+                                <div className="border-t border-gray-100 pt-3">
+                                    <button
+                                        onClick={() => setShowFilters(!showFilters)}
+                                        className="w-full flex items-center justify-between group"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <div className={`p-1.5 rounded-lg transition-colors ${showFilters ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-500 group-hover:bg-orange-100'}`}>
+                                                <Filter size={12} />
+                                            </div>
+                                            <span className="text-[11px] font-black uppercase tracking-widest text-gray-700">Filtros</span>
+                                        </div>
+                                        <ChevronRight size={14} className={`text-gray-400 transition-transform duration-300 ${showFilters ? 'rotate-90' : ''}`} />
+                                    </button>
+
+                                    <div className={`overflow-hidden transition-all duration-500 ease-in-out ${showFilters ? 'max-h-64 mt-4 opacity-100' : 'max-h-0 opacity-0'}`}>
+                                        <div className="space-y-4 pb-2">
+                                            <div className="space-y-2">
+                                                <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Categoria</label>
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {['Todos', 'Reparos', 'Limpeza', 'Mecânico', 'Construção'].map(cat => (
+                                                        <Badge
+                                                            key={cat}
+                                                            variant="secondary"
+                                                            className="cursor-pointer bg-white border border-gray-100 text-gray-400 hover:border-orange-200 hover:text-orange-500 font-bold text-[9px] uppercase px-2 py-0.5 rounded-full transition-all"
+                                                        >
+                                                            {cat}
+                                                        </Badge>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Distância Máxima</label>
+                                                <div className="px-1">
+                                                    <div className="h-1 w-full bg-gray-100 rounded-full relative">
+                                                        <div className="absolute top-0 left-0 h-1 w-1/2 bg-orange-500 rounded-full"></div>
+                                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-white border-2 border-orange-500 rounded-full shadow-sm"></div>
+                                                    </div>
+                                                    <div className="flex justify-between mt-2 text-[9px] font-bold text-gray-400 uppercase tracking-tighter">
+                                                        <span>1km</span>
+                                                        <span className="text-orange-600">5km</span>
+                                                        <span>15km+</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </CardContent>
@@ -353,7 +422,7 @@ const OpportunitiesMap = () => {
                                                     <div className="text-right">
                                                         <div className="flex items-center gap-1 text-[10px] text-gray-400 font-bold uppercase mb-1">
                                                             <Clock size={10} />
-                                                            {formatDate(req.created_at)}
+                                                            {formatDate(req.created_at, req.details)}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -427,7 +496,7 @@ const OpportunitiesMap = () => {
                                 <div className="flex flex-wrap gap-4 pt-4 border-t border-gray-100">
                                     <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
                                         <Calendar size={14} className="text-orange-500" />
-                                        {selectedRequest && formatDate(selectedRequest.created_at)}
+                                        {selectedRequest && formatDate(selectedRequest.created_at, selectedRequest.details)}
                                     </div>
                                     <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
                                         <MapPin size={14} className="text-orange-500" />

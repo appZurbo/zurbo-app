@@ -28,6 +28,7 @@ interface LeafletMapComponentProps {
         iconUrl?: string;
     }>;
     onMarkerClick?: (marker: any) => void;
+    onMapMove?: (center: { lat: number; lng: number }) => void;
     showControls?: boolean;
 }
 
@@ -38,6 +39,7 @@ export const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
     height = '400px',
     markers = [],
     onMarkerClick,
+    onMapMove,
     showControls = true
 }) => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -66,6 +68,13 @@ export const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
         if (showControls) {
             L.control.zoom({ position: 'bottomright' }).addTo(map);
         }
+
+        map.on('moveend', () => {
+            if (onMapMove) {
+                const newCenter = map.getCenter();
+                onMapMove({ lat: newCenter.lat, lng: newCenter.lng });
+            }
+        });
 
         mapInstanceRef.current = map;
         setInitialized(true);
