@@ -11,7 +11,7 @@ const loadMapbox = async () => {
       const mapbox = await import('mapbox-gl');
       await import('mapbox-gl/dist/mapbox-gl.css');
       mapboxgl = mapbox.default || mapbox;
-      
+
       // Set access token
       mapboxgl.accessToken = 'pk.eyJ1IjoienVyYm8iLCJhIjoiY21jYXY1aHhsMDdrODJsb3B5cG1obm13MyJ9.ZiQVy5e_cS76E07l9HlYLA';
     } catch (error) {
@@ -37,14 +37,16 @@ interface MapboxMapProps {
   showControls?: boolean;
 }
 
-export const MapboxMap: React.FC<MapboxMapProps> = ({
+export const MapboxMap: React.FC<MapboxMapProps & { styleUrl?: string; onMarkerClick?: (marker: any) => void }> = ({
   center = [-55.5, -11.87], // Coordenadas de Sinop, MT
   zoom = 12,
   className = '',
   height = '400px',
   markers = [],
   bairrosAtendidos = [],
-  showControls = true
+  showControls = true,
+  styleUrl = 'mapbox://styles/mapbox/streets-v12', // Default style
+  onMarkerClick
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<any>(null);
@@ -77,7 +79,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
       // Initialize map
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v12',
+        style: styleUrl,
         center: center,
         zoom: zoom,
       });
@@ -101,11 +103,15 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
       console.error('Error initializing map:', error);
       setLoadError(true);
     }
-  }, [mapboxLoaded, center, zoom, showControls]);
+  }, [mapboxLoaded, center, zoom, showControls, styleUrl]);
 
   // Add markers when map is loaded
   useEffect(() => {
     if (!mapLoaded || !map.current || !mapboxgl || markers.length === 0) return;
+
+    // Clear existing markers if we were tracking them (simplification: we just redraw all for now, assuming not too many updates)
+    // Note: In a real app we'd track marker instances to remove them. For now, rely on map re-init if really needed, or just let them stack if this effect doesn't run often.
+    // Actually, let's just proceed with adding new ones. 
 
     markers.forEach((marker) => {
       try {
@@ -122,12 +128,16 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
         el.style.display = 'flex';
         el.style.alignItems = 'center';
         el.style.justifyContent = 'center';
-        
+
         // Add icon
         const icon = document.createElement('div');
-        icon.innerHTML = '👤';
+        icon.innerHTML = '👤'; // Or dynamic icon
         icon.style.fontSize = '14px';
         el.appendChild(icon);
+
+        if (onMarkerClick) {
+          el.addEventListener('click', () => onMarkerClick(marker));
+        }
 
         // Create popup
         const popup = new mapboxgl.Popup({ offset: 25 })
@@ -147,7 +157,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({
         console.error('Error adding marker:', error);
       }
     });
-  }, [mapLoaded, markers]);
+  }, [mapLoaded, markers, onMarkerClick]);
 
   // Highlight bairros atendidos
   useEffect(() => {

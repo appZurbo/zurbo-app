@@ -209,6 +209,21 @@ export interface PortfolioFoto {
 // LOCATION & GEOGRAPHICAL TYPES
 // ============================================
 
+export interface ServiceRequest {
+  id: string;
+  user_id: string;
+  category_id: string;
+  description: string;
+  details?: any;
+  photos?: string[];
+  location_lat: number;
+  location_lng: number;
+  status: 'open' | 'in_progress' | 'completed' | 'cancelled';
+  created_at: string;
+  updated_at: string;
+  user?: UserProfile;
+}
+
 export interface CidadeBrasileira {
   id: string;
   nome: string;

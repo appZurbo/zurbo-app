@@ -42,6 +42,9 @@ import AdminContentModeration from "./pages/AdminContentModeration";
 import ImageManager from "./pages/admin/ImageManager";
 import BannerImageManager from "./pages/admin/BannerImageManager";
 
+const CreateServiceRequest = lazy(() => import("./pages/client/CreateServiceRequest"));
+const OpportunitiesMap = lazy(() => import("./pages/provider/OpportunitiesMap"));
+
 const queryClient = new QueryClient();
 
 import { useNativeBridge } from "@/hooks/useNativeBridge";
@@ -115,6 +118,11 @@ function App() {
               <Route path="/regras-comunidade" element={<RegrasComunidade />} />
               <Route path="/sobre-nos" element={<SobreNos />} />
               <Route path="/informacoes" element={<InformacoesUnificada />} />
+
+              {/* Service Requests */}
+              <Route path="/solicitar-servico" element={<ProtectedRoute><CreateServiceRequest /></ProtectedRoute>} />
+              <Route path="/mapa-servicos" element={<OpportunitiesMap />} />
+
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

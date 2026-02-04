@@ -8,11 +8,11 @@ export const setupSecurityHeaders = () => {
 
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-    "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: https:",
-    "font-src 'self' data:",
-    `connect-src ${connectSrc}`,
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "img-src 'self' data: https: https://*.openstreetmap.org https://*.cartocdn.com https://cdnjs.cloudflare.com",
+    "font-src 'self' data: https://fonts.gstatic.com",
+    `connect-src ${connectSrc} https://maps.googleapis.com`,
     "frame-ancestors 'self' https://*.lovableproject.com https://*.lovable.dev",
     "base-uri 'self'",
     "form-action 'self'"
@@ -27,7 +27,7 @@ export const setupSecurityHeaders = () => {
 
   if (window.self !== window.top) {
     const parentOrigin = document.referrer;
-    const isTrustedDomain = trustedDomains.some(domain => 
+    const isTrustedDomain = trustedDomains.some(domain =>
       parentOrigin.includes(domain)
     );
 
@@ -54,11 +54,11 @@ export const setupSecurityHeaders = () => {
       warn: console.warn,
       error: console.error
     };
-    
-    console.log = () => {};
-    console.warn = () => {};
-    console.error = () => {};
-    
+
+    console.log = () => { };
+    console.warn = () => { };
+    console.error = () => { };
+
     window.addEventListener('error', (e) => {
       originalConsole.error('Critical error:', e.error);
     });
@@ -83,11 +83,11 @@ export const validateCSRF = (): boolean => {
       'lovable.dev',
       'localhost'
     ];
-    
-    const isTrusted = trustedDomains.some(domain => 
+
+    const isTrusted = trustedDomains.some(domain =>
       referrer.includes(domain)
     );
-    
+
     if (!isTrusted) {
       if (typeof console !== 'undefined' && console.warn) {
         console.warn('Possible CSRF attempt detected');

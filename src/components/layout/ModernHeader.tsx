@@ -19,7 +19,8 @@ import {
   Bell,
   Calendar,
   BarChart3,
-  Crown
+  Crown,
+  Map
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
@@ -137,6 +138,10 @@ export const ModernHeader = () => {
                         Favoritos
                       </DropdownMenuItem>
                     )}
+                    <DropdownMenuItem onClick={() => navigate('/mapa-servicos')}>
+                      <Map className="mr-2 h-4 w-4" />
+                      Mapa de Serviços
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/notificacoes')}>
                       <Bell className="mr-2 h-4 w-4" />
                       Notificações
