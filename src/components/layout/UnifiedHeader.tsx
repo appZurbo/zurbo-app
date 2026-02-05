@@ -33,6 +33,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Badge } from '@/components/ui/badge';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 
+// Header unificado com navegação desktop centralizada
 export const UnifiedHeader = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -69,6 +70,33 @@ export const UnifiedHeader = () => {
                 className="h-8 md:h-12 w-auto object-contain"
               />
             </button>
+          </div>
+
+          {/* Desktop Navigation Tabs */}
+          <div className="hidden md:flex flex-1 justify-center items-center space-x-2">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/prestadores')}
+              className={`flex items-center gap-2 rounded-full px-6 transition-all ${isActivePage('/prestadores')
+                ? 'bg-orange-50 text-orange-600 ring-1 ring-orange-200 shadow-sm'
+                : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+            >
+              <Users className={`h-4 w-4 ${isActivePage('/prestadores') ? 'fill-current' : ''}`} />
+              <span className="font-bold tracking-tight">Prestadores</span>
+            </Button>
+
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/mapa-servicos')}
+              className={`flex items-center gap-2 rounded-full px-6 transition-all ${isActivePage('/mapa-servicos')
+                ? 'bg-orange-50 text-orange-600 ring-1 ring-orange-200 shadow-sm'
+                : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+            >
+              <MapIcon className={`h-4 w-4 ${isActivePage('/mapa-servicos') ? 'fill-current' : ''}`} />
+              <span className="font-bold tracking-tight">Mapa</span>
+            </Button>
           </div>
 
           <div className="flex items-center space-x-4">
