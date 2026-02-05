@@ -1,11 +1,12 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Home, Search, Calendar, User, MessageCircle, Map as MapIcon } from 'lucide-react';
+import { Home, Search, Calendar, MessageCircle, Map as MapIcon } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile, useTablet } from '@/hooks/useMobile';
 import { useRealtimeChat } from '@/hooks/useRealtimeChat';
+import TactileCalendar from '@/components/ui/TactileCalendar';
 
 export const UnifiedDock = () => {
   const navigate = useNavigate();
@@ -57,15 +58,6 @@ export const UnifiedDock = () => {
       isActive: isActive('/conversas'),
       badge: chatUnreadCount > 0 ? chatUnreadCount : undefined,
       requiresAuth: true
-    },
-    {
-      icon: User,
-      label: 'Perfil',
-      path: isAuthenticated
-        ? '/settings'
-        : '/auth',
-      isActive: isActive('/settings') || isActive('/configuracoes') || isActive('/auth'),
-      showAlways: true
     }
   ];
 
@@ -85,14 +77,13 @@ export const UnifiedDock = () => {
 
           if (isCenter) {
             return (
-              <div key={index} className="relative -top-6">
-                <Button
-                  size="icon"
-                  className="h-14 w-14 bg-[#E05815] text-white rounded-full shadow-lg shadow-[#E05815]/30 flex items-center justify-center border-4 border-white/50 hover:bg-[#E05815]/90 transition-all"
-                  onClick={() => navigate(item.path)}
-                >
-                  <IconComponent className="h-7 w-7" />
-                </Button>
+              <div key={index} className="relative top-0">
+                <div className="relative top-0 transition-transform hover:scale-110 active:scale-95">
+                  <TactileCalendar
+                    onClick={() => navigate(item.path)}
+                    className="shadow-2xl shadow-orange-500/20"
+                  />
+                </div>
               </div>
             );
           }

@@ -66,7 +66,7 @@ export const UnifiedHeader = () => {
               <img
                 src="/newlogo.png"
                 alt="Zurbo Logo"
-                className="h-12 w-auto object-contain"
+                className="h-8 md:h-12 w-auto object-contain"
               />
             </button>
           </div>
@@ -115,12 +115,17 @@ export const UnifiedHeader = () => {
                       <div className="flex flex-col space-y-1 leading-none">
                         <p className="font-medium">{profile?.nome || 'Usuário'}</p>
                         <p className="text-xs text-muted-foreground">{profile?.email}</p>
-                        {isPremium && (
-                          <Badge variant="secondary" className="text-xs w-fit">
-                            <Crown className="h-3 w-3 mr-1" />
-                            Premium
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          <Badge variant="outline" className="text-[10px] uppercase font-bold text-orange-600 border-orange-200 bg-orange-50/50">
+                            {isPrestador ? 'Prestador' : 'Cliente'}
                           </Badge>
-                        )}
+                          {isPremium && (
+                            <Badge variant="secondary" className="text-[10px] uppercase font-bold">
+                              <Crown className="h-2.5 w-2.5 mr-1" />
+                              Premium
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <DropdownMenuSeparator />

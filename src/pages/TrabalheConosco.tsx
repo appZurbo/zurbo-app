@@ -9,7 +9,7 @@ import AuthButton from '@/components/auth/AuthModalHelper';
 
 const TrabalheConosco = () => {
   const navigate = useNavigate();
-  
+
   const beneficios = [{
     icon: Users,
     titulo: "Clientes Qualificados",
@@ -35,7 +35,7 @@ const TrabalheConosco = () => {
     titulo: "Agenda Inteligente",
     descricao: "Organize seus agendamentos facilmente"
   }];
-  
+
   const comoFunciona = [{
     numero: "01",
     titulo: "Cadastre-se",
@@ -57,28 +57,26 @@ const TrabalheConosco = () => {
     titulo: "Receba",
     descricao: "Seja avaliado e receba seu pagamento"
   }];
-  
+
   const servicos = ["Limpeza", "Jardinagem", "Pintura", "Elétrica", "Encanamento", "Construção", "Beleza", "Informática", "Educação", "Saúde", "Transporte", "Eventos"];
 
   return (
     <UnifiedLayout>
-      
+
       {/* Hero Section */}
       <section className="py-20 px-4">
-        <div className="max-w-6xl mx-auto text-center">
-          <div className="flex items-center justify-center gap-0 mb-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-2xl">Z</span>
-            </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mx-0 text-center px-[5px]">
-              Trabalhe Conosco
+        <div className="max-w-6xl mx-auto flex flex-col items-center">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-2 h-10 bg-orange-500 rounded-full"></div>
+            <h1 className="text-4xl md:text-7xl font-black text-gray-900 uppercase tracking-tighter leading-none text-center">
+              Trabalhe <span className="text-orange-500">Conosco</span>
             </h1>
           </div>
-          
-          <p className="md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto text-xl font-normal">
-            Conecte-se com milhares de clientes em Sinop e região. Cresça seu faturamento com a primeira plataforma feita para serviços
+
+          <p className="md:text-2xl text-gray-500 font-medium mb-12 max-w-3xl mx-auto text-xl text-center">
+            Cresça seu faturamento com a primeira plataforma feita para serviços em Sinop e região.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <AuthButton size="lg" className="bg-orange-500 hover:bg-orange-600 text-lg px-8 py-6">
               <Wrench className="mr-2 h-5 w-5" />
@@ -93,7 +91,7 @@ const TrabalheConosco = () => {
       <section className="px-4 bg-white py-[15px]">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12">Por que escolher o Zurbo?</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {beneficios.map((beneficio, index) => (
               <Card key={index} className="hover:shadow-lg transition-shadow">
@@ -114,7 +112,7 @@ const TrabalheConosco = () => {
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12">Como funciona?</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
             {comoFunciona.map((passo, index) => (
               <div key={index} className="text-center">
@@ -133,7 +131,7 @@ const TrabalheConosco = () => {
       <section className="px-4 bg-white py-[15px]">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12">Muitos Serviços Disponíveis</h2>
-          
+
           <div className="flex flex-wrap justify-center gap-3">
             {servicos.map((servico, index) => (
               <Badge key={index} variant="secondary" className="text-sm py-2 px-4">
@@ -151,7 +149,7 @@ const TrabalheConosco = () => {
           <p className="text-xl mb-8 opacity-90">
             Junte-se a centenas de prestadores que já confiam no Zurbo para fazer seus negócios crescerem.
           </p>
-          
+
           <AuthButton size="lg" className="bg-white text-orange-600 hover:bg-gray-50 py-[10px] text-left text-sm px-[11px]">
             <Wrench className="mr-2 h-5 w-5" />
             Cadastrar-se agora como Prestador

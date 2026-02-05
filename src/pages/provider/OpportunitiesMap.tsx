@@ -9,6 +9,9 @@ import { Loader2, MapPin, Locate, List, Map as MapIcon, Calendar, Clock, Chevron
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { serviceCategories } from '@/config/serviceCategories';
+import { motion, AnimatePresence } from 'framer-motion';
+import { QuickCreateRequestModal } from '@/components/client/QuickCreateRequestModal';
+import { Plus } from 'lucide-react';
 
 const MOCK_REQUESTS: ServiceRequest[] = [
     {
@@ -188,6 +191,8 @@ const OpportunitiesMap = () => {
     const [selectedRequest, setSelectedRequest] = useState<ServiceRequest | null>(null);
     const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
     const [showFilters, setShowFilters] = useState(false);
+    const [isMinimized, setIsMinimized] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
 
     useEffect(() => {
         fetchRequests();
@@ -200,18 +205,43 @@ const OpportunitiesMap = () => {
             const sevenDaysAgo = new Date();
             sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-            const { data, error } = await supabase
+            // 1. Fetch requests
+            const { data: requestsData, error: requestsError } = await supabase
                 .from('service_requests')
-                .select(`
-                    *,
-                    user:profiles(nome, foto_url)
-                `)
+                .select('*')
                 .eq('status', 'open')
                 .gt('created_at', sevenDaysAgo.toISOString())
                 .order('created_at', { ascending: false });
 
-            if (error) throw error;
-            setRequests([...MOCK_REQUESTS, ...(data || [])]);
+            if (requestsError) throw requestsError;
+
+            // 2. Fetch profiles for these requests
+            if (requestsData && requestsData.length > 0) {
+                const userIds = Array.from(new Set(requestsData.map(r => r.user_id)));
+
+                const { data: profilesData, error: profilesError } = await supabase
+                    .from('profiles')
+                    .select('id, nome, foto_url')
+                    .in('id', userIds);
+
+                if (profilesError) {
+                    console.error('Error fetching profiles:', profilesError);
+                    // Continue without profiles if this fails
+                    setRequests(requestsData);
+                } else {
+                    // 3. Manual Join
+                    const requestsWithProfiles = requestsData.map(req => {
+                        const profile = profilesData?.find(p => p.id === req.user_id);
+                        return {
+                            ...req,
+                            user: profile ? { nome: profile.nome, foto_url: profile.foto_url } : undefined
+                        };
+                    });
+                    setRequests([...MOCK_REQUESTS, ...requestsWithProfiles]);
+                }
+            } else {
+                setRequests(MOCK_REQUESTS);
+            }
         } catch (error) {
             console.error('Error fetching requests:', error);
             setRequests(MOCK_REQUESTS);
@@ -283,89 +313,141 @@ const OpportunitiesMap = () => {
 
                 {/* Map Header Overlay */}
                 <div className="absolute top-4 left-4 right-4 z-20 md:left-8 md:w-96 pointer-events-none">
-                    <Card className="shadow-2xl border-none bg-white/90 backdrop-blur-md pointer-events-auto overflow-hidden">
-                        <div className="h-1 w-full bg-gradient-to-r from-orange-400 to-orange-600"></div>
-                        <CardContent className="p-5">
-                            <h1 className="text-xl font-black text-gray-900 flex items-center gap-2 uppercase tracking-tighter">
-                                <MapPin className="text-orange-500" size={20} /> Mapa de Serviços
-                            </h1>
-                            <p className="text-xs text-gray-500 font-medium mt-1">
-                                Explore oportunidades de trabalho em tempo real na sua região.
-                            </p>
+                    <AnimatePresence mode="wait">
+                        {!isMinimized ? (
+                            <motion.div
+                                key="full-menu"
+                                initial={{ opacity: 0, x: -20, scale: 0.95 }}
+                                animate={{ opacity: 1, x: 0, scale: 1 }}
+                                exit={{ opacity: 0, x: -20, scale: 0.95 }}
+                                transition={{ duration: 0.3, ease: "easeOut" }}
+                                className="pointer-events-auto"
+                            >
+                                <Card className="shadow-2xl border-none bg-white/90 backdrop-blur-md overflow-hidden relative group">
+                                    <div className="h-1 w-full bg-gradient-to-r from-orange-400 to-orange-600"></div>
 
-                            <div className="mt-6 flex flex-col gap-3">
-                                <div className="flex gap-2">
-                                    <Button
-                                        className={`flex-1 gap-2 font-black uppercase text-[10px] tracking-widest transition-all h-10 rounded-xl ${viewMode === 'list' ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' : 'bg-white text-gray-400 border border-gray-100 hover:text-orange-500 hover:border-orange-100'}`}
-                                        onClick={toggleViewMode}
-                                        size="sm"
-                                    >
-                                        <List size={16} /> VER LISTA
-                                    </Button>
-                                </div>
-
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                        <Locate className="w-3 h-3 text-orange-400" />
-                                        <span>Sinop, MT</span>
-                                    </div>
-                                    <Button variant="ghost" size="sm" className="h-7 text-[10px] font-black uppercase text-orange-500 hover:text-orange-600 hover:bg-orange-50" onClick={fetchRequests} disabled={loading}>
-                                        {loading ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null}
-                                        Atualizar
-                                    </Button>
-                                </div>
-
-                                <div className="border-t border-gray-100 pt-3">
+                                    {/* Minimize Button */}
                                     <button
-                                        onClick={() => setShowFilters(!showFilters)}
-                                        className="w-full flex items-center justify-between group"
+                                        onClick={() => setIsMinimized(true)}
+                                        className="absolute top-3 right-3 p-2 rounded-xl bg-orange-100/50 text-orange-600 hover:text-orange-700 hover:bg-orange-200/50 hover:scale-110 active:scale-90 transition-all z-30 shadow-sm border border-orange-200/30"
+                                        title="Minimizar Menu"
                                     >
-                                        <div className="flex items-center gap-2">
-                                            <div className={`p-1.5 rounded-lg transition-colors ${showFilters ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-500 group-hover:bg-orange-100'}`}>
-                                                <Filter size={12} />
-                                            </div>
-                                            <span className="text-[11px] font-black uppercase tracking-widest text-gray-700">Filtros</span>
-                                        </div>
-                                        <ChevronRight size={14} className={`text-gray-400 transition-transform duration-300 ${showFilters ? 'rotate-90' : ''}`} />
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M4 14h6v6" />
+                                            <path d="M20 10h-6V4" />
+                                        </svg>
                                     </button>
 
-                                    <div className={`overflow-hidden transition-all duration-500 ease-in-out ${showFilters ? 'max-h-64 mt-4 opacity-100' : 'max-h-0 opacity-0'}`}>
-                                        <div className="space-y-4 pb-2">
-                                            <div className="space-y-2">
-                                                <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Categoria</label>
-                                                <div className="flex flex-wrap gap-1.5">
-                                                    {['Todos', 'Reparos', 'Limpeza', 'Mecânico', 'Construção'].map(cat => (
-                                                        <Badge
-                                                            key={cat}
-                                                            variant="secondary"
-                                                            className="cursor-pointer bg-white border border-gray-100 text-gray-400 hover:border-orange-200 hover:text-orange-500 font-bold text-[9px] uppercase px-2 py-0.5 rounded-full transition-all"
-                                                        >
-                                                            {cat}
-                                                        </Badge>
-                                                    ))}
-                                                </div>
+                                    <CardContent className="p-5">
+                                        <h1 className="text-xl font-black text-gray-900 flex items-center gap-2 uppercase tracking-tighter">
+                                            <MapPin className="text-orange-500" size={20} /> Mapa de Serviços
+                                        </h1>
+                                        <p className="text-xs text-gray-500 font-medium mt-1">
+                                            Explore oportunidades de trabalho em tempo real na sua região.
+                                        </p>
+
+                                        <div className="mt-6 flex flex-col gap-3">
+                                            <div className="flex gap-2">
+                                                <Button
+                                                    className={`flex-1 gap-2 font-black uppercase text-[10px] tracking-widest transition-all h-10 rounded-xl ${viewMode === 'list' ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' : 'bg-white text-gray-400 border border-gray-100 hover:text-orange-500 hover:border-orange-100'}`}
+                                                    onClick={toggleViewMode}
+                                                    size="sm"
+                                                >
+                                                    <List size={16} /> VER LISTA
+                                                </Button>
                                             </div>
 
-                                            <div className="space-y-2">
-                                                <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Distância Máxima</label>
-                                                <div className="px-1">
-                                                    <div className="h-1 w-full bg-gray-100 rounded-full relative">
-                                                        <div className="absolute top-0 left-0 h-1 w-1/2 bg-orange-500 rounded-full"></div>
-                                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-white border-2 border-orange-500 rounded-full shadow-sm"></div>
-                                                    </div>
-                                                    <div className="flex justify-between mt-2 text-[9px] font-bold text-gray-400 uppercase tracking-tighter">
-                                                        <span>1km</span>
-                                                        <span className="text-orange-600">5km</span>
-                                                        <span>15km+</span>
-                                                    </div>
+                                            <div className="flex justify-between items-center">
+                                                <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                                    <Locate className="w-3 h-3 text-orange-400" />
+                                                    <span>Sinop, MT</span>
                                                 </div>
+                                                <Button variant="ghost" size="sm" className="h-7 text-[10px] font-black uppercase text-orange-500 hover:text-orange-600 hover:bg-orange-50" onClick={fetchRequests} disabled={loading}>
+                                                    {loading ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null}
+                                                    Atualizar
+                                                </Button>
+                                            </div>
+
+                                            <div className="border-t border-gray-100 pt-3">
+                                                <button
+                                                    onClick={() => setShowFilters(!showFilters)}
+                                                    className="w-full flex items-center justify-between group"
+                                                >
+                                                    <div className="flex items-center gap-2">
+                                                        <div className={`p-1.5 rounded-lg transition-colors ${showFilters ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-500 group-hover:bg-orange-100'}`}>
+                                                            <Filter size={12} />
+                                                        </div>
+                                                        <span className="text-[11px] font-black uppercase tracking-widest text-gray-700">Filtros</span>
+                                                    </div>
+                                                    <ChevronRight size={14} className={`text-gray-400 transition-transform duration-300 ${showFilters ? 'rotate-90' : ''}`} />
+                                                </button>
+
+                                                <AnimatePresence>
+                                                    {showFilters && (
+                                                        <motion.div
+                                                            initial={{ height: 0, opacity: 0 }}
+                                                            animate={{ height: 'auto', opacity: 1 }}
+                                                            exit={{ height: 0, opacity: 0 }}
+                                                            transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
+                                                            className="overflow-hidden mt-4"
+                                                        >
+                                                            <div className="space-y-4 pb-2">
+                                                                <div className="space-y-2">
+                                                                    <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Categoria</label>
+                                                                    <div className="flex flex-wrap gap-1.5">
+                                                                        {['Todos', 'Reparos', 'Limpeza', 'Mecânico', 'Construção'].map(cat => (
+                                                                            <Badge
+                                                                                key={cat}
+                                                                                variant="secondary"
+                                                                                className="cursor-pointer bg-white border border-gray-100 text-gray-400 hover:border-orange-200 hover:text-orange-500 font-bold text-[9px] uppercase px-2 py-0.5 rounded-full transition-all"
+                                                                            >
+                                                                                {cat}
+                                                                            </Badge>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+
+                                                                <div className="space-y-2">
+                                                                    <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Distância Máxima</label>
+                                                                    <div className="px-1">
+                                                                        <div className="h-1 w-full bg-gray-100 rounded-full relative">
+                                                                            <div className="absolute top-0 left-0 h-1 w-1/2 bg-orange-500 rounded-full"></div>
+                                                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-white border-2 border-orange-500 rounded-full shadow-sm"></div>
+                                                                        </div>
+                                                                        <div className="flex justify-between mt-2 text-[9px] font-bold text-gray-400 uppercase tracking-tighter">
+                                                                            <span>1km</span>
+                                                                            <span className="text-orange-600">5km</span>
+                                                                            <span>15km+</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
+                        ) : (
+                            <motion.button
+                                key="minimized-trigger"
+                                initial={{ opacity: 0, scale: 0.5, x: -20 }}
+                                animate={{ opacity: 1, scale: 1, x: 0 }}
+                                exit={{ opacity: 0, scale: 0.5, x: -20 }}
+                                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                onClick={() => setIsMinimized(false)}
+                                className="pointer-events-auto p-3.5 bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl border-none text-orange-500 hover:bg-orange-50 hover:scale-110 active:scale-90 transition-all flex items-center justify-center group border border-orange-100/50"
+                                title="Abrir Menu"
+                            >
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="rotate-180 transition-transform group-hover:rotate-0">
+                                    <path d="M15 3h6v6" />
+                                    <path d="M9 21H3v-6" />
+                                </svg>
+                            </motion.button>
+                        )}
+                    </AnimatePresence>
                 </div>
 
                 {/* Main Content Area */}
@@ -378,8 +460,20 @@ const OpportunitiesMap = () => {
                             zoom={13}
                             markers={markers}
                             onMarkerClick={handleMarkerClick}
+                            onInteraction={() => setIsMinimized(true)}
                             showControls={true}
                         />
+                    </div>
+
+                    {/* Floating Action Button (FAB) */}
+                    <div className="absolute bottom-24 right-6 z-40 md:bottom-8 md:right-8">
+                        <Button
+                            onClick={() => setShowCreateModal(true)}
+                            className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-orange-500 hover:bg-orange-600 shadow-2xl shadow-orange-200 flex items-center justify-center group transition-all hover:scale-110 active:scale-90 border-4 border-white"
+                            title="Criar novo pedido"
+                        >
+                            <Plus className="w-8 h-8 text-white group-hover:rotate-90 transition-transform duration-300" />
+                        </Button>
                     </div>
 
                     {/* Mobile Overlay */}
@@ -477,7 +571,15 @@ const OpportunitiesMap = () => {
                         <div className="p-8">
                             <div className="flex gap-4 items-center mb-8 bg-gray-50 p-4 rounded-2xl">
                                 <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm">
-                                    <img src={selectedRequest?.user?.foto_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedRequest?.id}`} alt="User" />
+                                    <img
+                                        src={selectedRequest?.user?.foto_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(selectedRequest?.user?.nome || 'User')}`}
+                                        alt={selectedRequest?.user?.nome || "Usuário"}
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                            const target = e.target as HTMLImageElement;
+                                            target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(selectedRequest?.user?.nome || 'User')}`;
+                                        }}
+                                    />
                                 </div>
                                 <div>
                                     <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest leading-none mb-1">Cliente</p>
@@ -516,6 +618,13 @@ const OpportunitiesMap = () => {
                         </div>
                     </DialogContent>
                 </Dialog>
+
+                {/* Quick Create Request Modal */}
+                <QuickCreateRequestModal
+                    open={showCreateModal}
+                    onOpenChange={setShowCreateModal}
+                    onSuccess={fetchRequests}
+                />
 
             </div>
         </UnifiedLayout>

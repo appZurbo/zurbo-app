@@ -8,12 +8,12 @@ export const setupSecurityHeaders = () => {
 
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://js.stripe.com",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "img-src 'self' data: https: https://*.openstreetmap.org https://*.cartocdn.com https://cdnjs.cloudflare.com",
+    "img-src 'self' data: blob: https: https://*.openstreetmap.org https://*.cartocdn.com https://cdnjs.cloudflare.com https://api.mapbox.com",
     "font-src 'self' data: https://fonts.gstatic.com",
-    `connect-src ${connectSrc} https://maps.googleapis.com`,
-    "frame-ancestors 'self' https://*.lovableproject.com https://*.lovable.dev",
+    `connect-src ${connectSrc} https://maps.googleapis.com https://api.mapbox.com https://api.stripe.com`,
+    "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
     "base-uri 'self'",
     "form-action 'self'"
   ].join('; ');

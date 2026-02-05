@@ -309,12 +309,15 @@ const PrestadoresPage = () => {
       <div className="bg-[#FBF7F2] border-b border-[#E6DDD5]/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Header */}
-          <div className={`mb-6 ${isMobile ? '' : 'flex items-center justify-between gap-4'}`}>
+          <div className={`mb-8 ${isMobile ? '' : 'flex items-center justify-between gap-4'}`}>
             <div className="flex-1">
-              <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
-                Prestadores de Serviços
-              </h1>
-              <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-8 bg-orange-500 rounded-full"></div>
+                <h1 className="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter leading-none">
+                  Prestadores de <span className="text-orange-500">Serviços</span>
+                </h1>
+              </div>
+              <p className="text-gray-500 font-medium ml-4">
                 Encontre o profissional ideal para suas necessidades
               </p>
             </div>

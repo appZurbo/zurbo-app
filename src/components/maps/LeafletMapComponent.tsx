@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapPin } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Fix for default marker icons in Leaflet with React
 // This handles the missing icon asset issue common in react-leaflet/leaflet usage
@@ -29,6 +30,7 @@ interface LeafletMapComponentProps {
     }>;
     onMarkerClick?: (marker: any) => void;
     onMapMove?: (center: { lat: number; lng: number }) => void;
+    onInteraction?: () => void;
     showControls?: boolean;
 }
 
@@ -40,8 +42,10 @@ export const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
     markers = [],
     onMarkerClick,
     onMapMove,
+    onInteraction,
     showControls = true
 }) => {
+    const isMobile = useIsMobile();
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<L.Map | null>(null);
     const markersRef = useRef<L.Marker[]>([]);
@@ -56,23 +60,33 @@ export const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
             center: [center.lat, center.lng],
             zoom: zoom,
             zoomControl: false, // We will add it manually if needed, or use default
+            attributionControl: false // Hide default attribution
         });
 
-        // Add Tile Layer (CartoDB Positron for minimalist look)
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-            subdomains: 'abcd',
-            maxZoom: 20
+        // Mapbox Tile Layer (Light v11 for premium clean look)
+        const mapboxAccessToken = 'pk.eyJ1IjoienVyYm8iLCJhIjoiY21jYXY1aHhsMDdrODJsb3B5cG1obm13MyJ9.ZiQVy5e_cS76E07l9HlYLA';
+
+        L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/light-v11/tiles/{z}/{x}/{y}{r}?access_token=${mapboxAccessToken}`, {
+            attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            tileSize: 512,
+            zoomOffset: -1,
+            maxZoom: 18,
         }).addTo(map);
 
-        if (showControls) {
-            L.control.zoom({ position: 'bottomright' }).addTo(map);
+        if (showControls && !isMobile) {
+            L.control.zoom({ position: 'topright' }).addTo(map);
         }
 
         map.on('moveend', () => {
             if (onMapMove) {
                 const newCenter = map.getCenter();
                 onMapMove({ lat: newCenter.lat, lng: newCenter.lng });
+            }
+        });
+
+        map.on('movestart', () => {
+            if (onInteraction) {
+                onInteraction();
             }
         });
 
@@ -192,6 +206,41 @@ export const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
 
     return (
         <div className={`relative ${className} z-0`} style={{ height }}>
+            <style>
+                {`
+                .leaflet-top.leaflet-right {
+                    top: 20px;
+                    right: 20px;
+                }
+                .leaflet-control-zoom {
+                    display: flex !important;
+                    flex-direction: row !important;
+                    border: none !important;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+                }
+                .leaflet-control-zoom a {
+                    width: 36px !important;
+                    height: 36px !important;
+                    line-height: 36px !important;
+                    color: #4b5563 !important;
+                    font-size: 18px !important;
+                    border: 1px solid #e5e7eb !important;
+                    background-color: white !important;
+                    transition: all 0.2s;
+                }
+                .leaflet-control-zoom a:hover {
+                    background-color: #f9fafb !important;
+                    color: #f97316 !important;
+                }
+                .leaflet-control-zoom-in {
+                    border-right: none !important;
+                    border-radius: 8px 0 0 8px !important;
+                }
+                .leaflet-control-zoom-out {
+                    border-radius: 0 8px 8px 0 !important;
+                }
+                `}
+            </style>
             <div ref={mapContainerRef} style={{ height: '100%', width: '100%' }} />
         </div>
     );

@@ -4,13 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  ArrowLeft, 
-  Calendar, 
-  MessageCircle, 
-  Star, 
-  Users, 
-  Eye, 
+import {
+  ArrowLeft,
+  Calendar,
+  MessageCircle,
+  Star,
+  Users,
+  Eye,
   Crown,
   DollarSign,
   Clock,
@@ -82,7 +82,7 @@ const PrestadorDashboard = () => {
 
   const loadDashboardData = async () => {
     if (!profile) return;
-    
+
     setLoadingStats(true);
     try {
       // Load agendamentos
@@ -142,28 +142,28 @@ const PrestadorDashboard = () => {
       const amanha = new Date(hoje);
       amanha.setDate(amanha.getDate() + 1);
 
-      const agendamentosHoje = agendamentos?.filter(a => 
+      const agendamentosHoje = agendamentos?.filter(a =>
         isToday(parseISO(a.data_agendada))
       ).length || 0;
 
-      const agendamentosAmanha = agendamentos?.filter(a => 
+      const agendamentosAmanha = agendamentos?.filter(a =>
         isTomorrow(parseISO(a.data_agendada))
       ).length || 0;
 
-      const pedidosAtivos = pedidos?.filter(p => 
+      const pedidosAtivos = pedidos?.filter(p =>
         ['pendente', 'confirmado'].includes(p.status)
       ).length || 0;
 
       const startOfCurrentMonth = startOfMonth(hoje);
       const endOfCurrentMonth = endOfMonth(hoje);
-      const servicosConcluidosEsteMes = pedidos?.filter(p => 
-        p.status === 'concluido' && 
-        parseISO(p.created_at) >= startOfCurrentMonth && 
+      const servicosConcluidosEsteMes = pedidos?.filter(p =>
+        p.status === 'concluido' &&
+        parseISO(p.created_at) >= startOfCurrentMonth &&
         parseISO(p.created_at) <= endOfCurrentMonth
       ).length || 0;
 
       const totalAvaliacoes = avaliacoes?.length || 0;
-      const avaliacaoMedia = avaliacoes?.length ? 
+      const avaliacaoMedia = avaliacoes?.length ?
         avaliacoes.reduce((acc, av) => acc + (av.nota || 0), 0) / avaliacoes.length : 0;
 
       // Receita deste mês e valor a receber (pedidos pendentes/confirmados no período)
@@ -329,47 +329,44 @@ const PrestadorDashboard = () => {
             )}
 
             {/* Main Header */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
-                      <span className="text-white font-bold text-xl">P</span>
-                    </div>
-                    <div>
-                      <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
-                        Painel do Prestador
-                      </h1>
-                      <div className="flex items-center gap-2">
-                        <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
-                          Bem-vindo, {profile.nome}
-                        </p>
-                        {profile.premium && (
-                          <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white">
-                            <Crown className="h-3 w-3 mr-1" />
-                            PRO
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+            <div className={`flex ${isMobile ? 'flex-col gap-6' : 'items-end justify-between'} mb-12`}>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-2 h-8 bg-orange-500 rounded-full"></div>
+                  <h1 className="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter leading-none">
+                    Painel do <span className="text-orange-500">Prestador</span>
+                  </h1>
+                </div>
+                <div className="flex items-center gap-2 ml-4">
+                  <p className="text-gray-500 font-medium">
+                    Bem-vindo, {profile.nome}
+                  </p>
+                  {profile.premium && (
+                    <Badge className="bg-orange-500 text-white border-none font-black text-[10px] px-2">
+                      <Crown className="h-3 w-3 mr-1" />
+                      PRO
+                    </Badge>
+                  )}
                 </div>
               </div>
-              
-              <div className="flex items-center gap-4">
+
+              <div className="flex items-center gap-3">
                 <Select value={periodFilter} onValueChange={setPeriodFilter}>
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger className="w-40 h-12 bg-white border-gray-200 rounded-xl font-bold uppercase text-[10px] tracking-widest text-gray-400">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="day">Hoje</SelectItem>
-                    <SelectItem value="month">Este Mês</SelectItem>
-                    <SelectItem value="year">Este Ano</SelectItem>
+                  <SelectContent className="rounded-xl border-gray-100">
+                    <SelectItem value="day" className="font-bold uppercase text-[10px] tracking-widest">Hoje</SelectItem>
+                    <SelectItem value="month" className="font-bold uppercase text-[10px] tracking-widest">Este Mês</SelectItem>
+                    <SelectItem value="year" className="font-bold uppercase text-[10px] tracking-widest">Este Ano</SelectItem>
                   </SelectContent>
                 </Select>
-                
-                <Button onClick={() => navigate('/agenda')} className="bg-orange-500 hover:bg-orange-600">
-                  <Calendar className="h-4 w-4 mr-2" />
+
+                <Button
+                  onClick={() => navigate('/agenda')}
+                  className="bg-orange-500 hover:bg-orange-600 shadow-lg shadow-orange-100 rounded-xl px-6 h-12 font-bold transition-all hover:scale-105 active:scale-95"
+                >
+                  <Calendar className="h-5 w-5 mr-2" />
                   Ver Agenda
                 </Button>
               </div>
@@ -514,8 +511,8 @@ const PrestadorDashboard = () => {
                           </div>
                         </div>
                         <Badge variant="outline" className="text-xs">
-                          {agendamento.status === 'confirmado' ? 'Confirmado' : 
-                           agendamento.status === 'pendente' ? 'Pendente' : agendamento.status}
+                          {agendamento.status === 'confirmado' ? 'Confirmado' :
+                            agendamento.status === 'pendente' ? 'Pendente' : agendamento.status}
                         </Badge>
                       </div>
                     ))}

@@ -19,40 +19,39 @@ export const FilterTabs: React.FC<FilterTabsProps> = ({
   isMobile
 }) => {
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg">
-          {isPrestador ? 'Pedidos Recebidos' : 'Meus Agendamentos'}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Tabs value={filter} onValueChange={(value) => onFilterChange(value as FilterType)}>
-          <TabsList className={`grid w-full ${isMobile ? 'grid-cols-3' : 'grid-cols-6'} h-auto p-1`}>
-            <TabsTrigger value="todos" className="text-xs py-2 px-3">
-              Todos
-            </TabsTrigger>
-            <TabsTrigger value="pendente" className="text-xs py-2 px-3">
-              Pendente
-            </TabsTrigger>
-            <TabsTrigger value="aceito" className="text-xs py-2 px-3">
-              Aceito
-            </TabsTrigger>
-            {!isMobile && (
-              <>
-                <TabsTrigger value="em_andamento" className="text-xs py-2 px-3">
-                  Andamento
-                </TabsTrigger>
-                <TabsTrigger value="concluido" className="text-xs py-2 px-3">
-                  Concluído
-                </TabsTrigger>
-                <TabsTrigger value="cancelado" className="text-xs py-2 px-3">
-                  Cancelado
-                </TabsTrigger>
-              </>
-            )}
-          </TabsList>
-        </Tabs>
-      </CardContent>
-    </Card>
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 mb-2">
+        <div className="w-1.5 h-6 bg-orange-500 rounded-full"></div>
+        <h2 className="text-lg font-black text-gray-900 uppercase tracking-tighter leading-none">
+          {isPrestador ? 'Pedidos' : 'Meus'} <span className="text-orange-500">{isPrestador ? 'Recebidos' : 'Agendamentos'}</span>
+        </h2>
+      </div>
+
+      <div className="p-1 bg-gray-100/80 backdrop-blur-sm rounded-2xl flex gap-1 overflow-x-auto no-scrollbar">
+        {[
+          { id: 'todos', label: 'Todos' },
+          { id: 'pendente', label: 'Pendente' },
+          { id: 'aceito', label: 'Aceito' },
+          ...(isMobile ? [] : [
+            { id: 'em_andamento', label: 'Andamento' },
+            { id: 'concluido', label: 'Concluído' },
+            { id: 'cancelado', label: 'Cancelado' }
+          ])
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => onFilterChange(tab.id as FilterType)}
+            className={`
+              flex-1 min-w-fit whitespace-nowrap rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-all
+              ${filter === tab.id
+                ? 'bg-white text-orange-600 shadow-sm'
+                : 'text-gray-400 hover:text-gray-600'}
+            `}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 };

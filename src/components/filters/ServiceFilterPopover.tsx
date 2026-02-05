@@ -25,7 +25,7 @@ export const ServiceFilterPopover: React.FC<ServiceFilterPopoverProps> = ({
 
   const loadServicos = async () => {
     try {
-      console.log('🔄 ServiceFilterPopover: Loading services from database...');
+
       const servicosData = await getServicos();
       console.log(`✅ ServiceFilterPopover: Loaded ${servicosData.length} active services`);
       setServicos(servicosData);
@@ -40,7 +40,7 @@ export const ServiceFilterPopover: React.FC<ServiceFilterPopoverProps> = ({
     const newSelection = selectedServices.includes(servicoId)
       ? selectedServices.filter(id => id !== servicoId)
       : [...selectedServices, servicoId];
-    
+
     onSelectionChange(newSelection);
   };
 
@@ -96,21 +96,20 @@ export const ServiceFilterPopover: React.FC<ServiceFilterPopoverProps> = ({
                 </Button>
               )}
             </div>
-            
+
             <div className="space-y-2 max-h-60 overflow-y-auto">
               {servicos.map((servico) => {
                 const iconConfig = getServiceIcon(servico.nome);
                 const IconComponent = iconConfig.icon;
                 const isSelected = selectedServices.includes(servico.id);
-                
+
                 return (
                   <div
                     key={servico.id}
-                    className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${
-                      isSelected 
-                        ? 'bg-orange-50 border border-orange-200' 
+                    className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${isSelected
+                        ? 'bg-orange-50 border border-orange-200'
                         : 'hover:bg-gray-50'
-                    }`}
+                      }`}
                     onClick={() => handleServiceToggle(servico.id)}
                   >
                     <div className={`w-8 h-8 rounded-lg ${iconConfig.bgColor} flex items-center justify-center`}>

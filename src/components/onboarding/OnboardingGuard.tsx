@@ -35,23 +35,16 @@ export const OnboardingGuard = ({ children }: OnboardingGuardProps) => {
 
     // Se não tem perfil ainda, aguardar (pode estar sendo criado)
     if (!profile) {
-      console.log('⏳ Aguardando perfil ser carregado...');
+
       return;
     }
 
     // Verificar se precisa de onboarding
     const needsOnboardingCheck = needsOnboarding(profile);
-    console.log('🔍 Verificação de onboarding:', {
-      profileId: profile.id,
-      email: profile.email,
-      cidade: profile.endereco_cidade,
-      tipo: profile.tipo,
-      criadoEm: profile.criado_em,
-      needsOnboarding: needsOnboardingCheck
-    });
+
 
     if (needsOnboardingCheck) {
-      console.log('🔄 Usuário precisa completar onboarding, redirecionando...');
+
       navigate('/onboarding', { replace: true });
     }
   }, [profile, loading, isAuthenticated, location.pathname, navigate]);

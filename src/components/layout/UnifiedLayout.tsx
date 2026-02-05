@@ -11,11 +11,13 @@ import { AdminViewToggle } from '@/components/admin/AdminViewToggle';
 interface UnifiedLayoutProps {
   children: React.ReactNode;
   showDock?: boolean;
+  showHeader?: boolean;
 }
 
 export const UnifiedLayout: React.FC<UnifiedLayoutProps> = ({
   children,
-  showDock = true
+  showDock = true,
+  showHeader = true
 }) => {
   const isMobile = useMobile();
   const { profile } = useAuth();
@@ -37,10 +39,10 @@ export const UnifiedLayout: React.FC<UnifiedLayoutProps> = ({
           background-color: #FDFDFD;
         }
       `}</style>
-      {isPrestadoresPage ? <ModernHeader /> : <UnifiedHeader />}
+      {showHeader && (isPrestadoresPage ? <ModernHeader /> : <UnifiedHeader />)}
 
       {/* Admin View Toggle - only show for admins */}
-      {isAdmin && (
+      {isAdmin && showHeader && (
         <div className={`sticky top-16 z-40 px-4 py-2 ${isPrestadoresPage ? 'bg-[#FBF7F2]' : 'bg-[#FDFDFD]'} border-b ${isPrestadoresPage ? 'border-[#E6DDD5]/30' : 'border-gray-100'} shadow-sm relative z-30`}>
           <div className="max-w-7xl mx-auto">
             <AdminViewToggle />

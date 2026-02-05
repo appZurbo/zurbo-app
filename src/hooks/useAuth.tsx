@@ -34,10 +34,10 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
   signIn: async () => ({ error: null }),
   signUp: async () => ({ error: null }),
-  signOut: async () => {},
-  logout: async () => {},
-  updateLocalProfile: () => {},
-  refreshProfile: async () => {},
+  signOut: async () => { },
+  logout: async () => { },
+  updateLocalProfile: () => { },
+  refreshProfile: async () => { },
 });
 
 export const useAuth = () => {
@@ -97,7 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const userData = user.user_metadata || {};
       const nome = userData.full_name || userData.name || user.email?.split('@')[0] || 'Usuário';
-      
+
       const { data, error } = await supabase
         .from('users')
         .insert({
@@ -145,8 +145,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.id);
-        
+
+
         if (!isMounted) return;
 
         setSession(session);
@@ -167,11 +167,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setTimeout(async () => {
             if (isMounted) {
               let userProfile = await loadProfile(session.user.id);
-              
+
               if (!userProfile && event === 'SIGNED_IN' && session.user.app_metadata.provider !== 'email') {
                 userProfile = await createSocialUserProfile(session.user);
               }
-              
+
               if (isMounted && userProfile) {
                 setProfile(userProfile);
               }
@@ -190,7 +190,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const initializeAuth = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
-        
+
         if (error) {
           console.error('Error getting session:', error);
           setError(error.message);
@@ -244,14 +244,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email,
         password,
       });
-      
+
       // Enhanced email confirmation check
       if (data.user && !data.user.email_confirmed_at) {
         // Force sign out if email not confirmed
         await supabase.auth.signOut();
         return { error: { message: 'Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada.' } };
       }
-      
+
       return { error };
     } catch (error) {
       setError('Erro ao fazer login');
@@ -264,7 +264,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setError(null);
       const redirectUrl = getRedirectUrl();
       console.log('Using redirect URL for signup:', redirectUrl);
-      
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,

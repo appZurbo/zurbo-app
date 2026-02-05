@@ -63,12 +63,12 @@ export const useEnhancedChat = () => {
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      
+
       const typedMessages = (data || []).map(msg => ({
         ...msg,
         message_type: msg.message_type as ChatMessage['message_type']
       })) as ChatMessage[];
-      
+
       setMessages(typedMessages);
     } catch (error) {
       console.error('Error loading messages:', error);
@@ -110,7 +110,7 @@ export const useEnhancedChat = () => {
         .single();
 
       if (error) throw error;
-      
+
       await loadConversations();
       return data;
     } catch (error) {
@@ -231,7 +231,7 @@ export const useEnhancedChat = () => {
         .eq('id', conversationId);
 
       if (error) throw error;
-      
+
       // Send system message
       await supabase
         .from('chat_messages')
@@ -351,7 +351,7 @@ export const useEnhancedChat = () => {
       .select('upload_count')
       .eq('user_id', profile.id)
       .eq('upload_date', today)
-      .single();
+      .maybeSingle();
 
     const used = data?.upload_count || 0;
     setImageUploadInfo({ remaining: 5 - used, total: 5 });
@@ -377,7 +377,7 @@ export const useEnhancedChat = () => {
             ...payload.new,
             message_type: payload.new.message_type as ChatMessage['message_type']
           } as ChatMessage;
-          
+
           setMessages(prev => {
             // Prevent duplicates
             const exists = prev.find(m => m.id === newMessage.id);

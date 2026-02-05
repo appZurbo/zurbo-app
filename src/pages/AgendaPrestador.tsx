@@ -15,14 +15,14 @@ import { useMobile } from '@/hooks/useMobile';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import AuthButton from '@/components/auth/AuthModalHelper';
-import { 
-  ArrowLeft, 
-  Calendar as CalendarIcon, 
-  Clock, 
-  MapPin, 
-  User, 
-  Copy, 
-  MessageCircle, 
+import {
+  ArrowLeft,
+  Calendar as CalendarIcon,
+  Clock,
+  MapPin,
+  User,
+  Copy,
+  MessageCircle,
   Plus,
   Bell,
   X,
@@ -188,7 +188,7 @@ const AgendaPrestador = () => {
   const { profile, loading: authLoading } = useAuth();
   const isMobile = useMobile();
   const { toast } = useToast();
-  
+
   const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
@@ -215,7 +215,7 @@ const AgendaPrestador = () => {
     preco_acordado: ''
   });
   const [editingAppointmentId, setEditingAppointmentId] = useState<string | null>(null);
-  
+
   useEffect(() => {
     if (profile) {
       loadAgendamentos();
@@ -229,7 +229,7 @@ const AgendaPrestador = () => {
       );
     }
   }, [datePickerOpen, newAppointment.data_agendada]);
-  
+
   const loadAgendamentos = async () => {
     if (!profile) return;
     try {
@@ -241,7 +241,7 @@ const AgendaPrestador = () => {
         `)
         .eq('prestador_id', profile.id)
         .order('data_agendada', { ascending: true });
-      
+
       if (error) throw error;
       const rows = (data || []) as (Agendamento & { manually_added?: boolean; prestador_id?: string; solicitante_id?: string | null })[];
       setAgendamentos(rows.map(a => ({
@@ -265,7 +265,7 @@ const AgendaPrestador = () => {
   };
 
   const getAppointmentsForDate = (date: Date) => {
-    return agendamentos.filter(apt => 
+    return agendamentos.filter(apt =>
       isSameDay(parseISO(apt.data_agendada), date)
     ).sort((a, b) => a.hora_agendada.localeCompare(b.hora_agendada));
   };
@@ -565,230 +565,235 @@ const AgendaPrestador = () => {
       <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
         <div className={`${isMobile ? 'px-4 py-4' : 'max-w-6xl mx-auto p-6'}`}>
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
-                  Minha Agenda
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-8 bg-orange-500 rounded-full"></div>
+                <h1 className="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter leading-none">
+                  Minha <span className="text-orange-500">Agenda</span>
                 </h1>
-                <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
-                  Gerencie seus compromissos e agendamentos
-                </p>
               </div>
+              <p className="text-gray-500 font-medium ml-4">
+                Gerencie seus compromissos e agendamentos
+              </p>
             </div>
 
-            <Button type="button" onClick={openCreateModal} className="bg-orange-500 hover:bg-orange-600">
-              <Plus className="h-4 w-4 mr-2" />
+            <Button
+              type="button"
+              onClick={openCreateModal}
+              className="self-start md:self-auto bg-orange-500 hover:bg-orange-600 shadow-lg shadow-orange-200 rounded-xl px-6 h-12 font-bold transition-all hover:scale-105 active:scale-95"
+            >
+              <Plus className="h-5 w-5 mr-2" />
               Novo Compromisso
             </Button>
           </div>
 
           <Dialog open={isAddingManual} onOpenChange={handleManualModalOpenChange}>
             <DialogContent
-                className="sm:max-w-md"
-                onPointerDownOutside={(e) => {
-                  const target = e.target as HTMLElement;
-                  if (target.closest?.('[data-modal-picker]')) e.preventDefault();
-                }}
-                onInteractOutside={(e) => {
-                  const target = e.target as HTMLElement;
-                  if (target.closest?.('[data-modal-picker]')) e.preventDefault();
-                }}
-                onFocusOutside={(e) => {
-                  const target = e.target as HTMLElement;
-                  if (target.closest?.('[data-modal-picker]')) e.preventDefault();
-                }}
-              >
-                <div ref={el => setPickerContainer(el)} className="contents" />
-                <DialogHeader>
-                  <DialogTitle>
-                    {editingAppointmentId ? 'Editar compromisso' : 'Adicionar Compromisso Manual'}
-                  </DialogTitle>
-                  <DialogDescription className="sr-only">
-                    {editingAppointmentId
-                      ? 'Altere título, data, horário, descrição, endereço ou valor combinado deste compromisso manual.'
-                      : 'Preencha título, data, horário e opcionalmente nome do cliente, descrição, endereço e valor para criar um compromisso na sua agenda.'}
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
+              className="sm:max-w-md"
+              onPointerDownOutside={(e) => {
+                const target = e.target as HTMLElement;
+                if (target.closest?.('[data-modal-picker]')) e.preventDefault();
+              }}
+              onInteractOutside={(e) => {
+                const target = e.target as HTMLElement;
+                if (target.closest?.('[data-modal-picker]')) e.preventDefault();
+              }}
+              onFocusOutside={(e) => {
+                const target = e.target as HTMLElement;
+                if (target.closest?.('[data-modal-picker]')) e.preventDefault();
+              }}
+            >
+              <div ref={el => setPickerContainer(el)} className="contents" />
+              <DialogHeader>
+                <DialogTitle>
+                  {editingAppointmentId ? 'Editar compromisso' : 'Adicionar Compromisso Manual'}
+                </DialogTitle>
+                <DialogDescription className="sr-only">
+                  {editingAppointmentId
+                    ? 'Altere título, data, horário, descrição, endereço ou valor combinado deste compromisso manual.'
+                    : 'Preencha título, data, horário e opcionalmente nome do cliente, descrição, endereço e valor para criar um compromisso na sua agenda.'}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="titulo">Título *</Label>
+                  <Input
+                    id="titulo"
+                    value={newAppointment.titulo}
+                    onChange={(e) => setNewAppointment(prev => ({ ...prev, titulo: e.target.value }))}
+                    placeholder="Ex: Reunião com cliente"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="cliente_nome">Nome do Cliente</Label>
+                  <Input
+                    id="cliente_nome"
+                    value={newAppointment.cliente_nome}
+                    onChange={(e) => setNewAppointment(prev => ({ ...prev, cliente_nome: e.target.value }))}
+                    placeholder="Nome do cliente (opcional)"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="titulo">Título *</Label>
-                    <Input
-                      id="titulo"
-                      value={newAppointment.titulo}
-                      onChange={(e) => setNewAppointment(prev => ({ ...prev, titulo: e.target.value }))}
-                      placeholder="Ex: Reunião com cliente"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="cliente_nome">Nome do Cliente</Label>
-                    <Input
-                      id="cliente_nome"
-                      value={newAppointment.cliente_nome}
-                      onChange={(e) => setNewAppointment(prev => ({ ...prev, cliente_nome: e.target.value }))}
-                      placeholder="Nome do cliente (opcional)"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="data">Data *</Label>
-                      <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen} modal={false}>
-                        <PopoverTrigger asChild>
-                          <Button
-                            id="data"
-                            variant="outline"
-                            className={cn(
-                              "w-full justify-start text-left font-normal h-10 px-3",
-                              !newAppointment.data_agendada && "text-muted-foreground"
-                            )}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4 text-orange-500" />
-                            {newAppointment.data_agendada
-                              ? format(parseISO(newAppointment.data_agendada), "dd 'de' MMMM, yyyy", { locale: ptBR })
-                              : "Selecione a data"}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0 z-[100]" align="start" container={pickerContainer}>
-                          <div data-modal-picker>
-                            <Calendar
-                              mode="single"
-                              month={modalCalendarMonth}
-                              onMonthChange={setModalCalendarMonth}
-                              selected={newAppointment.data_agendada ? parseISO(newAppointment.data_agendada) : undefined}
-                              onSelect={(date) => {
-                                if (date) {
-                                  setNewAppointment(prev => ({ ...prev, data_agendada: format(date, "yyyy-MM-dd") }));
-                                  setDatePickerOpen(false);
-                                }
-                              }}
-                              locale={ptBR}
-                              components={{
-                                Caption: (props) => (
-                                  <CaptionComHoje {...props} onGoToToday={() => setModalCalendarMonth(new Date())} />
-                                ),
-                              }}
-                              classNames={{
-                                day: cn(buttonVariants({ variant: "ghost" }), "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-accent hover:text-accent-foreground"),
-                              }}
-                            />
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                    <div>
-                      <Label htmlFor="hora">Horário *</Label>
-                      <Popover open={timePickerOpen} onOpenChange={setTimePickerOpen} modal={false}>
-                        <PopoverTrigger asChild>
-                          <Button
-                            id="hora"
-                            variant="outline"
-                            className={cn(
-                              "w-full justify-start text-left font-normal h-10 px-3",
-                              !newAppointment.hora_agendada && "text-muted-foreground"
-                            )}
-                          >
-                            <Clock className="mr-2 h-4 w-4 text-orange-500" />
-                            {newAppointment.hora_agendada
-                              ? (newAppointment.hora_agendada?.slice(0, 5) ?? newAppointment.hora_agendada)
-                              : "Selecione o horário"}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0 z-[100]" align="start" container={pickerContainer}>
-                          <div data-modal-picker>
-                            {(() => {
-                              const parts = (newAppointment.hora_agendada?.slice(0, 5) ?? (newAppointment.hora_agendada || "08:00")).split(":");
-                              const horaAtual = parts[0] ?? "08";
-                              const minutoAtual = parts[1] ?? "00";
-                              const setHora = (h: string) =>
-                                setNewAppointment(prev => ({ ...prev, hora_agendada: `${h}:${minutoAtual}` }));
-                              const setMinuto = (m: string) => {
-                                setNewAppointment(prev => ({ ...prev, hora_agendada: `${horaAtual}:${m}` }));
-                                setTimePickerOpen(false);
-                              };
-                              return (
-                                <TimePickerColumns
-                                  horaAtual={horaAtual}
-                                  minutoAtual={minutoAtual}
-                                  setHora={setHora}
-                                  setMinuto={setMinuto}
-                                />
-                              );
-                            })()}
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                  </div>
-                  {newAppointment.data_agendada && newAppointment.hora_agendada && (
-                    <p className="text-xs text-gray-600 leading-tight italic">
-                      <span className="text-orange-600 font-medium">O compromisso será agendado para:</span>{' '}
-                      {format(parseISO(newAppointment.data_agendada), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-                      {' às '}
-                      {newAppointment.hora_agendada?.slice(0, 5) ?? newAppointment.hora_agendada}
-                    </p>
-                  )}
-                  <div>
-                    <Label htmlFor="descricao">Descrição</Label>
-                    <Textarea
-                      id="descricao"
-                      value={newAppointment.descricao}
-                      onChange={(e) => setNewAppointment(prev => ({ ...prev, descricao: e.target.value }))}
-                      placeholder="Detalhes do compromisso (opcional)"
-                      rows={3}
-                    />
+                    <Label htmlFor="data">Data *</Label>
+                    <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen} modal={false}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          id="data"
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal h-10 px-3",
+                            !newAppointment.data_agendada && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4 text-orange-500" />
+                          {newAppointment.data_agendada
+                            ? format(parseISO(newAppointment.data_agendada), "dd 'de' MMMM, yyyy", { locale: ptBR })
+                            : "Selecione a data"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0 z-[100]" align="start" container={pickerContainer}>
+                        <div data-modal-picker>
+                          <Calendar
+                            mode="single"
+                            month={modalCalendarMonth}
+                            onMonthChange={setModalCalendarMonth}
+                            selected={newAppointment.data_agendada ? parseISO(newAppointment.data_agendada) : undefined}
+                            onSelect={(date) => {
+                              if (date) {
+                                setNewAppointment(prev => ({ ...prev, data_agendada: format(date, "yyyy-MM-dd") }));
+                                setDatePickerOpen(false);
+                              }
+                            }}
+                            locale={ptBR}
+                            components={{
+                              Caption: (props) => (
+                                <CaptionComHoje {...props} onGoToToday={() => setModalCalendarMonth(new Date())} />
+                              ),
+                            }}
+                            classNames={{
+                              day: cn(buttonVariants({ variant: "ghost" }), "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-accent hover:text-accent-foreground"),
+                            }}
+                          />
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                   </div>
                   <div>
-                    <Label htmlFor="endereco">Endereço</Label>
-                    <Input
-                      id="endereco"
-                      value={newAppointment.endereco}
-                      onChange={(e) => setNewAppointment(prev => ({ ...prev, endereco: e.target.value }))}
-                      placeholder="Endereço do serviço ou entrega (opcional)"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="preco_acordado">Valor combinado (R$)</Label>
-                    <Input
-                      id="preco_acordado"
-                      type="text"
-                      inputMode="decimal"
-                      value={newAppointment.preco_acordado}
-                      onChange={(e) => setNewAppointment(prev => ({ ...prev, preco_acordado: e.target.value }))}
-                      placeholder="Ex: 150,00 (opcional)"
-                    />
-                  </div>
-                  <div className="flex gap-2 pt-4">
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        handleManualModalOpenChange(false);
-                        setNewAppointment({
-                          titulo: '',
-                          data_agendada: '',
-                          hora_agendada: '',
-                          descricao: '',
-                          cliente_nome: '',
-                          endereco: '',
-                          preco_acordado: ''
-                        });
-                      }}
-                      className="flex-1"
-                    >
-                      Cancelar
-                    </Button>
-                    {editingAppointmentId ? (
-                      <Button onClick={updateManualAppointment} className="flex-1 bg-orange-500 hover:bg-orange-600">
-                        Salvar alterações
-                      </Button>
-                    ) : (
-                      <Button onClick={createManualAppointment} className="flex-1 bg-orange-500 hover:bg-orange-600">
-                        Adicionar
-                      </Button>
-                    )}
+                    <Label htmlFor="hora">Horário *</Label>
+                    <Popover open={timePickerOpen} onOpenChange={setTimePickerOpen} modal={false}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          id="hora"
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal h-10 px-3",
+                            !newAppointment.hora_agendada && "text-muted-foreground"
+                          )}
+                        >
+                          <Clock className="mr-2 h-4 w-4 text-orange-500" />
+                          {newAppointment.hora_agendada
+                            ? (newAppointment.hora_agendada?.slice(0, 5) ?? newAppointment.hora_agendada)
+                            : "Selecione o horário"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0 z-[100]" align="start" container={pickerContainer}>
+                        <div data-modal-picker>
+                          {(() => {
+                            const parts = (newAppointment.hora_agendada?.slice(0, 5) ?? (newAppointment.hora_agendada || "08:00")).split(":");
+                            const horaAtual = parts[0] ?? "08";
+                            const minutoAtual = parts[1] ?? "00";
+                            const setHora = (h: string) =>
+                              setNewAppointment(prev => ({ ...prev, hora_agendada: `${h}:${minutoAtual}` }));
+                            const setMinuto = (m: string) => {
+                              setNewAppointment(prev => ({ ...prev, hora_agendada: `${horaAtual}:${m}` }));
+                              setTimePickerOpen(false);
+                            };
+                            return (
+                              <TimePickerColumns
+                                horaAtual={horaAtual}
+                                minutoAtual={minutoAtual}
+                                setHora={setHora}
+                                setMinuto={setMinuto}
+                              />
+                            );
+                          })()}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 </div>
-              </DialogContent>
-            </Dialog>
+                {newAppointment.data_agendada && newAppointment.hora_agendada && (
+                  <p className="text-xs text-gray-600 leading-tight italic">
+                    <span className="text-orange-600 font-medium">O compromisso será agendado para:</span>{' '}
+                    {format(parseISO(newAppointment.data_agendada), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                    {' às '}
+                    {newAppointment.hora_agendada?.slice(0, 5) ?? newAppointment.hora_agendada}
+                  </p>
+                )}
+                <div>
+                  <Label htmlFor="descricao">Descrição</Label>
+                  <Textarea
+                    id="descricao"
+                    value={newAppointment.descricao}
+                    onChange={(e) => setNewAppointment(prev => ({ ...prev, descricao: e.target.value }))}
+                    placeholder="Detalhes do compromisso (opcional)"
+                    rows={3}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="endereco">Endereço</Label>
+                  <Input
+                    id="endereco"
+                    value={newAppointment.endereco}
+                    onChange={(e) => setNewAppointment(prev => ({ ...prev, endereco: e.target.value }))}
+                    placeholder="Endereço do serviço ou entrega (opcional)"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="preco_acordado">Valor combinado (R$)</Label>
+                  <Input
+                    id="preco_acordado"
+                    type="text"
+                    inputMode="decimal"
+                    value={newAppointment.preco_acordado}
+                    onChange={(e) => setNewAppointment(prev => ({ ...prev, preco_acordado: e.target.value }))}
+                    placeholder="Ex: 150,00 (opcional)"
+                  />
+                </div>
+                <div className="flex gap-2 pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      handleManualModalOpenChange(false);
+                      setNewAppointment({
+                        titulo: '',
+                        data_agendada: '',
+                        hora_agendada: '',
+                        descricao: '',
+                        cliente_nome: '',
+                        endereco: '',
+                        preco_acordado: ''
+                      });
+                    }}
+                    className="flex-1"
+                  >
+                    Cancelar
+                  </Button>
+                  {editingAppointmentId ? (
+                    <Button onClick={updateManualAppointment} className="flex-1 bg-orange-500 hover:bg-orange-600">
+                      Salvar alterações
+                    </Button>
+                  ) : (
+                    <Button onClick={createManualAppointment} className="flex-1 bg-orange-500 hover:bg-orange-600">
+                      Adicionar
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           {/* Calendar and Appointments */}
           {loading ? (
@@ -861,8 +866,8 @@ const AgendaPrestador = () => {
                 <Card className="border-0 bg-transparent shadow-none">
                   <CardHeader>
                     <CardTitle>
-                      {selectedDate ? 
-                        `Agendamentos - ${format(selectedDate, 'dd \'de\' MMMM', { locale: ptBR })}` : 
+                      {selectedDate ?
+                        `Agendamentos - ${format(selectedDate, 'dd \'de\' MMMM', { locale: ptBR })}` :
                         'Próximos Compromissos'
                       }
                     </CardTitle>
