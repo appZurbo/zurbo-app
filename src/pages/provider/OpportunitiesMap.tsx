@@ -12,6 +12,7 @@ import { serviceCategories } from '@/config/serviceCategories';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QuickCreateRequestModal } from '@/components/client/QuickCreateRequestModal';
 import { Plus } from 'lucide-react';
+import { renderToString } from 'react-dom/server';
 
 const MOCK_REQUESTS: ServiceRequest[] = [
     {
@@ -257,18 +258,8 @@ const OpportunitiesMap = () => {
             c.id.toLowerCase() === req.category_id.toLowerCase()
         );
 
-        // Default to service icons 3D if match, otherwise generic category icon
-        let iconUrl = category ? `/icons/${category.image}` : undefined;
-
-        if (req.category_id.toLowerCase() === 'reparos') {
-            iconUrl = '/icons/reparos_3d.png';
-        } else if (req.category_id.toLowerCase() === 'limpeza') {
-            iconUrl = '/icons/limpeza_3d.png';
-        } else if (req.category_id.toLowerCase() === 'mecânico') {
-            iconUrl = '/icons/mecanico_3d.png';
-        } else if (req.category_id.toLowerCase() === 'construção') {
-            iconUrl = '/icons/construcao_3d.png';
-        }
+        const Icon = category?.icon || MapPin;
+        const iconHtml = renderToString(<Icon size={22} color="white" strokeWidth={2.5} />);
 
         return {
             lng: req.location_lng,
@@ -277,7 +268,7 @@ const OpportunitiesMap = () => {
             description: req.category_id,
             color: '#f97316',
             id: req.id,
-            iconUrl
+            iconHtml
         };
     });
 

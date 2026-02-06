@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { MapPin } from 'lucide-react';
+import { MapPin, Locate } from 'lucide-react';
+import { renderToString } from 'react-dom/server';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 // Fix for default marker icons in Leaflet with React
@@ -26,7 +27,7 @@ interface LeafletMapComponentProps {
         description?: string;
         color?: string;
         id?: string;
-        iconUrl?: string;
+        iconHtml?: string;
     }>;
     onMarkerClick?: (marker: any) => void;
     onMapMove?: (center: { lat: number; lng: number }) => void;
@@ -50,6 +51,7 @@ export const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
     const mapInstanceRef = useRef<L.Map | null>(null);
     const markersRef = useRef<L.Marker[]>([]);
     const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+    const userLocationRef = useRef<{ lat: number; lng: number } | null>(null);
     const [initialized, setInitialized] = useState(false);
 
     // Initialize Map
@@ -80,8 +82,46 @@ export const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
             bounds: worldBounds
         }).addTo(map);
 
-        if (showControls && !isMobile) {
-            L.control.zoom({ position: 'topright' }).addTo(map);
+        // Custom Locate Control
+        const LocateControl = L.Control.extend({
+            onAdd: function () {
+                const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-locate-control');
+                const button = L.DomUtil.create('a', 'leaflet-locate-button', container);
+                button.innerHTML = renderToString(<Locate size={20} color="white" />);
+                button.href = '#';
+                button.title = 'Minha Localização';
+                button.role = 'button';
+                button.style.backgroundColor = '#f97316';
+                button.style.display = 'flex';
+                button.style.alignItems = 'center';
+                button.style.justifyContent = 'center';
+                button.style.width = '36px';
+                button.style.height = '36px';
+                button.style.border = 'none';
+                button.style.borderRadius = '8px';
+                container.style.border = 'none';
+                container.style.marginTop = '10px';
+                container.style.boxShadow = '0 4px 12px rgba(249, 115, 22, 0.2)';
+
+                L.DomEvent.on(button, 'click', function (e) {
+                    L.DomEvent.stopPropagation(e);
+                    L.DomEvent.preventDefault(e);
+                    if (userLocationRef.current) {
+                        map.setView([userLocationRef.current.lat, userLocationRef.current.lng], 15);
+                    } else if (onInteraction) {
+                        onInteraction();
+                    }
+                });
+
+                return container;
+            }
+        });
+
+        if (showControls) {
+            if (!isMobile) {
+                L.control.zoom({ position: 'topright' }).addTo(map);
+            }
+            new (LocateControl as any)({ position: 'topright' }).addTo(map);
         }
 
         map.on('moveend', () => {
@@ -116,7 +156,9 @@ export const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
                     const { latitude, longitude } = position.coords;
                     // Check if in Brazil (rough bounds)
                     if (latitude >= -34 && latitude <= 5 && longitude >= -74 && longitude <= -34) {
-                        setUserLocation({ lat: latitude, lng: longitude });
+                        const loc = { lat: latitude, lng: longitude };
+                        setUserLocation(loc);
+                        userLocationRef.current = loc;
                         // Only pan if we are at default position (Sinop)
                         if (mapInstanceRef.current && center.lat === -11.87 && center.lng === -55.5) {
                             mapInstanceRef.current.setView([latitude, longitude], zoom);
@@ -168,19 +210,16 @@ export const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
             justify-content: center;
             width: 44px;
             height: 44px;
-            background-color: #ffffff;
-            border: 3px solid #f97316;
+            background-color: #f97316;
+            border: 2px solid #ffffff;
             border-radius: 50%;
-            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
-            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
             cursor: pointer;
             overflow: hidden;
             transition: all 0.2s;
+            color: white;
           ">
-            ${markerData.iconUrl
-                            ? `<img src="${markerData.iconUrl}" style="width: 100%; height: 100%; object-fit: contain; padding: 4px;" />`
-                            : '👤'
-                        }
+            ${markerData.iconHtml || '👤'}
           </div>`,
                     iconSize: [44, 44],
                     iconAnchor: [22, 22]
