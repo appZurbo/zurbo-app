@@ -33,6 +33,7 @@ interface LeafletMapComponentProps {
     onMapMove?: (center: { lat: number; lng: number }) => void;
     onInteraction?: () => void;
     showControls?: boolean;
+    onLocationUpdate?: (location: { lat: number; lng: number }) => void;
 }
 
 export const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
@@ -44,7 +45,8 @@ export const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
     onMarkerClick,
     onMapMove,
     onInteraction,
-    showControls = true
+    showControls = true,
+    onLocationUpdate
 }) => {
     const isMobile = useIsMobile();
     const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -159,6 +161,9 @@ export const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
                         const loc = { lat: latitude, lng: longitude };
                         setUserLocation(loc);
                         userLocationRef.current = loc;
+                        if (onLocationUpdate) {
+                            onLocationUpdate(loc);
+                        }
                         // Only pan if we are at default position (Sinop)
                         if (mapInstanceRef.current && center.lat === -11.87 && center.lng === -55.5) {
                             mapInstanceRef.current.setView([latitude, longitude], zoom);

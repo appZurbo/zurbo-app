@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, MapPin, Locate, List, Map as MapIcon, Calendar, Clock, ChevronRight, Filter } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { Slider } from '@/components/ui/slider';
 import { serviceCategories } from '@/config/serviceCategories';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QuickCreateRequestModal } from '@/components/client/QuickCreateRequestModal';
@@ -194,7 +195,24 @@ const OpportunitiesMap = () => {
     const [showFilters, setShowFilters] = useState(false);
     const [isMinimized, setIsMinimized] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
+    const [maxDistance, setMaxDistance] = useState<number>(50); // km
+    const [dateRange, setDateRange] = useState<string>('7days'); // 'today', '3days', '7days', 'all'
+    const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showInlineFilters, setShowInlineFilters] = useState(false);
+
+    // Haversine formula to calculate distance in km
+    const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+        const R = 6371; // Earth's radius in km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    };
 
     useEffect(() => {
         fetchRequests();
@@ -203,16 +221,11 @@ const OpportunitiesMap = () => {
     const fetchRequests = async () => {
         setLoading(true);
         try {
-            // Filter: Created within the last 7 days
-            const sevenDaysAgo = new Date();
-            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-            // 1. Fetch requests
+            // 1. Fetch requests - Fetch all active for now, we'll filter in JS to keep UI snappy
             const { data: requestsData, error: requestsError } = await supabase
                 .from('service_requests')
                 .select('*')
                 .eq('status', 'open')
-                .gt('created_at', sevenDaysAgo.toISOString())
                 .order('created_at', { ascending: false });
 
             if (requestsError) throw requestsError;
@@ -252,15 +265,51 @@ const OpportunitiesMap = () => {
         }
     };
 
-    const filteredRequests = selectedCategory === 'Todos'
-        ? requests
-        : requests.filter(req => {
+    const filteredRequests = requests.filter(req => {
+        // 1. Category Filter
+        let categoryMatch = true;
+        if (selectedCategory !== 'Todos') {
             const category = serviceCategories.find(c =>
                 c.name.toLowerCase() === req.category_id.toLowerCase() ||
                 c.id.toLowerCase() === req.category_id.toLowerCase()
             );
-            return category?.name === selectedCategory;
-        });
+            categoryMatch = category?.name === selectedCategory;
+        }
+
+        if (!categoryMatch) return false;
+
+        // 2. Date Filter
+        const createdAt = new Date(req.created_at);
+        const now = new Date();
+        let dateMatch = true;
+
+        if (dateRange === 'today') {
+            dateMatch = createdAt.toDateString() === now.toDateString();
+        } else if (dateRange === '3days') {
+            const threeDaysAgo = new Date();
+            threeDaysAgo.setDate(now.getDate() - 3);
+            dateMatch = createdAt >= threeDaysAgo;
+        } else if (dateRange === '7days') {
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(now.getDate() - 7);
+            dateMatch = createdAt >= sevenDaysAgo;
+        }
+
+        if (!dateMatch) return false;
+
+        // 3. Proximity Filter
+        if (userLocation && maxDistance < 150) {
+            const dist = calculateDistance(
+                userLocation.lat,
+                userLocation.lng,
+                req.location_lat,
+                req.location_lng
+            );
+            if (dist > maxDistance) return false;
+        }
+
+        return true;
+    });
 
     // Convert requests to markers
     const markers = filteredRequests.map(req => {
@@ -420,16 +469,48 @@ const OpportunitiesMap = () => {
                                                                     </div>
 
                                                                     <div className="space-y-2">
-                                                                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Distância Máxima</label>
+                                                                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Data do Pedido</label>
+                                                                        <div className="flex flex-wrap gap-1.5">
+                                                                            {[
+                                                                                { id: 'today', label: 'Hoje' },
+                                                                                { id: '3days', label: '3 dias' },
+                                                                                { id: '7days', label: '7 dias' },
+                                                                                { id: 'all', label: 'Tudo' }
+                                                                            ].map(range => (
+                                                                                <Badge
+                                                                                    key={range.id}
+                                                                                    variant={dateRange === range.id ? "default" : "secondary"}
+                                                                                    onClick={() => setDateRange(range.id)}
+                                                                                    className={`cursor-pointer font-bold text-[9px] uppercase px-2 py-0.5 rounded-full transition-all ${dateRange === range.id
+                                                                                        ? 'bg-orange-500 text-white'
+                                                                                        : 'bg-white border border-gray-100 text-gray-400 hover:text-orange-500'
+                                                                                        }`}
+                                                                                >
+                                                                                    {range.label}
+                                                                                </Badge>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="space-y-4 pt-2">
+                                                                        <div className="flex justify-between items-center mb-1">
+                                                                            <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Proximidade</label>
+                                                                            <span className="text-[10px] font-black text-orange-500 bg-orange-50 px-2 py-0.5 rounded-full">
+                                                                                {maxDistance >= 150 ? 'Toda a região' : `${maxDistance}km`}
+                                                                            </span>
+                                                                        </div>
                                                                         <div className="px-1">
-                                                                            <div className="h-1 w-full bg-gray-100 rounded-full relative">
-                                                                                <div className="absolute top-0 left-0 h-1 w-1/2 bg-orange-500 rounded-full"></div>
-                                                                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-white border-2 border-orange-500 rounded-full shadow-sm"></div>
-                                                                            </div>
-                                                                            <div className="flex justify-between mt-2 text-[9px] font-bold text-gray-400 uppercase tracking-tighter">
+                                                                            <Slider
+                                                                                value={[maxDistance]}
+                                                                                onValueChange={(values) => setMaxDistance(values[0])}
+                                                                                max={150}
+                                                                                step={maxDistance <= 20 ? 1 : 5}
+                                                                                className="[&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&_[role=slider]]:bg-orange-500 [&_[role=slider]]:border-white [&_[role=slider]]:shadow-md"
+                                                                            />
+                                                                            <div className="flex justify-between mt-2 text-[8px] font-bold text-gray-300 uppercase tracking-tighter">
                                                                                 <span>1km</span>
-                                                                                <span className="text-orange-600">5km</span>
-                                                                                <span>15km+</span>
+                                                                                <span>75km</span>
+                                                                                <span>150km+</span>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -479,6 +560,7 @@ const OpportunitiesMap = () => {
                             onMarkerClick={handleMarkerClick}
                             onInteraction={() => setIsMinimized(true)}
                             showControls={true}
+                            onLocationUpdate={setUserLocation}
                         />
                     </div>
 
@@ -501,15 +583,98 @@ const OpportunitiesMap = () => {
 
                     {/* The List Layer - Sidebar Right */}
                     <div className={`absolute top-0 right-0 z-30 h-full w-full md:w-[450px] bg-white/40 backdrop-blur-xl shadow-2xl transition-all duration-500 ease-in-out border-l border-white/20 overflow-y-auto ${viewMode === 'list' ? 'translate-x-0' : 'translate-x-full'}`}>
-                        <div className="p-6 pt-32 md:pt-6 pb-24 space-y-4">
+                        <div className="p-6 pt-14 md:pt-6 pb-24 space-y-4">
                             <div className="flex items-center justify-between mb-8">
                                 <h2 className="text-xl font-black text-gray-900 uppercase tracking-tighter">
                                     Disponíveis <span className="text-orange-500 ml-1">({filteredRequests.length})</span>
                                 </h2>
-                                <Button variant="ghost" size="sm" onClick={() => setViewMode('map')} className="md:hidden text-gray-400">
-                                    <MapIcon size={20} />
-                                </Button>
+                                <div className="flex items-center gap-1">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setShowInlineFilters(!showInlineFilters)}
+                                        className={`md:hidden transition-colors ${showInlineFilters ? 'text-orange-600 bg-orange-100' : 'text-orange-500 hover:text-orange-600 hover:bg-orange-50'}`}
+                                    >
+                                        <Filter size={18} className={showInlineFilters ? 'fill-orange-500' : ''} />
+                                    </Button>
+                                    <Button variant="ghost" size="sm" onClick={() => setViewMode('map')} className="md:hidden text-gray-400">
+                                        <MapIcon size={20} />
+                                    </Button>
+                                </div>
                             </div>
+
+                            <AnimatePresence>
+                                {showInlineFilters && (
+                                    <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: 'auto', opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                        className="md:hidden overflow-hidden bg-white/60 backdrop-blur-md rounded-2xl border border-white/40 mb-6"
+                                    >
+                                        <div className="p-5 space-y-6">
+                                            <div className="space-y-2">
+                                                <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Categoria</label>
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {['Todos', ...serviceCategories.map(c => c.name)].map(cat => (
+                                                        <Badge
+                                                            key={cat}
+                                                            variant={selectedCategory === cat ? "default" : "secondary"}
+                                                            onClick={() => setSelectedCategory(cat)}
+                                                            className={`cursor-pointer font-bold text-[9px] uppercase px-2 py-0.5 rounded-full transition-all ${selectedCategory === cat
+                                                                ? 'bg-orange-500 text-white'
+                                                                : 'bg-white border border-gray-100 text-gray-400'
+                                                                }`}
+                                                        >
+                                                            {cat}
+                                                        </Badge>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Data</label>
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {[
+                                                        { id: 'today', label: 'Hoje' },
+                                                        { id: '3days', label: '3 dias' },
+                                                        { id: '7days', label: '7 dias' },
+                                                        { id: 'all', label: 'Tudo' }
+                                                    ].map(range => (
+                                                        <Badge
+                                                            key={range.id}
+                                                            variant={dateRange === range.id ? "default" : "secondary"}
+                                                            onClick={() => setDateRange(range.id)}
+                                                            className={`cursor-pointer font-bold text-[9px] uppercase px-2 py-0.5 rounded-full transition-all ${dateRange === range.id
+                                                                ? 'bg-orange-500 text-white'
+                                                                : 'bg-white border border-gray-100 text-gray-400'
+                                                                }`}
+                                                        >
+                                                            {range.label}
+                                                        </Badge>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-3 pt-1">
+                                                <div className="flex justify-between items-center mb-1">
+                                                    <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Distância Máxima</label>
+                                                    <span className="text-[10px] font-black text-orange-500 bg-orange-50 px-2 py-0.5 rounded-full">
+                                                        {maxDistance >= 150 ? 'Toda a região' : `${maxDistance}km`}
+                                                    </span>
+                                                </div>
+                                                <Slider
+                                                    value={[maxDistance]}
+                                                    onValueChange={(values) => setMaxDistance(values[0])}
+                                                    max={150}
+                                                    step={maxDistance <= 20 ? 1 : 5}
+                                                    className="[&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&_[role=slider]]:bg-orange-500 [&_[role=slider]]:border-white"
+                                                />
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
 
                             {filteredRequests.map((req) => (
                                 <Card
@@ -524,7 +689,10 @@ const OpportunitiesMap = () => {
                                                 <div className="flex justify-between items-start mb-2">
                                                     <div>
                                                         <Badge variant="secondary" className="bg-orange-100 text-orange-600 hover:bg-orange-200 border-none font-bold text-[10px] uppercase mb-2">
-                                                            {req.category_id}
+                                                            {serviceCategories.find(c =>
+                                                                c.name.toLowerCase() === req.category_id.toLowerCase() ||
+                                                                c.id.toLowerCase() === req.category_id.toLowerCase()
+                                                            )?.name || req.category_id}
                                                         </Badge>
                                                         <h3 className="text-lg font-black text-gray-900 group-hover:text-orange-500 transition-colors uppercase tracking-tight leading-tight">
                                                             {req.description}
