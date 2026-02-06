@@ -193,6 +193,7 @@ const OpportunitiesMap = () => {
     const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
     const [showFilters, setShowFilters] = useState(false);
     const [isMinimized, setIsMinimized] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
     const [showCreateModal, setShowCreateModal] = useState(false);
 
     useEffect(() => {
@@ -251,8 +252,18 @@ const OpportunitiesMap = () => {
         }
     };
 
+    const filteredRequests = selectedCategory === 'Todos'
+        ? requests
+        : requests.filter(req => {
+            const category = serviceCategories.find(c =>
+                c.name.toLowerCase() === req.category_id.toLowerCase() ||
+                c.id.toLowerCase() === req.category_id.toLowerCase()
+            );
+            return category?.name === selectedCategory;
+        });
+
     // Convert requests to markers
-    const markers = requests.map(req => {
+    const markers = filteredRequests.map(req => {
         const category = serviceCategories.find(c =>
             c.name.toLowerCase() === req.category_id.toLowerCase() ||
             c.id.toLowerCase() === req.category_id.toLowerCase()
@@ -392,11 +403,15 @@ const OpportunitiesMap = () => {
                                                                     <div className="space-y-2">
                                                                         <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Categoria</label>
                                                                         <div className="flex flex-wrap gap-1.5">
-                                                                            {['Todos', 'Reparos', 'Limpeza', 'Mecânico', 'Construção'].map(cat => (
+                                                                            {['Todos', ...serviceCategories.map(c => c.name)].map(cat => (
                                                                                 <Badge
                                                                                     key={cat}
-                                                                                    variant="secondary"
-                                                                                    className="cursor-pointer bg-white border border-gray-100 text-gray-400 hover:border-orange-200 hover:text-orange-500 font-bold text-[9px] uppercase px-2 py-0.5 rounded-full transition-all"
+                                                                                    variant={selectedCategory === cat ? "default" : "secondary"}
+                                                                                    onClick={() => setSelectedCategory(cat)}
+                                                                                    className={`cursor-pointer font-bold text-[9px] uppercase px-2 py-0.5 rounded-full transition-all ${selectedCategory === cat
+                                                                                        ? 'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-100'
+                                                                                        : 'bg-white border border-gray-100 text-gray-400 hover:border-orange-200 hover:text-orange-500'
+                                                                                        }`}
                                                                                 >
                                                                                     {cat}
                                                                                 </Badge>
@@ -489,14 +504,14 @@ const OpportunitiesMap = () => {
                         <div className="p-6 pt-32 md:pt-6 pb-24 space-y-4">
                             <div className="flex items-center justify-between mb-8">
                                 <h2 className="text-xl font-black text-gray-900 uppercase tracking-tighter">
-                                    Disponíveis <span className="text-orange-500 ml-1">({requests.length})</span>
+                                    Disponíveis <span className="text-orange-500 ml-1">({filteredRequests.length})</span>
                                 </h2>
                                 <Button variant="ghost" size="sm" onClick={() => setViewMode('map')} className="md:hidden text-gray-400">
                                     <MapIcon size={20} />
                                 </Button>
                             </div>
 
-                            {requests.map((req) => (
+                            {filteredRequests.map((req) => (
                                 <Card
                                     key={req.id}
                                     className="group hover:shadow-lg transition-all duration-300 border border-white/50 bg-white/80 backdrop-blur-sm cursor-pointer overflow-hidden rounded-3xl"
@@ -547,7 +562,7 @@ const OpportunitiesMap = () => {
                                 </Card>
                             ))}
 
-                            {requests.length === 0 && !loading && (
+                            {filteredRequests.length === 0 && !loading && (
                                 <div className="text-center py-20 bg-white rounded-[40px] shadow-sm">
                                     <MapIcon className="w-16 h-16 mx-auto text-gray-200 mb-4" />
                                     <p className="text-gray-500 font-medium">Nenhum pedido encontrado no momento.</p>
