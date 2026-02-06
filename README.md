@@ -1,73 +1,76 @@
-# Welcome to your Lovable project
+# 🦏 Zurbo - Conectando Necessidades a Soluções
 
-## Project info
+![Zurbo Logo](public/logo.png)
 
-**URL**: https://lovable.dev/projects/2a4f188d-fdf6-4c05-bd20-f93ac7af7de6
+## 📌 O que é o Zurbo?
 
-## How can I edit this code?
+O **Zurbo** é uma plataforma inovadora de intermediação de serviços que visa simplificar a vida de quem precisa de ajuda e valorizar o trabalho de quem sabe fazer. Combinando tecnologia de geolocalização em tempo real e uma interface intuitiva, o Zurbo conecta clientes a prestadores de serviços qualificados de forma rápida, segura e eficiente.
 
-There are several ways of editing your application.
+Seja para um reparo doméstico urgente, um serviço de limpeza, fretes ou até cuidados pessoais, o Zurbo é o elo que faltava entre o problema e a solução.
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/2a4f188d-fdf6-4c05-bd20-f93ac7af7de6) and start prompting.
+## 🚀 Como Funciona?
 
-Changes made via Lovable will be committed automatically to this repo.
+### Para quem Precisa (Clientes)
+1. **Peça o que Precisa:** Descreva o serviço, adicione fotos e defina sua localização.
+2. **Receba Propostas:** Prestadores próximos verão sua solicitação e enviarão orçamentos.
+3. **Escolha o Melhor:** Analise perfis, avaliações e preços para tomar a melhor decisão.
+4. **Serviço Concluído:** Pague com segurança e avalie a experiência.
 
-**Use your preferred IDE**
+### Para quem Faz (Prestadores)
+1. **Mapa de Oportunidades:** Visualize em tempo real todas as solicitações de serviço ao seu redor.
+2. **Filtros Inteligentes:** Encontre trabalhos por categoria, distância ou urgência.
+3. **Negocie Direto:** Envie sua proposta e combine os detalhes diretamente com o cliente.
+4. **Construa sua Reputação:** Ganhe avaliações positivas e torne-se um destaque na plataforma.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🛠️ Tecnologias Utilizadas
 
-Follow these steps:
+O Zurbo utiliza o que há de mais moderno em desenvolvimento web para garantir performance e escalabilidade:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- **Frontend:** [React](https://reactjs.org/) + [Vite](https://vitejs.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- **Estilização:** [Tailwind CSS](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/)
+- **Backend & Database:** [Supabase](https://supabase.com/) (Auth, PostgreSQL, Realtime)
+- **Mapas:** [Leaflet](https://leafletjs.com/) (OpenStreetMap)
+- **Animações:** [Framer Motion](https://www.framer.com/motion/)
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+---
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 💻 Desenvolvimento Local
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+Se você deseja contribuir ou rodar o projeto localmente:
 
-**Edit a file directly in GitHub**
+1. **Clone o repositório:**
+   ```sh
+   git clone https://github.com/appZurbo/zurbo-app.git
+   cd zurbo-app
+   ```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+2. **Instale as dependências:**
+   ```sh
+   npm install
+   ```
 
-**Use GitHub Codespaces**
+3. **Configure as variáveis de ambiente:**
+   Crie um arquivo `.env.local` com suas chaves do Supabase:
+   ```env
+   VITE_SUPABASE_URL=seu_url_do_supabase
+   VITE_SUPABASE_ANON_KEY=sua_chave_anonima
+   ```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+4. **Inicie o servidor de desenvolvimento:**
+   ```sh
+   npm run dev
+   ```
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## 🌍 Onde estamos?
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+O Zurbo está em constante expansão, focando inicialmente em regiões estratégicas como **Sinop, MT**, para validar e refinar a experiência de nossos usuários.
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/2a4f188d-fdf6-4c05-bd20-f93ac7af7de6) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+© 2026 Zurbo - Todos os direitos reservados.
