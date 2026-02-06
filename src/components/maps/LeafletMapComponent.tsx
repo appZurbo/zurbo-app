@@ -56,9 +56,14 @@ export const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
     useEffect(() => {
         if (!mapContainerRef.current || mapInstanceRef.current) return;
 
+        const worldBounds = L.latLngBounds(L.latLng(-90, -180), L.latLng(90, 180));
+
         const map = L.map(mapContainerRef.current, {
             center: [center.lat, center.lng],
             zoom: zoom,
+            minZoom: 3,
+            maxBounds: worldBounds,
+            maxBoundsViscosity: 1.0,
             zoomControl: false, // We will add it manually if needed, or use default
             attributionControl: false // Hide default attribution
         });
@@ -71,6 +76,8 @@ export const LeafletMapComponent: React.FC<LeafletMapComponentProps> = ({
             tileSize: 512,
             zoomOffset: -1,
             maxZoom: 18,
+            noWrap: true,
+            bounds: worldBounds
         }).addTo(map);
 
         if (showControls && !isMobile) {
