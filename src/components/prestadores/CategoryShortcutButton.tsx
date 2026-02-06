@@ -14,29 +14,8 @@ export const CategoryShortcutButton: React.FC<CategoryShortcutButtonProps> = ({
   isSelected,
   onClick
 }) => {
-  const imageUrl = `/${category.image}`;
-
-  // Mapeamento das imagens do grid para usar PNGs da pasta icons/
-  const getGridImageUrl = (categoryId: string) => {
-    const gridImageMap: Record<string, string> = {
-      'limpeza': 'icons/limpeza.png',
-      'reparos': 'icons/reparos.png',
-      'eletrica': 'icons/eletricista.png',
-      'beleza': 'icons/beleza.png',
-      'construcao': 'icons/construcao.png',
-      'jardinagem': 'icons/jardineiro.png',
-      'fretes': 'icons/fretes.png',
-      'chaveiro': 'icons/chaveiro.png',
-      'cozinha': 'icons/cozinha.png',
-      'tecnologia': 'icons/tecnologia.png',
-      'cuidados': 'icons/cuidados (1).png',
-      'refrigeracao': 'icons/refrigeracao.png',
-      'mecanico': 'icons/mecanico.png'
-    };
-    return gridImageMap[categoryId] || category.image;
-  };
-
-  const gridImageUrl = `/${getGridImageUrl(category.id)}`;
+  // Use the image path from the category configuration
+  const gridImageUrl = category.image.startsWith('/') ? category.image : `/${category.image}`;
 
   // Get image positioning based on category needs - optimized scale for better containment
   const getImageStyles = (categoryId: string) => {
@@ -50,31 +29,18 @@ export const CategoryShortcutButton: React.FC<CategoryShortcutButtonProps> = ({
       case 'refrigeracao':
       case 'cuidados':
       case 'cozinha':
-        // Slightly larger scale for specific categories (reduced from 1.056 to 0.95 for better containment)
+        // Slightly larger scale for specified categories
+        return {
+          ...baseStyles,
+          objectPosition: 'center',
+          transform: 'scale(1)'
+        };
+      default:
+        // Adjust default scale for better 3D icon visibility
         return {
           ...baseStyles,
           objectPosition: 'center',
           transform: 'scale(0.95)'
-        };
-      case 'limpeza':
-      case 'beleza':
-      case 'reparos':
-      case 'eletrica':
-      case 'jardinagem':
-      case 'tecnologia':
-      case 'chaveiro':
-      case 'mecanico':
-        // Standard scale reduced from 0.88 to 0.8 for better containment
-        return {
-          ...baseStyles,
-          objectPosition: 'center',
-          transform: 'scale(0.8)'
-        };
-      default:
-        return {
-          ...baseStyles,
-          objectPosition: 'center',
-          transform: 'scale(0.8)'
         };
     }
   };

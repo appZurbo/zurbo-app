@@ -19,7 +19,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Limpeza',
     icon: Sparkles,
     color: 'bg-blue-50 border-blue-200 hover:bg-blue-100',
-    image: '/unused/limpeza.png',
+    image: '/newicon/limpeza.png',
     serviceIds: ['13e3d8e2-ca44-4f37-bf48-d5900766a4ed', '49b33016-e956-432d-9887-40f54e02e630'] // Limpeza, Diarista
   },
   {
@@ -27,7 +27,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Reparos',
     icon: Wrench,
     color: 'bg-orange-50 border-orange-200 hover:bg-orange-100',
-    image: '/unused/reparos.png',
+    image: '/newicon/reparos.png',
     serviceIds: ['ce1a57d6-df65-42e4-bc5e-1daf54ba5958', 'eed94aa8-4055-40ac-a7cf-18212dfc97e3', '20c31e3d-3728-4822-8df3-a061d6c524e2'] // Montador de móveis, Pedreiro, Encanador
   },
   {
@@ -35,7 +35,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Elétrica',
     icon: Zap,
     color: 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100',
-    image: '/unused/eletricista.png',
+    image: '/newicon/eletrica.png',
     serviceIds: ['bd19e35c-d9a8-41a6-a792-5e4343309139'] // Eletricista
   },
   {
@@ -43,7 +43,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Beleza',
     icon: Scissors,
     color: 'bg-pink-50 border-pink-200 hover:bg-pink-100',
-    image: '/unused/beleza.png',
+    image: '/newicon/beleza.jpg',
     serviceIds: ['ca56750e-8d06-4586-958c-c3d6c9a7b995', 'db2f4ed1-9506-4c01-8ea1-87a068dc2e9b'] // Beleza, Cabeleireiro(a)
   },
   {
@@ -51,7 +51,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Construção',
     icon: Hammer,
     color: 'bg-green-50 border-green-200 hover:bg-green-100',
-    image: '/unused/construcao.png',
+    image: '/newicon/construcao.png',
     serviceIds: ['fb0f8f1d-6734-4d25-b9e4-bcae95faf5b5', 'bc344b0e-551a-4253-90bf-74a8ad8095ca'] // Construção, Pintor
   },
   {
@@ -59,7 +59,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Jardinagem',
     icon: TreePine,
     color: 'bg-emerald-50 border-emerald-200 hover:bg-emerald-100',
-    image: '/unused/jardineiro.png',
+    image: '/newicon/jardinagem.jpg',
     serviceIds: ['f2f93a54-860e-4af3-941b-95e32a772428'] // Jardineiro
   },
   {
@@ -67,7 +67,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Fretes',
     icon: Truck,
     color: 'bg-red-50 border-red-200 hover:bg-red-100',
-    image: '/unused/fretes.png',
+    image: '/newicon/fretes.jpg',
     serviceIds: ['5c19ce68-8639-4eed-bf3c-1ec673d43add'] // Fretes
   },
   {
@@ -83,7 +83,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Cozinha',
     icon: ChefHat,
     color: 'bg-orange-50 border-orange-200 hover:bg-orange-100',
-    image: '/unused/cozinha.png',
+    image: '/newicon/cozinha.jpg',
     serviceIds: ['5fbb818e-a0ba-4be9-a81a-4fced06e6c5e'] // Cozinha
   },
   {
@@ -91,7 +91,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Tecnologia',
     icon: Laptop,
     color: 'bg-indigo-50 border-indigo-200 hover:bg-indigo-100',
-    image: '/unused/tecnologia.png',
+    image: '/newicon/tecnologia.jpg',
     serviceIds: ['b8a42132-1792-4ee4-bafe-b74f771e26ab'] // Serviços de TI
   },
   {
@@ -99,7 +99,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Cuidados',
     icon: Baby,
     color: 'bg-teal-50 border-teal-200 hover:bg-teal-100',
-    image: '/unused/cuidados (1).png',
+    image: '/newicon/cuidados.jpg',
     serviceIds: ['ab0869db-7537-46fe-b823-b8490ab364ff', '480b2d2c-58a6-4000-8a47-e75a949d882d', '70fc8f4b-f6b9-465e-864d-e497631948b4'] // Babá, Cuidador(a) de idosos, Pet Care
   },
   {
@@ -107,7 +107,7 @@ export const serviceCategories: ServiceCategory[] = [
     name: 'Refrigeração',
     icon: Snowflake,
     color: 'bg-cyan-50 border-cyan-200 hover:bg-cyan-100',
-    image: '/unused/refrigeracao.png',
+    image: '/newicon/refrigeracao.jpg',
     serviceIds: ['d397bcc6-883a-495f-b19e-f1a34c1b0312'] // Refrigeração
   },
   {
