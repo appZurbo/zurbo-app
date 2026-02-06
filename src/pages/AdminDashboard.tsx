@@ -1,78 +1,31 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Users, CheckCircle, AlertTriangle, MessageCircle, ShoppingBag, Wrench, Settings, Image, ImageIcon } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, Users, Wrench, MessageCircle, Image, ImageIcon, LayoutDashboard, Shield, List } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
 import { UnifiedHeader } from '@/components/layout/UnifiedHeader';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { CreateTestData } from '@/components/admin/CreateTestData';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+// Sub-components (Tabs)
+import { AnalyticsTab } from '@/components/admin/tabs/AnalyticsTab';
+import { ModeracaoTab } from '@/components/admin/tabs/ModeracaoTab';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const { profile, isAdmin } = useAuth();
+  const { isAdmin } = useAuth();
   const isMobile = useMobile();
   const { toast } = useToast();
-
-  const [userCount, setUserCount] = useState(0);
-  const [prestadorCount, setPrestadorCount] = useState(0);
-  const [pedidoCount, setPedidoCount] = useState(0);
-  const [reviewCount, setReviewCount] = useState(0);
-  const [conversationCount, setConversationCount] = useState(0);
+  const [activeTab, setActiveTab] = useState("analytics");
 
   useEffect(() => {
     if (!isAdmin) {
       navigate('/');
     }
   }, [isAdmin, navigate]);
-
-  const loadStats = async () => {
-    try {
-      // Get user counts
-      const { count: usersCount } = await supabase
-        .from('users')
-        .select('*', { count: 'exact', head: true });
-      setUserCount(usersCount || 0);
-
-      const { count: prestadoresCount } = await supabase
-        .from('users')
-        .select('*', { count: 'exact', head: true })
-        .eq('tipo', 'prestador');
-      setPrestadorCount(prestadoresCount || 0);
-
-      const { count: pedidosCount } = await supabase
-        .from('pedidos')
-        .select('*', { count: 'exact', head: true });
-      setPedidoCount(pedidosCount || 0);
-
-      const { count: reviewsCount } = await supabase
-        .from('avaliacoes')
-        .select('*', { count: 'exact', head: true });
-      setReviewCount(reviewsCount || 0);
-
-      const { count: conversationsCount } = await supabase
-        .from('chat_conversations')
-        .select('*', { count: 'exact', head: true });
-      setConversationCount(conversationsCount || 0);
-
-    } catch (error) {
-      console.error('Error loading stats:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível carregar as estatísticas.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  useEffect(() => {
-    if (isAdmin) {
-      loadStats();
-    }
-  }, [isAdmin]);
 
   if (!isAdmin) {
     return (
@@ -96,12 +49,13 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50/50">
       <UnifiedHeader />
-      <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
-        <div className={`${isMobile ? 'px-4 py-4' : 'max-w-7xl mx-auto p-6'}`}>
-          {/* Header */}
-          <div className="flex items-center gap-3 mb-6">
+      <div className={`mx-auto max-w-7xl ${isMobile ? 'px-4 py-4' : 'p-6'}`}>
+
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               onClick={() => navigate('/')}
@@ -110,206 +64,112 @@ const AdminDashboard = () => {
               <ArrowLeft className="h-4 w-4 mr-2" />
               {!isMobile && 'Voltar'}
             </Button>
-            <div className="flex-1">
+            <div>
               <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
-                Painel do Administrador
+                Painel Admin
               </h1>
-              <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
-                Visão geral e ferramentas de gestão
+              <p className="text-gray-600 text-sm">
+                Gestão completa da plataforma Zurbo
               </p>
             </div>
           </div>
+        </div>
 
-          {/* Test Data Section */}
-          <div className="mb-6">
-            <CreateTestData />
-          </div>
+        {/* Main Interface */}
+        <Tabs defaultValue="analytics" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full sm:w-auto grid-cols-3 h-auto p-1 bg-white border shadow-sm rounded-lg">
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600 py-2.5">
+              <LayoutDashboard className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Visão Geral</span>
+              <span className="sm:hidden">Geral</span>
+            </TabsTrigger>
+            <TabsTrigger value="moderacao" className="data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600 py-2.5">
+              <Shield className="h-4 w-4 mr-2" />
+              Moderação
+            </TabsTrigger>
+            <TabsTrigger value="gerenciamento" className="data-[state=active]:bg-orange-50 data-[state=active]:text-orange-600 py-2.5">
+              <List className="h-4 w-4 mr-2" />
+              Gestão
+            </TabsTrigger>
+          </TabsList>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-gray-500" />
-                  Usuários
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold">{userCount}</p>
-                <p className="text-sm text-gray-500">Total de usuários cadastrados</p>
-              </CardContent>
-            </Card>
+          <TabsContent value="analytics" className="outline-none">
+            <AnalyticsTab />
+          </TabsContent>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Wrench className="h-5 w-5 text-orange-500" />
-                  Prestadores
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold">{prestadorCount}</p>
-                <p className="text-sm text-gray-500">Total de prestadores de serviço</p>
-              </CardContent>
-            </Card>
+          <TabsContent value="moderacao" className="outline-none">
+            <ModeracaoTab />
+          </TabsContent>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageCircle className="h-5 w-5 text-blue-500" />
-                  Conversas
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold">{conversationCount}</p>
-                <p className="text-sm text-gray-500">Total de conversas iniciadas</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ShoppingBag className="h-5 w-5 text-blue-500" />
-                  Pedidos
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold">{pedidoCount}</p>
-                <p className="text-sm text-gray-500">Total de pedidos realizados</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Additional Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                  Avaliações
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold">{reviewCount}</p>
-                <p className="text-sm text-gray-500">Total de avaliações recebidas</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-red-500" />
-                  Status do Sistema
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Banco de Dados</span>
-                    <span className="text-green-600 text-sm font-medium">✅ Online</span>
+          <TabsContent value="gerenciamento" className="outline-none space-y-6">
+            {/* Extended Quick Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/admin/users')}>
+                <CardContent className="p-6 flex flex-col items-center text-center gap-4">
+                  <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                    <Users className="h-6 w-6" />
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Chat em Tempo Real</span>
-                    <span className="text-green-600 text-sm font-medium">✅ Ativo</span>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Usuários</h3>
+                    <p className="text-sm text-gray-500">Gerenciar clientes e prestadores</p>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Dados de Teste</span>
-                    <span className={`text-sm font-medium ${conversationCount > 0 ? 'text-green-600' : 'text-yellow-600'}`}>
-                      {conversationCount > 0 ? '✅ Disponível' : '⚠️ Executar Criação'}
-                    </span>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/admin/prestadores')}>
+                <CardContent className="p-6 flex flex-col items-center text-center gap-4">
+                  <div className="h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                    <Wrench className="h-6 w-6" />
                   </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Prestadores</h3>
+                    <p className="text-sm text-gray-500">Verificação e serviços</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/conversas')}>
+                <CardContent className="p-6 flex flex-col items-center text-center gap-4">
+                  <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                    <MessageCircle className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Conversas</h3>
+                    <p className="text-sm text-gray-500">Monitorar chat em tempo real</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/admin/image-manager')}>
+                <CardContent className="p-6 flex flex-col items-center text-center gap-4">
+                  <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                    <ImageIcon className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Imagens</h3>
+                    <p className="text-sm text-gray-500">Gestão de banners e assets</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Configurações do Sistema</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600 mb-4">
+                  Ferramentas avançadas de configuração.
+                </p>
+                <div className="flex gap-4">
+                  <Button variant="outline" onClick={() => navigate('/admin/banner-image-manager')}>
+                    Gerenciar Banners 3D
+                  </Button>
                 </div>
               </CardContent>
             </Card>
-          </div>
-
-          {/* Quick Actions */}
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Ações Rápidas</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Button
-                  onClick={() => navigate('/admin/users')}
-                  variant="outline"
-                  className="justify-start"
-                >
-                  <Users className="h-4 w-4 mr-2" />
-                  Gerenciar Usuários
-                </Button>
-                <Button
-                  onClick={() => navigate('/conversas')}
-                  variant="outline"
-                  className="justify-start"
-                >
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  Ver Conversas
-                </Button>
-                <Button
-                  onClick={() => navigate('/prestadores')}
-                  variant="outline"
-                  className="justify-start"
-                >
-                  <Wrench className="h-4 w-4 mr-2" />
-                  Ver Prestadores
-                </Button>
-                <Button
-                  onClick={() => window.location.reload()}
-                  variant="outline"
-                  className="justify-start"
-                >
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  Atualizar Stats
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Content Management Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ImageIcon className="h-5 w-5" />
-                Gerenciamento de Conteúdo
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Button
-                  onClick={() => navigate('/admin/image-manager')}
-                  variant="outline"
-                  className="justify-start h-auto p-4"
-                >
-                  <div className="flex flex-col items-start">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Image className="h-4 w-4" />
-                      <span className="font-medium">Imagens de Categorias</span>
-                    </div>
-                    <span className="text-xs text-muted-foreground text-left">
-                      Gerenciar imagens das categorias de serviços
-                    </span>
-                  </div>
-                </Button>
-                <Button
-                  onClick={() => navigate('/admin/banner-image-manager')}
-                  variant="outline"
-                  className="justify-start h-auto p-4"
-                >
-                  <div className="flex flex-col items-start">
-                    <div className="flex items-center gap-2 mb-1">
-                      <ImageIcon className="h-4 w-4" />
-                      <span className="font-medium">Imagens dos Banners</span>
-                    </div>
-                    <span className="text-xs text-muted-foreground text-left">
-                      Gerenciar imagens 3D dos banners da página inicial
-                    </span>
-                  </div>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

@@ -37,11 +37,7 @@ const OnboardingPage = lazy(() => import("./pages/OnboardingPage"));
 import InformacoesUnificada from "./pages/InformacoesUnificada";
 import UserManagement from "./pages/admin/UserManagement";
 import PrestadorManagement from "./pages/admin/PrestadorManagement";
-import Moderacao from "./pages/admin/Moderacao";
-import Relatorios from "./pages/admin/Relatorios";
-import AdminContentModeration from "./pages/AdminContentModeration";
 import ImageManager from "./pages/admin/ImageManager";
-import BannerImageManager from "./pages/admin/BannerImageManager";
 
 const CreateServiceRequest = lazy(() => import("./pages/client/CreateServiceRequest"));
 const OpportunitiesMap = lazy(() => import("./pages/provider/OpportunitiesMap"));
@@ -91,43 +87,39 @@ function App() {
           <OnboardingGuard>
             <Suspense fallback={<PageLoader />}>
               <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/onboarding" element={<OnboardingPage />} />
-              <Route path="/prestadores" element={<PrestadoresPage />} />
-              <Route path="/conversas" element={<Conversas />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/prestador/:id" element={<PrestadorProfile />} />
-              <Route path="/pedidos" element={<Pedidos />} />
-              <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
-              <Route path="/admin/users" element={<ProtectedRoute requireAdmin><UserManagement /></ProtectedRoute>} />
-              <Route path="/admin/prestadores" element={<ProtectedRoute requireAdmin><PrestadorManagement /></ProtectedRoute>} />
-              <Route path="/admin/moderacao" element={<ProtectedRoute requireAdmin><Moderacao /></ProtectedRoute>} />
-              <Route path="/admin/relatorios" element={<ProtectedRoute requireAdmin><Relatorios /></ProtectedRoute>} />
-              <Route path="/admin/content-moderation" element={<ProtectedRoute requireAdmin><AdminContentModeration /></ProtectedRoute>} />
-              <Route path="/admin/image-manager" element={<ProtectedRoute requireAdmin><ImageManager /></ProtectedRoute>} />
-              <Route path="/admin/banner-image-manager" element={<ProtectedRoute requireAdmin><BannerImageManager /></ProtectedRoute>} />
-              <Route path="/notificacoes" element={<NotificacoesPage />} />
-              <Route path="/favoritos" element={<FavoritosPage />} />
-              <Route path="/agenda" element={<ProtectedRoute requirePrestador><AgendaPrestador /></ProtectedRoute>} />
-              <Route path="/dashboard" element={<ProtectedRoute requirePrestador><PrestadorDashboard /></ProtectedRoute>} />
-              <Route path="/ads" element={<AdsPage />} />
-              <Route path="/planos" element={<Planos />} />
-              <Route path="/premium-overview" element={<PremiumOverview />} />
-              <Route path="/como-funciona" element={<ComoFunciona />} />
-              <Route path="/trabalhe-conosco" element={<TrabalheConosco />} />
-              <Route path="/central-ajuda" element={<CentralAjuda />} />
-              <Route path="/termos-uso" element={<TermosUso />} />
-              <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
-              <Route path="/regras-comunidade" element={<RegrasComunidade />} />
-              <Route path="/sobre-nos" element={<SobreNos />} />
-              <Route path="/informacoes" element={<InformacoesUnificada />} />
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="/onboarding" element={<OnboardingPage />} />
+                <Route path="/prestadores" element={<PrestadoresPage />} />
+                <Route path="/conversas" element={<Conversas />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/prestador/:id" element={<PrestadorProfile />} />
+                <Route path="/pedidos" element={<Pedidos />} />
+                <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
+                <Route path="/admin/users" element={<ProtectedRoute requireAdmin><UserManagement /></ProtectedRoute>} />
+                <Route path="/admin/prestadores" element={<ProtectedRoute requireAdmin><PrestadorManagement /></ProtectedRoute>} />
+                <Route path="/admin/image-manager" element={<ProtectedRoute requireAdmin><ImageManager /></ProtectedRoute>} />
+                <Route path="/notificacoes" element={<NotificacoesPage />} />
+                <Route path="/favoritos" element={<FavoritosPage />} />
+                <Route path="/agenda" element={<ProtectedRoute requirePrestador><AgendaPrestador /></ProtectedRoute>} />
+                <Route path="/dashboard" element={<ProtectedRoute requirePrestador><PrestadorDashboard /></ProtectedRoute>} />
+                <Route path="/ads" element={<AdsPage />} />
+                <Route path="/planos" element={<Planos />} />
+                <Route path="/premium-overview" element={<PremiumOverview />} />
+                <Route path="/como-funciona" element={<ComoFunciona />} />
+                <Route path="/trabalhe-conosco" element={<TrabalheConosco />} />
+                <Route path="/central-ajuda" element={<CentralAjuda />} />
+                <Route path="/termos-uso" element={<TermosUso />} />
+                <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
+                <Route path="/regras-comunidade" element={<RegrasComunidade />} />
+                <Route path="/sobre-nos" element={<SobreNos />} />
+                <Route path="/informacoes" element={<InformacoesUnificada />} />
 
-              {/* Service Requests */}
-              <Route path="/solicitar-servico" element={<ProtectedRoute><CreateServiceRequest /></ProtectedRoute>} />
-              <Route path="/mapa-servicos" element={<OpportunitiesMap />} />
+                {/* Service Requests */}
+                <Route path="/solicitar-servico" element={<ProtectedRoute><CreateServiceRequest /></ProtectedRoute>} />
+                <Route path="/mapa-servicos" element={<OpportunitiesMap />} />
 
-              <Route path="*" element={<NotFound />} />
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
           </OnboardingGuard>

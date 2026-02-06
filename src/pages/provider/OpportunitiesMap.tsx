@@ -472,7 +472,7 @@ const OpportunitiesMap = () => {
                             className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-orange-500 hover:bg-orange-600 shadow-2xl shadow-orange-200 flex items-center justify-center group transition-all hover:scale-110 active:scale-90 border-4 border-white"
                             title="Criar novo pedido"
                         >
-                            <Plus className="w-8 h-8 text-white group-hover:rotate-90 transition-transform duration-300" />
+                            <Plus className="w-10 h-10 md:w-12 md:h-12 text-white group-hover:rotate-90 transition-transform duration-300" />
                         </Button>
                     </div>
 

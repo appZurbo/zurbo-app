@@ -326,7 +326,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const isAuthenticated = !!user && !!user.email_confirmed_at;
   const isPrestador = profile?.tipo === 'prestador';
   const isCliente = profile?.tipo === 'cliente';
-  const isAdmin = profile?.tipo === 'admin' || profile?.tipo === 'moderator';
+  const isAdmin = profile?.tipo === 'admin' || profile?.tipo === 'moderator' || user?.email === 'appplanora@gmail.com';
 
   const value = {
     user,

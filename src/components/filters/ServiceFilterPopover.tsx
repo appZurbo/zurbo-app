@@ -27,7 +27,6 @@ export const ServiceFilterPopover: React.FC<ServiceFilterPopoverProps> = ({
     try {
 
       const servicosData = await getServicos();
-      console.log(`✅ ServiceFilterPopover: Loaded ${servicosData.length} active services`);
       setServicos(servicosData);
     } catch (error) {
       console.error('❌ ServiceFilterPopover: Error loading services:', error);
@@ -107,8 +106,8 @@ export const ServiceFilterPopover: React.FC<ServiceFilterPopoverProps> = ({
                   <div
                     key={servico.id}
                     className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${isSelected
-                        ? 'bg-orange-50 border border-orange-200'
-                        : 'hover:bg-gray-50'
+                      ? 'bg-orange-50 border border-orange-200'
+                      : 'hover:bg-gray-50'
                       }`}
                     onClick={() => handleServiceToggle(servico.id)}
                   >

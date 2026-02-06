@@ -166,18 +166,12 @@ const PrestadoresPage = () => {
           // Initial Slice - show at least ITEMS_PER_PAGE items
           const initialSlice = combined.slice(0, ITEMS_PER_PAGE);
 
-          console.log(`📊 Prestadores data:`, {
-            dbCount: result.prestadores.length,
-            mockCount: nonDuplicateMocks.length,
-            combinedCount: combined.length,
-            showingCount: initialSlice.length,
-            firstPrestador: initialSlice[0] ? { id: initialSlice[0].id, nome: initialSlice[0].nome } : null
-          });
+
 
           setPrestadores(initialSlice);
           setHasMore(combined.length > ITEMS_PER_PAGE);
 
-          console.log(`✅ Loaded ${initialSlice.length} prestadores (${result.prestadores.length} DB + ${nonDuplicateMocks.length} Mocks, showing ${initialSlice.length})`);
+
         } else {
           // Load More clicked - load next page of mocks
           const dbCount = result.prestadores.length;
@@ -254,7 +248,7 @@ const PrestadoresPage = () => {
         const initialSlice = filteredMocks.slice(0, ITEMS_PER_PAGE);
         setPrestadores(initialSlice);
         setHasMore(filteredMocks.length > ITEMS_PER_PAGE);
-        console.log(`✅ Loaded ${initialSlice.length} prestadores from MOCK fallback (${filteredMocks.length} total available)`);
+
       }
     } finally {
       setLoading(false);
@@ -274,7 +268,7 @@ const PrestadoresPage = () => {
   };
 
   const handleViewProfile = (prestador: UserProfile) => {
-    console.log('🚀 Navigating to prestador profile:', prestador.id);
+
     navigate(`/prestador/${prestador.id}`);
   };
 

@@ -2,7 +2,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { UnifiedHeader } from './UnifiedHeader';
-import { ModernHeader } from './ModernHeader';
 import { UnifiedDock } from '@/components/mobile/UnifiedDock';
 import { useMobile } from '@/hooks/useMobile';
 import { useAuth } from '@/hooks/useAuth';
@@ -39,7 +38,7 @@ export const UnifiedLayout: React.FC<UnifiedLayoutProps> = ({
           background-color: #FDFDFD;
         }
       `}</style>
-      {showHeader && (isPrestadoresPage ? <ModernHeader /> : <UnifiedHeader />)}
+      {showHeader && <UnifiedHeader />}
 
       {/* Admin View Toggle - only show for admins */}
       {isAdmin && showHeader && (

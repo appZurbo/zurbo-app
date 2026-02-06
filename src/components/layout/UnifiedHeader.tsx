@@ -194,6 +194,11 @@ export const UnifiedHeader = () => {
                       <span>Conversas</span>
                     </DropdownMenuItem>
 
+                    <DropdownMenuItem onClick={() => navigate('/prestadores')}>
+                      <Users className="mr-2 h-4 w-4" />
+                      <span>Encontrar Prestadores</span>
+                    </DropdownMenuItem>
+
                     <DropdownMenuItem onClick={() => navigate('/mapa-servicos')}>
                       <MapIcon className="mr-2 h-4 w-4" />
                       <span>Mapa de Serviços</span>
@@ -219,19 +224,14 @@ export const UnifiedHeader = () => {
                     {isAdmin && (
                       <>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => navigate('/admin/relatorios')}>
-                          <FileText className="mr-2 h-4 w-4" />
+                        <DropdownMenuItem onClick={() => navigate('/admin')}>
+                          <BarChart3 className="mr-2 h-4 w-4" />
                           <span>Painel Administrativo</span>
                         </DropdownMenuItem>
 
                         <DropdownMenuItem onClick={() => navigate('/admin/users')}>
                           <Users className="mr-2 h-4 w-4" />
                           <span>Gerenciar Usuários</span>
-                        </DropdownMenuItem>
-
-                        <DropdownMenuItem onClick={() => navigate('/admin/moderacao')}>
-                          <Shield className="mr-2 h-4 w-4" />
-                          <span>Moderação</span>
                         </DropdownMenuItem>
                       </>
                     )}

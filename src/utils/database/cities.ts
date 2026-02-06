@@ -5,14 +5,14 @@ import { CidadeBrasileira } from './types';
 // Function to normalize city names for consistent matching
 const normalizeCityName = (cityName: string): string => {
   if (!cityName) return '';
-  
+
   // Convert common variations to standard format
   const normalizedName = cityName
     .trim()
     .replace(/\s*,\s*MT\s*$/i, ', Mato Grosso') // Convert "Sinop, MT" to "Sinop, Mato Grosso"
     .replace(/\s*,\s*Mato\s+Grosso\s*$/i, ', Mato Grosso') // Ensure consistent spacing
     .replace(/\s+/g, ' '); // Remove extra spaces
-  
+
   return normalizedName;
 };
 
@@ -48,7 +48,7 @@ export const getCidadeByNome = async (nome: string): Promise<CidadeBrasileira | 
   try {
     const normalizedName = normalizeCityName(nome);
     const cityPart = normalizedName.split(',')[0].trim();
-    
+
     const { data, error } = await supabase
       .from('cidades_brasileiras')
       .select('*')
@@ -81,8 +81,8 @@ export const getCidadesPrestadores = async (): Promise<string[]> => {
 // Function to update all existing city references to use consistent format
 export const normalizeDatabaseCities = async (): Promise<void> => {
   try {
-    console.log('Starting city normalization process...');
-    
+
+
     // Update all users to use "Sinop, Mato Grosso" for consistency
     const { data: updateResult, error: updateError } = await supabase
       .from('users')
@@ -95,7 +95,7 @@ export const normalizeDatabaseCities = async (): Promise<void> => {
       return;
     }
 
-    console.log(`Successfully normalized ${updateResult?.length || 0} user cities to "Sinop, Mato Grosso"`);
+
   } catch (error) {
     console.error('Error normalizing database cities:', error);
   }
