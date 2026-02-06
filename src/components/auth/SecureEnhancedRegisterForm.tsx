@@ -84,7 +84,7 @@ export const SecureEnhancedRegisterForm = ({ onSuccess, onSwitchToLogin }: Secur
     setLoading(true);
 
     try {
-      const defaultAvatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(formData.nome)}`;
+      const defaultAvatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=${encodeURIComponent(formData.nome)}`;
 
       const result = await secureSignUp(
         formData.email,

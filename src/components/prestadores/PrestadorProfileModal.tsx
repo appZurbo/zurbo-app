@@ -55,7 +55,7 @@ export const PrestadorProfileModal: React.FC<PrestadorProfileModalProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <Avatar className="h-12 w-12">
-              <AvatarImage src={prestador.foto_url} />
+              <AvatarImage src={prestador.foto_url || `https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=${encodeURIComponent(prestador.nome || 'User')}`} />
               <AvatarFallback className="bg-orange-500 text-white">
                 {getInitials(prestador.nome)}
               </AvatarFallback>
@@ -125,8 +125,8 @@ export const PrestadorProfileModal: React.FC<PrestadorProfileModalProps> = ({
                 {prestador.prestador_servicos.map((servico, index) => (
                   <div key={index} className="p-3 border rounded-lg">
                     <div className="flex items-center gap-2 mb-1">
-                      <div 
-                        className="w-4 h-4 rounded-full" 
+                      <div
+                        className="w-4 h-4 rounded-full"
                         style={{ backgroundColor: servico.servicos?.cor || '#f97316' }}
                       />
                       <span className="font-medium">{servico.servicos?.nome}</span>
@@ -156,11 +156,10 @@ export const PrestadorProfileModal: React.FC<PrestadorProfileModalProps> = ({
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
-                            className={`h-4 w-4 ${
-                              i < avaliacao.nota 
-                                ? 'text-yellow-500 fill-current' 
-                                : 'text-gray-300'
-                            }`}
+                            className={`h-4 w-4 ${i < avaliacao.nota
+                              ? 'text-yellow-500 fill-current'
+                              : 'text-gray-300'
+                              }`}
                           />
                         ))}
                       </div>
@@ -185,13 +184,13 @@ export const PrestadorProfileModal: React.FC<PrestadorProfileModalProps> = ({
               </p>
             )}
           </TabsContent>
-          
+
           <TabsContent value="localizacao" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Informações de endereço */}
               <div className="space-y-4">
                 <h3 className="font-semibold">Informações de Localização</h3>
-                
+
                 {(prestador.endereco_rua || prestador.endereco_bairro) && (
                   <div className="p-4 bg-gray-50 rounded-lg">
                     <div className="flex items-start gap-2">

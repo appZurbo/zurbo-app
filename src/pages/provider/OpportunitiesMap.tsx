@@ -25,7 +25,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         status: 'open',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        user: { nome: 'João Silva', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Joao' } as any
+        user: { nome: 'João Silva', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Joao' } as any
     },
     {
         id: 'mock-2',
@@ -38,7 +38,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         status: 'open',
         created_at: new Date(Date.now() - 3600000).toISOString(),
         updated_at: new Date().toISOString(),
-        user: { nome: 'Maria Oliveira', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Maria' } as any
+        user: { nome: 'Maria Oliveira', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Maria' } as any
     },
     {
         id: 'mock-3',
@@ -51,7 +51,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         status: 'open',
         created_at: new Date(Date.now() - 7200000).toISOString(),
         updated_at: new Date().toISOString(),
-        user: { nome: 'Pedro Santos', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Pedro' } as any
+        user: { nome: 'Pedro Santos', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Pedro' } as any
     },
     {
         id: 'mock-4',
@@ -64,7 +64,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         status: 'open',
         created_at: new Date(Date.now() - 10800000).toISOString(),
         updated_at: new Date().toISOString(),
-        user: { nome: 'Ana Costa', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ana' } as any
+        user: { nome: 'Ana Costa', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Ana' } as any
     },
     {
         id: 'mock-5',
@@ -77,7 +77,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         status: 'open',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        user: { nome: 'Ricardo Lima', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ricardo' } as any
+        user: { nome: 'Ricardo Lima', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Ricardo' } as any
     },
     {
         id: 'mock-6',
@@ -90,7 +90,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         status: 'open',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        user: { nome: 'Beatriz Lima', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Beatriz' } as any
+        user: { nome: 'Beatriz Lima', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Beatriz' } as any
     },
     {
         id: 'mock-7',
@@ -103,7 +103,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         status: 'open',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        user: { nome: 'Carlos Souza', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carlos' } as any
+        user: { nome: 'Carlos Souza', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Carlos' } as any
     },
     {
         id: 'mock-8',
@@ -116,7 +116,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         status: 'open',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        user: { nome: 'Marcos Veras', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcos' } as any
+        user: { nome: 'Marcos Veras', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Marcos' } as any
     },
     {
         id: 'mock-9',
@@ -129,7 +129,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         status: 'open',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        user: { nome: 'Dona Neide', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Neide' } as any
+        user: { nome: 'Dona Neide', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Neide' } as any
     },
     {
         id: 'mock-10',
@@ -142,7 +142,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         status: 'open',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        user: { nome: 'Lucas Tech', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Lucas' } as any
+        user: { nome: 'Lucas Tech', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Lucas' } as any
     },
     {
         id: 'mock-11',
@@ -155,7 +155,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         status: 'open',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        user: { nome: 'Fernanda Luz', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Fernanda' } as any
+        user: { nome: 'Fernanda Luz', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Fernanda' } as any
     },
     {
         id: 'mock-12',
@@ -168,7 +168,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         status: 'open',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        user: { nome: 'Gelado Ar', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Gelado' } as any
+        user: { nome: 'Gelado Ar', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Gelado' } as any
     },
     {
         id: 'mock-13',
@@ -181,7 +181,7 @@ const MOCK_REQUESTS: ServiceRequest[] = [
         status: 'open',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        user: { nome: 'Auto Reparo', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Auto' } as any
+        user: { nome: 'Auto Reparo', foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Auto' } as any
     }
 ];
 
@@ -540,7 +540,7 @@ const OpportunitiesMap = () => {
                                                     <div className="flex items-center gap-2">
                                                         <div className="w-8 h-8 rounded-full bg-orange-100 overflow-hidden border border-orange-200">
                                                             <img
-                                                                src={req.user?.foto_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${req.id}`}
+                                                                src={req.user?.foto_url || `https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=${req.id}`}
                                                                 alt={req.user?.nome}
                                                             />
                                                         </div>
@@ -583,12 +583,12 @@ const OpportunitiesMap = () => {
                             <div className="flex gap-4 items-center mb-8 bg-gray-50 p-4 rounded-2xl">
                                 <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm">
                                     <img
-                                        src={selectedRequest?.user?.foto_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(selectedRequest?.user?.nome || 'User')}`}
+                                        src={selectedRequest?.user?.foto_url || `https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=${encodeURIComponent(selectedRequest?.user?.nome || 'User')}`}
                                         alt={selectedRequest?.user?.nome || "Usuário"}
                                         className="w-full h-full object-cover"
                                         onError={(e) => {
                                             const target = e.target as HTMLImageElement;
-                                            target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(selectedRequest?.user?.nome || 'User')}`;
+                                            target.src = `https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=${encodeURIComponent(selectedRequest?.user?.nome || 'User')}`;
                                         }}
                                     />
                                 </div>

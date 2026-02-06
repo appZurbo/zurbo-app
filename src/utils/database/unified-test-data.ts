@@ -48,7 +48,7 @@ export const createUnifiedTestData = async () => {
       const { error } = await supabase
         .from('servicos')
         .upsert(servico, { onConflict: 'id' });
-      
+
       if (error) {
         console.log(`Serviço ${servico.nome}:`, error.message);
       }
@@ -63,7 +63,7 @@ export const createUnifiedTestData = async () => {
         email: 'admin@zurbo.com',
         tipo: 'admin',
         premium: true,
-        foto_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+        foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Admin',
         endereco_cidade: 'Sinop',
         endereco_bairro: 'Centro',
         endereco_rua: 'Av. dos Ingás',
@@ -79,7 +79,7 @@ export const createUnifiedTestData = async () => {
         email: 'ana@zurbo.com',
         tipo: 'prestador',
         premium: true,
-        foto_url: 'https://images.unsplash.com/photo-1494790108755-2616b332c32d?w=150&h=150&fit=crop&crop=face',
+        foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Ana',
         endereco_cidade: 'Sinop',
         endereco_bairro: 'Centro',
         endereco_rua: 'Rua das Flores',
@@ -96,7 +96,7 @@ export const createUnifiedTestData = async () => {
         email: 'carlos@zurbo.com',
         tipo: 'prestador',
         premium: false,
-        foto_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+        foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Carlos',
         endereco_cidade: 'Sinop',
         endereco_bairro: 'Jardim das Palmeiras',
         endereco_rua: 'Av. Governador Julio Campos',
@@ -113,7 +113,7 @@ export const createUnifiedTestData = async () => {
         email: 'maria@zurbo.com',
         tipo: 'prestador',
         premium: true,
-        foto_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+        foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Maria',
         endereco_cidade: 'Sinop',
         endereco_bairro: 'Residencial Cidade Jardim',
         endereco_rua: 'Rua dos Ipês',
@@ -156,7 +156,7 @@ export const createUnifiedTestData = async () => {
       const { error } = await supabase
         .from('users')
         .upsert(usuario, { onConflict: 'id' });
-      
+
       if (error) {
         console.log(`Usuário ${usuario.nome}:`, error.message);
       }
@@ -174,7 +174,7 @@ export const createUnifiedTestData = async () => {
       const { error } = await supabase
         .from('prestador_servicos')
         .upsert(ps);
-      
+
       if (error) {
         console.log('Prestador-Serviço:', error.message);
       }
@@ -207,7 +207,7 @@ export const createUnifiedTestData = async () => {
       const { error } = await supabase
         .from('avaliacoes')
         .insert(avaliacao);
-      
+
       if (error) {
         console.log('Avaliação:', error.message);
       }
@@ -256,7 +256,7 @@ export const createUnifiedTestData = async () => {
         const { error } = await supabase
           .from('chat_messages')
           .insert(mensagem);
-        
+
         if (error) {
           console.log('Mensagem:', error.message);
         }
@@ -292,7 +292,7 @@ export const createUnifiedTestData = async () => {
       const { error } = await supabase
         .from('pedidos')
         .insert(pedido);
-      
+
       if (error) {
         console.log('Pedido:', error.message);
       }
@@ -319,7 +319,7 @@ export const createUnifiedTestData = async () => {
       const { error } = await supabase
         .from('usuarios_premium')
         .upsert(premium);
-      
+
       if (error) {
         console.log('Premium:', error.message);
       }

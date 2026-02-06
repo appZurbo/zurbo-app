@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { 
-  ArrowLeft, 
-  Share2, 
-  Heart, 
-  Star, 
-  Tag, 
-  Award, 
-  Clock, 
+import {
+  ArrowLeft,
+  Share2,
+  Heart,
+  Star,
+  Tag,
+  Award,
+  Clock,
   MapPin,
   MessageCircle,
   Calendar,
@@ -35,28 +35,28 @@ export const ModernProviderProfile: React.FC<ModernProviderProfileProps> = ({
   const navigate = useNavigate();
   const rating = prestador.nota_media || 0;
   const totalAvaliacoes = avaliacoes.length;
-  
+
   // Mock data for demonstration
   const experience = '12 Anos';
   const responseTime = '~15 min';
   const distance = '1.8 km';
-  const priceRange = prestador.preco_min && prestador.preco_max 
+  const priceRange = prestador.preco_min && prestador.preco_max
     ? `R$ ${prestador.preco_min} - ${prestador.preco_max}`
-    : prestador.preco_min 
-    ? `R$ ${prestador.preco_min}`
-    : 'Consulte';
+    : prestador.preco_min
+      ? `R$ ${prestador.preco_min}`
+      : 'Consulte';
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FBF7F2] font-sans text-[#3D342B] overflow-x-hidden">
       {/* Banner Image */}
       <div className="relative h-80 w-full">
         <img
-          src={prestador.foto_url || 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=800&q=80'}
+          src={prestador.foto_url || `https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=${encodeURIComponent(prestador.nome || 'Prestador')}`}
           className="w-full h-full object-cover"
           alt={prestador.nome}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-        
+
         {/* Header with back and share */}
         <div className="absolute top-0 left-0 right-0 px-5 pt-12 flex justify-between items-center">
           <Button
@@ -126,7 +126,7 @@ export const ModernProviderProfile: React.FC<ModernProviderProfileProps> = ({
             </div>
             <span className="font-bold text-[#3D342B]">{priceRange}</span>
           </Card>
-          
+
           <Card className="p-4 bg-white rounded-2xl shadow-sm border border-[#E6DDD5]/50">
             <div className="flex items-center gap-2 text-[#E05815] mb-1">
               <Award className="h-5 w-5" />
@@ -134,7 +134,7 @@ export const ModernProviderProfile: React.FC<ModernProviderProfileProps> = ({
             </div>
             <span className="font-bold text-[#3D342B]">{experience}</span>
           </Card>
-          
+
           <Card className="p-4 bg-white rounded-2xl shadow-sm border border-[#E6DDD5]/50">
             <div className="flex items-center gap-2 text-[#E05815] mb-1">
               <Clock className="h-5 w-5" />
@@ -142,7 +142,7 @@ export const ModernProviderProfile: React.FC<ModernProviderProfileProps> = ({
             </div>
             <span className="font-bold text-[#3D342B]">{responseTime}</span>
           </Card>
-          
+
           <Card className="p-4 bg-white rounded-2xl shadow-sm border border-[#E6DDD5]/50">
             <div className="flex items-center gap-2 text-[#E05815] mb-1">
               <MapPin className="h-5 w-5" />
@@ -207,7 +207,7 @@ export const ModernProviderProfile: React.FC<ModernProviderProfileProps> = ({
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-3">
                       <img
-                        src={avaliacao.foto_url || 'https://randomuser.me/api/portraits/women/12.jpg'}
+                        src={avaliacao.foto_url || `https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=${encodeURIComponent(avaliacao.nome || 'Cliente')}`}
                         className="h-10 w-10 rounded-full"
                         alt="Reviewer"
                       />
@@ -219,11 +219,10 @@ export const ModernProviderProfile: React.FC<ModernProviderProfileProps> = ({
                           {Array.from({ length: 5 }).map((_, i) => (
                             <Star
                               key={i}
-                              className={`h-3 w-3 ${
-                                i < (avaliacao.nota || 5)
-                                  ? 'text-yellow-500 fill-yellow-500'
-                                  : 'text-[#E6DDD5]'
-                              }`}
+                              className={`h-3 w-3 ${i < (avaliacao.nota || 5)
+                                ? 'text-yellow-500 fill-yellow-500'
+                                : 'text-[#E6DDD5]'
+                                }`}
                             />
                           ))}
                         </div>

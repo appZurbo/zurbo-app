@@ -48,6 +48,8 @@ export interface UserProfile {
   stripe_account_id?: string;
   ativo?: boolean; // For admin management
   categoria_servico?: string; // Service category
+  preco_min?: number;
+  preco_max?: number;
 }
 
 /**

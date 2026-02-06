@@ -16,7 +16,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.9,
     premium: true,
     servicos_oferecidos: ['Limpeza', 'Diarista', 'Faxina'],
-    foto_url: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Maria',
     criado_em: new Date().toISOString(),
     preco_min: 120,
     preco_max: 250,
@@ -35,7 +35,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.7,
     premium: false,
     servicos_oferecidos: ['Limpeza', 'Diarista'],
-    foto_url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Ana',
     criado_em: new Date().toISOString(),
     preco_min: 100,
     preco_max: 180,
@@ -54,7 +54,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.8,
     premium: true,
     servicos_oferecidos: ['Limpeza', 'Comercial'],
-    foto_url: 'https://images.unsplash.com/photo-1581578731117-104f2a863a30?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=CleanFast',
     criado_em: new Date().toISOString(),
     preco_min: 300,
     preco_max: 1000,
@@ -75,7 +75,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.8,
     premium: true,
     servicos_oferecidos: ['Encanador', 'Hidráulica', 'Reparos'],
-    foto_url: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Joao',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Encanador' }, preco_min: 80, preco_max: 300 }] as any
   },
@@ -92,7 +92,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.6,
     premium: false,
     servicos_oferecidos: ['Reparos', 'Montador de móveis', 'Faz tudo'],
-    foto_url: 'https://images.unsplash.com/photo-1504593811423-6dd665756598?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Pedro',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Reparos Gerais' }, preco_min: 50, preco_max: 150 }] as any
   },
@@ -109,7 +109,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.9,
     premium: true,
     servicos_oferecidos: ['Montador de móveis', 'Reparos'],
-    foto_url: 'https://images.unsplash.com/photo-1463453091185-61582044d556?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Roberto',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Montagem de Móveis' }, preco_min: 70, preco_max: 200 }] as any
   },
@@ -128,7 +128,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 5.0,
     premium: true,
     servicos_oferecidos: ['Eletricista', 'Elétrica'],
-    foto_url: 'https://images.unsplash.com/photo-1552058544-f2b08422138a?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Carlos',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Eletricista' }, preco_min: 100, preco_max: 500 }] as any
   },
@@ -145,7 +145,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.5,
     premium: false,
     servicos_oferecidos: ['Eletricista', 'Elétrica'],
-    foto_url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Fabio',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Visita Técnica' }, preco_min: 60, preco_max: 120 }] as any
   },
@@ -164,7 +164,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.9,
     premium: true,
     servicos_oferecidos: ['Beleza', 'Cabeleireiro(a)', 'Cabelo'],
-    foto_url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Juliana',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Corte e Escova' }, preco_min: 80, preco_max: 300 }] as any
   },
@@ -181,7 +181,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.8,
     premium: false,
     servicos_oferecidos: ['Beleza', 'Maquiagem'],
-    foto_url: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Amanda',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Maquiagem Social' }, preco_min: 150, preco_max: 250 }] as any
   },
@@ -198,7 +198,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.7,
     premium: false,
     servicos_oferecidos: ['Beleza', 'Manicure'],
-    foto_url: 'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=StudioNails',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Mão e Pé' }, preco_min: 50, preco_max: 120 }] as any
   },
@@ -217,7 +217,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.8,
     premium: true,
     servicos_oferecidos: ['Construção', 'Pedreiro', 'Obras'],
-    foto_url: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Ricardo',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Diária Pedreiro' }, preco_min: 200, preco_max: 250 }] as any
   },
@@ -234,7 +234,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.7,
     premium: false,
     servicos_oferecidos: ['Construção', 'Pintor', 'Pintura'],
-    foto_url: 'https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Silva',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'M² Pintura' }, preco_min: 15, preco_max: 40 }] as any
   },
@@ -253,7 +253,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.9,
     premium: true,
     servicos_oferecidos: ['Jardinagem', 'Jardineiro', 'Paisagismo'],
-    foto_url: 'https://images.unsplash.com/photo-1557862921-37829c790f19?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=VerdeVida',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Manutenção Jardim' }, preco_min: 100, preco_max: 300 }] as any
   },
@@ -270,7 +270,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.6,
     premium: false,
     servicos_oferecidos: ['Jardinagem', 'Jardineiro'],
-    foto_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Jose',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Diária Jardinagem' }, preco_min: 150, preco_max: 200 }] as any
   },
@@ -289,7 +289,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.8,
     premium: true,
     servicos_oferecidos: ['Fretes', 'Mudanças', 'Transporte'],
-    foto_url: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Paulo',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Frete Local' }, preco_min: 150, preco_max: 500 }] as any
   },
@@ -306,7 +306,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.5,
     premium: false,
     servicos_oferecidos: ['Fretes', 'Carreto'],
-    foto_url: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Carreto',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Carreto' }, preco_min: 80, preco_max: 200 }] as any
   },
@@ -325,7 +325,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.9,
     premium: true,
     servicos_oferecidos: ['Chaveiro', 'Fechaduras'],
-    foto_url: 'https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Andre',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Abertura de Porta' }, preco_min: 100, preco_max: 200 }] as any
   },
@@ -342,7 +342,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.6,
     premium: false,
     servicos_oferecidos: ['Chaveiro'],
-    foto_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Socorro',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Cópia Simples' }, preco_min: 10, preco_max: 50 }] as any
   },
@@ -361,7 +361,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 5.0,
     premium: true,
     servicos_oferecidos: ['Cozinha', 'Chef', 'Gastronomia'],
-    foto_url: 'https://images.unsplash.com/photo-1583336137498-afdf44ae98b6?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Helena',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Jantar Completo' }, preco_min: 300, preco_max: 1200 }] as any
   },
@@ -378,7 +378,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.8,
     premium: false,
     servicos_oferecidos: ['Cozinha', 'Confeitaria'],
-    foto_url: 'https://images.unsplash.com/photo-1556910103-1c02745a30bf?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=MariaBolos',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Bolo kg' }, preco_min: 60, preco_max: 120 }] as any
   },
@@ -397,7 +397,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.8,
     premium: true,
     servicos_oferecidos: ['Serviços de TI', 'Informática', 'Computador', 'Tecnologia'],
-    foto_url: 'https://images.unsplash.com/photo-1504703395950-b89145154253?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Lucas',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Formatação' }, preco_min: 80, preco_max: 150 }] as any
   },
@@ -414,7 +414,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.6,
     premium: false,
     servicos_oferecidos: ['Serviços de TI', 'Celular', 'Tecnologia'],
-    foto_url: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=SmartCell',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Troca de Tela' }, preco_min: 150, preco_max: 800 }] as any
   },
@@ -433,7 +433,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 5.0,
     premium: true,
     servicos_oferecidos: ['Cuidador(a) de idosos', 'Cuidados', 'Enfermagem'],
-    foto_url: 'https://images.unsplash.com/photo-1554151228-14d9def656ec?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Sandra',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Plantão 12h' }, preco_min: 150, preco_max: 300 }] as any
   },
@@ -450,7 +450,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.9,
     premium: false,
     servicos_oferecidos: ['Babá', 'Cuidados', 'Infantil'],
-    foto_url: 'https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=JuBaba',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Hora Babá' }, preco_min: 25, preco_max: 50 }] as any
   },
@@ -467,7 +467,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.8,
     premium: true,
     servicos_oferecidos: ['Pet Care', 'Cuidados', 'Animais'],
-    foto_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Carol',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Passeio' }, preco_min: 30, preco_max: 60 }] as any
   },
@@ -486,7 +486,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.7,
     premium: true,
     servicos_oferecidos: ['Refrigeração', 'Ar Condicionado', 'Climatização'],
-    foto_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=RicardoCli',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Limpeza de Ar' }, preco_min: 150, preco_max: 250 }] as any
   },
@@ -505,7 +505,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.8,
     premium: true,
     servicos_oferecidos: ['Mecânico', 'Automotivo', 'Carro', 'Mecanico'],
-    foto_url: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Tiago',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Mão de Obra' }, preco_min: 100, preco_max: 5000 }] as any
   },
@@ -522,7 +522,7 @@ const basePrestadores: UserProfile[] = [
     nota_media: 4.5,
     premium: false,
     servicos_oferecidos: ['Mecânico', 'Borracharia'],
-    foto_url: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=200&h=200&fit=crop&crop=face',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Ze',
     criado_em: new Date().toISOString(),
     prestador_servicos: [{ servico: { nome: 'Conserto Pneu' }, preco_min: 30, preco_max: 80 }] as any
   }
@@ -533,16 +533,16 @@ const addPrecoToPrestador = (prestador: UserProfile): UserProfile => {
   if (prestador.preco_min && prestador.preco_max) {
     return prestador; // Already has prices
   }
-  
+
   if (prestador.prestador_servicos && prestador.prestador_servicos.length > 0) {
     const precos = prestador.prestador_servicos
       .map((ps: any) => ({ min: ps.preco_min, max: ps.preco_max }))
       .filter((p: any) => p.min || p.max);
-    
+
     if (precos.length > 0) {
       const allMins = precos.map((p: any) => p.min || 0).filter((m: number) => m > 0);
       const allMaxs = precos.map((p: any) => p.max || 0).filter((m: number) => m > 0);
-      
+
       return {
         ...prestador,
         preco_min: allMins.length > 0 ? Math.min(...allMins) : undefined,
@@ -550,7 +550,7 @@ const addPrecoToPrestador = (prestador: UserProfile): UserProfile => {
       };
     }
   }
-  
+
   return prestador;
 };
 

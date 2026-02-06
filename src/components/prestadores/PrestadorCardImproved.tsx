@@ -11,31 +11,31 @@ interface PrestadorCardImprovedProps {
   onViewProfile: (prestador: UserProfile) => void;
 }
 
-export const PrestadorCardImproved = ({ 
-  prestador, 
-  onContact, 
-  onViewProfile 
+export const PrestadorCardImproved = ({
+  prestador,
+  onContact,
+  onViewProfile
 }: PrestadorCardImprovedProps) => {
   // Debug log
   if (!prestador || !prestador.id) {
     console.error('❌ PrestadorCardImproved: Invalid prestador data', prestador);
     return null;
   }
-  
+
   const isPremium = prestador.premium || false;
   const rating = prestador.nota_media || 0;
   const isOnline = prestador.em_servico ?? true;
-  
+
   // Get first service name
   const firstService = prestador.servicos_oferecidos?.[0] || prestador.tipo || 'Prestador de Serviços';
-  
+
   // Calculate distance (mock for now)
   const distance = '2.5 km';
-  
+
   // Get price range from prestador_servicos or direct properties
   let precoMin = prestador.preco_min;
   let precoMax = prestador.preco_max;
-  
+
   // Extract prices from prestador_servicos (for mock data structure)
   if (!precoMin && prestador.prestador_servicos && prestador.prestador_servicos.length > 0) {
     const servicos = prestador.prestador_servicos;
@@ -45,7 +45,7 @@ export const PrestadorCardImproved = ({
     const allMaxs = servicos
       .map((ps: any) => ps.preco_max)
       .filter((p: number) => p != null && p > 0);
-    
+
     if (allMins.length > 0) {
       precoMin = Math.min(...allMins);
     }
@@ -53,12 +53,12 @@ export const PrestadorCardImproved = ({
       precoMax = Math.max(...allMaxs);
     }
   }
-  
-  const priceRange = precoMin && precoMax 
+
+  const priceRange = precoMin && precoMax
     ? `R$ ${precoMin} - ${precoMax}`
-    : precoMin 
-    ? `R$ ${precoMin}/h`
-    : 'Consulte';
+    : precoMin
+      ? `R$ ${precoMin}/h`
+      : 'Consulte';
 
   const handleCardClick = () => {
     console.log('🖱️ Card clicked:', prestador.id, prestador.nome);
@@ -66,10 +66,10 @@ export const PrestadorCardImproved = ({
   };
 
   return (
-    <div 
+    <div
       className="p-4 bg-white rounded-2xl shadow-sm border border-[#E6DDD5]/40 flex gap-4 hover:shadow-md transition-shadow cursor-pointer"
       onClick={handleCardClick}
-      style={{ 
+      style={{
         minWidth: '100%',
         display: 'flex',
         visibility: 'visible',
@@ -78,9 +78,9 @@ export const PrestadorCardImproved = ({
     >
       {/* Avatar with Rating Badge */}
       <div className="relative flex-shrink-0">
-        <img 
-          src={prestador.foto_url || 'https://placehold.co/80x80/E2E8F0/4A5568?text=Foto'} 
-          alt={`Foto de ${prestador.nome}`} 
+        <img
+          src={prestador.foto_url || `https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=${encodeURIComponent(prestador.nome || 'User')}`}
+          alt={`Foto de ${prestador.nome}`}
           className="h-20 w-20 rounded-xl object-cover"
         />
         {rating > 0 && (
@@ -98,7 +98,7 @@ export const PrestadorCardImproved = ({
             <h3 className="font-bold text-[#3D342B] truncate">{prestador.nome}</h3>
             <p className="text-xs text-[#8C7E72] truncate">{firstService}</p>
           </div>
-          <button 
+          <button
             className="text-[#8C7E72] hover:text-red-500 transition-colors flex-shrink-0 ml-2"
             onClick={(e) => {
               e.stopPropagation();
@@ -131,6 +131,6 @@ export const PrestadorCardImproved = ({
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 };

@@ -184,7 +184,7 @@ function Hero() {
                 <div className="bg-white rounded-2xl p-3 border border-gray-100 shadow-sm">
                   <div className="flex gap-3 items-center mb-2">
                     <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                      <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Carlos" alt="Pro" />
+                      <img src="https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Carlos" alt="Pro" />
                     </div>
                     <div className="flex-1 overflow-hidden">
                       <h3 className="text-xs font-bold leading-none truncate">Carlos Silva</h3>
@@ -204,7 +204,7 @@ function Hero() {
                 <div className="bg-white rounded-2xl p-3 border border-gray-100 shadow-sm opacity-60">
                   <div className="flex gap-3 items-center mb-2">
                     <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                      <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ana" alt="Pro" />
+                      <img src="https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Ana" alt="Pro" />
                     </div>
                     <div className="flex-1 overflow-hidden">
                       <h3 className="text-xs font-bold leading-none truncate">Ana Oliveira</h3>

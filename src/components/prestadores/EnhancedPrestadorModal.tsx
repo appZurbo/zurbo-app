@@ -15,11 +15,11 @@ interface EnhancedPrestadorModalProps {
   onContact: (prestador: UserProfile) => void;
 }
 
-export const EnhancedPrestadorModal = ({ 
-  prestador, 
-  open, 
-  onOpenChange, 
-  onContact 
+export const EnhancedPrestadorModal = ({
+  prestador,
+  open,
+  onOpenChange,
+  onContact
 }: EnhancedPrestadorModalProps) => {
   const mockGallery = [
     '/lovable-uploads/23923192-d3bc-4751-82d3-665cae0d614f.jpg',
@@ -32,11 +32,11 @@ export const EnhancedPrestadorModal = ({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl">
         {/* Header with slightly darkened background effect */}
         <div className="absolute inset-0 bg-black bg-opacity-20 -z-10" />
-        
+
         <DialogHeader className="relative">
           <div className="flex items-center gap-4 mb-4">
             <Avatar className="w-20 h-20 border-2 border-white shadow-lg">
-              <AvatarImage src={prestador.foto_url} alt={prestador.nome} />
+              <AvatarImage src={prestador.foto_url || `https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=${encodeURIComponent(prestador.nome || 'User')}`} alt={prestador.nome} />
               <AvatarFallback className="text-xl bg-orange-100 text-orange-600">
                 {prestador.nome?.charAt(0)?.toUpperCase()}
               </AvatarFallback>
@@ -114,9 +114,9 @@ export const EnhancedPrestadorModal = ({
               <h4 className="font-semibold mb-3">Serviços Oferecidos</h4>
               <div className="flex flex-wrap gap-2">
                 {prestador.prestador_servicos.map((servico, index) => (
-                  <Badge 
-                    key={index} 
-                    variant="secondary" 
+                  <Badge
+                    key={index}
+                    variant="secondary"
                     className="bg-orange-100 text-orange-800 border-orange-200"
                   >
                     {servico.servicos?.nome || 'Serviço'}
@@ -136,12 +136,12 @@ export const EnhancedPrestadorModal = ({
             <h4 className="font-semibold mb-3">Galeria de Trabalhos</h4>
             <div className="grid grid-cols-3 gap-2">
               {mockGallery.map((image, index) => (
-                <div 
+                <div
                   key={index}
                   className="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform shadow-sm"
                 >
-                  <img 
-                    src={image} 
+                  <img
+                    src={image}
                     alt={`Trabalho ${index + 1}`}
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -177,7 +177,7 @@ export const EnhancedPrestadorModal = ({
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4 border-t">
-            <Button 
+            <Button
               onClick={() => {
                 onContact(prestador);
                 onOpenChange(false);
@@ -187,8 +187,8 @@ export const EnhancedPrestadorModal = ({
               <MessageCircle className="h-4 w-4 mr-2" />
               Entrar em Contato
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => onOpenChange(false)}
               className="px-6"
             >

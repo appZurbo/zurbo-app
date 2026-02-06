@@ -15,7 +15,8 @@ export const fakeUsers = [
     nota_media: 4.8,
     premium: true,
     servicos: ['Eletricista'],
-    telefone: '(11) 99999-1111'
+    telefone: '(11) 99999-1111',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Joao'
   },
   {
     nome: 'Maria Oliveira',
@@ -30,7 +31,8 @@ export const fakeUsers = [
     nota_media: 4.9,
     premium: false,
     servicos: ['Faxina'],
-    telefone: '(11) 99999-2222'
+    telefone: '(11) 99999-2222',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Maria'
   },
   {
     nome: 'Carlos Pereira',
@@ -45,7 +47,8 @@ export const fakeUsers = [
     nota_media: 4.7,
     premium: true,
     servicos: ['Encanador'],
-    telefone: '(11) 99999-3333'
+    telefone: '(11) 99999-3333',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Carlos'
   },
   {
     nome: 'Ana Santos',
@@ -60,7 +63,8 @@ export const fakeUsers = [
     nota_media: 4.6,
     premium: false,
     servicos: ['Pintor'],
-    telefone: '(11) 99999-4444'
+    telefone: '(11) 99999-4444',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Ana'
   },
   {
     nome: 'Roberto Costa',
@@ -75,7 +79,8 @@ export const fakeUsers = [
     nota_media: 4.5,
     premium: true,
     servicos: ['Jardinagem'],
-    telefone: '(11) 99999-5555'
+    telefone: '(11) 99999-5555',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Roberto'
   },
   {
     nome: 'Fernanda Lima',
@@ -90,7 +95,8 @@ export const fakeUsers = [
     nota_media: 4.9,
     premium: true,
     servicos: ['Cabeleireiro'],
-    telefone: '(11) 99999-6666'
+    telefone: '(11) 99999-6666',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Fernanda'
   },
   {
     nome: 'Ricardo Alves',
@@ -105,7 +111,8 @@ export const fakeUsers = [
     nota_media: 4.4,
     premium: false,
     servicos: ['Ar Condicionado'],
-    telefone: '(11) 99999-7777'
+    telefone: '(11) 99999-7777',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Ricardo'
   },
   {
     nome: 'Patrícia Rocha',
@@ -120,7 +127,8 @@ export const fakeUsers = [
     nota_media: 4.7,
     premium: false,
     servicos: ['Manicure'],
-    telefone: '(11) 99999-8888'
+    telefone: '(11) 99999-8888',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Patricia'
   },
   {
     nome: 'Pedro Costa',
@@ -130,7 +138,8 @@ export const fakeUsers = [
     endereco_bairro: 'Itaim Bibi',
     endereco_rua: 'Rua Pedroso Alvarenga, 100',
     endereco_cep: '04531-004',
-    cpf: '901.234.567-89'
+    cpf: '901.234.567-89',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Pedro'
   },
   {
     nome: 'Julia Ferreira',
@@ -140,14 +149,15 @@ export const fakeUsers = [
     endereco_bairro: 'Vila Olímpia',
     endereco_rua: 'Rua Funchal, 200',
     endereco_cep: '04551-060',
-    cpf: '012.345.678-90'
+    cpf: '012.345.678-90',
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Julia'
   }
 ];
 
 export const createFakeUsers = async () => {
   try {
     console.log('Criando usuários de teste...');
-    
+
     // Inserir usuários fake
     const { data: insertedUsers, error: usersError } = await supabase
       .from('users')
@@ -163,6 +173,7 @@ export const createFakeUsers = async () => {
         cpf: user.cpf || null,
         nota_media: user.nota_media || 0,
         premium: user.premium || false,
+        foto_url: user.foto_url || `https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=${encodeURIComponent(user.nome)}`,
         auth_id: `fake-${user.email}` // ID fake para teste
       })), { onConflict: 'email' })
       .select();
@@ -187,7 +198,8 @@ export const createFakeUsers = async () => {
         endereco_cep: '01310-100',
         cpf: '000.000.000-00',
         nota_media: 5.0,
-        premium: true
+        premium: true,
+        foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Matheus'
       }, { onConflict: 'email' });
 
     if (realUserError) {
@@ -212,7 +224,7 @@ export const createFakeHistorico = async () => {
     if (!prestadores || prestadores.length === 0) return;
 
     const historicoFake = [];
-    
+
     prestadores.forEach(prestador => {
       // Criar alguns registros de histórico para cada prestador
       for (let i = 0; i < 5; i++) {
@@ -259,14 +271,14 @@ export const createFakeAgendamentos = async () => {
     if (!prestadores || !clientes || prestadores.length === 0 || clientes.length === 0) return;
 
     const agendamentosFake = [];
-    
+
     prestadores.forEach(prestador => {
       // Criar 2-3 agendamentos para cada prestador
       for (let i = 0; i < Math.floor(Math.random() * 3) + 2; i++) {
         const cliente = clientes[Math.floor(Math.random() * clientes.length)];
         const dataFutura = new Date();
         dataFutura.setDate(dataFutura.getDate() + Math.floor(Math.random() * 30) + 1);
-        
+
         agendamentosFake.push({
           prestador_id: prestador.id,
           solicitante_id: cliente.id,
@@ -302,19 +314,19 @@ import { createFakePrestadores } from './fake-prestadores';
 export const createAllFakeData = async () => {
   try {
     console.log('Iniciando criação de dados de teste...');
-    
+
     // Create original fake users
     await createFakeUsers();
-    
+
     // Create fake prestadores with enhanced data
     await createFakePrestadores();
-    
+
     // Create fake agendamentos
     await createFakeAgendamentos();
-    
+
     // Create fake historico
     await createFakeHistorico();
-    
+
     console.log('Todos os dados de teste foram criados com sucesso!');
     return true;
   } catch (error) {

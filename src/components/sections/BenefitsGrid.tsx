@@ -29,7 +29,7 @@ const BenefitsGrid = () => {
                             </div>
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center border-2 border-yellow-200 overflow-hidden text-gray-900">
-                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Erik" alt="User" />
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Erik" alt="User" />
                                 </div>
                                 <div>
                                     <p className="font-bold text-xs text-gray-900">Carlos Pintor</p>
@@ -69,7 +69,7 @@ const BenefitsGrid = () => {
                     >
                         <div className="flex items-center gap-2 mb-2">
                             <div className="w-8 h-8 bg-blue-100 rounded-full overflow-hidden">
-                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sara" alt="User" />
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Sara" alt="User" />
                             </div>
                             <div className="flex-1 h-2 bg-gray-100 rounded-full"></div>
                         </div>

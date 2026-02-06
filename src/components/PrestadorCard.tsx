@@ -3,11 +3,11 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Star, 
-  MapPin, 
-  MessageCircle, 
-  Phone, 
+import {
+  Star,
+  MapPin,
+  MessageCircle,
+  Phone,
   Crown,
   Shield,
   Verified,
@@ -37,11 +37,11 @@ interface PrestadorCardProps {
   distance?: number;
 }
 
-const PrestadorCard = ({ 
-  prestador, 
-  compact = false, 
-  showDistance = false, 
-  distance 
+const PrestadorCard = ({
+  prestador,
+  compact = false,
+  showDistance = false,
+  distance
 }: PrestadorCardProps) => {
   const [showChat, setShowChat] = useState(false);
 
@@ -57,18 +57,17 @@ const PrestadorCard = ({
   const chatModalPrestador = {
     id: prestador.id,
     name: prestador.nome,
-    avatar: prestador.foto_url,
+    avatar: prestador.foto_url || `https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=${encodeURIComponent(prestador.nome || 'User')}`,
     isOnline: isOnline
   };
 
   return (
     <>
-      <Card 
-        className={`overflow-hidden transition-all duration-300 hover:shadow-xl group ${
-          isPremium 
-            ? 'border-2 shadow-lg bg-gradient-to-br from-yellow-50 to-amber-50' 
-            : 'border border-gray-200 hover:border-orange-300 hover:shadow-lg'
-        }`}
+      <Card
+        className={`overflow-hidden transition-all duration-300 hover:shadow-xl group ${isPremium
+          ? 'border-2 shadow-lg bg-gradient-to-br from-yellow-50 to-amber-50'
+          : 'border border-gray-200 hover:border-orange-300 hover:shadow-lg'
+          }`}
         style={isPremium ? {
           boxShadow: '0 0 20px rgba(251, 191, 36, 0.2)',
           border: '2px solid #f59e0b'
@@ -80,17 +79,19 @@ const PrestadorCard = ({
             <div className="relative flex-shrink-0">
               <div className={`${isPremium ? 'p-1 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full' : ''}`}>
                 <Avatar className={`${compact ? 'h-16 w-16' : 'h-20 w-20'} ${isPremium ? 'border-2 border-white' : ''}`}>
-                  <AvatarImage src={prestador.foto_url} alt={prestador.nome} />
+                  <AvatarImage
+                    src={prestador.foto_url || `https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=${encodeURIComponent(prestador.nome || 'User')}`}
+                    alt={prestador.nome}
+                  />
                   <AvatarFallback className="bg-orange-100 text-orange-600 font-semibold text-lg">
                     {prestador.nome.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
               </div>
-              
+
               {/* Online Status */}
-              <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
-                isOnline ? 'bg-green-500' : 'bg-gray-400'
-              }`} />
+              <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${isOnline ? 'bg-green-500' : 'bg-gray-400'
+                }`} />
             </div>
 
             <div className="flex-1 min-w-0">
@@ -101,7 +102,7 @@ const PrestadorCard = ({
                     <h3 className={`font-semibold text-gray-900 truncate ${compact ? 'text-lg' : 'text-xl'}`}>
                       {prestador.nome}
                     </h3>
-                    
+
                     {isVerified && (
                       <div className="flex items-center gap-1">
                         <Verified className="h-4 w-4 text-blue-500" />
@@ -121,12 +122,11 @@ const PrestadorCard = ({
                         {prestador.nota_media.toFixed(1)}
                       </span>
                     </div>
-                    
-                    <div className={`px-2 py-1 rounded-full text-xs ${
-                      isOnline 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-600'
-                    }`}>
+
+                    <div className={`px-2 py-1 rounded-full text-xs ${isOnline
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-600'
+                      }`}>
                       {isOnline ? 'Online' : 'Offline'}
                     </div>
                   </div>
@@ -164,16 +164,15 @@ const PrestadorCard = ({
                 <Button
                   onClick={handleContactClick}
                   size="sm"
-                  className={`flex-1 ${
-                    isPremium 
-                      ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white' 
-                      : 'bg-orange-500 hover:bg-orange-600'
-                  }`}
+                  className={`flex-1 ${isPremium
+                    ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white'
+                    : 'bg-orange-500 hover:bg-orange-600'
+                    }`}
                 >
                   <MessageCircle className="h-4 w-4 mr-2" />
                   Conversar
                 </Button>
-                
+
                 {prestador.telefone && (
                   <Button
                     variant="outline"

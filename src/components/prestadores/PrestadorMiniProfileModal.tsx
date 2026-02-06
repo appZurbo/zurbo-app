@@ -44,12 +44,12 @@ export const PrestadorMiniProfileModal: React.FC<PrestadorMiniProfileModalProps>
           {/* Header with photo, name, category */}
           <div className="flex items-center gap-4 mb-4">
             <Avatar className="h-20 w-20 border-2 border-orange-100">
-              <AvatarImage src={prestador.foto_url} alt={prestador.nome} />
+              <AvatarImage src={prestador.foto_url || `https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=${encodeURIComponent(prestador.nome || 'User')}`} alt={prestador.nome} />
               <AvatarFallback className="text-xl bg-orange-100 text-orange-600">
                 {prestador.nome?.charAt(0)?.toUpperCase() || '?'}
               </AvatarFallback>
             </Avatar>
-            
+
             <div className="flex-1">
               <h2 className="text-lg font-bold text-gray-800 mb-1">{prestador.nome}</h2>
               <p className="text-sm text-gray-500 mb-2">
@@ -81,8 +81,8 @@ export const PrestadorMiniProfileModal: React.FC<PrestadorMiniProfileModalProps>
             <div className="mb-4">
               <div className="flex flex-wrap gap-2">
                 {prestador.prestador_servicos.slice(0, 3).map((servico: any, index: number) => (
-                  <Badge 
-                    key={index} 
+                  <Badge
+                    key={index}
                     variant="secondary"
                     className="bg-orange-100 text-orange-800 text-xs px-3 py-1"
                   >
@@ -103,8 +103,8 @@ export const PrestadorMiniProfileModal: React.FC<PrestadorMiniProfileModalProps>
             <div className="grid grid-cols-3 gap-2">
               {/* Placeholder gallery images */}
               {[1, 2, 3].map((i) => (
-                <div 
-                  key={i} 
+                <div
+                  key={i}
                   className="aspect-square bg-gray-100 rounded-md flex items-center justify-center"
                 >
                   <span className="text-gray-400 text-xs">Foto {i}</span>
@@ -114,7 +114,7 @@ export const PrestadorMiniProfileModal: React.FC<PrestadorMiniProfileModalProps>
           </div>
 
           {/* Contact Button */}
-          <Button 
+          <Button
             onClick={handleContact}
             className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 rounded-xl"
           >

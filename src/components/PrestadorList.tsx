@@ -25,7 +25,7 @@ const mockPrestadores = [
     descricao_servico: 'Profissional experiente em limpeza residencial e comercial. Trabalho com produtos próprios e equipamentos modernos.',
     telefone: '(11) 99999-1234',
     em_servico: true,
-    foto_url: 'https://images.unsplash.com/photo-1494790108755-2616b332c32d?w=150&h=150&fit=crop&crop=face'
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Ana'
   },
   {
     id: '2',
@@ -38,7 +38,7 @@ const mockPrestadores = [
     descricao_servico: 'Eletricista profissional com mais de 10 anos de experiência. Atendo emergências 24h.',
     telefone: '(11) 88888-5678',
     em_servico: false,
-    foto_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Carlos'
   },
   {
     id: '3',
@@ -51,7 +51,7 @@ const mockPrestadores = [
     descricao_servico: 'Cabeleireira especializada em cortes modernos e coloração. Atendimento domiciliar disponível.',
     telefone: '(11) 77777-9999',
     em_servico: true,
-    foto_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
+    foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Maria'
   },
 ];
 
@@ -65,7 +65,7 @@ const PrestadorList = ({ category, onViewProfile, onSchedule, onChat }: Prestado
         <h2 className="text-2xl font-bold">
           {category ? `Prestadores - ${category}` : 'Prestadores Disponíveis'}
         </h2>
-        
+
         <div className="flex items-center space-x-4">
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-48">
@@ -78,9 +78,9 @@ const PrestadorList = ({ category, onViewProfile, onSchedule, onChat }: Prestado
               <SelectItem value="reviews">Mais contratados</SelectItem>
             </SelectContent>
           </Select>
-          
-          <Button 
-            variant="outline" 
+
+          <Button
+            variant="outline"
             onClick={() => setShowFilters(!showFilters)}
           >
             <SlidersHorizontal className="h-4 w-4 mr-2" />
@@ -103,7 +103,7 @@ const PrestadorList = ({ category, onViewProfile, onSchedule, onChat }: Prestado
                 <SelectItem value="200+">R$ 200+</SelectItem>
               </SelectContent>
             </Select>
-            
+
             <Select>
               <SelectTrigger>
                 <SelectValue placeholder="Distância" />
@@ -115,7 +115,7 @@ const PrestadorList = ({ category, onViewProfile, onSchedule, onChat }: Prestado
                 <SelectItem value="any">Qualquer distância</SelectItem>
               </SelectContent>
             </Select>
-            
+
             <Select>
               <SelectTrigger>
                 <SelectValue placeholder="Avaliação" />
@@ -127,7 +127,7 @@ const PrestadorList = ({ category, onViewProfile, onSchedule, onChat }: Prestado
                 <SelectItem value="any">Qualquer avaliação</SelectItem>
               </SelectContent>
             </Select>
-            
+
             <Select>
               <SelectTrigger>
                 <SelectValue placeholder="Disponibilidade" />

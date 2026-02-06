@@ -54,11 +54,10 @@ export const PrestadorCard: React.FC<PrestadorCardProps> = ({
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
-        className={`h-4 w-4 ${
-          i < Math.floor(rating) 
-            ? 'fill-yellow-400 text-yellow-400' 
-            : 'text-gray-300'
-        }`}
+        className={`h-4 w-4 ${i < Math.floor(rating)
+          ? 'fill-yellow-400 text-yellow-400'
+          : 'text-gray-300'
+          }`}
       />
     ));
   };
@@ -68,7 +67,7 @@ export const PrestadorCard: React.FC<PrestadorCardProps> = ({
   const precoMax = servicos.length > 0 ? Math.max(...servicos.map(s => s.preco_max || 0)) : 0;
 
   return (
-    <Card 
+    <Card
       className="hover:shadow-lg transition-all duration-200 cursor-pointer group"
       onClick={handleCardClick}
     >
@@ -77,12 +76,12 @@ export const PrestadorCard: React.FC<PrestadorCardProps> = ({
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-3">
             <Avatar>
-              <AvatarImage src={prestador.foto_url} alt={prestador.nome} />
+              <AvatarImage src={prestador.foto_url || `https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=${encodeURIComponent(prestador.nome || 'User')}`} alt={prestador.nome} />
               <AvatarFallback>
                 {prestador.nome.split(' ').map(n => n[0]).join('').toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            
+
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <h3 className="font-semibold text-gray-900 group-hover:text-orange-600 transition-colors">
@@ -93,7 +92,7 @@ export const PrestadorCard: React.FC<PrestadorCardProps> = ({
                   <Badge className="bg-yellow-100 text-yellow-800">Premium</Badge>
                 )}
               </div>
-              
+
               {prestador.endereco_cidade && (
                 <div className="flex items-center gap-1 mt-1">
                   <MapPin className="h-3 w-3 text-gray-500" />
@@ -118,13 +117,13 @@ export const PrestadorCard: React.FC<PrestadorCardProps> = ({
           <div className="mb-3">
             <div className="flex flex-wrap gap-1">
               {servicos.slice(0, 3).map((servico, index) => (
-                <Badge 
-                  key={index} 
+                <Badge
+                  key={index}
                   variant="secondary"
                   className="text-xs"
-                  style={{ 
+                  style={{
                     backgroundColor: `${servico.servicos?.cor}20`,
-                    color: servico.servicos?.cor 
+                    color: servico.servicos?.cor
                   }}
                 >
                   {servico.servicos?.nome}
@@ -164,17 +163,17 @@ export const PrestadorCard: React.FC<PrestadorCardProps> = ({
 
         {/* Botões de Ação */}
         <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             className="flex-1"
             onClick={handleViewProfile}
           >
             <Eye className="h-4 w-4 mr-1" />
             Ver Perfil
           </Button>
-          <Button 
-            size="sm" 
+          <Button
+            size="sm"
             className="flex-1 bg-orange-500 hover:bg-orange-600"
             onClick={handleContact}
           >
