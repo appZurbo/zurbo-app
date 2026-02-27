@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { UnifiedLayout } from '@/components/layout/UnifiedLayout';
 import { LeafletMapComponent } from '@/components/maps/LeafletMapComponent';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,8 +12,11 @@ import { Slider } from '@/components/ui/slider';
 import { serviceCategories } from '@/config/serviceCategories';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QuickCreateRequestModal } from '@/components/client/QuickCreateRequestModal';
-import { Plus } from 'lucide-react';
+import { Plus, Trash } from 'lucide-react';
 import { renderToString } from 'react-dom/server';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+import { ConfirmModal } from '@/components/ui/confirm-modal';
 
 const MOCK_REQUESTS: ServiceRequest[] = [
     {
@@ -188,6 +191,8 @@ const MOCK_REQUESTS: ServiceRequest[] = [
 ];
 
 const OpportunitiesMap = () => {
+    const { user } = useAuth();
+    const { toast } = useToast();
     const [requests, setRequests] = useState<ServiceRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedRequest, setSelectedRequest] = useState<ServiceRequest | null>(null);
@@ -200,6 +205,8 @@ const OpportunitiesMap = () => {
     const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showInlineFilters, setShowInlineFilters] = useState(false);
+    const [requestToDelete, setRequestToDelete] = useState<string | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     // Haversine formula to calculate distance in km
     const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -230,17 +237,14 @@ const OpportunitiesMap = () => {
 
             if (requestsError) throw requestsError;
 
-            // 2. Fetch profiles for these requests
+            // 2. Fetch user data (profiles) for these requests from the 'users' table
             if (requestsData && requestsData.length > 0) {
                 const userIds = Array.from(new Set(requestsData.map(r => r.user_id)));
 
-                // Temporary bypass to prevent 'profiles' 404 error
-                // const { data: profilesData, error: profilesError } = await supabase
-                //     .from('profiles')
-                //     .select('id, nome, foto_url')
-                //     .in('id', userIds);
-                const profilesData: any[] = [];
-                const profilesError = null;
+                const { data: profilesData, error: profilesError } = await supabase
+                    .from('users')
+                    .select('auth_id, nome, foto_url')
+                    .in('auth_id', userIds);
 
                 if (profilesError) {
                     console.error('Error fetching profiles:', profilesError);
@@ -249,13 +253,17 @@ const OpportunitiesMap = () => {
                 } else {
                     // 3. Manual Join
                     const requestsWithProfiles = requestsData.map(req => {
-                        const profile = profilesData?.find(p => p.id === req.user_id);
+                        const profile = profilesData?.find(p => p.auth_id === req.user_id);
                         return {
                             ...req,
                             user: profile ? { nome: profile.nome, foto_url: profile.foto_url } : undefined
                         };
                     });
-                    setRequests([...MOCK_REQUESTS, ...requestsWithProfiles]);
+
+                    // IF we have real requests, we don't need mock ones for at least the current user's visibility
+                    // But we'll keep them for filling the space if preferred.
+                    // Let's at least ensure they don't replace real data.
+                    setRequests([...requestsWithProfiles, ...MOCK_REQUESTS]);
                 }
             } else {
                 setRequests(MOCK_REQUESTS);
@@ -268,73 +276,125 @@ const OpportunitiesMap = () => {
         }
     };
 
-    const filteredRequests = requests.filter(req => {
-        // 1. Category Filter
-        let categoryMatch = true;
-        if (selectedCategory !== 'Todos') {
+    const handleDeleteRequest = async (id: string) => {
+        if (isDeleting) return;
+        setIsDeleting(true);
+
+        try {
+            if (!id.startsWith('mock-')) {
+                const { data, error } = await supabase
+                    .from('service_requests')
+                    .delete()
+                    .eq('id', id)
+                    .select();
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    throw new Error('Não foi possível excluir o pedido. O registro pode já ter sido removido ou você não tem permissão.');
+                }
+            }
+
+            toast({
+                title: "Sucesso",
+                description: "Pedido removido com sucesso."
+            });
+
+            // Step 1: Hide the confirmation modal first
+            setRequestToDelete(null);
+
+            // Step 2: WAIT for transition to finish before closing the second modal
+            // This is the CRUCIAL fix for the RangeError / focus fight
+            setTimeout(() => {
+                setSelectedRequest(null);
+                setIsDeleting(false);
+                fetchRequests();
+            }, 100);
+
+        } catch (error: any) {
+            console.error('Final deletion error:', error);
+            setIsDeleting(false);
+            setRequestToDelete(null);
+            toast({
+                title: "Erro ao excluir",
+                description: error.message,
+                variant: "destructive"
+            });
+        }
+    };
+
+    const filteredRequests = useMemo(() => {
+        return requests.filter(req => {
+            // 1. Category Filter
+            let categoryMatch = true;
+            if (selectedCategory !== 'Todos') {
+                const category = serviceCategories.find(c =>
+                    c.name.toLowerCase() === req.category_id.toLowerCase() ||
+                    c.id.toLowerCase() === req.category_id.toLowerCase()
+                );
+                categoryMatch = category?.name === selectedCategory;
+            }
+
+            if (!categoryMatch) return false;
+
+            // 2. Date Filter
+            const createdAt = new Date(req.created_at);
+            const now = new Date();
+            let dateMatch = true;
+
+            if (dateRange === 'today') {
+                dateMatch = createdAt.toDateString() === now.toDateString();
+            } else if (dateRange === '3days') {
+                const threeDaysAgo = new Date();
+                threeDaysAgo.setDate(now.getDate() - 3);
+                dateMatch = createdAt >= threeDaysAgo;
+            } else if (dateRange === '7days') {
+                const sevenDaysAgo = new Date();
+                sevenDaysAgo.setDate(now.getDate() - 7);
+                dateMatch = createdAt >= sevenDaysAgo;
+            }
+
+            if (!dateMatch) return false;
+
+            // 3. Proximity Filter
+            if (userLocation && maxDistance < 150) {
+                const dist = calculateDistance(
+                    userLocation.lat,
+                    userLocation.lng,
+                    req.location_lat,
+                    req.location_lng
+                );
+                if (dist > maxDistance) return false;
+            }
+
+            return true;
+        });
+    }, [requests, selectedCategory, dateRange, userLocation, maxDistance]);
+
+    // Convert requests to markers
+    const markers = useMemo(() => {
+        return filteredRequests.map(req => {
             const category = serviceCategories.find(c =>
                 c.name.toLowerCase() === req.category_id.toLowerCase() ||
                 c.id.toLowerCase() === req.category_id.toLowerCase()
             );
-            categoryMatch = category?.name === selectedCategory;
-        }
 
-        if (!categoryMatch) return false;
+            const Icon = category?.icon || MapPin;
+            const iconHtml = renderToString(<Icon size={22} color="white" strokeWidth={2.5} />);
 
-        // 2. Date Filter
-        const createdAt = new Date(req.created_at);
-        const now = new Date();
-        let dateMatch = true;
-
-        if (dateRange === 'today') {
-            dateMatch = createdAt.toDateString() === now.toDateString();
-        } else if (dateRange === '3days') {
-            const threeDaysAgo = new Date();
-            threeDaysAgo.setDate(now.getDate() - 3);
-            dateMatch = createdAt >= threeDaysAgo;
-        } else if (dateRange === '7days') {
-            const sevenDaysAgo = new Date();
-            sevenDaysAgo.setDate(now.getDate() - 7);
-            dateMatch = createdAt >= sevenDaysAgo;
-        }
-
-        if (!dateMatch) return false;
-
-        // 3. Proximity Filter
-        if (userLocation && maxDistance < 150) {
-            const dist = calculateDistance(
-                userLocation.lat,
-                userLocation.lng,
-                req.location_lat,
-                req.location_lng
-            );
-            if (dist > maxDistance) return false;
-        }
-
-        return true;
-    });
-
-    // Convert requests to markers
-    const markers = filteredRequests.map(req => {
-        const category = serviceCategories.find(c =>
-            c.name.toLowerCase() === req.category_id.toLowerCase() ||
-            c.id.toLowerCase() === req.category_id.toLowerCase()
-        );
-
-        const Icon = category?.icon || MapPin;
-        const iconHtml = renderToString(<Icon size={22} color="white" strokeWidth={2.5} />);
-
-        return {
-            lng: req.location_lng,
-            lat: req.location_lat,
-            title: req.description,
-            description: req.details?.additional_info || req.category_id,
-            color: '#f97316',
-            id: req.id,
-            iconHtml,
-            imageUrl: category?.image
-        };
-    });
+            return {
+                lng: req.location_lng,
+                lat: req.location_lat,
+                title: req.description,
+                description: req.details?.additional_info || req.category_id,
+                color: '#f97316',
+                id: req.id,
+                iconHtml,
+                imageUrl: category?.image,
+                createdAt: req.created_at
+            };
+        });
+    }, [filteredRequests]);
 
     const handleMarkerClick = (markerData: any) => {
         const req = requests.find(r => r.id === markerData.id);
@@ -746,13 +806,21 @@ const OpportunitiesMap = () => {
 
                 {/* Selected Request Modal - Refined */}
                 <Dialog open={!!selectedRequest} onOpenChange={(open) => !open && setSelectedRequest(null)}>
-                    <DialogContent className="max-w-md p-0 overflow-hidden border-none rounded-[32px] bg-white">
+                    <DialogContent
+                        className="max-w-md p-0 overflow-hidden border-none rounded-[32px] bg-white"
+                    >
+                        <DialogTitle className="sr-only">
+                            Detalhes do Pedido
+                        </DialogTitle>
+                        <DialogDescription className="sr-only">
+                            Detalhes completos do pedido de serviço para que o prestador possa analisar e candidatar-se.
+                        </DialogDescription>
                         <div className="h-32 bg-gradient-to-br from-orange-400 to-orange-600 p-8 relative">
                             <div className="absolute top-4 right-4 text-white/50 text-8xl font-black select-none pointer-events-none opacity-20 uppercase -rotate-12">
                                 ZURBO
                             </div>
                             <Badge className="bg-white/20 text-white border-none backdrop-blur-sm mb-2">{selectedRequest?.category_id}</Badge>
-                            <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter leading-none mt-1">
+                            <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter leading-none mt-1" aria-hidden="true">
                                 {selectedRequest?.description}
                             </h2>
                         </div>
@@ -800,15 +868,45 @@ const OpportunitiesMap = () => {
                                 <Button variant="outline" className="flex-1 rounded-2xl h-12 font-bold" onClick={() => setSelectedRequest(null)}>
                                     Voltar
                                 </Button>
-                                <Button className="flex-[2] bg-orange-500 hover:bg-orange-600 text-white rounded-2xl h-12 font-bold shadow-lg shadow-orange-100 transition-all hover:scale-[1.02]">
-                                    Candidatar-me
-                                </Button>
+                                {(() => {
+                                    const isOwner = selectedRequest?.user_id === user?.id;
+                                    return isOwner ? (
+                                        <Button
+                                            variant="destructive"
+                                            onClick={() => setRequestToDelete(selectedRequest.id)}
+                                            className="flex-[2] rounded-2xl h-12 font-bold shadow-lg transition-all hover:scale-[1.02]"
+                                        >
+                                            {isDeleting ? (
+                                                <>
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                    Processando...
+                                                </>
+                                            ) : 'Apagar Pedido'}
+                                        </Button>
+                                    ) : (
+                                        <Button className="flex-[2] bg-orange-500 hover:bg-orange-600 text-white rounded-2xl h-12 font-bold shadow-lg shadow-orange-100 transition-all hover:scale-[1.02]">
+                                            Candidatar-me
+                                        </Button>
+                                    );
+                                })()}
                             </div>
                         </div>
+
+                        {/* Nested ConfirmModal allows Radix to manage focus stack better */}
+                        <ConfirmModal
+                            isOpen={!!requestToDelete}
+                            onClose={() => !isDeleting && setRequestToDelete(null)}
+                            onConfirm={() => requestToDelete && handleDeleteRequest(requestToDelete)}
+                            title="Tem certeza?"
+                            description="Esta ação não pode ser desfeita. O pedido será removido permanentemente."
+                            confirmText="Sim, apagar"
+                            cancelText="Cancelar"
+                            isDestructive={true}
+                            isLoading={isDeleting}
+                        />
                     </DialogContent>
                 </Dialog>
 
-                {/* Quick Create Request Modal */}
                 <QuickCreateRequestModal
                     open={showCreateModal}
                     onOpenChange={setShowCreateModal}
@@ -821,4 +919,3 @@ const OpportunitiesMap = () => {
 };
 
 export default OpportunitiesMap;
-
