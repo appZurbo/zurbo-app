@@ -1,4 +1,4 @@
-name: Keep Supabase Alive
+name: System Health Check
 
 on:
   schedule:
@@ -7,10 +7,10 @@ on:
   workflow_dispatch: # Permite rodar manualmente para testar
 
 jobs:
-  ping:
+  health-check:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase Database
+      - name: Perform Backend Health Check
         run: |
           curl -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
