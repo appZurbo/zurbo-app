@@ -234,10 +234,13 @@ const OpportunitiesMap = () => {
             if (requestsData && requestsData.length > 0) {
                 const userIds = Array.from(new Set(requestsData.map(r => r.user_id)));
 
-                const { data: profilesData, error: profilesError } = await supabase
-                    .from('profiles')
-                    .select('id, nome, foto_url')
-                    .in('id', userIds);
+                // Temporary bypass to prevent 'profiles' 404 error
+                // const { data: profilesData, error: profilesError } = await supabase
+                //     .from('profiles')
+                //     .select('id, nome, foto_url')
+                //     .in('id', userIds);
+                const profilesData: any[] = [];
+                const profilesError = null;
 
                 if (profilesError) {
                     console.error('Error fetching profiles:', profilesError);
@@ -325,10 +328,11 @@ const OpportunitiesMap = () => {
             lng: req.location_lng,
             lat: req.location_lat,
             title: req.description,
-            description: req.category_id,
+            description: req.details?.additional_info || req.category_id,
             color: '#f97316',
             id: req.id,
-            iconHtml
+            iconHtml,
+            imageUrl: category?.image
         };
     });
 

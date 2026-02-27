@@ -77,8 +77,8 @@ export const UnifiedDock = () => {
 
           if (isCenter) {
             return (
-              <div key={index} className="relative top-0">
-                <div className="relative top-0 transition-transform hover:scale-110 active:scale-95">
+              <div key={index} className="flex flex-col items-center justify-center px-2">
+                <div className="relative transition-transform hover:scale-110 active:scale-95">
                   <TactileCalendar
                     onClick={() => navigate(item.path)}
                     className="shadow-2xl shadow-orange-500/20"

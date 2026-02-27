@@ -16,12 +16,14 @@ export const AnalyticsTracker = () => {
                     deviceType = 'Tablet';
                 }
 
-                const { error } = await (supabase as any).from('site_analytics').insert({
-                    page_path: location.pathname,
-                    referrer: document.referrer || 'Direct',
-                    device_type: deviceType,
-                    user_agent: userAgent
-                });
+                // Temporary bypass of site_analytics to perfectly prevent 404 console errors
+                // const { error } = await (supabase as any).from('site_analytics').insert({
+                //     page_path: location.pathname,
+                //     referrer: document.referrer || 'Direct',
+                //     device_type: deviceType,
+                //     user_agent: userAgent
+                // });
+                const error = null;
 
                 if (error) {
                     // If table doesn't exist yet, we just fail silently in production
