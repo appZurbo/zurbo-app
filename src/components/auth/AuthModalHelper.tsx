@@ -9,9 +9,9 @@ interface AuthButtonProps {
   size?: 'default' | 'sm' | 'lg' | 'icon';
 }
 
-export const AuthButton: React.FC<AuthButtonProps> = ({ 
-  children, 
-  variant = 'default', 
+const AuthButton: React.FC<AuthButtonProps> = ({
+  children,
+  variant = 'default',
   className = '',
   size = 'default'
 }) => {
@@ -19,7 +19,7 @@ export const AuthButton: React.FC<AuthButtonProps> = ({
 
   return (
     <>
-      <Button 
+      <Button
         variant={variant}
         className={className}
         size={size}
@@ -27,11 +27,11 @@ export const AuthButton: React.FC<AuthButtonProps> = ({
       >
         {children}
       </Button>
-      
+
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
-        onLogin={() => {}}
+        onLogin={() => { }}
       />
     </>
   );
