@@ -10,7 +10,7 @@ export default function RegrasComunidade() {
   return (
     <div className="min-h-screen bg-gray-50">
       <UnifiedHeader />
-      
+
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-8">
           <Link to="/">
@@ -19,7 +19,7 @@ export default function RegrasComunidade() {
               Voltar ao início
             </Button>
           </Link>
-          
+
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Users className="h-8 w-8 text-white" />
@@ -41,8 +41,8 @@ export default function RegrasComunidade() {
             </CardHeader>
             <CardContent>
               <p className="text-green-800 leading-relaxed">
-                O Zurbo é mais que uma plataforma - somos uma comunidade que conecta pessoas 
-                através de serviços de qualidade. Estas regras garantem que todos tenham uma 
+                O Zurbo é mais que uma plataforma - somos uma comunidade que conecta pessoas
+                através de serviços de qualidade. Estas regras garantem que todos tenham uma
                 experiência positiva, segura e respeitosa.
               </p>
             </CardContent>
@@ -66,7 +66,7 @@ export default function RegrasComunidade() {
                     <li>• Reconheça bom trabalho com avaliações positivas</li>
                   </ul>
                 </div>
-                
+
                 <div className="bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
                   <h4 className="font-semibold text-red-800 mb-2">❌ Evite:</h4>
                   <ul className="text-red-700 text-sm space-y-1">
@@ -109,7 +109,7 @@ export default function RegrasComunidade() {
                   </li>
                 </ul>
               </div>
-              
+
               <div className="bg-purple-50 p-4 rounded-lg">
                 <h4 className="font-semibold text-purple-800 mb-3">Para Clientes:</h4>
                 <ul className="text-purple-700 space-y-2">
@@ -152,7 +152,7 @@ export default function RegrasComunidade() {
                     <li>• Foque no serviço prestado, não na pessoa</li>
                   </ul>
                 </div>
-                
+
                 <div className="bg-yellow-50 p-4 rounded-lg">
                   <h4 className="font-semibold text-yellow-800 mb-2">Comunicação Direta</h4>
                   <ul className="text-yellow-700 text-sm space-y-1">
@@ -178,7 +178,7 @@ export default function RegrasComunidade() {
                 <p className="text-red-800 font-medium mb-3">
                   As seguintes condutas podem resultar em advertência, suspensão ou banimento:
                 </p>
-                
+
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <h5 className="font-semibold text-red-800 mb-2">Conteúdo Inadequado:</h5>
@@ -189,7 +189,7 @@ export default function RegrasComunidade() {
                       <li>• Spam ou conteúdo repetitivo</li>
                     </ul>
                   </div>
-                  
+
                   <div>
                     <h5 className="font-semibold text-red-800 mb-2">Comportamento Inadequado:</h5>
                     <ul className="text-red-700 text-sm space-y-1">
@@ -212,7 +212,7 @@ export default function RegrasComunidade() {
               <p className="text-gray-700">
                 Quando surgirem problemas, siga estas etapas:
               </p>
-              
+
               <div className="space-y-3">
                 <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
                   <Badge variant="outline" className="mt-0.5">1</Badge>
@@ -223,7 +223,7 @@ export default function RegrasComunidade() {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
                   <Badge variant="outline" className="mt-0.5">2</Badge>
                   <div>
@@ -233,7 +233,7 @@ export default function RegrasComunidade() {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
                   <Badge variant="outline" className="mt-0.5">3</Badge>
                   <div>
@@ -263,7 +263,7 @@ export default function RegrasComunidade() {
                       Notificação sobre comportamento inadequado
                     </p>
                   </div>
-                  
+
                   <div className="bg-orange-50 p-4 rounded-lg text-center border border-orange-200">
                     <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-2">
                       <span className="text-white font-bold text-sm">2</span>
@@ -273,7 +273,7 @@ export default function RegrasComunidade() {
                       Bloqueio temporário da conta
                     </p>
                   </div>
-                  
+
                   <div className="bg-red-50 p-4 rounded-lg text-center border border-red-200">
                     <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-2">
                       <span className="text-white font-bold text-sm">3</span>
@@ -297,22 +297,22 @@ export default function RegrasComunidade() {
                 <h4 className="font-semibold text-blue-800 mb-3">
                   Precisa reportar algum problema?
                 </h4>
-                
+
                 <div className="space-y-2 text-blue-700">
                   <p className="flex items-center gap-2">
                     <MessageCircle className="h-4 w-4" />
-                    <strong>Email:</strong> suporte@zurbo.com.br
+                    <strong>Email:</strong> contato@zurbo.com.br
                   </p>
                   <p className="flex items-center gap-2">
                     <MessageCircle className="h-4 w-4" />
-                    <strong>Telefone:</strong> (11) 9999-9999
+                    <strong>Telefone:</strong> (66) 99914-5353
                   </p>
                   <p className="flex items-center gap-2">
                     <MessageCircle className="h-4 w-4" />
                     <strong>Chat:</strong> Disponível 24/7 na plataforma
                   </p>
                 </div>
-                
+
                 <p className="text-blue-600 text-sm mt-3">
                   Nossa equipe responde em até 24 horas e trata todas as denúncias com seriedade e confidencialidade.
                 </p>

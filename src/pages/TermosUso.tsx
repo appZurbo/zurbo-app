@@ -183,9 +183,9 @@ export default function TermosUso() {
                 Para dúvidas sobre estes Termos de Uso, entre em contato conosco:
               </p>
               <ul>
-                <li>Email: legal@zurbo.com.br</li>
-                <li>Telefone: (11) 9999-9999</li>
-                <li>Endereço: São Paulo, SP, Brasil</li>
+                <li>Email: contato@zurbo.com.br</li>
+                <li>Telefone: (66) 99914-5353</li>
+                <li>Endereço: Sinop, MT, Brasil</li>
               </ul>
             </CardContent>
           </Card>

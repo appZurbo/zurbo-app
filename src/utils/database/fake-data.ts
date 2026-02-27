@@ -7,7 +7,7 @@ export const fakeUsers = [
     email: 'joao.silva@teste.com',
     tipo: 'prestador',
     bio: 'Eletricista com 15 anos de experiência. Especialista em instalações residenciais e comerciais.',
-    endereco_cidade: 'São Paulo',
+    endereco_cidade: 'Sinop',
     endereco_bairro: 'Vila Madalena',
     endereco_rua: 'Rua Harmonia, 123',
     endereco_cep: '05435-000',
@@ -15,7 +15,7 @@ export const fakeUsers = [
     nota_media: 4.8,
     premium: true,
     servicos: ['Eletricista'],
-    telefone: '(11) 99999-1111',
+    telefone: '(66) 99914-5353',
     foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Joao'
   },
   {
@@ -23,7 +23,7 @@ export const fakeUsers = [
     email: 'maria.oliveira@teste.com',
     tipo: 'prestador',
     bio: 'Faxineira profissional com foco em limpeza residencial e pós-obra. Trabalho com produtos ecológicos.',
-    endereco_cidade: 'São Paulo',
+    endereco_cidade: 'Sinop',
     endereco_bairro: 'Pinheiros',
     endereco_rua: 'Rua dos Pinheiros, 456',
     endereco_cep: '05422-001',
@@ -31,7 +31,7 @@ export const fakeUsers = [
     nota_media: 4.9,
     premium: false,
     servicos: ['Faxina'],
-    telefone: '(11) 99999-2222',
+    telefone: '(66) 99914-5353',
     foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Maria'
   },
   {
@@ -39,7 +39,7 @@ export const fakeUsers = [
     email: 'carlos.pereira@teste.com',
     tipo: 'prestador',
     bio: 'Encanador experiente, atendo emergências 24h. Especialista em vazamentos e instalações hidráulicas.',
-    endereco_cidade: 'São Paulo',
+    endereco_cidade: 'Sinop',
     endereco_bairro: 'Jardins',
     endereco_rua: 'Rua Augusta, 789',
     endereco_cep: '01305-100',
@@ -47,7 +47,7 @@ export const fakeUsers = [
     nota_media: 4.7,
     premium: true,
     servicos: ['Encanador'],
-    telefone: '(11) 99999-3333',
+    telefone: '(66) 99914-5353',
     foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Carlos'
   },
   {
@@ -55,7 +55,7 @@ export const fakeUsers = [
     email: 'ana.santos@teste.com',
     tipo: 'prestador',
     bio: 'Pintora profissional com especialidade em texturas e acabamentos especiais. 10 anos de experiência.',
-    endereco_cidade: 'São Paulo',
+    endereco_cidade: 'Sinop',
     endereco_bairro: 'Moema',
     endereco_rua: 'Av. Ibirapuera, 321',
     endereco_cep: '04029-200',
@@ -63,7 +63,7 @@ export const fakeUsers = [
     nota_media: 4.6,
     premium: false,
     servicos: ['Pintor'],
-    telefone: '(11) 99999-4444',
+    telefone: '(66) 99914-5353',
     foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Ana'
   },
   {
@@ -71,7 +71,7 @@ export const fakeUsers = [
     email: 'roberto.costa@teste.com',
     tipo: 'prestador',
     bio: 'Jardineiro e paisagista. Especialista em manutenção de jardins e criação de espaços verdes.',
-    endereco_cidade: 'São Paulo',
+    endereco_cidade: 'Sinop',
     endereco_bairro: 'Vila Olímpia',
     endereco_rua: 'Rua Olimpíadas, 654',
     endereco_cep: '04551-000',
@@ -79,7 +79,7 @@ export const fakeUsers = [
     nota_media: 4.5,
     premium: true,
     servicos: ['Jardinagem'],
-    telefone: '(11) 99999-5555',
+    telefone: '(66) 99914-5353',
     foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Roberto'
   },
   {
@@ -87,7 +87,7 @@ export const fakeUsers = [
     email: 'fernanda.lima@teste.com',
     tipo: 'prestador',
     bio: 'Cabeleireira profissional. Especialista em cortes modernos, coloração e tratamentos capilares.',
-    endereco_cidade: 'São Paulo',
+    endereco_cidade: 'Sinop',
     endereco_bairro: 'Itaim Bibi',
     endereco_rua: 'Rua Bandeira Paulista, 987',
     endereco_cep: '04532-001',
@@ -95,7 +95,7 @@ export const fakeUsers = [
     nota_media: 4.9,
     premium: true,
     servicos: ['Cabeleireiro'],
-    telefone: '(11) 99999-6666',
+    telefone: '(66) 99914-5353',
     foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Fernanda'
   },
   {
@@ -103,7 +103,7 @@ export const fakeUsers = [
     email: 'ricardo.alves@teste.com',
     tipo: 'prestador',
     bio: 'Técnico em ar condicionado. Instalação, manutenção e reparo de equipamentos de climatização.',
-    endereco_cidade: 'São Paulo',
+    endereco_cidade: 'Sinop',
     endereco_bairro: 'Brooklin',
     endereco_rua: 'Av. Santo Amaro, 1500',
     endereco_cep: '04506-000',
@@ -111,7 +111,7 @@ export const fakeUsers = [
     nota_media: 4.4,
     premium: false,
     servicos: ['Ar Condicionado'],
-    telefone: '(11) 99999-7777',
+    telefone: '(66) 99914-5353',
     foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Ricardo'
   },
   {
@@ -119,7 +119,7 @@ export const fakeUsers = [
     email: 'patricia.rocha@teste.com',
     tipo: 'prestador',
     bio: 'Manicure e pedicure profissional. Atendimento domiciliar com materiais esterilizados.',
-    endereco_cidade: 'São Paulo',
+    endereco_cidade: 'Sinop',
     endereco_bairro: 'Perdizes',
     endereco_rua: 'Rua Cardoso de Almeida, 250',
     endereco_cep: '05013-001',
@@ -127,14 +127,14 @@ export const fakeUsers = [
     nota_media: 4.7,
     premium: false,
     servicos: ['Manicure'],
-    telefone: '(11) 99999-8888',
+    telefone: '(66) 99914-5353',
     foto_url: 'https://api.dicebear.com/7.x/avataaars/svg?mouth=smile,serious,default&seed=Patricia'
   },
   {
     nome: 'Pedro Costa',
     email: 'pedro.costa@teste.com',
     tipo: 'cliente',
-    endereco_cidade: 'São Paulo',
+    endereco_cidade: 'Sinop',
     endereco_bairro: 'Itaim Bibi',
     endereco_rua: 'Rua Pedroso Alvarenga, 100',
     endereco_cep: '04531-004',
@@ -145,7 +145,7 @@ export const fakeUsers = [
     nome: 'Julia Ferreira',
     email: 'julia.ferreira@teste.com',
     tipo: 'cliente',
-    endereco_cidade: 'São Paulo',
+    endereco_cidade: 'Sinop',
     endereco_bairro: 'Vila Olímpia',
     endereco_rua: 'Rua Funchal, 200',
     endereco_cep: '04551-060',
@@ -193,7 +193,7 @@ export const createFakeUsers = async () => {
         nome: 'Matheus Roque',
         tipo: 'prestador',
         bio: 'Desenvolvedor e empreendedor, fundador do Zurbo.',
-        endereco_cidade: 'São Paulo',
+        endereco_cidade: 'Sinop',
         endereco_bairro: 'Centro',
         endereco_cep: '01310-100',
         cpf: '000.000.000-00',

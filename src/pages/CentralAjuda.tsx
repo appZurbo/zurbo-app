@@ -64,98 +64,98 @@ const CentralAjuda = () => {
     questions: category.questions.filter(item => item.question.toLowerCase().includes(searchTerm.toLowerCase()) || item.answer.toLowerCase().includes(searchTerm.toLowerCase()))
   })).filter(category => category.questions.length > 0);
   return <div className={`min-h-screen bg-gray-50 ${isMobile ? 'pb-20' : ''}`}>
-      <div className={`${isMobile ? 'px-4 py-4' : 'max-w-4xl mx-auto p-6'}`}>
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-8">
-          <Button variant="ghost" onClick={() => navigate('/')} className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            {!isMobile && 'Voltar'}
-          </Button>
-          <div>
-            <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
-              Central de Ajuda
-            </h1>
-            <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
-              Encontre respostas para suas dúvidas
-            </p>
-          </div>
+    <div className={`${isMobile ? 'px-4 py-4' : 'max-w-4xl mx-auto p-6'}`}>
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-8">
+        <Button variant="ghost" onClick={() => navigate('/')} className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          {!isMobile && 'Voltar'}
+        </Button>
+        <div>
+          <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
+            Central de Ajuda
+          </h1>
+          <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
+            Encontre respostas para suas dúvidas
+          </p>
         </div>
+      </div>
 
-        {/* Search */}
-        <div className="relative mb-8">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <Input placeholder="Buscar na central de ajuda..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
-        </div>
+      {/* Search */}
+      <div className="relative mb-8">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+        <Input placeholder="Buscar na central de ajuda..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
+      </div>
 
-        {/* Contact Options */}
-        <div className="grid gap-4 mb-8 md:grid-cols-3">
-          <Card className="text-center cursor-pointer hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <MessageCircle className="h-8 w-8 text-blue-500 mx-auto mb-3" />
-              <h3 className="font-semibold mb-2">Chat Online</h3>
-              <p className="text-sm text-gray-600">Fale conosco em tempo real</p>
-            </CardContent>
-          </Card>
+      {/* Contact Options */}
+      <div className="grid gap-4 mb-8 md:grid-cols-3">
+        <Card className="text-center cursor-pointer hover:shadow-md transition-shadow">
+          <CardContent className="p-6">
+            <MessageCircle className="h-8 w-8 text-blue-500 mx-auto mb-3" />
+            <h3 className="font-semibold mb-2">Chat Online</h3>
+            <p className="text-sm text-gray-600">Fale conosco em tempo real</p>
+          </CardContent>
+        </Card>
 
-          <Card className="text-center cursor-pointer hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <Mail className="h-8 w-8 text-green-500 mx-auto mb-3" />
-              <h3 className="font-semibold mb-2">Email</h3>
-              <p className="text-sm text-gray-600">contato@zurbo.com</p>
-            </CardContent>
-          </Card>
+        <Card className="text-center cursor-pointer hover:shadow-md transition-shadow">
+          <CardContent className="p-6">
+            <Mail className="h-8 w-8 text-green-500 mx-auto mb-3" />
+            <h3 className="font-semibold mb-2">Email</h3>
+            <p className="text-sm text-gray-600">contato@zurbo.com.br</p>
+          </CardContent>
+        </Card>
 
-          <Card className="text-center cursor-pointer hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <Phone className="h-8 w-8 text-orange-500 mx-auto mb-3" />
-              <h3 className="font-semibold mb-2">Telefone</h3>
-              <p className="text-sm text-gray-600">(11) 99999-9999</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* FAQ */}
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-gray-900">Perguntas Frequentes</h2>
-          
-          {filteredFAQ.length === 0 ? <Card>
-              <CardContent className="p-8 text-center">
-                <p className="text-gray-600">Nenhum resultado encontrado para "{searchTerm}"</p>
-                <Button variant="outline" onClick={() => setSearchTerm('')} className="mt-4">
-                  Limpar busca
-                </Button>
-              </CardContent>
-            </Card> : filteredFAQ.map((category, categoryIndex) => <Card key={categoryIndex}>
-                <CardHeader>
-                  <CardTitle>{category.category}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {category.questions.map((item, index) => <Collapsible key={index}>
-                      <CollapsibleTrigger className="flex w-full items-center justify-between text-left p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                        <span className="font-medium">{item.question}</span>
-                        <ChevronDown className="h-4 w-4 text-gray-500" />
-                      </CollapsibleTrigger>
-                      <CollapsibleContent className="px-3 pb-3">
-                        <p className="text-gray-600 mt-2">{item.answer}</p>
-                      </CollapsibleContent>
-                    </Collapsible>)}
-                </CardContent>
-              </Card>)}
-        </div>
-
-        {/* Still need help */}
-        <Card className="mt-8">
-          <CardContent className="p-8 text-center">
-            <h3 className="text-xl font-semibold mb-4">Ainda precisa de ajuda?</h3>
-            <p className="text-gray-600 mb-6">
-              Nossa equipe de suporte está sempre pronta para ajudar você.
-            </p>
-            <Button className="bg-orange-500 hover:bg-orange-600">
-              Entrar em Contato
-            </Button>
+        <Card className="text-center cursor-pointer hover:shadow-md transition-shadow">
+          <CardContent className="p-6">
+            <Phone className="h-8 w-8 text-orange-500 mx-auto mb-3" />
+            <h3 className="font-semibold mb-2">Telefone</h3>
+            <p className="text-sm text-gray-600">(66) 99914-5353</p>
           </CardContent>
         </Card>
       </div>
-    </div>;
+
+      {/* FAQ */}
+      <div className="space-y-6">
+        <h2 className="text-2xl font-bold text-gray-900">Perguntas Frequentes</h2>
+
+        {filteredFAQ.length === 0 ? <Card>
+          <CardContent className="p-8 text-center">
+            <p className="text-gray-600">Nenhum resultado encontrado para "{searchTerm}"</p>
+            <Button variant="outline" onClick={() => setSearchTerm('')} className="mt-4">
+              Limpar busca
+            </Button>
+          </CardContent>
+        </Card> : filteredFAQ.map((category, categoryIndex) => <Card key={categoryIndex}>
+          <CardHeader>
+            <CardTitle>{category.category}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {category.questions.map((item, index) => <Collapsible key={index}>
+              <CollapsibleTrigger className="flex w-full items-center justify-between text-left p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                <span className="font-medium">{item.question}</span>
+                <ChevronDown className="h-4 w-4 text-gray-500" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="px-3 pb-3">
+                <p className="text-gray-600 mt-2">{item.answer}</p>
+              </CollapsibleContent>
+            </Collapsible>)}
+          </CardContent>
+        </Card>)}
+      </div>
+
+      {/* Still need help */}
+      <Card className="mt-8">
+        <CardContent className="p-8 text-center">
+          <h3 className="text-xl font-semibold mb-4">Ainda precisa de ajuda?</h3>
+          <p className="text-gray-600 mb-6">
+            Nossa equipe de suporte está sempre pronta para ajudar você.
+          </p>
+          <Button className="bg-orange-500 hover:bg-orange-600">
+            Entrar em Contato
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  </div>;
 };
 export default CentralAjuda;

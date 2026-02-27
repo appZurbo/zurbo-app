@@ -9,7 +9,7 @@ export default function PoliticaPrivacidade() {
   return (
     <div className="min-h-screen bg-gray-50">
       <UnifiedHeader />
-      
+
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-8">
           <Link to="/">
@@ -18,7 +18,7 @@ export default function PoliticaPrivacidade() {
               Voltar ao início
             </Button>
           </Link>
-          
+
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Shield className="h-8 w-8 text-white" />
@@ -43,13 +43,13 @@ export default function PoliticaPrivacidade() {
             </CardHeader>
             <CardContent className="prose prose-gray max-w-none">
               <p>
-                No Zurbo, respeitamos profundamente sua privacidade e estamos comprometidos 
-                em proteger suas informações pessoais. Esta política explica como coletamos, 
+                No Zurbo, respeitamos profundamente sua privacidade e estamos comprometidos
+                em proteger suas informações pessoais. Esta política explica como coletamos,
                 usamos, compartilhamos e protegemos suas informações quando você usa nossa plataforma.
               </p>
               <p>
-                Suas informações pessoais (como nome, CPF, email e localização) são utilizadas 
-                exclusivamente para melhorar sua experiência na plataforma e conectá-lo com 
+                Suas informações pessoais (como nome, CPF, email e localização) são utilizadas
+                exclusivamente para melhorar sua experiência na plataforma e conectá-lo com
                 prestadores de serviços adequados às suas necessidades.
               </p>
             </CardContent>
@@ -114,7 +114,7 @@ export default function PoliticaPrivacidade() {
             </CardHeader>
             <CardContent className="prose prose-gray max-w-none">
               <p>
-                <strong>Nunca vendemos suas informações pessoais para terceiros.</strong> 
+                <strong>Nunca vendemos suas informações pessoais para terceiros.</strong>
                 Podemos compartilhar informações apenas nas seguintes situações:
               </p>
               <ul>
@@ -124,9 +124,9 @@ export default function PoliticaPrivacidade() {
                 <li>Em caso de fusão ou aquisição da empresa</li>
                 <li>Com seu consentimento explícito</li>
               </ul>
-              
+
               <p className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500 mt-4">
-                <strong>Importante:</strong> Informações do seu perfil público (nome, foto, avaliações) 
+                <strong>Importante:</strong> Informações do seu perfil público (nome, foto, avaliações)
                 são visíveis para outros usuários da plataforma para facilitar a escolha de serviços.
               </p>
             </CardContent>
@@ -149,10 +149,10 @@ export default function PoliticaPrivacidade() {
                 <li>Auditorias regulares de segurança</li>
                 <li>Backup seguro de dados</li>
               </ul>
-              
+
               <p>
-                Apesar de todos os esforços, nenhum sistema é 100% seguro. 
-                Comprometemo-nos a notificá-lo imediatamente em caso de qualquer 
+                Apesar de todos os esforços, nenhum sistema é 100% seguro.
+                Comprometemo-nos a notificá-lo imediatamente em caso de qualquer
                 violação de dados que possa afetar suas informações.
               </p>
             </CardContent>
@@ -172,15 +172,15 @@ export default function PoliticaPrivacidade() {
                 <li><strong>Oposição:</strong> Opor-se ao processamento de suas informações</li>
                 <li><strong>Limitação:</strong> Limitar como processamos suas informações</li>
               </ul>
-              
+
               <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500 mt-4">
                 <p className="mb-2">
                   <strong>Para exercer seus direitos:</strong>
                 </p>
                 <ul className="mb-0">
                   <li>Acesse as configurações da sua conta</li>
-                  <li>Entre em contato: privacidade@zurbo.com.br</li>
-                  <li>Telefone: (11) 9999-9999</li>
+                  <li>Entre em contato: contato@zurbo.com.br</li>
+                  <li>Telefone: (66) 99914-5353</li>
                 </ul>
               </div>
             </CardContent>
@@ -200,9 +200,9 @@ export default function PoliticaPrivacidade() {
                 <li><strong>Cookies de personalização:</strong> Lembram suas preferências</li>
                 <li><strong>Cookies de marketing:</strong> Usados para publicidade relevante (opcional)</li>
               </ul>
-              
+
               <p>
-                Você pode gerenciar suas preferências de cookies nas configurações do 
+                Você pode gerenciar suas preferências de cookies nas configurações do
                 seu navegador ou através das nossas configurações de privacidade.
               </p>
             </CardContent>
@@ -222,9 +222,9 @@ export default function PoliticaPrivacidade() {
                 <li>Resolver disputas</li>
                 <li>Fazer cumprir nossos acordos</li>
               </ul>
-              
+
               <p>
-                Quando você exclui sua conta, removemos suas informações pessoais, 
+                Quando você exclui sua conta, removemos suas informações pessoais,
                 exceto quando exigido por lei ou para proteção de direitos legítimos.
               </p>
             </CardContent>
@@ -236,7 +236,7 @@ export default function PoliticaPrivacidade() {
             </CardHeader>
             <CardContent className="prose prose-gray max-w-none">
               <p>
-                Podemos atualizar esta Política de Privacidade ocasionalmente. 
+                Podemos atualizar esta Política de Privacidade ocasionalmente.
                 Notificaremos você sobre mudanças significativas através de:
               </p>
               <ul>
@@ -244,9 +244,9 @@ export default function PoliticaPrivacidade() {
                 <li>Notificação na plataforma</li>
                 <li>Aviso em nosso site</li>
               </ul>
-              
+
               <p>
-                Recomendamos que revise esta política periodicamente para se manter 
+                Recomendamos que revise esta política periodicamente para se manter
                 informado sobre como protegemos suas informações.
               </p>
             </CardContent>
@@ -262,9 +262,9 @@ export default function PoliticaPrivacidade() {
               </p>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <ul className="mb-0">
-                  <li><strong>Email:</strong> privacidade@zurbo.com.br</li>
-                  <li><strong>Telefone:</strong> (11) 9999-9999</li>
-                  <li><strong>Endereço:</strong> São Paulo, SP, Brasil</li>
+                  <li><strong>Email:</strong> contato@zurbo.com.br</li>
+                  <li><strong>Telefone:</strong> (66) 99914-5353</li>
+                  <li><strong>Endereço:</strong> Sinop, MT, Brasil</li>
                   <li><strong>Horário:</strong> Segunda a sexta, 9h às 18h</li>
                 </ul>
               </div>
@@ -274,7 +274,7 @@ export default function PoliticaPrivacidade() {
 
         <div className="mt-12 text-center">
           <p className="text-gray-600 mb-4">
-            Sua confiança é fundamental para nós. Estamos sempre trabalhando para 
+            Sua confiança é fundamental para nós. Estamos sempre trabalhando para
             proteger sua privacidade da melhor forma possível.
           </p>
           <Link to="/">
