@@ -59,11 +59,11 @@ const ComoFunciona = () => {
 
   return (
     <UnifiedLayout>
-      <div className={`${isMobile ? 'px-4 py-4' : 'max-w-6xl mx-auto p-6'}`}>
+      <div className={`${isMobile ? 'px-4 py-8' : 'max-w-6xl mx-auto py-16 px-6'}`}>
         {/* Header */}
-        <div className="flex items-center gap-3 mb-8">
-          <Button 
-            variant="ghost" 
+        <div className="flex items-center gap-4 mb-12">
+          <Button
+            variant="ghost"
             onClick={() => navigate('/')}
             className={`${isMobile ? 'h-10 w-10 p-0' : ''}`}
           >
@@ -71,7 +71,7 @@ const ComoFunciona = () => {
             {!isMobile && 'Voltar'}
           </Button>
           <div>
-            <h1 className={`font-bold text-gray-900 ${isMobile ? 'text-xl' : 'text-3xl'}`}>
+            <h1 className={`font-bold text-gray-900 tracking-[-0.02em] leading-[1.1] ${isMobile ? 'text-2xl' : 'text-4xl'}`}>
               Como Funciona o ZURBO
             </h1>
             <p className={`text-gray-600 ${isMobile ? 'text-sm' : ''}`}>
@@ -81,11 +81,11 @@ const ComoFunciona = () => {
         </div>
 
         {/* Hero */}
-        <div className="text-center mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-16">
+          <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-6 tracking-tight">
             Simples, Rápido e Seguro
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
             Nossa plataforma foi criada para facilitar a conexão entre quem precisa de serviços e quem os oferece.
           </p>
         </div>
@@ -97,15 +97,15 @@ const ComoFunciona = () => {
           </h3>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {stepsCliente.map((step, index) => (
-              <Card key={index} className="text-center">
+              <Card key={index} className="text-center border-none shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1">
                 <CardHeader>
-                  <div className="mx-auto mb-4">
+                  <div className="mx-auto mb-4 p-3 bg-blue-50 rounded-2xl">
                     {step.icon}
                   </div>
-                  <CardTitle className="text-lg">{step.title}</CardTitle>
+                  <CardTitle className="text-lg font-bold">{step.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600">{step.description}</p>
+                  <p className="text-gray-600 text-sm leading-relaxed">{step.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -119,15 +119,15 @@ const ComoFunciona = () => {
           </h3>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {stepsPrestador.map((step, index) => (
-              <Card key={index} className="text-center">
+              <Card key={index} className="text-center border-none shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1">
                 <CardHeader>
-                  <div className="mx-auto mb-4">
+                  <div className="mx-auto mb-4 p-3 bg-orange-50 rounded-2xl">
                     {step.icon}
                   </div>
-                  <CardTitle className="text-lg">{step.title}</CardTitle>
+                  <CardTitle className="text-lg font-bold">{step.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600">{step.description}</p>
+                  <p className="text-gray-600 text-sm leading-relaxed">{step.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -136,10 +136,12 @@ const ComoFunciona = () => {
 
         {/* Segurança */}
         <Card className="mb-8">
-          <CardContent className="p-8">
-            <div className="text-center mb-6">
-              <Shield className="h-12 w-12 text-green-500 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold mb-4">Segurança em Primeiro Lugar</h3>
+          <CardContent className="p-8 lg:p-12">
+            <div className="text-center mb-10">
+              <div className="bg-green-50 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <Shield className="h-10 w-10 text-green-500" />
+              </div>
+              <h3 className="text-2xl lg:text-3xl font-bold mb-4 tracking-tight">Segurança em Primeiro Lugar</h3>
             </div>
             <div className="grid gap-6 md:grid-cols-2">
               <div>
@@ -166,10 +168,10 @@ const ComoFunciona = () => {
         <div className="text-center">
           <h3 className="text-xl font-semibold mb-4">Pronto para começar?</h3>
           <div className="flex gap-4 justify-center">
-            <AuthButton className="bg-blue-500 hover:bg-blue-600">
+            <AuthButton className="bg-blue-500 hover:bg-blue-600 transform hover:scale-[1.05] transition-all duration-200 shadow-lg shadow-blue-500/10">
               Buscar Serviços
             </AuthButton>
-            <AuthButton className="bg-orange-500 hover:bg-orange-600">
+            <AuthButton className="bg-orange-500 hover:bg-orange-600 transform hover:scale-[1.05] transition-all duration-200 shadow-lg shadow-orange-500/10">
               Oferecer Serviços
             </AuthButton>
           </div>

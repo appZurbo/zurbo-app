@@ -3,17 +3,17 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import AuthModal from './AuthModal';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
-import { 
-  User, 
-  Settings, 
-  LogOut, 
+import {
+  User,
+  Settings,
+  LogOut,
   Crown,
   Calendar,
   MessageSquare,
@@ -43,7 +43,7 @@ export const Header = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-100">
+    <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
@@ -51,7 +51,7 @@ export const Header = () => {
               onClick={() => navigate('/')}
               className="flex items-center justify-center -m-2 p-0 hover:opacity-80 transition-opacity"
             >
-              <img 
+              <img
                 src="/logoinv.png"
                 alt="Zurbo Logo"
                 className="h-20 w-auto object-contain object-center"
@@ -71,15 +71,15 @@ export const Header = () => {
                   <Info className="h-4 w-4 mr-2" />
                   Informações
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={handleAuthClick}
                   className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-white/30"
                 >
                   Entrar
                 </Button>
-                <Button 
-                  onClick={handleAuthClick} 
+                <Button
+                  onClick={handleAuthClick}
                   className="bg-orange-500 hover:bg-orange-600 shadow-lg"
                 >
                   Cadastrar
@@ -90,14 +90,14 @@ export const Header = () => {
             {user && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     className="relative h-8 w-8 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm"
                   >
                     <div className="flex items-center space-x-2">
                       {profile?.foto_url ? (
-                        <img 
-                          src={profile.foto_url} 
+                        <img
+                          src={profile.foto_url}
                           alt={profile.nome || 'User'}
                           className="h-8 w-8 rounded-full object-cover border-2 border-white/30"
                         />
@@ -126,7 +126,7 @@ export const Header = () => {
                     </div>
                   </div>
                   <DropdownMenuSeparator />
-                  
+
                   <DropdownMenuItem onClick={() => navigate('/settings')}>
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Configurações</span>
@@ -180,7 +180,7 @@ export const Header = () => {
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
-        onLogin={() => {}}
+        onLogin={() => { }}
       />
     </header>
   );

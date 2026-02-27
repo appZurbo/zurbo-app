@@ -46,6 +46,7 @@ const queryClient = new QueryClient();
 
 import { useNativeBridge } from "@/hooks/useNativeBridge";
 import { OnboardingGuard } from "@/components/onboarding/OnboardingGuard";
+import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
 
 // Loading component for lazy loaded pages
 const PageLoader = () => (
@@ -84,6 +85,7 @@ function App() {
           </div>
         )}
         <BrowserRouter>
+          <AnalyticsTracker />
           <OnboardingGuard>
             <Suspense fallback={<PageLoader />}>
               <Routes>

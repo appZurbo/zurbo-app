@@ -67,7 +67,7 @@ export const PrestadorCardImproved = ({
 
   return (
     <div
-      className="p-4 bg-white rounded-2xl shadow-sm border border-[#E6DDD5]/40 flex gap-4 hover:shadow-md transition-shadow cursor-pointer"
+      className="p-4 bg-white rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-[#E6DDD5]/40 flex gap-4 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 cursor-pointer relative overflow-hidden group"
       onClick={handleCardClick}
       style={{
         minWidth: '100%',
@@ -76,6 +76,8 @@ export const PrestadorCardImproved = ({
         opacity: 1
       }}
     >
+      {/* Refined Inner Border effect for top depth */}
+      <div className="absolute inset-x-0 top-0 h-px bg-white/60 pointer-events-none" />
       {/* Avatar with Rating Badge */}
       <div className="relative flex-shrink-0">
         <img

@@ -37,59 +37,59 @@ export const HeroSection = () => {
   };
 
   return (
-    <section className="relative bg-gradient-to-br from-orange-50 via-white to-orange-50 py-16 lg:py-24 overflow-hidden">
+    <section className="relative bg-gradient-to-br from-orange-50 via-white to-orange-50 py-24 lg:py-32 overflow-hidden">
       {/* Background decorativo */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
       <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-orange-200 to-yellow-200 rounded-full blur-3xl opacity-20 -translate-y-1/2 translate-x-1/2"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-br from-blue-200 to-purple-200 rounded-full blur-3xl opacity-20 translate-y-1/2 -translate-x-1/2"></div>
-      
+
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Conteúdo principal */}
           <div className="text-center lg:text-left">
             <div className="mb-6">
-              <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-[1.1] tracking-[-0.02em]">
                 Encontre os
                 <span className="bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent"> melhores</span>
                 <br />
                 profissionais
               </h1>
-              
+
               <p className="text-xl text-gray-600 mb-8 max-w-2xl">
-                Conecte-se com prestadores de serviços qualificados na sua região. 
+                Conecte-se com prestadores de serviços qualificados na sua região.
                 Rápido, seguro e com avaliações reais.
               </p>
             </div>
 
             {/* Barra de busca hero */}
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl mb-8">
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-2xl shadow-orange-500/5 mb-8">
               <CardContent className="p-6">
                 <div className="flex flex-col sm:flex-row gap-3">
                   <div className="flex-1 relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                    <Input 
-                      placeholder="O que você precisa? (ex: limpeza, jardinagem...)" 
-                      value={busca} 
-                      onChange={(e) => setBusca(e.target.value)} 
-                      className="pl-10 h-12 text-base border-gray-200 focus:border-orange-500 focus:ring-orange-500" 
-                      onKeyPress={(e) => e.key === 'Enter' && handleSearch()} 
+                    <Input
+                      placeholder="O que você precisa? (ex: limpeza, jardinagem...)"
+                      value={busca}
+                      onChange={(e) => setBusca(e.target.value)}
+                      className="pl-10 h-12 text-base border-gray-200 focus:border-orange-500 focus:ring-orange-500"
+                      onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                     />
                   </div>
-                  
+
                   <div className="relative min-w-[200px]">
                     <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                    <Input 
-                      placeholder="Sua cidade" 
-                      value={cidade} 
-                      onChange={(e) => setCidade(e.target.value)} 
-                      className="pl-10 h-12 text-base border-gray-200 focus:border-orange-500 focus:ring-orange-500" 
-                      onKeyPress={(e) => e.key === 'Enter' && handleSearch()} 
+                    <Input
+                      placeholder="Sua cidade"
+                      value={cidade}
+                      onChange={(e) => setCidade(e.target.value)}
+                      className="pl-10 h-12 text-base border-gray-200 focus:border-orange-500 focus:ring-orange-500"
+                      onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                     />
                   </div>
-                  
-                  <Button 
-                    onClick={handleSearch} 
-                    className="h-12 px-8 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold"
+
+                  <Button
+                    onClick={handleSearch}
+                    className="h-12 px-8 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold transform hover:scale-[1.02] hover:-translate-y-0.5 transition-all duration-200"
                   >
                     Buscar
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -120,7 +120,7 @@ export const HeroSection = () => {
                 <Play className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform" />
                 Como funciona
               </Button>
-              
+
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <div className="flex -space-x-2">
                   {[1, 2, 3, 4].map((i) => (
